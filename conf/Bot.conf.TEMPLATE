@@ -1,0 +1,72 @@
+<?php
+  /*
+    These are the general settings of the bot:
+  */
+
+  $ao_username = "";               // Account username
+  $ao_password = "";               // Account password (optional, will request on running of Bot if not entered here)
+  $bot_name = "";                  // Name of the bot-character
+  $dimension = "";                 // The name of the server you play on, or (1, 2 or 3 for AO)
+  $guild = "";                     // Name of the guild running the bot (AOC only)
+
+/*
+    Suggested values for owner and super_admin:
+    We suggest that the owner should be the main characer on the
+    account for $ao_username.
+    super_admis should be alts on the same account.
+
+    Defining a superadmin in the config file prevents their removal and banning.
+    You are able to add more superadmins with the ingame interface.
+    Superadmins defined in game are able to be removed and banned.
+*/
+  $owner = "";                     // Owner of the bot.
+  // $super_admin["Superadmin1"] = true;// Bot superadmins.
+  // $super_admin["Superadmin2"] = true;
+
+
+  // $other_bots["Bot1"] = true;   // All other bots that are guildmembers/raidbotmembers
+  // $other_bots["Bot2"] = true;
+
+
+  $guildbot = true;                // false if its a raidbot.
+  $guild_id = 00000001;            // only if its a guildbot.
+
+
+  $log = "chat";                     // logging all/chat/off
+  $log_path = "./log";             // relative/absolute path of logfiles
+  $log_timestamp = "none";	//Valid options are: datetime, date, time, none.  Always defaults to datetime if missing or invalid.
+
+
+  /*
+  The next two entries define a list of additional core and module directories to be loaded after the core/ and custom/core/
+  btw the module/ and custom/module/ directories. The list is parsed as a comma-seperated list relative the the base directory
+  of the bot, without any / at the end of the directory names.
+  */
+  $core_directories = "";	// optional additional core directories
+  $module_directories = "";	// optional additional module directories
+
+
+  $command_prefix = "!";		// Please make sure this is in a Reg-Exp format... (exampe: for "." use "\.")
+  							 	// The prefix cannot be more then one character - either empty or one character (more only for regexp format)
+
+
+  $cron_delay = 30;                // Number of seconds before the cron jobs get executed the first time.
+  $tell_delay = 2222;              // Number of miliseconds between tells. (anti-flooding)
+  $reconnect_time = 60;            // Time to wait for auto reconnect after an error has accured.
+  if(is_numeric($dimension))
+	$max_blobsize = 12000;            // Maximum size of text blobs in byte. For AO
+  else
+	$max_blobsize = 8000;            // Maximum size of text blobs in byte. For AoC
+  $accessallbots = FALSE;			 // Allow Access to All Bots in modules like BotStatistics
+
+  /*
+  WARNING!  Enabling proxies will allow you to pull information from web servers if you have been blocked.
+  The more proxy addresses you have, the slower each lookup will be.  It is recommended that no more than
+  one proxy be added at any given time.  Proxies will only be used as a fallback (if the first lookup fails).
+  Format for $proxy_server_address: IP:PORT (The list is parsed as a comma-seperated list)
+  Example: $proxy_server_address = "4.2.2.2:80,4.2.2.3:80,4.2.2.4:80";
+  */
+  $use_proxy_server = false;                // Enable simple web proxy server for HTTP lookups?
+  $proxy_server_address = "";                // Proxy server to use address to use
+
+?>

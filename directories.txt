@@ -1,0 +1,63 @@
+This file contains a short explanation of the directory structure of BeBot.
+
+Sources
+=======
+The Sources directory contains the base files for the bot.
+These are accessed by name during bot startup.
+Any file in here is required, missing or faulty files lead to fatal errors.
+
+conf
+====
+The conf directory contains the configuration files for the bot(s).
+There are three types of configuration files:
+- [Botname.]Bot.conf to define the user, dimension, account and password the bot uses
+- [Botname.]MySQL.conf to define which mysql server to use, and how to log on to it
+- Botname.Modules.ini contains a list of modules, defining whether they should be loaded or not.
+  This file should never be edited by hand, it's created and written automatically by the bot.
+[Botname.] in the first two cases means that you can put more then one bot into the directory
+structure, if you are loading them with the botname as parameter to the start script. In this
+case there must be a Botname.Bot.conf (with first letters uppercase as seen), which has to
+contain all information usually found in Bot.conf (just copy the file over, and edit it then).
+Botname.MySQL.conf is optional in cases where you want to use different servers, users or databases.
+
+core
+====
+The core directory contains modules offering service not directly to users, but to other modules.
+Modules in here should never contain any user commands, but just offer interfaces to their functions.
+
+custom
+======
+The custom directory contains a core/ and modules/ directory. Here you can place your own custom
+modules. BeBot releases will never touch any files in here.
+
+extra
+=====
+This directory contains useful extras that help running the bot, but aren't really needed.
+The extras should contain some readme file.
+
+log
+===
+This is the default directory used for logging. It contains one subdirectory per bot used, in the
+format botname@RKx, with botname and x replaced.
+
+main
+====
+This directory contains the most important core modules of the bot, the ones absolutely needed by
+the Bot class to even run without errors.
+The files in here are named in a special way: XY-Filename.php. Filename.php would be the usual
+php file name, as could be used for any core module. XY together is a two-digit number. These
+numbers are used to define the order in which these modules are loaded. Any php file not starting
+with XY- as described above are ignored.
+
+modules
+=======
+This directory contains all modules, which offer the in-game command interface.
+
+themes
+======
+This directory contains the color theme(s) of the bot(s). Those are simple XML files.
+BeBot defines a default scheme.
+
+txt
+===
+This directory can be used to store text files that are used by modules to be displayed ingame.

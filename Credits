@@ -1,0 +1,58 @@
+/*
+*
+* BeBot - An Anarchy Online & Age of Conan Chat Automaton
+* Copyright (C) 2004 Jonas Jax
+* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+*
+* Developed by:
+* - Alreadythere (RK2)
+* - Blondengy (RK1)
+* - Blueeagl3 (RK1)
+* - Glarawyn (RK1)
+* - Khalem (RK1)
+* - Naturalistic (RK1)
+* - Temar (RK1)
+*
+*  This program is free software; you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation; either version 2 of the License.
+*
+*  This program is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with this program; if not, write to the Free Software
+*  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+*  USA
+*/
+
+/*
+* This file attempts to aknowledge and give credit to everyone who have directly or indirectly
+* helped in the development of BeBot over the years.
+* Names are never to be removed from this list.
+* If you redistribute BeBot or fork it, please include this file.
+*/
+
+BeBot was created by Jonas Jax (Blondengy (RK1)) in 2004 with spiritual guidance by Thomas J. Stensås (Khalem (RK1)).
+
+Currently maintained by a small group of dedicated community members with good help from the Anarchy Online community at large.
+
+The following people have written code that have made it into BeBot in one form or another:
+	- Akarah (RK1)
+	- Bigburtha (RK2) aka Craized
+	- Derroylo (RK2)
+	- Ebag333 (RK2)
+	- Foxferal (RK1)
+	- Jackjonez (RK1)
+	- Parfet (RK2)
+	- Sabkor (RK1)
+	- Temar (RK1)
+	- Vhab (RK1)
+	- Wolfbiter (RK1)
+	- Xenixa (RK1)
+	- Zacix (RK2)
+	- Zarkingu (RK2)
+	
+Special thanks go out to the best MMORPG community in exsistance and Auno for writing and maintaining the PHP AOChat library.

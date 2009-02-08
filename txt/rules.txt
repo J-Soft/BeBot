@@ -1,0 +1,7 @@
+<font color=CCInfoHeader>Rules for <botname></font><font color=CCInfoText>
+
+1. Rule 1
+
+2. Rule 2
+
+3. Rule 3
