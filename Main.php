@@ -31,11 +31,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2009-01-24 22:05:05 +0100 (Sat, 24 Jan 2009) $
-* Revision: $Id: Main.php 1961 2009-01-24 21:05:05Z alreadythere $
+* File last changed at $LastChangedDate: 2009-01-24 21:08:06 +0000 (Sat, 24 Jan 2009) $
+* Revision: $Id: Main.php 1963 2009-01-24 21:08:06Z alreadythere $
 */
 
-$bot_version = "0.6.2";
+$bot_version = "0.6.3";
 $php_version = phpversion();
 
 /*

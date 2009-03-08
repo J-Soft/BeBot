@@ -43,7 +43,7 @@
 	$server_list['aoc']['Wiccana'] = array('server'=>'208.82.194.5', 'port'=>7002);
 	$server_list['aoc']['Bloodspire'] = array('server'=>'208.82.194.7', 'port'=>7006);
 	$server_list['aoc']['Ironspine'] = array('server'=>'208.82.194.7', 'port'=>7007);
-	$server_list['aoc']['Tyranny'] = array('server'=>'208.82.194.6', 'port'=>7009);
+	$server_list['aoc']['Tyranny'] = array('server'=>'208.82.194.6', 'port'=>7003);
 	$server_list['aoc']['Cimmeria'] = array('server'=>'208.82.194.6', 'port'=>7004);
 	$server_list['aoc']['Agony'] = array('server'=>'208.82.194.7', 'port'=>7008);
 

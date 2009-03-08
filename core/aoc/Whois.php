@@ -92,7 +92,7 @@ class Whois_Core extends BasePassiveModule
 
 	function update_table()
 	{
-		if ($this -> bot -> db -> get_version("whois") == 2)
+		if ($this -> bot -> db -> get_version("whois") == 3)
 		{
 			return;
 		}

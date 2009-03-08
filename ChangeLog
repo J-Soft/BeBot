@@ -1,6 +1,12 @@
 -------------
 Version 0.6.1
 -------------
+- Fixed Tyranny Port
+- Fixed Update to whois table
+
+-------------
+Version 0.6.1
+-------------
 - Fixed a bug in buddy list handling of the Roster core.
 - setcraft now has the option to set it as None, Update by gerborg
 - Moved ServerList into conf folder and Checked US server List, 9 Updated, 6 Added
@@ -13,6 +19,7 @@ Version 0.6.1
 - Updated All US and some EU Servers with New names and ip's
 - Added sending of shutdown/restart reason
 - Now allows password to be entered on loading of StartBot.php
+
 
 -------------
 Version 0.6.0
