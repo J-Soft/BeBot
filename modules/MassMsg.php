@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: MassMsg.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2009-03-12 04:45:44 +0000 (Thu, 12 Mar 2009) $
+* Revision: $Id: MassMsg.php 5 2009-03-12 04:45:44Z temar $
 */
 
 
@@ -161,14 +161,22 @@ class MassMsg extends BaseActiveModule
 			{
 				if($massinv)
 				{
-					//Check if they've already gotten the tell so we don't spam unneccessarily.
-					if(!$status[$recipient]['sent'])
+					if($this -> bot -> core("online") -> in_chat($recipient))
 					{
-						$this->bot->send_tell($recipient, $message, 0, FALSE, TRUE, FALSE);
-						$status[$recipient]['sent']=true;
+						$status[$recipient]['sent']=FALSE;
+						$status[$recipient]['pg']=true;
 					}
-					$this->bot->core('chat')->pgroup_invite($recipient);
-					$status[$recipient]['invited']=true;
+					else
+					{
+						//Check if they've already gotten the tell so we don't spam unneccessarily.
+						if(!$status[$recipient]['sent'])
+						{
+							$this->bot->send_tell($recipient, $message, 0, FALSE, TRUE, FALSE);
+							$status[$recipient]['sent']=true;
+						}
+						$this->bot->core('chat')->pgroup_invite($recipient);
+						$status[$recipient]['invited']=true;
+					}
 				}
 				else
 				{
