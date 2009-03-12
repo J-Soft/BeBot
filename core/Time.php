@@ -33,8 +33,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: Time.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2009-03-08 19:46:18 +0000 (Sun, 08 Mar 2009) $
+* Revision: $Id: Time.php 2 2009-03-08 19:46:18Z temar $
 */
 
 $time_core = new Time_Core($bot);
@@ -117,11 +117,16 @@ class Time_Core extends BaseActiveModule
 	*/
 	function format_seconds($totalsec)
 	{ // Start function format_seconts()
+		if($totalsec < 0)
+		{
+			$minus = "-";
+			$totalsec = $totalsec - ($totalsec * 2);
+		}
 		$hours = floor( $totalsec / (60*60) );
 		$rest = $totalsec % (60*60);
 		$minutes = floor( $rest / 60 );
 		$seconds = $rest % 60;
-		return sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
+		return sprintf($minus."%02d:%02d:%02d", $hours, $minutes, $seconds);
 	} // End function format_seconts()
 
 	function parse_time($timestr)
