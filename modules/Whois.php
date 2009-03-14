@@ -234,7 +234,7 @@ class Whois extends BaseActiveModule
 				}
 				$result .= " :: " . $this -> bot -> core("whois") -> whois_details($source, $who);
 			}
-			else if ($this -> bot -> core("settings") -> get("Whois", "Alts") == TRUE)
+			elseif ($this -> bot -> core("settings") -> get("Whois", "Alts"))
 			{
 				$alts = $this -> bot -> core("alts") -> show_alt($name);
 				if ($alts['alts'])

@@ -40,8 +40,6 @@ $whois_core = new Whois_Core($bot);
 
 class Whois_Core extends BasePassiveModule
 {
-	var $bot;
-
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
