@@ -185,12 +185,12 @@ class Security_Core extends BaseActiveModule
 	{ // Start function connect()
 		// Bind the command to the bot
 		// Can't be done earlier as otherwise we'd end in a requirement loop with access control
-		$this -> register_command("all", "security", "OWNER");
-		$this -> register_command("all", "adduser", "OWNER");
-		$this -> register_command("all", "deluser", "OWNER");
-		$this -> register_command("all", "addgroup", "OWNER");
-		$this -> register_command("all", "delgroup", "OWNER");
-		$this -> register_command("all", "admin", "OWNER");
+		$this -> register_command("all", "security", "SUPERADMIN");
+		$this -> register_command("all", "adduser", "SUPERADMIN");
+		$this -> register_command("all", "deluser", "SUPERADMIN");
+		$this -> register_command("all", "addgroup", "SUPERADMIN");
+		$this -> register_command("all", "delgroup", "SUPERADMIN");
+		$this -> register_command("all", "admin", "SUPERADMIN");
 
 		$this -> enable();
 
