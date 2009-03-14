@@ -6,6 +6,7 @@ Version 0.6.2
 - Fixed Check for in PG for mass invite
 - Fixed Links in Main blob for maintenance
 - Added Optional Timer to Raffle as well as support for Item output useing &item& lowid highid ql name
+- Fixed pgleave in Raid
 
 -------------
 Version 0.6.1
