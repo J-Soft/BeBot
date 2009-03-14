@@ -61,7 +61,6 @@ class Conf
 				system('stty -echo');
 				$this -> pw = trim(fgets(STDIN));
 				system('stty echo');
-				echo "password is ".$this -> pw; die;
 			}
 		}
 	}
