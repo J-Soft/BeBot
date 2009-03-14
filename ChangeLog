@@ -7,6 +7,7 @@ Version 0.6.2
 - Fixed Links in Main blob for maintenance
 - Added Optional Timer to Raffle as well as support for Item output useing &item& lowid highid ql name
 - Fixed pgleave in Raid
+- Added a Fix for blobs that are too large for preg_match
 
 -------------
 Version 0.6.1
