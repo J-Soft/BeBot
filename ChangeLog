@@ -5,6 +5,7 @@ Version 0.6.2
 - Fixed Update to whois table
 - Fixed Check for in PG for mass invite
 - Fixed Links in Main blob for maintenance
+- Added Optional Timer to Raffle as well as support for Item output useing &item& lowid highid ql name
 
 -------------
 Version 0.6.1
