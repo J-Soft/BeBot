@@ -4,6 +4,7 @@ Version 0.6.2
 - Fixed Tyranny Port
 - Fixed Update to whois table
 - Fixed Check for in PG for mass invite
+- Fixed Links in Main blob for maintenance
 
 -------------
 Version 0.6.1
