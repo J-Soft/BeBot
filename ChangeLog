@@ -17,6 +17,9 @@ Version 0.6.2
 - Changed link inside !online to use !alts if alts arnt shows in whois (can be changed to use !alts by setting too)
 - Added Option to view all alts inc the name you used inside alts Blob
 - Added a Trigger in alts module for a check in points module
+- Added a Reason part to add and Remove Points
+- Added Logging of points
+- Improved working and added some check to help prevent points being on wrong char
 
 -------------
 Version 0.6.1
