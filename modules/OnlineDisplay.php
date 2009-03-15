@@ -110,6 +110,8 @@ class OnlineDisplay extends BaseActiveModule
 		$this -> bot -> core("settings") -> create("Online", "IRCText", "Users on IRC", "What title should be displayed when IRC members are listed?");
 		$this -> bot -> core("settings") -> create("Online", "IRCbot", $this -> bot -> botname, "What is the name of the bot used for IRC?");
 		$this -> bot -> core("settings") -> create("Online", "irc", FALSE, "Should IRC be included in the Online List");
+		$this -> bot -> core("settings") -> create("Online", "whois_alts_cmd", TRUE, "Should <pre>whois be used Instead of <pre>alts for link inside window (default to <pre>alts if alt list isnt shown in whois)");
+		$this -> bot -> core("settings") -> create("Online", "RaidStatus", TRUE, "Should Raid Status Be shown");
 
 		$this -> bot -> core("colors") -> define_scheme("online", "title", "blob_title");
 		$this -> bot -> core("colors") -> define_scheme("online", $this -> cp, "seagreen");
@@ -315,23 +317,43 @@ class OnlineDisplay extends BaseActiveModule
 				$main = $this -> bot -> core("alts") -> main($player[0]);
 				$alts = $this -> bot -> core("alts") -> get_alts($main);
 
+				if ($this -> bot -> exists_module("raid") && $this -> bot -> core("raid") -> raid && $this -> bot -> core("settings") -> get("Online", "RaidStatus"))
+				{
+					if(isset($this -> bot -> core("raid") -> user[$player[0]]))
+					{
+						$raid = " :: ##green##In Raid##end## ";
+					}
+					elseif(isset($this -> bot -> core("raid") -> user2[$player[0]]))
+					{
+						$raid = " :: ##red##".$this -> bot -> core("raid") -> user2[$player[0]]."##end## ";
+					}
+					else
+					{
+						$raid = " :: ##red##Not in Raid##end## ";
+					}
+				}
+
 				if ($this -> bot -> core("settings") -> get("Online", "Showaccesslevel") && $this -> bot -> core("security") -> check_access($player[0], "LEADER"))
 				{
 					$level = $this -> bot -> core("security") -> get_access_name($this -> bot -> core("security") -> get_access_level($player[0]));
 					$admin = " :: " . $this -> bot -> core("colors") -> colorize("online_title", ucfirst(strtolower($level))) . " ";
 				}
 
+				if($this -> bot -> core("settings") -> get("Online", "whois_alts_cmd") && $this -> bot -> core("settings") -> get("Whois", "Alts"))
+					$altcmd = "whois";
+				else
+					$altcmd = "alts";
 				if (empty($alts) || !$this -> bot -> core("settings") -> get("Online", "Showalts"))
 				{
 					$alts = "";
 				}
 				else if ($main == $this -> bot -> core("chat") -> get_uname($player[0]))
 				{
-					$alts = ":: ".$this -> bot -> core("tools") -> chatcmd("whois " . $player[0], "Details")." ::";
+					$alts = ":: ".$this -> bot -> core("tools") -> chatcmd($altcmd." " . $player[0], "Details")." ::";
 				}
 				else
 				{
-					$alts = ":: ".$this -> bot -> core("tools") -> chatcmd("whois " . $player[0], $main . "'s Alt")." ";
+					$alts = ":: ".$this -> bot -> core("tools") -> chatcmd($altcmd." " . $player[0], $main . "'s Alt")." ";
 				}
 
 				$charinfo = "";
@@ -366,7 +388,7 @@ class OnlineDisplay extends BaseActiveModule
 				$online_list .= $this -> bot -> core("colors") -> colorize("online_characters", " - Lvl " . $player[1]);
 				if($this -> bot -> game == "ao")
 					$online_list .= "/" . $player[5];
-				$online_list .= $this -> bot -> core("colors") -> colorize("online_characters", " " . $player[0] . " " . $charinfo . $admin . $alts);
+				$online_list .= $this -> bot -> core("colors") -> colorize("online_characters", " " . $player[0] . " " . $charinfo . $raid . $admin . $alts);
 				if($this -> bot -> commands["tell"]["afk"] -> afk[$player[0]])
 				{
 					$online_list .= ":: " . $this -> bot -> core("colors") -> colorize("online_afk", "( AFK )") . "\n";

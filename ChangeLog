@@ -13,6 +13,8 @@ Version 0.6.2
 - Added Encription of Chat option to relay (req mhash & mcrypt)
 - Added ignore setting for those users who maybe not want in your gc but want to still have relay with other org
 - Added option of not having other org prefix shown
+- Added Raid Status to !online
+- Changed link inside !online to use !alts if alts arnt shows in whois (can be changed to use !alts by setting too)
 
 -------------
 Version 0.6.1
