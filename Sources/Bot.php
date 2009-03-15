@@ -1581,6 +1581,12 @@ class Bot
 		unset($this -> module_links[strtolower($name)]);
 	}
 
+	public function exists_module($name)
+	{
+		$name = strtolower($name);
+		Return (isset($this -> module_links[$name]))
+	}
+
 	// Returns the reference to the module registered under $name. Returns NULL if link is not registered.
 	public function core($name)
 	{
