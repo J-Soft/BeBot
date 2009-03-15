@@ -8,6 +8,11 @@ Version 0.6.2
 - Added Optional Timer to Raffle as well as support for Item output useing &item& lowid highid ql name
 - Fixed pgleave in Raid
 - Added a Fix for blobs that are too large for preg_match
+- Added Relaying of Buddy Actions to Allow !online to include other org (when dif host)
+- Improved Relay Bot responsed on getting bot into the pg
+- Added Encription of Chat option to relay (req mhash & mcrypt)
+- Added ignore setting for those users who maybe not want in your gc but want to still have relay with other org
+- Added option of not having other org prefix shown
 
 -------------
 Version 0.6.1
