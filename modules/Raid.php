@@ -163,8 +163,8 @@ class Raid extends BaseActiveModule
 			if (isset($this -> user[$name]))
 			{
 				unset($this -> user[$name]);
-				return "##highlight##$name##end## was removed from the raid.";
 				$this -> bot -> db -> query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this -> points_to($name));
+				$this -> bot -> send_output("", "##highlight##$name##end## was removed from the raid.", "both");
 			}
 		}
 	}
