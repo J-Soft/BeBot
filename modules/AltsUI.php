@@ -221,6 +221,7 @@ class Alts extends BaseActiveModule
 		}
 		$this -> bot -> db -> query("INSERT INTO #___alts (alt, main) VALUES ('$alt', '$main')");
 		$this -> bot -> core("alts") -> add_alt($main, $alt);
+		$this -> bot -> core("points") -> check_alts($main);
 		return "##highlight##$alt##end## has been registered as a new alt of ##highlight##$main##end##.";
 	}
 
