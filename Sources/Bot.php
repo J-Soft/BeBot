@@ -374,7 +374,7 @@ class Bot
 	*/
 	function send_irc($prefix, $name, $msg)
 	{
-		if (isset($this -> irc) && $this -> core("settings") -> exists("irc", "connected"))
+		if (isset($this -> irc) && $this -> exists_module("irc"))
 		{
 			if ($this -> core("settings") -> get("Irc", "Connected"))
 			{
@@ -1584,7 +1584,7 @@ class Bot
 	public function exists_module($name)
 	{
 		$name = strtolower($name);
-		Return (isset($this -> module_links[$name]))
+		Return (isset($this -> module_links[$name]));
 	}
 
 	// Returns the reference to the module registered under $name. Returns NULL if link is not registered.

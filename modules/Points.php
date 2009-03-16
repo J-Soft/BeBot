@@ -393,7 +393,7 @@ class Points extends BaseActiveModule
 							$check = $this -> bot -> db -> select("SELECT nickname, beast_points, zods_points FROM #___raid_points WHERE id = " . $this -> points_to($res[1]));
 							if($check[0][1] != ($res[2] + $resu[0][1]) || $check[0][2] != ($res[3] + $resu[0][2]))
 							{
-								echo "Error With Transfering Points from Alt $alt to $main");
+								echo "Error With Transfering Points from Alt $alt to $main";
 							}
 							else
 							{

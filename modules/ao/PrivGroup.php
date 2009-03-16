@@ -63,6 +63,7 @@ class PrivGroup extends BaseActiveModule
 
 		$this -> register_alias("invite", "inviteuser");
 		$this -> register_alias("kick", "kickuser");
+		$this -> register_alias("kickall", "kick all");
 
 		$this -> register_event("pgjoin");
 		$this -> register_event("pgleave");

@@ -264,7 +264,7 @@ class Preferences_core extends BasePassiveModule
 
 	function exists($module, $setting)
 	{
-		return(isset($this->cache['def'][strtolower($module)][strtolower($setting)]))
+		return(isset($this->cache['def'][strtolower($module)][strtolower($setting)]));
 	}
 
 	function show_modules($name)
