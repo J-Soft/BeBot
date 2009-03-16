@@ -146,7 +146,7 @@ class Preferences_core extends BasePassiveModule
 	function get($name, $module=false, $setting=false)
 	{
 		//Check if $name is already a uid.
-		if(is_numeric($name) )
+		if(is_numeric($name))
 		{
 			$uid = $name;
 		}
@@ -246,32 +246,25 @@ class Preferences_core extends BasePassiveModule
 		$query = "UPDATE #___preferences_def SET default_value = '$value' WHERE module='$module' AND name='$setting' LIMIT 1";
 		$this -> bot -> db -> query($query);
 		//Remove custom preferences for this module->setting
-		$query = "DELETE FROM #___preferences WHERE pref_id=(SELECT ID FROM #___preferences_def WHERE module='$module' AND name='$setting' LIMIT 1)";
+		//$query = "DELETE FROM #___preferences WHERE pref_id=(SELECT ID FROM #___preferences_def WHERE module='$module' AND name='$setting' LIMIT 1)";
 		//Update the cache.
 		$this->cache['def'][$module][$setting]=$value;
 		//Remove any customisation for this cached entry
-		foreach($this->cache as &$user)
-		{
-			if(isset($user[$module][$setting]))
-			{
-				unset($user[$module][$setting]);
-			}
-		}
-		unset($user);
+		//foreach($this->cache as &$user)
+		//{
+		//	if(isset($user[$module][$setting]))
+		//	{
+		//		unset($user[$module][$setting]);
+		//	}
+		//}
+		//unset($user);
 		$this -> bot -> log ("PREFS", "CHANGE", "$name changed the default value for setting $module -> $setting to $value");
 		return("The default value for {$module}->{$setting} has been set to '$value'.");
 	}
 
 	function exists($module, $setting)
 	{
-		if(isset($this->cache['def'][strtolower($module)][strtolower($setting)]))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return(isset($this->cache['def'][strtolower($module)][strtolower($setting)]))
 	}
 
 	function show_modules($name)

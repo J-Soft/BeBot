@@ -20,6 +20,7 @@ Version 0.6.2
 - Added a Reason part to add and Remove Points
 - Added Logging of points
 - Improved working and added some check to help prevent points being on wrong char
+- Fixed Issue with Default preference not being cached when changed
 
 -------------
 Version 0.6.1
