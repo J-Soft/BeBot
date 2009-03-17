@@ -195,8 +195,8 @@ class Is extends BaseActiveModule
 							{
 								$this->is_queue[$source][$name]='Offline';
 							}
-							//This toon is no longer needed in the buddy list.
-							$this->bot->core('chat')->buddy_remove($name);
+							// This toon is removed by the inc_buddy() function of the buddy list already.
+							// No buddy_remove() needed.
 							$this->queue_counter--;
 						}
 					}

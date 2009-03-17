@@ -1,6 +1,7 @@
 -------------
 Version 0.6.2
 -------------
+- Fixed double removal on !is calls for people not on the notify list
 - Fixed Tyranny Port
 - Fixed Update to whois table
 - Fixed Check for in PG for mass invite
