@@ -1,4 +1,9 @@
 -------------
+Version 0.6.3
+-------------
+- Fixed stripping of control characters on text from IRC (logon/logoff)
+
+-------------
 Version 0.6.2
 -------------
 - Fixed double removal on !is calls for people not on the notify list

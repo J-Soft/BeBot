@@ -426,16 +426,16 @@ class IRC extends BaseActiveModule
 							{
 								$alts = " :: Alt of " . $main;
 							}
-
-							$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "", '3**** '.$res.$alts);
-							$this -> last_log["on"][$name] = time();
-						}
-					}
-					else
-					{
-						if ($this -> last_log["off"][$name] < (time() - 5))
-						{
-							$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "",'3**** '.$name.' has logged off.');
+							
+							$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "", chr(2).chr(3).'3***'.chr(2)." ".$res.$alts);
+                            $this -> last_log["on"][$name] = time();
+                            }
+                        }
+                        else
+                        {
+                            if ($this -> last_log["off"][$name] < (time() - 5))
+                            {
+                            $this -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "", chr(2).chr(3).'3***'.chr(2)." " .$name. " has logged off.");
 							$this -> last_log["off"][$name] = time();
 						}
 					}
@@ -760,6 +760,9 @@ class IRC extends BaseActiveModule
 				$txt = "##irc_group##" . $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . "##end## ##irc_user##" . $data -> nick . ":##end####irc_text## " . $msg . "##end##";
 			}
 
+			// Strip any control characters that might be lingering before we send out.
+			$txt = preg_replace('/[^(\x20-\x7F)]*/','', $txt);
+			
 			$this -> bot -> send_output("", $txt, $this -> bot -> core("settings") -> get("Irc", "Chat"));
 
 			if ($this -> bot -> core("settings") -> get("Irc", "Useguildrelay")
