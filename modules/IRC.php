@@ -472,7 +472,7 @@ class IRC extends BaseActiveModule
 		if ((strtolower($this -> bot -> core("settings") -> get("Irc", "AnnounceWhat")) == "joins")
 		|| (strtolower($this -> bot -> core("settings") -> get("Irc", "AnnounceWhat")) == "both"))
 		{
-			$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "IrcGuestprefix"), "", '3**** '.$name.' has joined the guest channel.');
+			$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "IrcGuestprefix"), "", '3*** '.$name.' has joined the guest channel.');
 		}
 	}
 
@@ -489,7 +489,7 @@ class IRC extends BaseActiveModule
 		if ((strtolower($this -> bot -> core("settings") -> get("Irc", "AnnounceWhat")) == "joins")
 		|| (strtolower($this -> bot -> core("settings") -> get("Irc", "AnnounceWhat")) == "both"))
 		{
-			$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "IrcGuestprefix"), "", '3**** '.$name.' has left the guest channel.');
+			$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "IrcGuestprefix"), "", '3*** '.$name.' has left the guest channel.');
 		}
 	}
 
@@ -762,6 +762,8 @@ class IRC extends BaseActiveModule
 
 			// Strip any control characters that might be lingering before we send out.
 			$txt = preg_replace('/[^(\x20-\x7F)]*/','', $txt);
+			$txt = preg_replace('/3\*\*\*/', '***', $txt);
+
 			
 			$this -> bot -> send_output("", $txt, $this -> bot -> core("settings") -> get("Irc", "Chat"));
 
