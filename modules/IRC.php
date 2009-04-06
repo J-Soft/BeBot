@@ -1049,12 +1049,16 @@ class IRC extends BaseActiveModule
 			unset($this -> irconline[strtolower($data -> nick)]);
 			$this -> irconline[strtolower($data -> message)] = strtolower($data -> message);
 		}
-		if ((strtolower($this -> bot -> core("settings") -> get("Irc", "Chat")) == "both") ||
-		(strtolower($this -> bot -> core("settings") -> get("Irc", "Chat")) == "pgroup"))
-			$this -> bot -> send_pgroup($data -> nick . ' is now known as ' . $data -> message);
-		if ((strtolower($this -> bot -> core("settings") -> get("Irc", "Chat")) == "both") ||
-		(strtolower($this -> bot -> core("settings") -> get("Irc", "Chat")) == "gc"))
-			$this -> bot -> send_gc($data -> nick . ' is now known as ' . $data -> message);
+		
+		$txt = "##irc_group##" . $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . "##end## ##irc_user##" . $data -> nick . "##end####irc_text## is known as##end## ##irc_user##". $data -> message"##end##";
+		
+		$this -> bot -> send_output("", $txt, $this -> bot -> core("settings") -> get("Irc", "Chat"));
+
+		if ($this -> bot -> core("settings") -> get("Irc", "Useguildrelay") && $this -> bot -> core("settings") -> get("Relay", "Relay"))
+		{
+			$this -> bot -> core("relay") -> relay_to_bot($txt);
+		}
+		
 		$this -> bot -> db -> query("UPDATE #___online SET nickname = '".$data -> message."' WHERE botname = '".$this -> bot -> botname . " - IRC' AND nickname = '".$data -> nick."'");
 	}
 	
