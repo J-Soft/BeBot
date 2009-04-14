@@ -1122,42 +1122,42 @@ class Security_Core extends BaseActiveModule
 			{
 				$superadmins .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$superadmins .= "\n";
-				$superadmins .= "        ".$this -> make_group_member_list($group['gid']);
+				$superadmins .= $this -> make_group_member_list($group['gid']);
 				$superadmins .= "\n";
 			}
 			elseif ($group['access_level'] == ADMIN)
 			{
 				$admins .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$admins .= "\n";
-				$admins .= "        ".$this -> make_group_member_list($group['gid']);
+				$admins .= $this -> make_group_member_list($group['gid']);
 				$admins .= "\n";
 			}
 			elseif ($group['access_level'] == LEADER)
 			{
 				$leaders .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$leaders .= "\n";
-				$leaders .= "        ".$this -> make_group_member_list($group['gid']);
+				$leaders .= $this -> make_group_member_list($group['gid']);
 				$leaders .= "\n";
 			}
 			elseif ($group['access_level'] == MEMBER)
 			{
 				$members .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$members .= "\n";
-				$members .= "        ".$this -> make_group_member_list($group['gid']);
+				$members .= $this -> make_group_member_list($group['gid']);
 				$members .= "\n";
 			}
 			elseif ($group['access_level'] == GUEST)
 			{
 				$guests .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$guests .= "\n";
-				$guests .= "        ".$this -> make_group_member_list($group['gid']);
+				$guests .= $this -> make_group_member_list($group['gid']);
 				$guests .= "\n";
 			}
 			elseif ($group['access_level'] == ANONYMOUS)
 			{
 				$anon .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$anon .= "\n";
-				$anon .= "        ".$this -> make_group_member_list($group['gid']);
+				$anon .= $this -> make_group_member_list($group['gid']);
 				$anon .= "\n";
 			}
 		}
@@ -1183,11 +1183,11 @@ class Security_Core extends BaseActiveModule
 		$tmp = "";
 		if (empty($this -> cache['groups'][$gid]['members']))
 		{
-			return "- No members.";
+			return "        - No members.";
 		}
 		foreach ($this -> cache['groups'][$gid]['members'] as $member)
 		{
-			$tmp .= "- ".$member."\n";
+			$tmp .= "        - ".$member."\n";
 		}
 		return rtrim($tmp);
 	} // End function make_group_member_list()
