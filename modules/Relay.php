@@ -292,20 +292,10 @@ class Relay extends BaseActiveModule
 			$main = "";
 			if ($name != "0")
 			{
-				if ($this -> bot -> core("settings") -> get('Relay', 'ShowMain') != "")
+				if ($name != "0")
 				{
-					$main = $this -> bot -> core("alts") -> main($name);
-					if ($main&& (strcasecmp($main, $name) != 0))
-					{
-						if (strlen($main) > ($this -> bot -> core("settings") -> get('Relay', 'TruncateMain')))
-						{
-							$main = substr($main, 0, ($this -> bot -> core("settings") -> get('Relay', 'TruncateMain')));
-							$main = "$main~";
-						}
-						$mainstr = " ##relay_mainname##(" . $main . ")##end##";
-					}
+					$namestr = $this -> get_namestring($name);
 				}
-				$namestr = "##relay_name##" . $name . $mainstr . ":##end## ";
 			}
 			if($this -> bot -> core("settings") -> get('Relay', 'Gcname') != "")
 			{
@@ -392,25 +382,11 @@ class Relay extends BaseActiveModule
 		if ($this -> bot -> core("settings") -> get('Relay', 'Status'))
 		{
 			$namestr = "";
-			$mainstr = "";
-			$main = "";
 			if ($name != "0")
 			{
-				if ($this -> bot -> core("settings") -> get('Relay', 'ShowMain') != "")
-				{
-					$main = $this -> bot -> core("alts") -> main($name);
-					if ($main && (strcasecmp($main, $name) != 0))
-					{
-						if (strlen($main) > ($this -> bot -> core("settings") -> get('Relay', 'TruncateMain')))
-						{
-							$main = substr($main, 0, ($this -> bot -> core("settings") -> get('Relay', 'TruncateMain')));
-							$main = "$main~";
-						}
-						$mainstr = " ##relay_mainname##(" . $main . ")##end##";
-					}
-				}
-				$namestr = "##relay_name##" . $name . $mainstr . ":##end## ";
+				$namestr = $this -> get_namestring($name);
 			}
+
 			$relaystring = "[##relay_channel##" . $this -> bot -> core("settings") -> get('Relay', 'Pgname') . "##end##] " . $namestr . "##relay_message##" . $msg . " ##end##";
 			if ($this -> bot -> core("settings") -> get('Relay', 'Priv') == "Both" || $this -> bot -> core("settings") -> get('Relay', 'Priv') == "Guildchat")
 			{
@@ -894,6 +870,28 @@ class Relay extends BaseActiveModule
 			$return['ciphrtxt'] = $rec_string;
 		}
 		return $return;
+	}
+	/*
+	Take a supplied name a build a namestring containing colors and additional information for it to be used in relay.
+	*/
+	function get_namestring($name)
+	{
+		if ($this -> bot -> core("settings") -> get('Relay', 'ShowMain') != "")
+		{
+			$main = $this -> bot -> core("alts") -> main($name);
+			if ($main && (strcasecmp($main, $name) != 0))
+			{
+				$truncatelen = ($this -> bot -> core("settings") -> get('Relay', 'TruncateMain'));
+				if ((strlen($main) > $truncatelen) && (strlen($main) > ($truncatelen + 1)))
+				{
+					$main = substr($main, 0, $truncatelen);
+					$main = "$main~";
+				}
+				$mainstr = " ##relay_mainname##(" . $main . ")##end##";
+			}
+		}
+		$namestr = "##relay_name##" . $name . $mainstr . ":##end## ";
+		return $namestr;
 	}
 }
 ?>
