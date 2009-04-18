@@ -90,10 +90,13 @@ class Relay extends BaseActiveModule
 		$this -> bot -> core("settings") -> create('Relay', 'Orgnameon', 'Both', 'Guild Prefix should be Output? (Requires other Bots to have TypeTag Setting ON)', 'Both;Guildchat;NotGuildChat;None');
 		$this -> bot -> core("settings") -> create("Relay", "Ignore", "", "Who should be ignored on incoming Relay? use ; to split eg mike;bob");
 		$this -> bot -> core("settings") -> create('Relay', 'TypeTag', FALSE, 'Should Bot Send a Special Tag to Say What Type of Message its Relaying, Note (Other Bots are Required to Have a Module that Supports This Feature)');
-
+		$this -> bot -> core("settings") -> create("Relay", 'ShowMain', FALSE, "Should we display the name of the characters main when relaying?");
+		$this -> bot -> core("settings") -> create("Relay", 'TruncateMain', '6', "How many characters of the main's name to display?", '4;6;8;10;13');
+		
 		$this -> bot -> core("colors") -> define_scheme("relay", "channel", "normal");
 		$this -> bot -> core("colors") -> define_scheme("relay", "name", "normal");
 		$this -> bot -> core("colors") -> define_scheme("relay", "message", "normal");
+		$this -> bot -> core("colors") -> define_scheme("relay", "mainname", "normal");
 
 		$this -> help['description'] = "Plugin to enable relay between guilds and private groups.";
 		$this -> help['command']['gcr <message>'] = "Has the bot say a message (useful for testing or other purposes).";
@@ -285,9 +288,24 @@ class Relay extends BaseActiveModule
 		if ($this -> bot -> core("settings") -> get('Relay', 'Status'))
 		{
 			$namestr = "";
+			$mainstr = "";
+			$main = "";
 			if ($name != "0")
 			{
-				$namestr = "##relay_name##" . $name . ":##end## ";
+				if ($this -> bot -> core("settings") -> get('Relay', 'ShowMain') != "")
+				{
+					$main = $this -> bot -> core("alts") -> main($name);
+					if ($main&& (strcasecmp($main, $name) != 0))
+					{
+						if (strlen($main) > ($this -> bot -> core("settings") -> get('Relay', 'TruncateMain')))
+						{
+							$main = substr($main, 0, ($this -> bot -> core("settings") -> get('Relay', 'TruncateMain')));
+							$main = "$main~";
+						}
+						$mainstr = " ##relay_mainname##(" . $main . ")##end##";
+					}
+				}
+				$namestr = "##relay_name##" . $name . $mainstr . ":##end## ";
 			}
 			if($this -> bot -> core("settings") -> get('Relay', 'Gcname') != "")
 			{
@@ -374,9 +392,24 @@ class Relay extends BaseActiveModule
 		if ($this -> bot -> core("settings") -> get('Relay', 'Status'))
 		{
 			$namestr = "";
+			$mainstr = "";
+			$main = "";
 			if ($name != "0")
 			{
-				$namestr = "##relay_name##" . $name . ":##end## ";
+				if ($this -> bot -> core("settings") -> get('Relay', 'ShowMain') != "")
+				{
+					$main = $this -> bot -> core("alts") -> main($name);
+					if ($main && (strcasecmp($main, $name) != 0))
+					{
+						if (strlen($main) > ($this -> bot -> core("settings") -> get('Relay', 'TruncateMain')))
+						{
+							$main = substr($main, 0, ($this -> bot -> core("settings") -> get('Relay', 'TruncateMain')));
+							$main = "$main~";
+						}
+						$mainstr = " ##relay_mainname##(" . $main . ")##end##";
+					}
+				}
+				$namestr = "##relay_name##" . $name . $mainstr . ":##end## ";
 			}
 			$relaystring = "[##relay_channel##" . $this -> bot -> core("settings") -> get('Relay', 'Pgname') . "##end##] " . $namestr . "##relay_message##" . $msg . " ##end##";
 			if ($this -> bot -> core("settings") -> get('Relay', 'Priv') == "Both" || $this -> bot -> core("settings") -> get('Relay', 'Priv') == "Guildchat")
