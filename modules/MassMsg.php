@@ -100,7 +100,8 @@ class MassMsg extends BaseActiveModule
 		
 		$msg = $this -> bot -> core("colors") -> parse($msg);
 
-		if(!$this -> bot -> core('settings') -> get('MassMsg', 'tell_to_PG_users'))
+		$inchattell = $this -> bot -> core('settings') -> get('MassMsg', 'tell_to_PG_users');
+		if(!$inchattell)
 		{
 			//Send to PG and ignore all in PG
 			$this -> bot -> send_pgroup("\n".$msg, NULL, TRUE, FALSE);
@@ -140,7 +141,7 @@ class MassMsg extends BaseActiveModule
 			//If they want messages they will get them regardless of type
 			if($massmsg)
 			{
-				if($this -> bot -> core("online") -> in_chat($recipient))
+				if(!$inchattell && $this -> bot -> core("online") -> in_chat($recipient))
 				{
 					$status[$recipient]['sent']=FALSE;
 					$status[$recipient]['pg']=true;
@@ -207,9 +208,20 @@ class MassMsg extends BaseActiveModule
 				else
 					$window.=" - Invite to pgroup: ##error##blocked by preferences##end##";
 			}
+			if(strtolower($this -> bot -> botname) == "bangbot")
+			{
+				if($status['sent'] || $status['pg'])
+				{
+						//Update announce count...
+					$result = $this -> bot -> db -> select("SELECT announces FROM stats WHERE nickname = '" . $recipient . "'");
+					if (!empty($result))
+					{
+						$this -> bot -> db -> query("UPDATE stats SET announces = announces+1 WHERE nickname = '" . $recipient . "'");
+					}
+				}
+			}
 		}
 		return($this->bot->core('tools')->make_blob('report', $window));
 	}
-		
 }
 ?>
