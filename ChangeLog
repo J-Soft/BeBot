@@ -6,6 +6,7 @@ Version 0.6.3
 - Added option to relay to suffix relayed text with a characters main. Controlled using !set relay showmain on/off
 - Added option to truncate the name of the main character for relayed text.
 - No Longer invites because of a bot restart if autoinvite is on, they will get invited if they were in PG before restart anyway
+- Added Option to have News Spammed at PGjoin
 
 -------------
 Version 0.6.2

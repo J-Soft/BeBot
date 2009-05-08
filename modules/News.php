@@ -71,14 +71,16 @@ class News extends BaseActiveModule
 		$this -> register_command('all', 'headline', 'GUEST', array('add'=>'ADMIN'));
 		$this -> register_command('all', 'raids', 'MEMBER', array('add'=>'LEADER', 'del'=>'LEADER'));
 
-		// Register for logon notifies
+		// Register for logon notifies and pgjoin
 		$this -> register_event("logon_notify");
+		$this -> register_event("pgjoin");
 
 		//These are required in order to let authors delete their own messages but not everyones.
 		$this -> bot -> core("settings") -> create ("News", "Headline_Del", "ADMIN", "Who should be able to delete headlines", "ADMIN;LEADER;MEMBER;GUEST;ANONYMOUS");
 		$this -> bot -> core("settings") -> create ("News", "News_Del", "ADMIN", "Who should be able to delete news", "ADMIN;LEADER;MEMBER;GUEST;ANONYMOUS");
 
 		$this -> bot -> core("prefs") -> create("News", "Logonspam", "What should news spam when logging on?", "Last_headline", "Last_headline;Link;Nothing");
+		$this -> bot -> core("prefs") -> create("News", "PGjoinspam", "What should news spam when joining private group?", "Nothing", "Last_headline;Link;Nothing");
 
 		$this -> help['description'] = 'Sets and shows headlines, news and raid events.';
 		$this -> help['command']['news']="Shows current headlines and news";
@@ -96,17 +98,29 @@ class News extends BaseActiveModule
 			switch($this -> bot -> core("prefs") -> get($name, "News", "Logonspam"))
 			{
 				case 'Last_headline':
-					$spam.= $this->get_last_headline();
-					$spam.=$this->get_news($name);
-					$this->bot->send_output($name, $spam, 'tell');
-				break;
+					$spam .= $this -> get_last_headline();
+					$spam .= $this -> get_news($name);
+					$this -> bot -> send_output($name, $spam, 'tell');
+					break;
 				case 'Link':
-					$spam.=$this->get_news($name);
-					$this->bot->send_output($name, $spam, 'tell');
-				break;
-				default:
-				break;
+					$spam .= $this -> get_news($name);
+					$this -> bot -> send_output($name, $spam, 'tell');
 		 	}
+		}
+	}
+
+	function pgjoin($name)
+	{
+		switch($this -> bot -> core("prefs") -> get($name, "News", "PGjoinspam"))
+		{
+			case 'Last_headline':
+				$spam .= $this -> get_last_headline();
+				$spam .= $this -> get_news($name);
+				$this -> bot -> send_output($name, $spam, 'tell');
+				break;
+			case 'Link':
+				$spam .= $this -> get_news($name);
+				$this -> bot -> send_output($name, $spam, 'tell');
 		}
 	}
 
