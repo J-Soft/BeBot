@@ -292,10 +292,7 @@ class Relay extends BaseActiveModule
 			$main = "";
 			if ($name != "0")
 			{
-				if ($name != "0")
-				{
 					$namestr = $this -> get_namestring($name);
-				}
 			}
 			if($this -> bot -> core("settings") -> get('Relay', 'Gcname') != "")
 			{
