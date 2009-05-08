@@ -133,6 +133,8 @@ class AutoInv extends BaseActiveModule
 
 	function notify($user, $startup = false)
 	{
+		if($startup) // dont invite because of a bot restart, they will get invited if they were in PG before restart anyway
+			Return;
 		if ($this -> bot -> core("settings") -> get("Autoinv", "Activated"))
 		{
 			if ($this->bot->core('prefs')->get($user, 'AutoInv', 'recieve_auto_invite')=='On'
