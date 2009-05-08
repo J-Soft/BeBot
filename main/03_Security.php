@@ -1185,7 +1185,9 @@ class Security_Core extends BaseActiveModule
 		{
 			return "        - No members.";
 		}
-		foreach ($this -> cache['groups'][$gid]['members'] as $member)
+		$users = $this -> cache['groups'][$gid]['members'];
+		sort($users);
+		foreach ($users as $member)
 		{
 			$tmp .= "        - ".$member."\n";
 		}
