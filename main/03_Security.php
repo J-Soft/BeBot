@@ -1339,10 +1339,23 @@ class Security_Core extends BaseActiveModule
 	*/
 	function get_access_level_player($player)
 	{ // Start function get_access_level()
+	
+		$uid = $this -> bot -> core("chat") -> get_uid($player);
 		// If user does not exist return ANONYMOUS access right away
-	if (!$this -> bot -> core("chat") -> get_uid($player))
+		if (!$uid)
+		{
 			return 0;
-
+		}
+		
+		$dbuid = $this -> bot -> core("user") -> get_db_uid($player);
+		if ($uid && $dbuid && ($uid != $dbuid))
+		{
+			// Danger rodger wilco. We have a rerolled player which have not yet been deleted from users table.
+			//$this -> bot -> core("user") -> erase("Security", $player, FALSE, $uid);
+			//echo "Debug1: $uid does not match $dbuid \n";
+			return 0;
+		}
+			
 		$player = ucfirst(strtolower($player));
 		// Check #1: Check Owner and SuperAdmin from Bot.conf.
 		if ($player == $this -> owner)
@@ -1467,6 +1480,22 @@ class Security_Core extends BaseActiveModule
 			}
 		}
 
+		$uid = $this -> bot -> core("chat") -> get_uid($player);
+		// If user does not exist return ANONYMOUS access right away
+		if (!$uid)
+		{
+			return 0;
+		}
+		
+		$dbuid = $this -> bot -> core("user") -> get_db_uid($player);
+		if ($uid && $dbuid && ($uid != $dbuid))
+		{
+			// Danger rodger wilco. We have a rerolled player which have not yet been deleted from users table.
+			//$this -> bot -> core("user") -> erase("Security", $player, FALSE, $uid);
+			//echo "Debug: $uid does not match $dbuid \n";
+			return 0;
+		}
+		
 		// If alts should not be queried just return the access level for $player
 		if (!$this -> bot -> core("settings") -> get("Security", "Usealts"))
 		{
