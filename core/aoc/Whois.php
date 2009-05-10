@@ -70,7 +70,6 @@ class Whois_Core extends BasePassiveModule
 					KEY used (used)
 				)");
 
-		$this -> bot -> db -> query("TRUNCATE table ".$this -> bot -> db -> define_tablename("whois", "false") );
 
 		$this -> register_module("whois");
 		$this -> register_event("cron", "1hour");
