@@ -147,7 +147,6 @@ class User_Core extends BasePassiveModule
 				{
 					$this -> erase("", $name, TRUE, $result[0][0]);
 				}
-				return $return;
 			}
 		}		
 		
