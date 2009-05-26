@@ -10,6 +10,7 @@ Version 0.6.3
 - Added improved handling of rerolled characters.
 - Whois table is no longer wiped for AoC bots upon startup.
 - Updated AO server information due to changed ports.
+- Fixed bug #380461 causing the AOC Autouseradd module to never add silently.
 
 
 -------------
