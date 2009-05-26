@@ -1,9 +1,9 @@
 <?php
 //AO
-	$server_list['ao']['Testlive'] = array('server'=>'chat.dt.funcom.com', 'port'=>7012);
-	$server_list['ao']['Atlantean'] = array('server'=>'chat.d1.funcom.com', 'port'=>7012);
-	$server_list['ao']['Rimor'] = array('server'=>'chat.d2.funcom.com', 'port'=>7012);
-	$server_list['ao']['Die neue welt'] = array('server'=>'chat.d3.funcom.com', 'port'=>7013);
+	$server_list['ao']['Testlive'] = array('server'=>'chat.dt.funcom.com', 'port'=>7109);
+	$server_list['ao']['Atlantean'] = array('server'=>'chat.d1.funcom.com', 'port'=>7101);
+	$server_list['ao']['Rimor'] = array('server'=>'chat.d2.funcom.com', 'port'=>7102);
+	$server_list['ao']['Die neue welt'] = array('server'=>'chat.d3.funcom.com', 'port'=>7103);
 
 //AOC
 	// EU Servers

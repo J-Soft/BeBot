@@ -9,6 +9,7 @@ Version 0.6.3
 - Added Option to have News Spammed at PGjoin.
 - Added improved handling of rerolled characters.
 - Whois table is no longer wiped for AoC bots upon startup.
+- Updated AO server information due to changed ports.
 
 
 -------------
