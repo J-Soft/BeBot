@@ -35,7 +35,7 @@
 * Revision: $Id: Main.php 1963 2009-01-24 21:08:06Z alreadythere $
 */
 
-$bot_version = "0.6.3";
+$bot_version = "0.6.4.dev";
 $php_version = phpversion();
 
 /*
