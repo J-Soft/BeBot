@@ -24,7 +24,7 @@
 	$server_list['aoc']['Indomitus'] = array('server'=>'213.244.186.137', 'port'=>7036);
 
 	// French Servers
-	$server_list['aoc']['Ishtar'] = array('server'=>'213.244.186.135', 'port'=>7013);
+	$server_list['aoc']['Ishtar'] = array('server'=>'213.244.186.135', 'port'=>7010);
 	$server_list['aoc']['Ferox'] = array('server'=>'213.244.186.134', 'port'=>7005);
 	$server_list['aoc']['Stygia'] = array('server'=>'213.244.186.136', 'port'=>7015);
 	$server_list['aoc']['Strix'] = array('server'=>'213.244.186.137', 'port'=>7025);

@@ -3,6 +3,7 @@ Version 0.6.4
 -------------
 - Reversing stripping of control characters on text from IRC for now.
 - htmlspecialchars_decode text going to IRC to decode &amp; and similar.
+- Updated port for AoC server Ishtar.
 
 -------------
 Version 0.6.3
