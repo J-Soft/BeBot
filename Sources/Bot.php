@@ -279,6 +279,7 @@ class Bot
 		$this -> core("settings") -> create("Core", "ColorizeTells", TRUE, "Should tells going out be colorized on default? Notice: Modules can set a nocolor flag before sending out tells.");
 		$this -> core("settings") -> create("Core", "ColorizeGC", TRUE, "Should output to guild chat be colorized using the current theme?");
 		$this -> core("settings") -> create("Core", "ColorizePGMSG", TRUE, "Should output to private group be colorized using the current theme?");
+		$this -> core("settings") -> create("Core", "BanReason", TRUE, "Should the Details on the Ban be Given to user when he tries to use bot?");
 
 		// Tell modules that the bot is connected
 		if (!empty($this -> commands["connect"]))
@@ -388,12 +389,27 @@ class Bot
 	*/
 	function send_ban($to, $msg=FALSE)
 	{
-		if (!isset($this -> banmsgout[$to]))
+		if(!isset($this -> banmsgout[$to]) || $this -> banmsgout[$to] < (time() - 60 * 5))
 		{
 			$this -> banmsgout[$to] = time();
 			if ($msg === FALSE)
 			{
-				$this -> send_tell($to, "You are banned from <botname>.");
+				if($this -> core("settings") -> get("Core", "BanReason"))
+				{
+					$why = $this -> db -> select("SELECT banned_by, banned_for, banned_until FROM #___users WHERE nickname = '".$to."'");
+					if($why[0][2] > 0)
+					{
+						$until = "Temporary ban until " .  gmdate($this -> core("settings") -> get("Time", "FormatString"), $why[0][2]);
+					}
+					else
+					{
+						$until = "Permanent ban.";
+					}
+					$why = " by ##highlight##".$why[0][0]."##end## for Reason: ##highlight##".$why[0][1]."##end##\n".$until;
+				}
+				else
+					$why = ".";
+				$this -> send_tell($to, "You are banned from <botname>".$why);
 			}
 			else
 			{
