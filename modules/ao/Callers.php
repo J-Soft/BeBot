@@ -45,7 +45,6 @@ The Class itself...
 */
 class Callers extends BaseActiveModule
 {
-	private $callers;
 
 	function __construct(&$bot)
 	{
@@ -151,14 +150,19 @@ class Callers extends BaseActiveModule
 		else
 		{
 			$batch = "";
+			$count = 0;
 			$list = "##AO_INFOHEADLINE##::: List of callers :::##END##\n\n";
 			foreach ($call as $player)
 			{
+				if ($count>=1)
+					$batch .= " \\n ";
+				$count++;
 				$list .= " - $player: [<a href='chatcmd:///macro $player /assist $player'>Create Macro</a>] [<a href='chatcmd:///assist $player'>Assist</a>]\n";
-				$batch .= "/assist ".$player."\\n ";
+				$batch .= "/assist ".$player;
 			}
 			$list .= "\n";
-			$list .= "All Callers: [<a href='chatcmd:///macro <botname> $batch'>Create Macro</a>] [<a href='chatcmd://$batch'>Assist</a>]";
+			$list .= "All Callers: [<a href='chatcmd://$batch'>Assist</a>]";
+			$list .= "\n\nAll Callers Macro:\n/macro <botname> $batch";
 			return $this -> bot -> core("tools") -> make_blob("List of Callers", $list);
 		}
 	}
