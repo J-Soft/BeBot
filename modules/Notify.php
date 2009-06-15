@@ -59,24 +59,33 @@ class Notify extends BaseActiveModule
 
 	function command_handler($name, $msg, $origin)
 	{
-		if (preg_match("/^notify$/i", $msg)
-		|| (preg_match("/^notify list$/i", $msg)))
-			return $this -> show_notify_list();
-		elseif (preg_match("/^notify on (.+)$/i", $msg, $info))
-			return $this -> add_notify($name, $info[1]);
-		elseif (preg_match("/^notify off (.+)$/i", $msg, $info))
-			return $this -> del_notify($info[1]);
-		elseif (preg_match("/^notify cache clear$/i", $msg, $info))
-			return $this -> bot -> core("notify") -> clear_cache();
-		elseif (preg_match("/^notify cache update$/i", $msg, $info))
+		$com = $this -> parse_com($msg, array('com', 'sub', 'arg'));
+		Switch($com['sub'])
 		{
-			$this -> bot -> core("notify") -> update_cache();
-			return "Updating notify cache.";
+			case 'on':
+				return $this -> add_notify($name, $com['arg']);
+			case 'off':
+				return $this -> del_notify($com['arg']);
+			case 'cache':
+				Switch(strtolower($com['arg']))
+				{
+					case 'clear':
+						return $this -> bot -> core("notify") -> clear_cache();
+					case 'update':
+						$this -> bot -> core("notify") -> update_cache();
+						return "Updating notify cache.";
+					Default:
+						return $this -> bot -> core("notify") -> list_cache();
+				}
+			case 'list':
+			case '':
+				return $this -> show_notify_list();
+			Default:
+				if(strtolower($com['arg']) == "on" || strtolower($com['arg']) == "off") // asume they want to turn notify on or off but did wrong order
+					Return $this -> command_handler($name, $com['com']." ".$com['arg']." ".$com['sub'], $origin);
+				else
+					Return("##error##Error: Unknown Sub Command ##highlight##".$com['sub']."##end####end##");
 		}
-		elseif (preg_match("/^notify cache$/i", $msg, $info))
-			return $this -> bot -> core("notify") -> list_cache();
-
-		return FALSE;
 	}
 
 	function show_notify_list()
