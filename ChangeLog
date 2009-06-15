@@ -8,6 +8,7 @@ Version 0.6.4
 - IRC part/quit messages are now relayed ingame.
 - Fixed flip command
 - Added the option to make reason required for !ban add
+- Added a check for botname_rules.txt before getting rules.txt
 
 -------------
 Version 0.6.3
