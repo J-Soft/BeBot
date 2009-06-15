@@ -9,6 +9,7 @@ Version 0.6.4
 - Fixed flip command
 - Added the option to make reason required for !ban add
 - Added a check for botname_rules.txt before getting rules.txt
+- Lots of Changes to Raid module, lots of new function and features including restart/crash support, raid logging, raid control interface, punish raiders, move countdown, min level and also fixed alot of problems with output to wrong place or unnessesary spam
 
 -------------
 Version 0.6.3
