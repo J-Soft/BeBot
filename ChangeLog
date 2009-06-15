@@ -6,6 +6,8 @@ Version 0.6.4
 - Updated port for AoC server Ishtar.
 - IRC join/part/quit messages now properly prefixed on IRC and are also relayed over guild relay if UseGuildRelay is set for IRC module.
 - IRC part/quit messages are now relayed ingame.
+- Fixed flip command
+- Added the option to make reason required for !ban add
 
 -------------
 Version 0.6.3
