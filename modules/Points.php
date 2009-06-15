@@ -393,7 +393,7 @@ class Points extends BaseActiveModule
 						else
 							$this -> bot -> db -> query("UPDATE #___raid_points SET points = " . ($res[2] + $resu[0][1]) . " WHERE id = " . $this -> points_to($res[0]));
 						$check = $this -> bot -> db -> select("SELECT nickname, points FROM #___raid_points WHERE id = " . $this -> points_to($res[1]));
-						if(!empty($check) && ($check[0][1] != ($res[2] + $resu[0][1]))
+						if(!empty($check) && ($check[0][1] != ($res[2] + $resu[0][1])))
 						{
 							echo "Error With Transfering Points from Alt $alt to $main";
 						}
