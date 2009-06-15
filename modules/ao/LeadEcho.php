@@ -73,9 +73,9 @@ class LeadEcho extends BaseActiveModule
 		$highlight = $this -> bot -> core("colors") -> get("highlight");
 		$repeatstring = "<br>Repeat is ";
 		if ($this -> bot -> core("settings") -> get("Leader", "Echo"))
-			$repeatstring .= $this -> bot -> core("colors") -> get("green") . "activated##end##!";
+			$repeatstring .= "##green##activated##end##!";
 		else
-			$repeatstring .= $this -> bot -> core("colors") -> get("red") . "deactivated##end##!";
+			$repeatstring .= "##red##deactivated##end##!";
 		$repeatstring .= " Use !repeat on|off to toggle it.";
 
 		if (preg_match("/^leader$/i", $msg))
@@ -96,12 +96,12 @@ class LeadEcho extends BaseActiveModule
 		elseif (preg_match("/^repeat on$/i", $msg))
 		{
 			$this -> bot -> core("settings") -> save("leader", "echo", TRUE);
-			return "Repeat is " . $this -> bot -> core("colors") -> get("green") . "activated##end##!";
+			return "Repeat is ##green##activated##end##!";
 		}
 		elseif (preg_match("/^repeat off$/i", $msg))
 		{
 			$this -> bot -> core("settings") -> save("leader", "echo", FALSE);
-			return "Repeat is " . $this -> bot -> core("colors") -> get("red") . "deactivated##end##!";
+			return "Repeat is ##red##deactivated##end##!";
 		}
 	}
 
@@ -149,7 +149,7 @@ class LeadEcho extends BaseActiveModule
 	{
 		if($name == $this -> bot -> core("settings") -> get("Leader", "Name") && $this -> bot -> core("settings") -> get("Leader", "Echo"))
 		{
-			$txt = $this -> bot -> core("colors") -> colorize("leader_echo_spam", $msg);
+			$txt = "##leader_echo_spam##".$msg."##end##";
 			$this -> bot -> send_pgroup($txt);
 		}
 	}
