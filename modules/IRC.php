@@ -129,7 +129,7 @@ class IRC extends BaseActiveModule
 		$this -> bot -> core("timer") -> register_callback("IRC", &$this);
 
 		$this -> spam[0] = array(0, 0, 0, 0);
-		
+
 		$this -> bot -> db -> query("UPDATE #___online SET status_gc = 0 WHERE botname = '".$this -> bot -> botname . " - IRC'");
 	}
 
@@ -427,16 +427,16 @@ class IRC extends BaseActiveModule
 							{
 								$alts = " :: Alt of " . $main;
 							}
-							
+
 							$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "", chr(2).chr(3).'3***'.chr(2)." ".$res.$alts);
-                            $this -> last_log["on"][$name] = time();
-                            }
-                        }
-                        else
-                        {
-                            if ($this -> last_log["off"][$name] < (time() - 5))
-                            {
-                            $this -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "", chr(2).chr(3).'3***'.chr(2)." " .$name. " has logged off.");
+							$this -> last_log["on"][$name] = time();
+						}
+					}
+					else
+					{
+						if ($this -> last_log["off"][$name] < (time() - 5))
+						{
+							$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "", chr(2).chr(3).'3***'.chr(2)." " .$name. " has logged off.");
 							$this -> last_log["off"][$name] = time();
 						}
 					}
@@ -1052,16 +1052,16 @@ class IRC extends BaseActiveModule
 			unset($this -> irconline[strtolower($data -> nick)]);
 			$this -> irconline[strtolower($data -> message)] = strtolower($data -> message);
 		}
-		
+
 		$txt = "##irc_group##" . $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . "##end## ##irc_user##" . $data -> nick . "##end####irc_text## is known as##end## ##irc_user##" . $data -> message . "##end##";
-		
+
 		$this -> bot -> send_output("", $txt, $this -> bot -> core("settings") -> get("Irc", "Chat"));
 
 		if ($this -> bot -> core("settings") -> get("Irc", "Useguildrelay") && $this -> bot -> core("settings") -> get("Relay", "Relay"))
 		{
 			$this -> bot -> core("relay") -> relay_to_bot($txt);
 		}
-		
+
 		$this -> bot -> db -> query("UPDATE #___online SET nickname = '".$data -> message."' WHERE botname = '".$this -> bot -> botname . " - IRC' AND nickname = '".$data -> nick."'");
 	}
 	
