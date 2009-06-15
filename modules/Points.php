@@ -74,8 +74,8 @@ class Points extends BaseActiveModule
 		$this -> help['description'] = 'Manage raid points';
 		$this -> help['command']['points [name]']="Shows the amount of points in [name]s account. If [name] is not given it shows the points in your account";
 		$this -> help['command']['points give <name> <points>']="Gives <points> points to player <name>";
-		$this -> help['command']['points add <name> <points>'] = "Adds <points> points to player <name>s point account";
-		$this -> help['command']['points [del/rem] <name> <points>'] = "Removes <points> points from player <name>s point account";
+		$this -> help['command']['points add <name> <points> <why>'] = "Adds <points> points to player <name>s point account";
+		$this -> help['command']['points [del/rem] <name> <points> <why>'] = "Removes <points> points from player <name>s point account";
 		$this -> help['command']['points transfer <(on|off)>'] = "Turns ability to give points on or off.";
 		$this -> help['command']['points tomain <(on|off)>'] = "Turns ability to give points from alts to main on or off.";
 		$this -> help['command']['points all'] = "Shows the combined number of points on your main and alts.";
@@ -161,10 +161,14 @@ class Points extends BaseActiveModule
 				$this -> give_points($name, $msg[2], $info[3]);
 				Break;
 			case 'add':
+				if(strlen($msg[4]) < 5)
+					Return("Error: Reason required, min ##highlight##5##end## letters");
 				$this -> add_points($name, $msg[2], $msg[3], $msg[4]);
 				Break;
 			case 'del':
 			case 'rem':
+				if(strlen($msg[4]) < 5)
+					Return("Error: Reason required, min ##highlight##5##end## letters");
 				$this -> rem_points($name, $msg[2], $msg[3], $msg[4]);
 				Break;
 			case 'transfer':
@@ -199,10 +203,10 @@ class Points extends BaseActiveModule
 	{
 		if (!$target || strtolower($target) == strtolower($name))
 		{
-			$result = $this -> bot -> db -> select("SELECT points FROM #___raid_points WHERE id = " . $this -> points_to($name));
+			$result = $this -> bot -> db -> select("SELECT points, nickname FROM #___raid_points WHERE id = " . $this -> points_to($name));
 			if ($result)
 			{
-				if($result[0][2] == "")
+				if($result[0][1] == "")
 				{
 					$this -> bot -> db -> query("UPDATE #___raid_points SET nickname = '".$this -> points_to_name($name)."' WHERE id = " . $this -> points_to($name));
 				}
@@ -212,7 +216,6 @@ class Points extends BaseActiveModule
 			{
 				$points = 0;
 			}
-
 			$this -> bot -> send_tell($name, "You have ##highlight##$points##end## raidpoints.");
 		}
 		else
@@ -378,27 +381,25 @@ class Points extends BaseActiveModule
 		{
 			foreach($alts as $alt)
 			{
-				$result = $this -> bot -> db -> select("SELECT id, nickname, beast_points, zods_points FROM #___raid_points WHERE (beast_points != 0 OR zods_points != 0) AND id = ".$this -> points_to($alt, FALSE));
+				$result = $this -> bot -> db -> select("SELECT id, nickname, points FROM #___raid_points WHERE points != 0 AND id = ".$this -> points_to($alt, FALSE));
 				if(!empty($result))
 				{
-					foreach ($result as $res)
+					$res = $result[0];
+					if ($res[0] != $this -> points_to($res[1]))
 					{
-						if ($res[0] != $this -> points_to($res[1]))
+						$resu = $this -> bot -> db -> select("SELECT nickname, points FROM #___raid_points WHERE id = " . $this -> points_to($res[1]));
+						if (empty($resu))
+							$this -> bot -> db -> query("INSERT INTO #___raid_points (id, nickname, points, raiding) VALUES (" . $this -> points_to($res[1]) . ", '".$this -> points_to_name($res[1])."', " . $res[2] . ", 0)");
+						else
+							$this -> bot -> db -> query("UPDATE #___raid_points SET points = " . ($res[2] + $resu[0][1]) . " WHERE id = " . $this -> points_to($res[0]));
+						$check = $this -> bot -> db -> select("SELECT nickname, points FROM #___raid_points WHERE id = " . $this -> points_to($res[1]));
+						if(!empty($check) && ($check[0][1] != ($res[2] + $resu[0][1]))
 						{
-							$resu = $this -> bot -> db -> select("SELECT nickname, beast_points, zods_points FROM #___raid_points WHERE id = " . $this -> points_to($res[1]));
-							if (empty($resu))
-								$this -> bot -> db -> query("INSERT INTO #___raid_points (id, nickname, beast_points, zods_points, raiding) VALUES (" . $this -> points_to($res[1]) . ", '".$this -> points_to_name($res[1])."', " . $res[2] . ", " . $res[3] . ", 0)");
-							else
-								$this -> bot -> db -> query("UPDATE #___raid_points SET beast_points = " . ($res[2] + $resu[0][1]) . ", zods_points = " . ($res[3] + $resu[0][2]) . " WHERE id = " . $this -> points_to($res[0]));
-							$check = $this -> bot -> db -> select("SELECT nickname, beast_points, zods_points FROM #___raid_points WHERE id = " . $this -> points_to($res[1]));
-							if($check[0][1] != ($res[2] + $resu[0][1]) || $check[0][2] != ($res[3] + $resu[0][2]))
-							{
-								echo "Error With Transfering Points from Alt $alt to $main";
-							}
-							else
-							{
-								$this -> bot -> db -> query("UPDATE #___raid_points SET beast_points = 0, zods_points = 0 WHERE id = " . $res[0]);
-							}
+							echo "Error With Transfering Points from Alt $alt to $main";
+						}
+						else
+						{
+							$this -> bot -> db -> query("UPDATE #___raid_points SET points = 0 WHERE id = " . $res[0]);
 						}
 					}
 				}
@@ -613,6 +614,7 @@ class Points extends BaseActiveModule
 				//{
 				//	if(!is_numeric($time2))
 				//		Return("Error: 2nd time
+				//}
 				$field = "time";
 				$value = "> ".time() - ($timeorname * 60 * 60);
 				$for = "last $timeorname hours";
