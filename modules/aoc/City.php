@@ -201,7 +201,7 @@ class City extends BaseActiveModule
 		}
 		else
 		{
-			$this -> bot -> db -> select("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
+			$this -> bot -> db -> query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
 		}
 		
 		$result = $this -> bot -> db -> select("SELECT `vark` FROM #___city WHERE `key` = 'stock'");
@@ -211,7 +211,7 @@ class City extends BaseActiveModule
 		}
 		else
 		{
-			$this -> bot -> db -> select("REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",",$this->stock) . "')");
+			$this -> bot -> db -> query("REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",",$this->stock) . "')");
 		}
 		
 		$this -> help['description'] = 'Tracks guild city progression and resources management';
@@ -344,7 +344,7 @@ class City extends BaseActiveModule
 			if ($this->progress[$w] > $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
 			{
 				$this->progress[$w] = $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w];
-				$this -> bot -> db -> select("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
+				$this -> bot -> db -> query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
 			}
 			$t1block .= "  " . $this->progress[$w] . " / " . $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
 			if ($this->progress[$w] < $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
@@ -365,7 +365,7 @@ class City extends BaseActiveModule
 			if ($this->progress[$w] > $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
 			{
 				$this->progress[$w] = $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w];
-				$this -> bot -> db -> select("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
+				$this -> bot -> db -> query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
 			}
 			$t2block .= "  " . $this->progress[$w] . " / " . $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
 			if ($this->progress[$w] < $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
@@ -386,7 +386,7 @@ class City extends BaseActiveModule
 			if ($this->progress[$w] > $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
 			{
 				$this->progress[$w] = $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w];
-				$this -> bot -> db -> select("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
+				$this -> bot -> db -> query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
 			}
 			$t3block .= "  " . $this->progress[$w] . " / " . $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
 			if ($this->progress[$w] < $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
@@ -476,7 +476,7 @@ class City extends BaseActiveModule
 			if ($this->progress[$w] > $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
 			{
 				$this->progress[$w] = $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w];
-				$this -> bot -> db -> select("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
+				$this -> bot -> db -> query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
 			}
 			$w1block .= "  " . $this->progress[$w] . " / " . $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
 			if ($this->progress[$w] < $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
@@ -497,7 +497,7 @@ class City extends BaseActiveModule
 			if ($this->progress[$w] > $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
 			{
 				$this->progress[$w] = $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w];
-				$this -> bot -> db -> select("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
+				$this -> bot -> db -> query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
 			}
 			$w2block .= "  " . $this->progress[$w] . " / " . $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
 			if ($this->progress[$w] < $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
@@ -518,7 +518,7 @@ class City extends BaseActiveModule
 			if ($this->progress[$w] > $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
 			{
 				$this->progress[$w] = $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w];
-				$this -> bot -> db -> select("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
+				$this -> bot -> db -> query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
 			}
 			$w3block .= "  " . $this->progress[$w] . " / " . $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
 			if ($this->progress[$w] < $this->max[$this -> bot -> core("settings") -> get("City", "CityLocation")][$w])
@@ -752,8 +752,8 @@ class City extends BaseActiveModule
 					$this->stock[$i] = 0;
 				}
 			}
-			$this -> bot -> db -> select("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
-			$this -> bot -> db -> select("REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",",$this->stock) . "')");
+			$this -> bot -> db -> query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",",$this->progress) . "')");
+			$this -> bot -> db -> query("REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",",$this->stock) . "')");
 			$this->buildtimer = 0;
 			return $this->bot->core("colors")->colorize("city_buildings", $this->names[$this->buildid]) . " has been built. Removed " . $this->bot->core("colors")->colorize("city_resources", $this->calcreqs($this->buildid)) . " from guild bank.";
 		}
@@ -786,7 +786,7 @@ class City extends BaseActiveModule
 					$qty = floor($qty/10);
 				}
 				$this->stock[$i] = $qty;
-				$this -> bot -> db -> select("REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",",$this->stock) . "')");
+				$this -> bot -> db -> query("REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",",$this->stock) . "')");
 				if ( $i == 12 )
 				{
 					return "Stock for " . $this->bot->core("colors")->colorize("city_resources", $this->refinednames[$i]) . " has been set to " . $this->bot->core("colors")->colorize("city_resources", $this->moneyformat($qty)) . ".";
