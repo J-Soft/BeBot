@@ -787,7 +787,7 @@ class IRC extends BaseActiveModule
 		{
 			$msg = "##irc_group##" . $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . "##end## ##highlight##" . $data -> nick . "##end## has logged##highlight## on##end##.";
 
-			$this -> bot -> send_output("", $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . $msg,
+			$this -> bot -> send_output("", $msg,
 			$this -> bot -> core("settings") -> get("Irc", "AnnounceTo"));
 		}
 		if (($data -> nick != $this -> bot -> core("settings") -> get("Irc", "Nick")))
@@ -817,7 +817,7 @@ class IRC extends BaseActiveModule
 		&& (strtolower($this -> bot -> core("settings") -> get("Irc", "AnnounceTo")) != "none"))
 		{
 			$msg = "##irc_group##" . $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . "##end## ##highlight##" . $data -> nick . "##end## has logged##highlight## off##end## (" . $data -> message . ").";
-			$this -> bot -> send_output("", $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . $msg,
+			$this -> bot -> send_output("", $msg,
 			$this -> bot -> core("settings") -> get("Irc", "AnnounceTo"));
 		}
 		if (($data -> nick != $this -> bot -> core("settings") -> get("Irc", "Nick")))
