@@ -153,10 +153,7 @@ class Raid extends BaseActiveModule
 							Return $return;
 						Break;
 					case 'add':
-						$return = $this -> addto_raid($name, $var[2]);
-						if($type == "tell")
-							Return $return;
-						Break;
+						return $this -> addto_raid($name, $var[2], $type);
 					case 'reward':
 					case 'give':
 						$this -> add_point($name, $var[2], $var[3]);
@@ -401,7 +398,7 @@ class Raid extends BaseActiveModule
 			$this -> bot -> db -> query("UPDATE #___raid_points SET points = points + " . $points . " WHERE raiding = 1");
 		}
 		else
-			$this -> bot -> send_tell($name, "You must be a raidleader to do this");
+			$this -> bot -> send_tell($name, "You must be a " . $this -> bot -> core("settings") -> get('Raid', 'Command') . " to do this");
 	}
 
 
@@ -459,7 +456,7 @@ class Raid extends BaseActiveModule
 	/*
 	Adds a player to Raid
 	*/
-	function addto_raid($name, $player)
+	function addto_raid($name, $player, $source)
 	{
 		$player = ucfirst(strtolower($player));
 		if ($this -> bot -> core("security") -> check_access($name, $this -> bot -> core("settings") -> get('Raid', 'Command')))
@@ -494,7 +491,8 @@ class Raid extends BaseActiveModule
 				if(!$this -> locked)
 					$ctj = " :: " . $this -> clickjoin();
 				$this -> bot -> send_output("", "##highlight##$player##end## was ##highlight##added##end## to the raid by ##highlight##$name##end##".$ctj, "both");
-				return "##highlight##$player##end## has been ##highlight##added##end## to the raid";
+				if($source == "tell")
+					return "##highlight##$player##end## has been ##highlight##added##end## to the raid";
 			}
 		}
 	}
