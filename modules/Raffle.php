@@ -127,8 +127,8 @@ class Raffle extends BaseActiveModule
 
 			natsort($this -> users);
 
-			$results = "<font color=CCInfoHeadline>::::: Raffle Results :::::##end##<font color=CCInfoText>\n\n";
-			$results .= "<font color=CCCCTextColor>" . $this -> admin . "##end## raffled <font color=CCCCTextColor>" . $this -> item_blank;
+			$results = "##ao_ccheader##::::: Raffle Results :::::##end####lightyellow##\n\n";
+			$results .= "##highlight##" . $this -> admin . "##end## raffled ##highlight##" . $this -> item_blank;
 			$results .= "##end##. I rolled 10000 times. The results where:\n\n";
 
 			$winner = "";
@@ -140,7 +140,7 @@ class Raffle extends BaseActiveModule
 				if ($count == 1)
 				$winner = $key;
 
-				$res = "<font color=CCCCTextColor>". $count . ".##end## $key <font color=CCCCTextColor>" . $points . " points##end##\n" . $res;
+				$res = "##highlight##". $count . ".##end## $key ##highlight##" . $points . " points##end##\n" . $res;
 				$count--;
 			}
 
@@ -348,7 +348,7 @@ class Raffle extends BaseActiveModule
 		return "You did not start the raffle and are not a bot admin.";
 		else
 		{
-			$inside = "<font color=CCInfoHeadline>:::: Raffle Administration ::::##end##<font color=CCInfoHeader>\n\n";
+			$inside = "##ao_ccheader##:::: Raffle Administration ::::##end##<font color=CCInfoHeader>\n\n";
 			$inside .= "Output channel: \n";
 			$inside .= $this -> bot -> core("tools") -> chatcmd(
 			"raffle output guild", "Guild")." ";
@@ -389,8 +389,8 @@ class Raffle extends BaseActiveModule
 	*/
 	function click_join($val)
 	{
-		$inside = "<font color=CCInfoHeadline>:::: Join/Leave Raffle ::::##end##<font color=CCInfoText>\n\n";
-		$inside .= "Raffle for: <font color=CCCCTextColor>" . $this -> item_blank . "##end##\n\n";
+		$inside = "##ao_ccheader##:::: Join/Leave Raffle ::::##end####lightyellow##\n\n";
+		$inside .= "Raffle for: ##highlight##" . $this -> item_blank . "##end##\n\n";
 		$inside .= "- ".$this -> bot -> core("tools") -> chatcmd(
 		"raffle join", "Join the raffle")."\n";
 		$inside .= "- ".$this -> bot -> core("tools") -> chatcmd(

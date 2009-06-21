@@ -204,7 +204,7 @@ class Colors_Core extends BasePassiveModule
 	function colorize($color, $text)
 	{
 		if ($this -> color_tags['##' . $color . '##'] != '')
-		return $this -> color_tags['##' . $color . '##'] . $text . "</font>";
+		return $this -> color_tags['##' . $color . '##'] . $text . "##end##";
 		else
 		return $text;
 	}
