@@ -54,7 +54,8 @@ class Whois extends BaseActiveModule
 		$this -> help['command']['whois <name>']="Shows information about player <name>.";
 
 		$this -> register_command("all", "whois", "GUEST");
-		$this -> register_event("buddy");
+		if($this -> bot -> game == "aoc")
+			$this -> register_event("buddy");
 
 		$this -> bot -> core("colors") -> define_scheme("whois", "alienlevel", "lightgreen");
 		$this -> bot -> core("colors") -> define_scheme("whois", "level", "lightbeige");
@@ -103,7 +104,7 @@ class Whois extends BaseActiveModule
 	{
 		if($this -> bot -> game == "aoc")
 		{
-			if((!$this -> bot -> core("notify") -> check($name)) && isset($this -> name[$name]))
+			if((isset($this -> name[$name]))
 			{
 				$msg = $this -> whois_player($this -> name[$name], $name, $this -> origin[$name]);
 				//$this -> irc -> message(SMARTIRC_TYPE_CHANNEL, $this -> whois[$name], $this -> whois[$name]);
@@ -119,16 +120,24 @@ class Whois extends BaseActiveModule
 	*/
 	function whois_player($source, $name, $origin)
 	{
-		$who = $this -> bot -> core("whois") -> lookup($name);
-
-		if (!$who)
+		if ($this -> bot -> game == "aoc")
 		{
 			$this -> name[ucfirst(strtolower($name))] = $source;
 			$this -> origin[ucfirst(strtolower($name))] = $origin;
 		}
+		$who = $this -> bot -> core("whois") -> lookup($name);
+
+		if ($this -> bot -> game == "aoc" && $who)
+		{
+			unset($this -> name[ucfirst(strtolower($name)));
+			unset($this -> origin[ucfirst(strtolower($name)));
+		}
+		if(!$who)
+		{
+			Return;
+		}
 		elseif (!$who["error"])
 		{
-
 			$result = "##whois_name##" . $who["nickname"] . "##end## is a level ";
 			$result .= "##whois_level##" . $who["level"] . "##end##";
 			if($this -> bot -> game == "ao")

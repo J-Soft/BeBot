@@ -318,13 +318,6 @@ class Whois_Core extends BasePassiveModule
 			return $who;
 		}
 
-		// Make sure $name is a valid character
-		if (!$this -> bot -> core("chat") -> get_uid($name))
-		{
-			$who["error"] = true;
-			$who["errordesc"] = $name . " is not a valid character!";
-			return $who;
-		}
 		$id = $this -> bot -> core("chat") -> get_uid($name);
 		// Make sure the character exsists.
 		if (!$id)
