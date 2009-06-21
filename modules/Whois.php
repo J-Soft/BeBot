@@ -104,11 +104,13 @@ class Whois extends BaseActiveModule
 	{
 		if($this -> bot -> game == "aoc")
 		{
-			if((isset($this -> name[$name]))
+			if(isset($this -> name[$name]))
 			{
-				$msg = $this -> whois_player($this -> name[$name], $name, $this -> origin[$name]);
+				$user = $this -> name[$name];
+				$origin = $this -> origin[$name];
+				$msg = $this -> whois_player($user, $name, $origin);
 				//$this -> irc -> message(SMARTIRC_TYPE_CHANNEL, $this -> whois[$name], $this -> whois[$name]);
-				$this -> bot -> send_output($this -> name[$name], $msg, $this -> origin[$name]);
+				$this -> bot -> send_output($user, $msg, $origin);
 				unset($this -> name[$name]);
 				unset($this -> origin[$name]);
 			}
@@ -120,17 +122,18 @@ class Whois extends BaseActiveModule
 	*/
 	function whois_player($source, $name, $origin)
 	{
+		$name = ucfirst(strtolower($name));
 		if ($this -> bot -> game == "aoc")
 		{
-			$this -> name[ucfirst(strtolower($name))] = $source;
-			$this -> origin[ucfirst(strtolower($name))] = $origin;
+			$this -> name[$name] = $source;
+			$this -> origin[$name] = $origin;
 		}
 		$who = $this -> bot -> core("whois") -> lookup($name);
 
 		if ($this -> bot -> game == "aoc" && $who)
 		{
-			unset($this -> name[ucfirst(strtolower($name)));
-			unset($this -> origin[ucfirst(strtolower($name)));
+			unset($this -> name[$name]);
+			unset($this -> origin[$name]);
 		}
 		if(!$who)
 		{
