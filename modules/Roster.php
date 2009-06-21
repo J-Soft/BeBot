@@ -52,9 +52,10 @@ class Roster_Handler extends BaseActiveModule
 			$this -> register_event("cron", "1hour");
 
 		$this -> help['description'] = 'Handles member roster commands.';
-		$this -> help['command']['member'] = "Shows the members list.";
+		$this -> help['command']['member'] = "Shows the members count.";
 		$this -> help['command']['member add <name>'] = "Adds player <name> as a member to the bot.";
 		$this -> help['command']['member del <name>'] = "Removes player <name> from the member list.";
+		$this -> help['command']['member list'] = "Shows the members list.";
 		$this -> help['command']['guest'] = "Shows the guest list.";
 		$this -> help['command']['guest add <name>'] = "Adds player <name> as a guest to the bot.";
 		$this -> help['command']['guest del <name>'] = "Removes player <name> from the guest list.";
@@ -102,7 +103,6 @@ class Roster_Handler extends BaseActiveModule
 						{
 							return $return["content"];
 						}
-						break;
 					case 'add':
 						$return = $this -> bot -> core("user") -> add ($source, $vars[2], 0, MEMBER, 0);
 						if ($return["error"] == true)
@@ -113,15 +113,11 @@ class Roster_Handler extends BaseActiveModule
 						{
 							return $return["content"];
 						}
-						break;
 					case 'list':
 						return $this -> memberslist();
-						break;
 					default:
 						return $this -> memberscount();
-						break;
 				}
-				break;
 			case 'guest':
 				switch($vars[1])
 				{
@@ -137,11 +133,6 @@ class Roster_Handler extends BaseActiveModule
 							$this->bot->core('notify')->del($vars[2]);
 							return $return["content"];
 						}
-						break;
-					case 'list':
-					default:
-						return $this -> guest_list();
-						break;
 					case 'add':
 						$userlevel = $this -> bot -> db -> select("SELECT user_level FROM #___users WHERE nickname = '".$vars[2]."'");
 						if(!empty($userlevel))
@@ -167,9 +158,10 @@ class Roster_Handler extends BaseActiveModule
 							//$this -> bot -> core('notify') -> add ($source, $vars[2]);
 							return $return["content"];
 						}
-						break;
+					case 'list':
+					default:
+						return $this -> guest_list();
 				}
-				break;
 			case 'rosterupdate':
 				$force = true;
 				if ($this -> bot -> guildbot)
