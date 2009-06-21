@@ -1482,6 +1482,8 @@ class Bot
 		// Change Encrypted Text to a Simple thing to say its encripted
 		$msg = preg_replace('/gcr &\$enc\$& ([a-z0-9]+) ([a-z0-9]+) ([a-z0-9]+) /U', "gcr <Encryted Message>", $msg);
 		$msg = preg_replace('/gcr &\$enc\$& ([a-z0-9]+) ([a-z0-9]+) ([a-z0-9]+)/', "gcr <Encryted Message>", $msg);
+		
+		$msg = $this -> replace_string_tags($msg);
 
 		if ($this -> log_timestamp == 'date')
 			$timestamp = "[" . gmdate("Y-m-d") . "]\t";
