@@ -204,6 +204,7 @@ $aoc = new AOChat("callback", $game);
 echo "Creating AOChat class!\n";
 $bot = new Bot($ao_username, $ao_password, $bot_name, $dimension, $bot_version, $bot_version_name, $other_bots, $aoc, $irc, $db, $command_prefix, $cron_delay, $tell_delay, $max_blobsize, $reconnect_time, $guildbot, $guild_id, $guild, $log, $logpath, $log_timestamp, $use_proxy_server, $proxy_server_address, $proxy_server_port, $game, $accessallbots, $sixtyfourbit);
 echo "Creating main Bot class!\n";
+$db -> bot = $bot;
 
 /*
 Make sure we no longer keep username and password in memory.

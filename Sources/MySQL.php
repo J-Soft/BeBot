@@ -161,8 +161,8 @@ class MySQL
 	function error($text, $fatal = false)
 	{
 		$msg = mysql_error();
-		echo "MySQL error (# " . $this -> error_count . ") on query: $text\n";
-		echo "$msg\n";
+		$this -> error_count++;
+		$this -> bot -> log("MySQL", "ERROR", "(# " . $this -> error_count . ") on query: $text\n$msg", TRUE);
 
 		// If this error is occuring while we are trying to first connect to the database when starting
 		// rthe bot its a fatal error.
@@ -341,10 +341,12 @@ class MySQL
 			{
 				$prefix = $this -> table_prefix;
 				$tablename = $prefix . $this -> underscore . $table;
+				$use_prefix = 'true';
 			}
 			else
 			{
 				$tablename = $table;
+				$use_prefix = 'false';
 			}
 
 			$this -> query("INSERT INTO " . $this -> master_tablename . " (internal_name, prefix, use_prefix) VALUES ('" . $table . "', '" . $prefix . "', '" . $use_prefix . "')");
