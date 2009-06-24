@@ -69,4 +69,9 @@
   $use_proxy_server = false;                // Enable simple web proxy server for HTTP lookups?
   $proxy_server_address = "";                // Proxy server to use address to use
 
+  /*
+  64bit servers may require a small change to how the bot connects, uncomment the variable below to enable this
+  */
+  //$sixtyfourbit = TRUE;
+
 ?>

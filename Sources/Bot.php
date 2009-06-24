@@ -147,7 +147,7 @@ class Bot
 	Constructor:
 	Prepares bot.
 	*/
-	function __construct($uname, $pwd, $botname, $dim, $botversion, $botversionname, $other_bots, &$aoc, &$irc, &$db, $commprefix, $crondelay, $telldelay, $maxsize, $recontime, $guildbot, $guildid, $guild, $log, $log_path, $log_timestamp, $use_proxy_server, $proxy_server_address, $proxy_server_port, $game, $accessallbots)
+	function __construct($uname, $pwd, $botname, $dim, $botversion, $botversionname, $other_bots, &$aoc, &$irc, &$db, $commprefix, $crondelay, $telldelay, $maxsize, $recontime, $guildbot, $guildid, $guild, $log, $log_path, $log_timestamp, $use_proxy_server, $proxy_server_address, $proxy_server_port, $game, $accessallbots, $sixtyfourbit)
 	{
 		$this -> username = $uname;
 		$this -> password = $pwd;
@@ -176,6 +176,7 @@ class Bot
 		$this -> use_proxy_server = $use_proxy_server;
 		$this -> proxy_server_address = explode(",", $proxy_server_address);
 		$this -> starttime = time();
+		$this -> sixtyfourbit = $sixtyfourbit;
 
 		$this -> module_links = array();
 
@@ -235,7 +236,7 @@ class Bot
 
 		// Open connection
 		$this -> log("LOGIN", "STATUS", "Connecting");
-		if (!$this -> aoc -> connect($server, $port))
+		if (!$this -> aoc -> connect($server, $port, $this -> sixtyfourbit))
 		{
 			$this -> cron_activated = false;
 			$this -> disconnect();

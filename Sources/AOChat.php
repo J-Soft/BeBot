@@ -188,8 +188,9 @@ class AOChat
 	}
 
 	/* Network stuff */
-	function connect($server = "default", $port = "default")
+	function connect($server = "default", $port = "default", $sixtyfourbit = FALSE)
 	{
+		$this -> sixtyfourbit = $sixtyfourbit;
 		if($server == "default")
 		{
 			if($this -> game == "ao")
@@ -985,22 +986,29 @@ class AOChat
 	function SafeDecHexReverseEndian($value)
 	{
 		$result = "";
-		$hex   = dechex($this -> ReduceTo32Bit($value));
-		$len   = strlen($hex);
-
-		while($len < 8)
+		if(!$this -> sixtyfourbit)
 		{
-			$hex = "0$hex";
-			$len++;
-		}
+			$hex   = dechex($this -> ReduceTo32Bit($value));
+			$len   = strlen($hex);
 
-		if (!function_exists("str_split"))
-		{
-			$bytes = $this -> my_str_split($hex, 2);
+			while($len < 8)
+			{
+				$hex = "0$hex";
+				$len++;
+			}
+
+			if (!function_exists("str_split"))
+			{
+				$bytes = $this -> my_str_split($hex, 2);
+			}
+			else
+			{
+				$bytes = str_split($hex, 2);
+			}
 		}
 		else
 		{
-			$bytes = str_split($hex, 2);
+			$bytes = unpack("H*", pack("L*", $value));
 		}
 
 		for($i = 3; $i >= 0; $i--)
