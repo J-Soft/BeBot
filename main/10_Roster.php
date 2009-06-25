@@ -189,14 +189,15 @@ class Roster_Core extends BasePassiveModule
 				$this -> bot -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "",
 				"$person has Left the Org");
 			}
-			else if (preg_match("/(.+) has joined the organization./i", $msg, $info))
+			else if (preg_match("/(.+) invited (.+) to your organization./i", $msg, $info))
 			{
-				$person = $info[1];
+				$inviter = $info[1];
+				$person = $info[2];
 				$id = $this -> bot -> core("chat") -> get_uid($person);
-				$this -> add ("Org Message", $id, $person, "from Org Message");
+				$this -> add ("Org Message", $id, $person, $inviter);
 				$this -> bot -> send_gc("Welcome##highlight## $person##end##!!!");
 				$this -> bot -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "",
-				"$person has Joined the Org ");
+				"$person has been invited to the org by $inviter");
 			}
 		}
 	}
