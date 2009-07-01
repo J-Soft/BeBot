@@ -46,28 +46,6 @@ if ((!empty($_SERVER[HTTP_HOST])) || (!empty($_SERVER[HTTP_USER_AGENT])))
 	die("BeBot does not support being run from a web server and it is inherently dangerous to do so!\nFor your own good and for the safety of your account information, please do not attempt to run BeBot from a web server!");
 }
 
-echo "
-===================================================\n
-    _/_/_/              _/_/_/                _/   \n
-   _/    _/    _/_/    _/    _/    _/_/    _/_/_/_/\n
-  _/_/_/    _/_/_/_/  _/_/_/    _/    _/    _/     \n
- _/    _/  _/        _/    _/  _/    _/    _/      \n
-_/_/_/      _/_/_/  _/_/_/      _/_/        _/_/   \n
-         An Anarchy Online Chat Automaton          \n
-                     And                           \n
-          An Age of Conan Chat Automaton           \n
-             v.$bot_version - PHP $php_version     \n
-===================================================\n
-";
-
-usleep(1500000);
-
-// The minimum required PHP version to run.
-if((float)phpversion() < 5.2)
-{
-	die("BeBot requires PHP version 5.2.0 or later to work.\n");
-}
-
 /*
 OS detection, borrowed from Angelsbot.
 */
@@ -80,6 +58,46 @@ if (empty($os))
 if (preg_match("/^windows/i", $os))
 {
 	$os_windows = true;
+}
+
+/*
+Check if we are running on a 64bit system or not
+*/
+if (PHP_INT_SIZE == 4)
+{
+	$sixtyfourbit = false;
+	$osbit = "32bit";
+}
+else
+{
+	$sixtyfourbit = true;
+	$osbit = "64bit";
+}
+
+
+
+echo "
+===================================================\n
+    _/_/_/              _/_/_/                _/   \n
+   _/    _/    _/_/    _/    _/    _/_/    _/_/_/_/\n
+  _/_/_/    _/_/_/_/  _/_/_/    _/    _/    _/     \n
+ _/    _/  _/        _/    _/  _/    _/    _/      \n
+_/_/_/      _/_/_/  _/_/_/      _/_/        _/_/   \n
+         An Anarchy Online Chat Automaton          \n
+                     And                           \n
+          An Age of Conan Chat Automaton           \n
+             v.$bot_version - PHP $php_version     \n
+			 OS: $os                               \n
+	Your operating system is detected as $osbit    \n
+===================================================\n
+";
+
+usleep(1500000);
+
+// The minimum required PHP version to run.
+if((float)phpversion() < 5.2)
+{
+	die("BeBot requires PHP version 5.2.0 or later to work.\n");
 }
 
 /*
