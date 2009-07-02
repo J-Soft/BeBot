@@ -232,7 +232,7 @@ class Roster_Core extends BasePassiveModule
 		if (($this -> lastrun + (60 * 60 * 6)) >= time() && $force == false)
 		{
 			$this -> bot -> log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
-			$this -> bot -> send_gc("##normal##".$msg."Roster update not scheduled ::: BeBot v.$this -> bot -> bot_version ready##end##");
+			$this -> bot -> send_gc("##normal##".$msg."Roster update not scheduled ::: BeBot v.".$this -> bot -> bot_version." ready##end##");
 			Return;
 		}
 
@@ -243,7 +243,7 @@ class Roster_Core extends BasePassiveModule
 		}
 		$this -> running = TRUE;
 
-		$this -> bot -> log("ROSTER", "UPDATE", "Starting roster update for guild id: $this -> bot -> guildid on RK$this -> bot -> dimension");
+		$this -> bot -> log("ROSTER", "UPDATE", "Starting roster update for guild id: ".$this -> bot -> guildid." on RK".$this -> bot -> dimension);
 		$this -> bot -> send_gc("##normal##".$msg."Roster update starting ::: System busy##end##");
 
 		// Get the guild roster
@@ -528,12 +528,12 @@ class Roster_Core extends BasePassiveModule
 
 			$this -> bot -> core("settings") -> save("members", "LastRosterUpdate", time());
 			$this -> bot -> log("ROSTER", "UPDATE", "Roster update complete. Added " . $this -> added . " members and removed " . $this -> removed . " of which " . $this -> rerolled . " was rerolled.",true);
-			$this -> bot -> send_gc("##normal##Roster update completed. Added " . $this -> added . " members and removed " . $this -> removed . " of which " . $this -> rerolled . " was rerolled. ::: BeBot v.$this -> bot -> bot_versionSystem ready##end##");
+			$this -> bot -> send_gc("##normal##Roster update completed. Added " . $this -> added . " members and removed " . $this -> removed . " of which " . $this -> rerolled . " was rerolled. ::: BeBot v.". $this -> bot -> bot_version. " ready##end##");
 		}
 		else
 		{
 			$this -> bot -> log("ROSTER", "UPDATE", "Roster update failed. Funcom XML returned 0 members.",true);
-			$this -> bot -> send_gc("##normal##Roster update failed! Funcom XML returned 0 members ::: BeBot v.$this -> bot -> bot_version ready##end##");
+			$this -> bot -> send_gc("##normal##Roster update failed! Funcom XML returned 0 members ::: BeBot v.".$this -> bot -> bot_version." ready##end##");
 		}
 
 		$this -> bot -> core("notify") -> update_cache();
@@ -559,7 +559,7 @@ class Roster_Core extends BasePassiveModule
 		{
 			$this -> bot -> log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
 			if($this -> bot -> game == "ao")
-				$this -> bot -> send_pgroup("##normal##".$msg."Roster update not scheduled ::: BeBot v.$this -> bot -> bot_version ready##end##");
+				$this -> bot -> send_pgroup("##normal##".$msg."Roster update not scheduled ::: BeBot v.".$this -> bot -> bot_version." ready##end##");
 		}
 		else
 		{
@@ -655,7 +655,7 @@ class Roster_Core extends BasePassiveModule
 			}
 			$this -> bot -> core("settings") -> save("members", "LastRosterUpdate", time());
 			$this -> bot -> log("CRON", "ROSTER", "Cleaning buddylist done. $num buddies removed.");
-			$this -> bot -> send_pgroup("##normal##Roster update completed ::: BeBot v.$this -> bot -> bot_version ready##end##");
+			$this -> bot -> send_pgroup("##normal##Roster update completed ::: BeBot v.".$this -> bot -> bot_version." ready##end##");
 		}
 		$this -> running = FALSE;
 	}
