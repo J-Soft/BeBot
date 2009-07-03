@@ -696,7 +696,7 @@ class Security_Core extends BaseActiveModule
 			return $return;
 		}
 
-		if ($this -> get_access_level($caller) < $this -> cache['groups'][$gid]['access_level'])
+		if (strtolower($caller) != "internal process" && $this -> get_access_level($caller) < $this -> cache['groups'][$gid]['access_level'])
 		{
 			$return['error'] = TRUE;
 			$return['errordesc'] = "Your Access Level is less than the Access Level of ".$group.". You cannot add members to ".$group.".";
