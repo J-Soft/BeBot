@@ -409,12 +409,14 @@ class Whois_Core extends BasePassiveModule
 
 		if(0 == $whois['online'])
 		{
-			$window .= " Last Online: ##highlight##".date("Y-m-d h:i",$whois['location'])."##end##\n";
+			// For offline users 'location' contains the last online time in milliseconds since 1970!
+			$window .= " ##normal##Last Online: ##highlight##".gmdate("Y-m-d h:i",$whois['location'])."##end##\n";
 		}
 
 		if ($this -> bot -> core("settings") -> get('Whois', 'Debug'))
-			$window .= " Character ID: ##highlight##" . $this -> bot -> core("tools") -> int_to_string($whois['id']) . "##end####end##\n\n";
-
+		{
+			$window .= " ##normal##Character ID: ##highlight##" . $this -> bot -> core("tools") -> int_to_string($whois['id']) . "##end####end##\n\n";
+		}
 
 		if ($this -> bot -> core("security") -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Whois')))
 		{
