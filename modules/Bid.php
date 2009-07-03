@@ -72,6 +72,9 @@ class Bid extends BaseActiveModule
 		$this -> help['command']['bid start <item>'] = "Starts an auction for <item>. <item> can be text or an item ref.";
 		$this -> help['command']['bid <points>'] = "Bid <points> raid points for the item currently on auction.";
 		$this -> help['command']['bid info'] = "Shows information about the current auction.";
+		$this -> help['command']['bid cancel'] = "Cancel the current auction.";
+		$this -> help['command']['bid [lock|unlock]'] = "Lock or Unlock the Current Auction to Raid users.";
+		$this -> help['command']['bid [history|list]'] = "Shows last 20 auctions or all since restart if less.";
 
 		$this -> bot -> core("settings") -> create("bid", "timer", 60, "How Long shold a Auction Last?");
 		$this -> bot -> core("settings") -> create("bid", "raid_locked", FALSE, "Should Auction be Locked to Users in Raid?");
@@ -110,7 +113,7 @@ class Bid extends BaseActiveModule
 						Return("Bids in /tell Only");
 				}
 				else
-					$this -> bot -> send_help($name);
+					$this -> bot -> send_help($name, "bid");
 		}
 	}
 
@@ -415,7 +418,8 @@ class Bid extends BaseActiveModule
 		if(!empty($this -> history))
 		{
 			$inside = " :: Auction History ::";
-			foreach($this -> history as $h)
+			$history = array_reverse($this -> history);
+			foreach($history as $h)
 			{
 				$inside .= "\n\n".gmdate($this -> bot -> core("settings") -> get("Time", "FormatString"), $h[0]) . " GMT";
 				$inside .= "\nItem: ".$h[1];
