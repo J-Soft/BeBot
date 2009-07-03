@@ -57,7 +57,7 @@ class MySQL
 		return self::$instance[$bothandle];
 	}
 	
-	private private function __construct($botname)
+	private function __construct($botname)
 	{
 		$this -> botname = $botname;
 		$this -> error_count = 0;
