@@ -129,5 +129,17 @@ class BasePassiveModule
 		$this->error->set($msg);
 		return $this->error->message();
 	}
+	
+    public function debug_output($title)
+    {
+		if ($this -> bot -> debug)
+		{
+			if ($title != "")
+			{
+				echo $title . "\n";
+			}
+			debug_print_backtrace();
+	   }
+    }
 }
 ?>

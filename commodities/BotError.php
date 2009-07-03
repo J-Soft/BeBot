@@ -80,6 +80,11 @@ class BotError
 		}
 	}
 	
+	function set_description($description)
+	{
+		$this->description=$description;
+	}
+		
 	function get()
 	{
 		return $this->description;
