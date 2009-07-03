@@ -39,6 +39,9 @@ define('BOT_VERSION', "0.7.0.bzr(snapshot)");
 $bot_version = BOT_VERSION;
 $php_version = phpversion();
 
+// Set the time zone to UTC
+date_default_timezone_set(UTC);
+
 /*
 OS detection, borrowed from Angelsbot.
 */
@@ -96,13 +99,20 @@ MySQL.php: Used to communicate with the MySQL database
 AOChat.php: Interface to communicate with AO chat servers
 Bot.php: The actual bot itself.
 */
-require_once "./Sources/RequirementCheck.php";
-require_once "./Sources/MySQL.php";
-require_once "./Sources/AOChat.php";
-require_once "./Sources/ConfigMagik.php";
-require_once "./Sources/Bot.php";
-require_once "./Sources/Dispatcher.php";
 
+echo "Loading required files...\n RequirementCheck.php...";
+require_once "./Sources/RequirementCheck.php";
+echo "success...\n MySQL.php...";
+require_once "./Sources/MySQL.php";
+echo "success...\n AOChat.php...";
+require_once "./Sources/AOChat.php";
+echo "success...\n ConfigMagik.php...";
+require_once "./Sources/ConfigMagik.php";
+echo "success...\n Bot.php...";
+require_once "./Sources/Bot.php";
+echo "success...\n Dispatcher.php...";
+require_once "./Sources/Dispatcher.php";
+echo "success...\n All required files loaded.\n";
 /*
 Creating the bot.
 */

@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 * Loot Module - allows you to flatroll items
 * Module originally coded by Craized <http://www.craized.net>

@@ -27,7 +27,8 @@
 * Original download location: http://www.phpclasses.org/browse/package/1726.html
 */
 
-class ConfigMagik extends BasePassiveModule
+/*class ConfigMagik extends BasePassiveModule*/
+class ConfigMagik
 {
 	var $PATH             = null;
 	var $VARS             = array();
@@ -35,7 +36,7 @@ class ConfigMagik extends BasePassiveModule
 	var $PROCESS_SECTIONS = true;
 	var $PROTECTED_MODE   = true;
 	var $ERRORS           = array();
-
+	public static $instance=array();
 	/**
 	* @desc   Constructor of this class.
 	* @param  string $path Path to ini-file to load at startup.
@@ -46,15 +47,26 @@ class ConfigMagik extends BasePassiveModule
 	* @param  bool $process_sections TRUE or FALSE to enable or disable sections in your ini-file (enabled by default).
 	* @return void Returns nothing, like any other constructor-method ¦¬] .
 	*/
-	function __construct(&$bot, $path=null, $synchronize=false, $process_sections=true)
+/*	function __construct(&$bot, $path=null, $synchronize=false, $process_sections=true)*/
+	function __construct($path=null, $synchronize=false, $process_sections=true)
 	{
-		parent::__construct(&$bot, get_class($this));
+/*		parent::__construct(&$bot, get_class($this));
 
 		$this -> register_module("ini");
-
+*/
 		$this -> PATH = $path;
 
 		$this -> create_ini($path, $synchronize, $process_sections);
+	}
+	
+	public function get_instance($bothandle, $path=null, $synchronize=false, $process_sections=true)
+	{
+		if(!isset(self::$instance[$bothandle]))
+		{
+			$class = __CLASS__;
+			self::$instance[$bothandle] = new $class($path, $synchronize, $process_sections);
+		}
+		return self::$instance[$bothandle];
 	}
 
 	/**

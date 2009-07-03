@@ -120,7 +120,7 @@ class User_Core extends BasePassiveModule
 				{
 					$this -> bot -> db -> query("UPDATE #___users SET nickname = '" . $name . "' where char_id = '" . $id . "'");
 				}
-				return $this->error
+				return $this->error;
 			}
 		}
 		$result = $this -> bot -> db -> select("SELECT char_id, user_level FROM #___users WHERE nickname = '" . $name . "'");
@@ -129,7 +129,7 @@ class User_Core extends BasePassiveModule
 			if ($result[0][1] == -1 && !($this -> bot -> guildbot))
 			{
 				$this->error->set("##highlight##" . $name . " ##end##is banned and cannot be added.");
-				return $this->error
+				return $this->error;
 			}
 			else
 			{
@@ -146,7 +146,7 @@ class User_Core extends BasePassiveModule
 		else if ($user_level < 0)
 		{
 			$this->error->set("##highlight##" . $level . " ##end##is not a valid access level. The plugin trying to add a user might be broken.");
-			return $this->error
+			return $this->error;
 		}
 
 		if($this -> bot -> game == "ao")
