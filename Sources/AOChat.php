@@ -76,6 +76,7 @@ ini_set("html_errors", 0);
 * they are mostly the same for same type packets, but maybe it should
 * have been done anyway..  // auno - 2004/mar/26
 */
+define('AOCP_LOGIN_CHARID',		0);
 define('AOCP_LOGIN_SEED',		0);
 define('AOCP_LOGIN_REQUEST',		2);
 define('AOCP_LOGIN_SELECT',		3);
@@ -153,6 +154,22 @@ define('AOEM_AI_REMOVE',              0x34);
 define('AOEM_AI_HQ_REMOVE_INIT',      0x35);
 define('AOEM_AI_HQ_REMOVE',           0x36);
 
+
+/* RPC Packet type definitions - so we won't have to use the number IDs */
+define('RPC_UNIVERSE_INIT',				0 );
+define('RPC_UNIVERSE_CHALLENGE',		0 );
+define('RPC_UNIVERSE_ANSWERCHALLENGE',	1 );
+define('RPC_UNIVERSE_AUTHENTICATED',	1 );
+define('RPC_UNIVERSE_ERROR',			2 );
+
+define('RPC_TERRITORY_INIT',			0x9CB2CB03 );
+define('RPC_TERRITORY_INITACK',			0x5DC18991 );
+define('RPC_TERRITORY_STARTUP',			0x6A546D41 );
+define('RPC_TERRITORY_CHARACTERLIST',	0xC414C5EF );
+define('RPC_TERRITORY_LOGINCHARACTER',	0xEF616EB6 );
+define('RPC_TERRITORY_GETCHATSERVER',	0x23A632FA );
+define('RPC_TERRITORY_ERROR',			0xD4063CA0 );
+
 class AOChat
 {
 	var $state, $debug, $id, $gid, $chars, $char, $grp, $buddies;
@@ -190,20 +207,18 @@ class AOChat
 	/* Network stuff */
 	function connect($server = "default", $port = "default")
 	{
-		if($server == "default")
+		if($this -> game == "ao")
 		{
-			if($this -> game == "ao")
-				$server = "chat2.d1.funcom.com";
-			else
-				$server = "proddm01.ams.ageofconan.com";
-		}
-		if($port == "default")
-		{
-			if($this -> game == "ao")
+			if($server == "default")
+			{
+				$server = "chat2.d1.funcom.com";		
+			}
+			if($port == "default")
+			{
 				$port = 7012;
-			else
-				$port = 7002;
+			}
 		}
+
 		if($this->state !== "connect")
 		die("AOChat: not expecting connect.\n");
 
@@ -222,14 +237,18 @@ class AOChat
 			return false;
 		}
 
-		$packet = $this->get_packet();
-		if(!is_object($packet) || $packet->type != AOCP_LOGIN_SEED)
+		/* For AO we expect the login seed when we connect to the chatserver */
+		if($this -> game == "ao")
 		{
-			trigger_error("Received invalid greeting packet from ".strtoupper($this -> game)." Chat server.", E_USER_WARNING);
-			$this->disconnect();
-			return false;
+			$packet = $this->get_packet();
+			if(!is_object($packet) || $packet->type != AOCP_LOGIN_SEED)
+			{	
+				trigger_error("Received invalid greeting packet from ".strtoupper($this -> game)." Chat server.", E_USER_WARNING);
+				$this->disconnect();
+				return false;
+			}
 		}
-
+		
 		return $s;
 	}
 
@@ -387,6 +406,16 @@ class AOChat
 			case AOCP_BUDDY_REMOVE :
 				unset($this->buddies[$packet->args[0]]);
 				break;
+				
+			case AOCP_LOGIN_ERROR:
+				if ( $this->game = "aoc" )
+				{
+					echo "Resending auth to chatserver [Character:" . $this->char["name"] . ", id:" . $this->char["id"] . "]\n";
+					$loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(0,$this->char["id"],$this->serverseed) );
+					$this->send_packet($loginCharacterPacket);	
+				}
+				break;
+
 		}
 
 		$this->last_packet = time();
@@ -412,10 +441,480 @@ class AOChat
 		return true;
 	}
 
+	function get_rpcpacket()
+	{
+		$head = $this->read_data(8);
+		if(strlen($head) != 8)
+		{
+			die("Error while reading rpc header. ($head)\n");
+			return "disconnected";
+		}
+
+		// First header contains of the packetsize and checksum
+		list(,$packetsize,$crc) = unpack("N2", $head);		
+		$data = $this->read_data($packetsize-4);
+		if ( strlen($data) != $packetsize - 4 )
+		{
+			die("Error while reading rpc packet." . strlen($data) . ":" .$packetsize);
+		}
+
+		// Skip the caller id
+		$temparray 	= unpack("n",$data);
+		$len 		= array_pop($temparray);
+		$data		= substr($data, 2 + $len + 8);
+
+		// Skip the endpoint id
+		$temparray 	= unpack("n",$data);
+		$len 		= array_pop($temparray);
+		$data		= substr($data, 2 + $len + 8);
+
+		// Read RPC id ( same as type for normal packeets )
+		$temparray 	= unpack("N", $data);
+		$type  		= array_pop($temparray);
+		$data 		= substr($data, 4);
+
+		// Unpack willl give a signed int32 back, so make sure we make type unsigned
+		if ($type <0)
+		{
+	      $type += 4294967296;
+		}
+		
+		if(is_resource($this->debug))
+		{
+			fwrite($this->debug, "<<<<<\n");
+			fwrite($this->debug, $head);
+			fwrite($this->debug, $data);
+			fwrite($this->debug, "\n=====\n");
+		}
+	
+		$packet = new RPCPacket("in", $type, $data);
+		switch($type)
+		{
+			case RPC_UNIVERSE_CHALLENGE :
+				$this->serverseed = $packet->args[0];
+				break;
+				
+			case RPC_UNIVERSE_AUTHENTICATED:
+				$this->accountid				= $packet->args[2];
+				$this->territoryServerAddress	= $packet->args[3];
+				$this->serverseed 				= $packet->args[4];
+				break;
+								
+			case RPC_TERRITORY_CHARACTERLIST:
+			
+				$temparray 	= unpack("N", $data);
+				$playerid	= array_pop($temparray);
+				$data 		= substr($data, 4);
+
+				$temparray 	= unpack("N", $data);
+				$characters	= array_pop($temparray);
+				$data 		= substr($data, 4);
+
+				$characters = (($characters / 1009) - 1);
+			
+				// Prepare an array of all characters returned
+				for($i=0;$i<$characters;$i++)
+				{
+					// CharacterID again ?
+					$data		= substr($data, 4);
+					
+					// PlayerID
+					$temparray 	= unpack("N",$data);
+					$playerid	= array_pop($temparray);
+					$data		= substr($data, 4);
+
+					// CharacterID
+					$temparray 	= unpack("N",$data);
+					$characterid= array_pop($temparray);
+					$data		= substr($data, 4);
+
+					// CharacterName
+					$temparray 	= unpack("n",$data);
+					$namelen	= array_pop($temparray);
+					$name		= substr($data, 2, $namelen);
+					$data		= substr($data, 2 + $namelen);
+
+					// DimensionID
+					$temparray 	= unpack("N",$data);
+					$dimensionid= array_pop($temparray);
+					$data		= substr($data, 4);
+
+					// Loginstate
+					$temparray 	= unpack("N",$data);
+					$loginstate	= array_pop($temparray);
+					$data		= substr($data, 4);
+
+					// Logindate
+					$temparray 	= unpack("n",$data);
+					$datelen	= array_pop($temparray);
+					$date		= substr($data, 2, $datelen);
+					$data		= substr($data, 2 + $datelen);
+
+					// 9 uint32 blocks with
+					// playtime, playfieldid, level, class, ?, ?, Gender, Race
+					list(,$playtime,$locationid,$level,) = unpack("N9", $data);
+					$data		= substr($data, 36);
+
+					// Languagesetting
+					$temparray 	= unpack("n",$data);
+					$langlen	= array_pop($temparray);
+					$lang		= substr($data, 2, $langlen);
+					$data		= substr($data, 2 + $langlen);
+
+					// Blocked status
+					$temparray 	= unpack("N",$data);
+					$blocked	= array_pop($temparray);
+					$data		= substr($data, 4);
+					
+					$this->chars[] = array(
+					"id"     	=> $characterid,
+					"name"   	=> $name,
+					"level"  	=> $level,
+					"online" 	=> $loginstate,
+					"language"	=> $lang );				
+				}
+		}
+	
+		return $packet;
+	}
+
+	function send_rpcpacket($packet)
+	{
+		$instance		= 0;
+		$callername 	= "";
+		$endpointname	= "";
+		
+		// We have to create the callerid and endpoint
+		switch( $packet->type )
+		{
+			case RPC_UNIVERSE_INIT:
+			case RPC_UNIVERSE_ANSWERCHALLENGE:
+				$callername 	= "UniverseInterface";
+				$endpointname	= "UniverseAgent";
+				$instance		= 1;
+				break;
+				
+			case RPC_TERRITORY_INIT:
+			case RPC_TERRITORY_STARTUP:
+			case RPC_TERRITORY_LOGINCHARACTER:
+				$callername		= "PlayerInterface";
+				$endpointname	= "PlayerAgent";
+				$instance		= $this->accountid;
+				break;
+		}
+
+		// Create the RPC header
+		$header1		= pack("n", strlen($callername)) . $callername . pack("N2", $instance, 0);
+		$header2		= pack("n", strlen($endpointname)) . $endpointname . pack("N2", 0, 0);
+		$header			= $header1 . $header2 . pack("N", $packet->type);
+		
+		// Create the datablock (header+data)
+		$data			= $header . $packet->data;
+
+		// Create the checksum for the packet
+		$packet->crc	= crc32($data);
+		$data			= pack("N", $packet->crc) . $data;
+		
+		// Add the packetsize in the header
+		$data 			= pack("N", strlen($data) ) . $data;
+		
+		if(is_resource($this->debug))
+		{
+			fwrite($this->debug, ">>>>>\n");
+			fwrite($this->debug, $data);
+			fwrite($this->debug, "\n=====\n");
+		}
+				
+		socket_write($this->socket, $data, strlen($data));
+		return true;
+	}
+
+	/*
+	Connecting to the universe function
+	*/
+	function authenticateConan($username, $password)
+	{			
+		$this->accountid				= 0;	
+		$this->territoryServerAddress 	= "";
+
+		// Send the username and universeversion
+		$key = $username . ":2";
+		$initPacket = new RPCPacket("out", RPC_UNIVERSE_INIT, array("", $key, 1));
+		$this->send_rpcpacket($initPacket);
+		
+		$challengePacket = $this->get_rpcpacket();
+		if ( $challengePacket->type != RPC_LOGIN_CHALLENGE )
+		{
+			die("AOChat: Universeconnection expected login challenge.\n");
+		}
+
+		// Now do the authentication
+		$key = $this->generate_login_key($this->serverseed, $username, $password);
+
+		// Send the authenticate packet to the universe
+		$answerChallengePacket = new RPCPacket("out", RPC_UNIVERSE_ANSWERCHALLENGE, array($key) );
+		$this->send_rpcpacket($answerChallengePacket);
+
+		// Wait for the auth packet
+		do
+		{
+			$authPacket = $this->get_rpcpacket();
+			if ( $authPacket->type == RPC_UNIVERSE_ERROR ) 
+			{
+				die("Got UniverseError while waiting for authenticate: " . $packet->args[0] );
+			}
+		} while ( $authPacket->type != RPC_UNIVERSE_AUTHENTICATED );
+
+		// Parse the serveraddress to the territory server
+		if ( strlen( $this->territoryServerAddress ) == 0 )
+		{
+			die("AOChat: Did not receive the serveraddress for the territorymanager.");
+		}
+		list($server,$port) = split( ":", $this->territoryServerAddress );
+		if ( strlen( $server ) == 0 || $port == 0 )
+		{
+			die("AOChat: Did not receive a proper serveraddress for the territorymanager ($this->territoryServerAddress) ($server:$port)");
+		}
+
+		// Disconnect from the universeserver
+		if(is_resource($this->socket))
+			socket_close($this->socket);
+
+		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+		if(!is_resource($this->socket))	die("Could not create socket.\n");
+		
+		// Connect to the territory server
+		if(@socket_connect($this->socket, $server, $port) === false)
+		{
+			trigger_error("Could not connect to the ".strtoupper($this -> game)." Territory server ($server:$port): ".
+			socket_strerror(socket_last_error($s)), E_USER_WARNING);
+			$this->disconnect();
+			return false;
+		}
+
+		// Log the player on to the territory server
+		$territoryInitPacket = new RPCPacket("out", RPC_TERRITORY_INIT, array($this->accountid, $this->serverseed ) );
+		$this->send_rpcpacket($territoryInitPacket);
+
+		// Receive the authenticate acknowledge
+		$territoryInitAckPacket = $this->get_rpcpacket();
+		if ( $territoryInitAckPacket->type != RPC_TERRITORY_INITACK )
+		{
+			die("AOChat: Universeconnection: Error while logging into territory. Got wrong RPC packet: " . $territoryInitAckPacket->type . "\n");
+		}
+
+		// Send the startupdata
+		$territoryStartupPacket = new RPCPacket("out", RPC_TERRITORY_STARTUP, array() );
+		$this->send_rpcpacket($territoryStartupPacket);
+
+		// Receive the characterlist
+		$territoryCharacterListPacket = $this->get_rpcpacket();
+		if ( $territoryCharacterListPacket->type != RPC_TERRITORY_CHARACTERLIST )
+		{
+			die("AOChat: Universeconnection: Error while fetching characterlist from territory. Got wrong RPC packet: " . $territoryCharacterListPacket->type . " (" . RPC_TERRITORY_CHARACTERLIST . ")\n");
+		}
+	
+		$this->username = $username;
+
+		// Authentication successfull, we are now logging in
+		$this->state    = "login";
+		
+		return $this->chars;
+	}
+
+		/*
+	Login Function
+
+	This function gets called after we have successfully authenticated and are ready to select a character to login.
+	*/
+	function loginConan($char)
+	{
+		// If we have not authenticated, bail
+		if($this->state != "login")
+		{
+			if ($this -> login_num >= 1)
+			{
+				die("AOChat: authentication failed. Keygeneration failure likely\n");
+			}
+			else
+			{
+				die("AOChat: not expecting login.\n");
+			}
+		}
+
+		// Allows us to catch if we've been here before and failed.
+		$this -> login_num += 1;
+		// Check if we have been given a character id or character name
+		if(is_int($char))
+		{
+			$field = "id";
+		}
+		else if(is_string($char))
+		{
+			$field = "name";
+			$char  = ucfirst(strtolower($char));
+		}
+
+		// Make sure we have a valid character to login
+		if(!is_array($char))
+		{
+			if(empty($field))
+			{
+				return false;
+			}
+			else
+			{
+				foreach($this->chars as $e)
+				{
+					if($e[$field] == $char)
+					{
+						$char = $e;
+						break;
+					}
+				}
+			}
+		}
+
+		if(!is_array($char))
+		{
+			die("AOChat: no valid character to login.\n");
+		}
+
+		
+		// Send the loginpacket
+		$lang = $char["language"];
+		if ( strlen($lang) == 0 )
+		{
+			$lang="en";
+		}
+		$territoryLoginCharPacket = new RPCPacket("out", RPC_TERRITORY_LOGINCHARACTER, array($char["id"], "", $lang) );
+		$this->send_rpcpacket($territoryLoginCharPacket);
+
+		// Should receive the chatserver ip in return	
+		$chatServerPacket = $this->get_rpcpacket();
+		while( $chatServerPacket->type != RPC_TERRITORY_GETCHATSERVER )
+		{
+			// If we receive an error here, it usually means we are already logged in with a character
+			if ( $chatServerPacket->type == RPC_TERRITORY_ERROR )
+			{
+				if ( !is_resource( $chatServerPacket->args[0] ) )
+				{
+					displayConanError( $chatServerPacket->args[0] );
+				}
+				else
+				{
+					echo "Got unknown error from packet : " . $chatServerPacket->type . "\n";
+				}
+				return false;
+			}
+			
+			$chatServerPacket = $this->get_rpcpacket();	
+		}
+		
+		// Disconnect from the territoryserver
+		if(is_resource($this->socket))
+			socket_close($this->socket);
+
+		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+		if(!is_resource($this->socket)) /* this is fatal */
+			die("Could not create socket.\n");
+
+		// Connect to the chat server
+		$serverip 	= $chatServerPacket->args[0];
+		$server 	= long2ip ( $serverip );
+		$port		= $chatServerPacket->args[1];
+		if(@socket_connect($this->socket, $server, $port) === false)
+		{
+			trigger_error("Could not connect to the ".strtoupper($this -> game)." Chatserver (server:$port)" . socket_strerror(socket_last_error($s)), E_USER_WARNING);
+			$this->disconnect();
+			return false;
+		}
+
+		// Prepare the login packet and send it
+		$loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(0,$char["id"],$this->serverseed) );
+		$this->send_packet($loginCharacterPacket);
+		
+		$this->char  = $char;
+		// We are authenticated and logged in. Everything is ok.
+		$this->state = "ok";
+
+		return true;
+	}
+
+	function displayConanError( $errorcode )
+	{
+		$err = "Unknown";
+		switch($errorcode)
+		{
+			case 0:
+				$err = "Login OK";
+			case 1:
+				$err = "Login timed out";
+				break;
+			case 2:
+				$err = "Dimension is down";
+				break;
+			case 3:
+				$err = "Too many characters logged in";
+				break;
+			case 4:
+				$err = "Invalid characterslot";
+				break;
+			case 5:
+				$err = "No gameservers available for this dimension";
+				break;
+			case 6:
+				$err = "Character not available";
+				break;
+			case 7:
+				$err = "Broken character";
+				break;
+			case 8:
+				$err = "Playfield shutting down";
+				break;
+				
+			case 9:
+				$err = "Playfield full";
+				break;
+			case 10:
+				$err = "Dimension full";
+				break;
+			case 11:
+				$err = "Unable to log in";
+				break;
+			case 12:
+				$err = "System Error";
+				break;
+			case 13:
+				$err = "Account banned";
+				break;
+			case 14:
+				$err = "Authentication failed";
+				break;
+			case 19:
+				$err = "Another character is already logged in";
+				break;
+			case 23:
+				$err = "Account frozen";
+				break;
+			case 25:
+				$err = "Wrong universe version";
+				break;
+			case 30:
+				$err = "Login timed out";
+				break;
+			case 33:
+				$err = "Access denied to this dimension";
+				break;
+		}
+		
+		echo "Server reported an error : $err\n";
+	}
+
 	/*
 	Authentication function
 	*/
-	function authenticate($username, $password)
+	function authenticateAO($username, $password)
 	{
 		// If we are not authenticating, bail
 		if($this->state != "auth")
@@ -459,7 +958,7 @@ class AOChat
 
 	This function gets called after we have successfully authenticated and are ready to select a character to login.
 	*/
-	function login($char)
+	function loginAO($char)
 	{
 		// If we have not authenticated, bail
 		if($this->state != "login")
@@ -1092,6 +1591,23 @@ class AOChat
 	}
 }
 
+$GLOBALS["aochat-rpcpacketmap"] = array(
+"in" => array(
+	RPC_UNIVERSE_CHALLENGE			=> array("name"=>"Login Challenge",				"args"=>"S"),
+	RPC_UNIVERSE_AUTHENTICATED		=> array("name"=>"Login Authenticated",			"args"=>"IIISII"),
+	RPC_UNIVERSE_ERROR				=> array("name"=>"Login Error",					"args"=>"I"),
+	RPC_TERRITORY_INITACK			=> array("name"=>"Player Authenticated",		"args"=>"S"),
+	RPC_TERRITORY_CHARACTERLIST		=> array("name"=>"Player Characterlist",		"args"=>"II"),
+	RPC_TERRITORY_GETCHATSERVER		=> array("name"=>"Receive Chatserver",			"args"=>"InIII"),
+	RPC_TERRITORY_ERROR				=> array("name"=>"Error while logging in",		"args"=>"I")),
+"out" => array(
+	RPC_UNIVERSE_INIT				=> array("name"=>"Login Init",					"args"=>"SSI"),
+	RPC_UNIVERSE_ANSWERCHALLENGE	=> array("name"=>"Login Answer Challenge",		"args"=>"S"),
+	RPC_UNIVERSE_ACCOUNT			=> array("name"=>"Login Player Account",		"args"=>"II"),
+	RPC_TERRITORY_INIT				=> array("name"=>"Player Init",					"args"=>"II"),
+	RPC_TERRITORY_STARTUP			=> array("name"=>"Player Startup",				"args"=>""),
+	RPC_TERRITORY_LOGINCHARACTER	=> array("name"=>"Login Character",				"args"=>"ISS"))
+);
 
 /* The AOChatPacket class - turning packets into binary blobs and binary
 * blobs into packets
@@ -1142,6 +1658,7 @@ AOCP_PING		=> array("name"=>"Pong",			"args"=>"S"),
 AOCP_FORWARD	=> array("name"=>"Forward",			"args"=>"IM"),
 AOCP_ADM_MUX_INFO	=> array("name"=>"Adm Mux Info",		"args"=>"iii")),
 "out" => array(
+AOCP_LOGIN_CHARID	=> array("name"=>"Login CharacterID",			"args"=>"III"),
 AOCP_LOGIN_REQUEST	=> array("name"=>"Login Response GetCharLst",	"args"=>"ISS"),
 AOCP_LOGIN_SELECT	=> array("name"=>"Login Select Character",	"args"=>"I"),
 AOCP_CLIENT_LOOKUP	=> array("name"=>"Name Lookup",			"args"=>"S"),
@@ -1162,6 +1679,7 @@ AOCP_CLIENTMODE_GET	=> array("name"=>"Clientmode Get",		"args"=>"IG"),
 AOCP_CLIENTMODE_SET	=> array("name"=>"Clientmode Set",		"args"=>"IIII"),
 AOCP_PING		=> array("name"=>"Ping",			"args"=>"S"),
 AOCP_CC		=> array("name"=>"CC",				"args"=>$aocpdifs[3])));
+
 
 class AOChatPacket
 {
@@ -1301,6 +1819,160 @@ class AOChatPacket
 		return true;
 	}
 }
+
+class RPCPacket
+{
+	function RPCPacket($dir, $type, $data)
+	{
+		$this->args 		= array();
+		$this->type 		= $type;
+		$this->dir  		= $dir;
+		$pmap = $GLOBALS["aochat-rpcpacketmap"][$dir][$type];
+
+		if(!$pmap)
+		{
+			echo "Unsupported rpcpacket type (".$dir.", ".$type.")\n";
+			return false;
+		}
+
+		if($dir == "in")
+		{
+			if(!is_string($data))
+			{
+				echo "Incorrect argument for incoming rpcpacket, expecting a string.\n";
+				return false;
+			}
+
+			for($i=0; $i<strlen($pmap["args"]); $i++)
+			{
+				$sa = $pmap["args"][$i];
+				switch($sa)
+				{
+					case "I" :
+						$temparray = unpack("N", $data);
+						$res  = array_pop($temparray);
+						$data = substr($data, 4);
+						
+						// Make sure the argument is unsigned int 32
+						if ($res <0)
+						{
+						  $res += 4294967296;
+						}
+
+						break;
+
+					case "n" :
+						$temparray = unpack("n", $data);
+						$res  = array_pop($temparray);
+						$data = substr($data, 2);
+						break;
+
+					case "B" :
+						$temparray = unpack("C", $data);
+						$res  = array_pop($temparray);
+						$data = substr($data, 1);
+						break;
+
+					case "S" :
+						$temparray = unpack("n", $data);
+						$len  = array_pop($temparray);
+						$res  = substr($data, 2, $len);
+						$data = substr($data, 2 + $len);
+						break;
+
+					case "G" :
+						$res  = substr($data, 0, 5);
+						$data = substr($data, 5);
+						break;
+
+					case "i" :
+						$temparray = unpack("n", $data);
+						$len  = array_pop($temparray);
+						$res  = array_values(unpack("N" . $len, substr($data, 2)));
+						$data = substr($data, 2 + 4 * $len);
+						break;
+
+					case "s" :
+						$temparray = unpack("n", $data);
+						$len  = array_pop($temparray);
+						$data = substr($data, 2);
+						$res  = array();
+						while($len--)
+						{
+							$temparray = unpack("n", $data);
+							$slen  = array_pop($temparray);
+							$res[] = substr($data, 2, $slen);
+							$data  = substr($data, 2+$slen);
+						}
+						break;
+
+					default :
+						echo "Unknown argument type! (" . $sa . ")\n";
+						continue(2);
+				}
+				$this->args[] = $res;
+			}
+		}
+		else
+		{
+			if(!is_array($data))
+			{
+				$args = array($data);
+			}
+			else
+			{
+				$args = $data;
+			}
+			$data = "";
+
+			for($i=0; $i<strlen($pmap["args"]); $i++)
+			{
+				$sa = $pmap["args"][$i];
+				$it = array_shift($args);
+
+				if(is_null($it))
+				{
+					echo "Missing argument for packet.\n";
+					break;
+				}
+
+				switch($sa)
+				{
+					case "I" :
+						$data .= pack("N", $it);
+						break;
+
+					case "i" :
+						$data .= pack("n", $it);
+						break;
+
+					case "S" :
+						$data .= pack("n", strlen($it)) . $it;
+						break;
+
+					case "G" :
+						$data .= $it;
+						break;
+
+					case "s" :
+						$data .= pack("n", sizeof($it));
+						foreach($it as $it_elem)
+						$data .= pack("n", strlen($it_elem)) . $it_elem;
+						break;
+
+					default :
+						echo "Unknown argument type! (" . $sa . ")\n";
+						continue(2);
+				}
+			}
+
+			$this->data = $data;
+		}
+		return true;
+	}
+
+}
+
 
 /* New "extended" messages, parser and abstraction.
 * These were introduced in 16.1.  The messages use postscript

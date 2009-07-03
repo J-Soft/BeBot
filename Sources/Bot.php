@@ -243,15 +243,28 @@ class Bot
 			sleep($this -> reconnecttime);
 			die("The bot is restarting.\n");
 		}
+		
+		// AoC authentication is a bit different
+		if ( $this -> game == "aoc" )
+		{
+			$this -> log("LOGIN", "STATUS", "Authenticating");
+			$this -> aoc -> authenticateConan($this -> username,$this -> password);
 
-		// Authenticate
-		$this -> log("LOGIN", "STATUS", "Authenticating");
-		$this -> aoc -> authenticate($this -> username, $this -> password);
+			// Login the bot character
+			$this -> log("LOGIN", "STATUS", "Logging in");
+			$this -> aoc -> loginConan(ucfirst(strtolower($this -> botname)));
+		}
+		else
+		{
+			// Authenticate
+			$this -> log("LOGIN", "STATUS", "Authenticating");
+			$this -> aoc -> authenticateAO($this -> username, $this -> password);
 
-		// Login the bot character
-		$this -> log("LOGIN", "STATUS", "Logging in");
-		$this -> aoc -> login(ucfirst(strtolower($this -> botname)));
-
+			// Login the bot character
+			$this -> log("LOGIN", "STATUS", "Logging in");
+			$this -> aoc -> loginAO(ucfirst(strtolower($this -> botname)));
+		}
+		
 		/*
 		We're logged in. Make sure we no longer keep username and password in memory.
 		*/
@@ -374,7 +387,7 @@ class Bot
 	*/
 	function send_irc($prefix, $name, $msg)
 	{
-		if (isset($this -> irc) && $this -> core("settings") -> exists("irc", "connected"))
+		if (isset($this -> irc) && $this -> exists_module("irc"))
 		{
 			if ($this -> core("settings") -> get("Irc", "Connected"))
 			{
@@ -436,12 +449,27 @@ class Bot
 		$send = true;
 		if($sizecheck)
 		{
-			if (preg_match("/<a href=\"(.+)\">/isU", $msg, $info))
+			if(strlen($msg) < 100000)
 			{
-				if (strlen($info[1]) > $this -> maxsize)
+				if (preg_match("/<a href=\"(.+)\">/isU", $msg, $info))
 				{
-					$this -> cut_size($msg, "tell", $to, $low);
-					$send = false;
+					if (strlen($info[1]) > $this -> maxsize)
+					{
+						$this -> cut_size($msg, "tell", $to, $low);
+						$send = false;
+					}
+				}
+			}
+			else
+			{
+				$info = explode('<a href="', $msg, 2);
+				if(count($info) > 1)
+				{
+					if (strlen($msg) > $this -> maxsize)
+					{
+						$this -> cut_size($msg, "tell", $to, $low);
+						$send = false;
+					}
 				}
 			}
 		}
@@ -462,7 +490,7 @@ class Bot
 				$this -> aoc -> send_tell($to, $msg);
 			}
 			else
-			$this -> core("chat_queue") -> into_queue($to, $msg, "tell", $low);
+				$this -> core("chat_queue") -> into_queue($to, $msg, "tell", $low);
 		}
 	}
 
@@ -1448,6 +1476,9 @@ class Bot
 		//Change links to the text [link]...[/link]
 		$msg = preg_replace("/<a href=\"(.+)\">/sU", "[link]", $msg);
 		$msg = preg_replace("/<\/a>/U", "[/link]", $msg);
+		// Change Encrypted Text to a Simple thing to say its encripted
+		$msg = preg_replace('/gcr &\$enc\$& ([a-z0-9]+) ([a-z0-9]+) ([a-z0-9]+) /U', "gcr <Encryted Message>", $msg);
+		$msg = preg_replace('/gcr &\$enc\$& ([a-z0-9]+) ([a-z0-9]+) ([a-z0-9]+)/', "gcr <Encryted Message>", $msg);
 
 		if ($this -> log_timestamp == 'date')
 			$timestamp = "[" . gmdate("Y-m-d") . "]\t";
@@ -1500,7 +1531,19 @@ class Bot
 	*/
 	function cut_size($msg, $type, $to="", $pri=0)
 	{
-		preg_match("/^(.*)<a href=\"(.+)\">(.*)$/isU", $msg, $info);
+		if(strlen($msg) < 100000)
+		{
+			preg_match("/^(.*)<a href=\"(.+)\">(.*)$/isU", $msg, $info);
+		}
+		else
+		{
+			$var = explode("<a href=\"", $msg, 2);
+			$var2 = explode ("\">", $var[1], 2);
+			$info[1] = $var[0];
+			$info[2] = $var2[0];
+			$info[3] = $var2[1];
+		}
+
 		$info[2] = str_replace("<br>","\n",$info[2]);
 		$content = explode("\n", $info[2]);
 		$page = 0;
@@ -1549,6 +1592,12 @@ class Bot
 	{
 		$this -> module_links[strtolower($name)] = NULL;
 		unset($this -> module_links[strtolower($name)]);
+	}
+
+	public function exists_module($name)
+	{
+		$name = strtolower($name);
+		Return (isset($this -> module_links[$name]));
 	}
 
 	// Returns the reference to the module registered under $name. Returns NULL if link is not registered.
