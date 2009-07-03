@@ -130,6 +130,11 @@ class Settings_Core extends BasePassiveModule
 			$this -> maintenance = TRUE;
 			$this -> create("Settings", "Log", TRUE, "Should changes to settings and the loading of the settings be shown in the log? Errors are always logged!");		
 		}
+		else
+		{
+			
+			$this -> maintenance = FALSE;
+		}
 	}
 
 	/*

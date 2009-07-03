@@ -150,4 +150,11 @@ if(!empty($bot->module_directories))
 // Start up the bot.
 $bot -> connect();
 
+while(true)
+{
+	if ($bot -> aoc -> wait_for_packet() == "disconnected")
+	$bot -> reconnect();
+
+	$bot -> cron();
+}
 ?>
