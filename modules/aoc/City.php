@@ -29,8 +29,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-07-23 16:44:39 +0100 (Wed, 23 Jul 2008) $
-* Revision: $Id: Alias.php 1673 2008-07-23 15:44:39Z temar $
+* File last changed at $LastChangedDate: 2008-12-02 03:08:55 +0000 (Tue, 02 Dec 2008) $
+* Revision: $Id: City.php 39 2008-12-02 03:08:55Z temar $
 */
 
 /*

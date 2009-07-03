@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: TowerAttack.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2009-01-06 21:31:36 +0100 (ti, 06 jan 2009) $
+* Revision: $Id: TowerAttack.php 1946 2009-01-06 20:31:36Z temar $
 */
 
 $towerAttack = new TowerAttack($bot);
@@ -296,6 +296,16 @@ class TowerAttack extends BaseActiveModule
 		{
 			$infos["time"] = time();
 			$player = $this -> bot -> core("whois") -> lookup($infos["off_player"]);
+			if($player instanceof BotError)
+			{
+				$player = array(
+					'level' => '0',
+					'profession' => 'Unknown',
+					'off_side' => 'Unknown'
+				);
+			}
+			else
+			{
 			if (empty($player["level"]))
 			{
 				$player["level"] = '0';
@@ -308,12 +318,6 @@ class TowerAttack extends BaseActiveModule
 
 			if (empty($infos["off_side"]))
 			{
-				if ($player['error'])
-				{
-					$infos["off_side"] = "error";
-				}
-				else
-				{
 					$infos["off_side"] = $player["faction"];
 				}
 			}
@@ -433,7 +437,7 @@ class TowerAttack extends BaseActiveModule
 		if ($infos["off_side"] == "")
 		{
 			$who = $this -> bot -> core("whois") -> lookup($infos["off_player"]);
-			if ($who['error'])
+			if ($who instanceof BotError)
 			{
 				$infos["off_side"] = "error";
 			}
@@ -505,11 +509,18 @@ class TowerAttack extends BaseActiveModule
 		if ($attacker != "")
 		{
 			$who = $this -> bot -> core("whois") -> lookup($attacker);
+			if($who instanceof BotError)
+			{
+				$msg .= " by##Unknown## " . $attacker . "##end##";
+			}
+			else
+			{
 			$msg .= " by##" . $who['faction'] . "## " . $attacker . "##end##";
 			if ($org != "")
 			{
 				$msg .= " (##" . $who['faction'] . "##" . $org . "##end##)";
 			}
+		}
 		}
 		$msg .= "!";
 

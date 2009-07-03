@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-12-02 19:16:14 +0100 (Tue, 02 Dec 2008) $
-* Revision: $Id: Relay.php 1870 2008-12-02 18:16:14Z temar $
+* File last changed at $LastChangedDate: 2008-12-01 05:13:27 +0100 (ma, 01 des 2008) $
+* Revision: $Id: Relay.php 1842 2008-12-01 04:13:27Z temar $
 */
 
 $relay = new Relay($bot);

@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-03-03 06:17:31 +0100 (Mon, 03 Mar 2008) $
-* Revision: $Id: News.php 1240 2008-03-03 05:17:31Z blueeagle $
+* File last changed at $LastChangedDate: 2008-11-30 18:55:36 +0000 (Sun, 30 Nov 2008) $
+* Revision: $Id: Mail.php 35 2008-11-30 18:55:36Z temar $
 */
 
 /*
@@ -75,13 +75,13 @@ class Mail extends BaseActiveModule
 		$this -> register_event('connect');
 
 		//Create settings
-		$this -> bot -> core("settings") -> create ($this -> module_name, "Max_life_read","6_months", "How long should a read message be kept?", "1_week;2_weeks;1_month;6_months;1_year;2_years");
-		$this -> bot -> core("settings") -> create ($this -> module_name, "Max_life_unread","1_year", "How long should an unread message be kept?", "1_week;2_weeks;1_month;6_months;1_year;2_years");
+		$this -> bot -> core("settings") -> create ("Mail", "Max_life_read","6_months", "How long should a read message be kept?", "1_week;2_weeks;1_month;6_months;1_year;2_years");
+		$this -> bot -> core("settings") -> create ("Mail", "Max_life_unread","1_year", "How long should an unread message be kept?", "1_week;2_weeks;1_month;6_months;1_year;2_years");
 
 		//Create preferences
-		$this -> bot -> core("prefs") -> create ($this -> module_name, "Life_read", "How long should a read message be kept?", "1_month", "1_week;2_weeks;1_month;6_months;1_year;2_years", "GUEST");
-		$this -> bot -> core("prefs") -> create ($this -> module_name, "Life_unread", "How long should an unread message be kept?", "6_months", "1_week;2_weeks;1_month;6_months;1_year;2_years", "GUEST");
-		$this -> bot -> core("prefs") -> create($this -> module_name, "Logon_notification", "Do you want to be notified about new mail when you log on?", "Yes", "Yes;No", "GUEST");
+		$this -> bot -> core("prefs") -> create ("Mail", "Life_read", "How long should a read message be kept?", "1_month", "1_week;2_weeks;1_month;6_months;1_year;2_years", "GUEST");
+		$this -> bot -> core("prefs") -> create ("Mail", "Life_unread", "How long should an unread message be kept?", "6_months", "1_week;2_weeks;1_month;6_months;1_year;2_years", "GUEST");
+		$this -> bot -> core("prefs") -> create("Mail", "Logon_notification", "Do you want to be notified about new mail when you log on?", "Yes", "Yes;No", "GUEST");
 
 		$this -> help['description'] = "Module to send mail messages to other members of the bot.";
 		$this -> help['command']['mail'] = "Shows a list of messages for you.";

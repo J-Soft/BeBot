@@ -35,8 +35,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: History.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-06 22:22:52 +0100 (lø, 06 des 2008) $
+* Revision: $Id: History.php 1894 2008-12-06 21:22:52Z blueeagle $
 */
 
 $history = new History($bot);
@@ -79,9 +79,9 @@ class History extends BaseActiveModule
 		{
 			$output = "##blob_title##::: Character history for " .$name. " :::##end##\n\n";
 			$content = $this -> bot -> core("tools") -> get_site("http://auno.org/ao/char.php?output=xml&dimension=" . $this -> bot -> dimension	. "&name=".$name." ");
-			if (!$content['error'])
+			if (!($content instanceof BotError))
 			{
-				$history = $this -> bot -> core("tools") -> xmlparse($content['content'], "history");
+				$history = $this -> bot -> core("tools") -> xmlparse($content, "history");
 				$events = explode("<entry", $history);
 				for($i = 1; $i < count($events); $i++)
 				{
@@ -124,7 +124,7 @@ class History extends BaseActiveModule
 			}
 			else
 			{
-				return $content['errordesc'];
+				return $content;
 			}
 		}
 		else

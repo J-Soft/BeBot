@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: MySQL.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-02 22:03:20 +0100 (ti, 02 des 2008) $
+* Revision: $Id: MySQL.php 1871 2008-12-02 21:03:20Z blueeagle $
 */
 
 
@@ -44,8 +44,22 @@ class MySQL
 	var $PASS = "";
 	var $SERVER = "";
 
-	function __construct($botname)
+	public static $instance;
+
+	public function get_instance($bothandle)
 	{
+		$bot = Bot::get_instance($bothandle);
+		if(!isset(self::$instance[$bothandle]))
+		{
+			$class = __CLASS__;
+			self::$instance[$bothandle] = new $class($bot->botname);
+		}
+		return self::$instance[$bothandle];
+	}
+	
+	private private function __construct($botname)
+	{
+		$this -> botname = $botname;
 		$this -> error_count = 0;
 		$this -> last_error = 0;
 		$this -> last_reconnect = 0;

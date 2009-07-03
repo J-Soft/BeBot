@@ -29,8 +29,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-07-23 16:44:39 +0100 (Wed, 23 Jul 2008) $
-* Revision: $Id: Alias.php 1673 2008-07-23 15:44:39Z temar $
+* File last changed at $LastChangedDate: 2009-01-04 16:58:47 +0000 (Sun, 04 Jan 2009) $
+* Revision: $Id: Items.php 89 2009-01-04 16:58:47Z temar $
 */
 
 /*
@@ -133,19 +133,19 @@ class Items extends BaseActiveModule
 		{
 			$result = $this -> bot -> core('items') -> submit_item($item, $name);
 
-			if ($result['content'] == "0" && $origin)
+			if ($result == "0" && $origin)
 			{
 				$output = "Thank you for submitting the item, however the item was already discovered by others.";
 				$this -> bot -> send_output($name, $output, $origin);
 			}
-			elseif ($result['content'] == "1" && ($origin || $this -> bot -> core("settings") -> get("Items", "Itemaware")))
+			elseif ($result == "1" && ($origin || $this -> bot -> core("settings") -> get("Items", "Itemaware")))
 			{
 				if(!$origin)
 					$origin = "tell";
 				$output = "Congratulations!! You are the ##items_discover##world's first##end## to discover ".$this -> bot -> core('items') -> make_item($item)."!";
 				$this -> bot -> send_output($name, $output, $origin);
 			}
-			elseif ($result['content'] == "2" && ($origin || $this -> bot -> core("settings") -> get("Items", "Itemaware")))
+			elseif ($result == "2" && ($origin || $this -> bot -> core("settings") -> get("Items", "Itemaware")))
 			{
 				if(!$origin)
 					$origin = "tell";

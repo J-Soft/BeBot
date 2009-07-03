@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2009-01-01 02:45:16 +0100 (Thu, 01 Jan 2009) $
-* Revision: $Id: Points.php 1941 2009-01-01 01:45:16Z temar $
+* File last changed at $LastChangedDate: 2008-12-31 23:01:08 +0100 (on, 31 des 2008) $
+* Revision: $Id: Points.php 1940 2008-12-31 22:01:08Z temar $
 */
 
 

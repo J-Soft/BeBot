@@ -34,8 +34,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2007-07-25 20:54:01 +0200 (Mi, 25 Jul 2007) $
-* Revision: $Id: CommandAliasUI.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
+* Revision: $Id: CommandAliasUI.php 1944 2009-01-01 02:15:37Z temar $
 */
 
 $commandaliasinterface = new CommandAliasInterface($bot);
@@ -46,7 +46,7 @@ class CommandAliasInterface extends BaseActiveModule
 	{
 		parent::__construct(&$bot, get_class($this));
 
-		$this -> register_command('all', 'comalias', 'OWNER');
+		$this -> register_command('all', 'comalias', 'SUPERADMIN');
 
 		$this -> help['description'] = 'Handles Command Aliases.';
 		$this -> help['command']['comalias add <alias> <command>'] = "Sets <alias> as an alias of <command>.";

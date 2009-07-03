@@ -7,8 +7,8 @@
  *
  * Developed by Sabkor (RK1)
  *
- * File last changed at $LastChangedDate: 2004-12-29 01:41:32 +0100 (Wed, 29 Dec 2004) $
- * Revision: $Id: _ClassName.php 8 2004-12-29 00:41:32Z blondengy $
+ * File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
+ * Revision: $Id: Quotes.php 1 2008-11-04 06:00:45Z temar $
  */
    
 $quotes = new Quotes($bot);

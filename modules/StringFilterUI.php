@@ -32,8 +32,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: StringFilterUI.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-06 22:22:52 +0100 (lø, 06 des 2008) $
+* Revision: $Id: StringFilterUI.php 1894 2008-12-06 21:22:52Z blueeagle $
 */
 
 $stringfilter_interface = new StringFilter_Interface($bot);
@@ -79,28 +79,12 @@ class StringFilter_Interface extends BaseActiveModule
 
 	function add($string, $new=NULL)
 	{
-		$return = $this -> bot -> core("stringfilter") -> add_string($string, $new);
-		if ($return['error'])
-		{
-			return $return['errordesc'];
-		}
-		else
-		{
-			return $return['content'];
-		}
+		return $this -> bot -> core("stringfilter") -> add_string($string, $new);
 	}
 
 	function rem($string)
 	{
-		$return = $this -> bot -> core("stringfilter") -> rem_string($string);
-		if ($return['error'])
-		{
-			return $return['errordesc'];
-		}
-		else
-		{
-			return $return['content'];
-		}
+		return $this -> bot -> core("stringfilter") -> rem_string($string);
 	}
 
 	function show($source)

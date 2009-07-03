@@ -31,7 +31,7 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
+* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (sø, 30 nov 2008) $
 * Revision: $Id: Roll.php 1833 2008-11-30 22:09:06Z alreadythere $
 */
 

@@ -131,6 +131,8 @@ class Logon extends BaseActiveModule
 							if ($this -> last_log["on"][$name] < (time() - 5))
 							{
 								$result = $this -> bot -> core("whois") -> lookup($name);
+								if($result instanceof BotError)
+									$result = array("level" => 0);
 								$aliasm = $this -> bot -> core("alias") -> get_main($name);
 								if($aliasm)
 								{

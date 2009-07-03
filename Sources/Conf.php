@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-12-02 03:08:55 +0000 (Tue, 02 Dec 2008) $
-* Revision: $Id: Conf.php 39 2008-12-02 03:08:55Z temar $
+* File last changed at $LastChangedDate: 2009-03-09 01:58:35 +0000 (Mon, 09 Mar 2009) $
+* Revision: $Id: Conf.php 3 2009-03-09 01:58:35Z temar $
 */
 
 $conf = new Conf($argv, $confc);

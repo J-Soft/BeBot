@@ -32,8 +32,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-07-07 22:20:16 +0100 (Mon, 07 Jul 2008) $
-* Revision: $Id: Whois.php 1670 2008-07-07 21:20:16Z temar $
+* File last changed at $LastChangedDate: 2009-03-09 01:58:35 +0000 (Mon, 09 Mar 2009) $
+* Revision: $Id: Whois.php 3 2009-03-09 01:58:35Z temar $
 */
 
 $whois_core = new Whois_Core($bot);
@@ -113,7 +113,7 @@ class Whois_Core extends BasePassiveModule
 	*/
 	function buddy($name, $online, $level, $location, $class)
 	{
-		$user = $this -> bot -> core("chat") -> get_uid($name);
+		$user = $this -> bot -> core("player") -> id($name);
 
 		$who = array();
 		$who["id"] = $user;
@@ -239,17 +239,14 @@ class Whois_Core extends BasePassiveModule
 
 		$name = ucfirst(strtolower($name));
 
-		$who["error"] = false;
-		$uid = $this -> bot -> core("chat") -> get_uid($name);
+		$uid = $this -> bot -> core("player") -> id($name);
 		/*
 		Make sure we havent been passed a bogus name.
 		*/
 		if (!$uid)
 		{
-			$who["error"] = true;
-			$who["errordesc"] = "$name appears to be a non exsistant character.";
-
-			return $who;
+			$this->error->set("$name appears to be a non exsistant character.");
+			return $this->error;
 		}
 
 		// Check cache for entry first.
@@ -307,8 +304,8 @@ class Whois_Core extends BasePassiveModule
 			if (empty($lookup))
 			{
 				// No old data exists, return error:
-				$who["error"] = true;
-				$who["errordesc"] = "No chached character data was found for $name, but no web lookup mode was requested!";
+				$this->error->set("No chached character data was found for $name, but no web lookup mode was requested!");
+				return $this->error;
 			}
 			else
 			{
@@ -318,13 +315,12 @@ class Whois_Core extends BasePassiveModule
 			return $who;
 		}
 
-		$id = $this -> bot -> core("chat") -> get_uid($name);
+		$id = $this -> bot -> core("player") -> id($name);
 		// Make sure the character exsists.
 		if (!$id)
 		{
-			$who["error"] = true;
-			$who["errordesc"] = "Player ##highlight##" . $name . " ##end##does not exist";
-			return $who;
+ 			$this->error->set("Player ##highlight##" . $name . " ##end##does not exist");
+ 			return $this->error;
 		}
 		$this -> bot -> core("chat") -> buddy_add($id);
 		return false;
@@ -335,18 +331,20 @@ class Whois_Core extends BasePassiveModule
 	*/
 	function check_xml($xml)
 	{ // Start function check_xml()
-		if ($xml["error"])
-		return $xml; // The XML is bad to start with, no more checking needed.
-		$nickname = $this -> bot -> core("tools") -> xmlparse($xml["content"], "nick");
+		if ($xml instanceof BotError)
+		{
+			$this->bot->log("WHOIS", "CHECK_XML", "For some reason I was passed a BotError. This shouldn't happen!");
+			return $xml; // The XML is bad to start with, no more checking needed. Should not have made it this far!
+		}
+		$nickname = $this -> bot -> core("tools") -> xmlparse($xml, "nick");
 		/*
 		We have an empty nick despite having gotten a valid responce from Funcom XML? Bail!
 		This should __never__ happen, but you can never rule out errors on Funcom's end.
 		*/
 		if ($nickname == '')
 		{
-			$xml["error"] = TRUE;
-			$xml["errordesc"] = "Could not parse XML data.";
-			return $xml;
+			$this->error->set("Could not parse XML data.");
+			return $this->error;
 		}
 		else
 		return $xml; // If we get here, all should be well.
@@ -363,7 +361,7 @@ class Whois_Core extends BasePassiveModule
 		if ($who["id"] == 0 || $who["id"] === false)
 		{
 			$this -> bot -> log('Whois', 'Update', $who["nickname"] . " had an invalid user ID! UID: " . $who["id"]);
-			$who["id"] = $this -> bot -> core("chat") -> get_uid($who["nickname"]);
+			$who["id"] = $this -> bot -> core("player") -> id($who["nickname"]);
 		}
 
 
@@ -431,7 +429,7 @@ class Whois_Core extends BasePassiveModule
 
 		$online = $this -> bot -> core("online") -> get_online_state($whois['nickname']);
 
-		$window .= "##normal## Status: " . $online['content'] . $seen ."##end##\n";
+		$window .= "##normal## Status: " . $online . $seen ."##end##\n";
 
 		if($online['status'] <= 0)
 		{

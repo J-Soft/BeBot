@@ -34,8 +34,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-05-03 01:30:21 +0200 (Sat, 03 May 2008) $
-* Revision: $Id: Blacklist.php 1512 2008-05-02 23:30:21Z temar $
+* File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
+* Revision: $Id: Blacklist.php 1 2008-11-04 06:00:45Z temar $
 */
 
 $blacklist = new Blacklist($bot);
@@ -120,7 +120,7 @@ class Blacklist extends BaseActiveModule
 			{
 				// Get the reason from notes.
 				$note = $this -> bot -> core("player_notes") -> get_notes($name, $val['name'], $val['noteid']);
-				$note = $note["content"][0];
+				$note = $note[0];
 				print_r($note);
 				unset($tmp);
 				if ($val['expire'] == 0)
@@ -151,7 +151,7 @@ class Blacklist extends BaseActiveModule
 		$source = mysql_real_escape_string($source);
 		$target = mysql_real_escape_string($target);
 		$reason = mysql_real_escape_string($reason);
-		if ($this -> bot -> core("chat") -> get_uid($target))
+		if ($this -> bot -> core("player") -> id($target))
 		{
 			if ($this -> bot -> core("security") -> is_banned($target))
 			{
@@ -161,7 +161,7 @@ class Blacklist extends BaseActiveModule
 			{
 				// First add a note.
 				$note = $this -> bot -> core("player_notes") -> add($target, $source, $reason, "ban");
-				if (!$note['error'])
+				if (!($note instanceof BotError))
 				{
 					$note = $note['pnid'];
 				}

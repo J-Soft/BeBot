@@ -31,7 +31,7 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2009-01-11 16:36:02 +0100 (Sun, 11 Jan 2009) $
+* File last changed at $LastChangedDate: 2009-01-11 16:36:02 +0100 (sø, 11 jan 2009) $
 * Revision: $Id: Roster.php 1948 2009-01-11 15:36:02Z temar $
 */
 
@@ -94,25 +94,11 @@ class Roster_Handler extends BaseActiveModule
 				{
 					case 'del':
 					case 'rem':
-						$return = $this -> bot -> core("user") -> del ($source, $vars[2], 0, 0);
-						if ($return["error"] == true)
-						{
-							return $return["errordesc"];
-						}
-						else
-						{
-							return $return["content"];
-						}
+ 						return $this -> bot -> core("user") -> del ($source, $vars[2], 0, 0);
+  						break;
 					case 'add':
-						$return = $this -> bot -> core("user") -> add ($source, $vars[2], 0, MEMBER, 0);
-						if ($return["error"] == true)
-						{
-							return $return["errordesc"];
-						}
-						else
-						{
-							return $return["content"];
-						}
+ 						return $this -> bot -> core("user") -> add ($source, $vars[2], 0, MEMBER, 0);
+  						break;
 					case 'list':
 						return $this -> memberslist();
 					default:
@@ -124,15 +110,11 @@ class Roster_Handler extends BaseActiveModule
 					case 'del':
 					case 'rem':
 						$return = $this -> bot -> core("user") -> del ($source, $vars[2], 0, 0);
-						if ($return["error"] == true)
-						{
-							return $return["errordesc"];
-						}
-						else
+						if(!($return instanceof BotError))
 						{
 							$this->bot->core('notify')->del($vars[2]);
-							return $return["content"];
 						}
+						return $return;
 					case 'add':
 						$userlevel = $this -> bot -> db -> select("SELECT user_level FROM #___users WHERE nickname = '".$vars[2]."'");
 						if(!empty($userlevel))
@@ -149,15 +131,11 @@ class Roster_Handler extends BaseActiveModule
 						}
 
 						$return = $this -> bot -> core("user") -> add ($source, $vars[2], 0, GUEST, 0);
-						if ($return["error"] == true)
-						{
-							return $return["errordesc"];
-						}
-						else
-						{
-							//$this -> bot -> core('notify') -> add ($source, $vars[2]);
-							return $return["content"];
-						}
+ 						//if (!($return instanceof BotError))
+ 						//{
+ 						//	$this -> bot -> core('notify') -> add ($source, $vars[2]);
+ 						//}
+ 						return $return;
 					case 'list':
 					default:
 						return $this -> guest_list();
@@ -325,7 +303,7 @@ class Roster_Handler extends BaseActiveModule
 	*/
 	function cron()
 	{
-		$buddies = $this -> bot -> aoc -> buddies;
+		$buddies = $this -> bot -> core('player') -> get_cache();
 		$buddy_count = count($buddies);
 
 		$notify_db = $this -> bot -> db -> select("SELECT count(notify) FROM #___users WHERE notify = 1");

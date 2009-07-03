@@ -32,8 +32,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: Whois.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-06 22:42:40 +0100 (lø, 06 des 2008) $
+* Revision: $Id: Whois.php 1897 2008-12-06 21:42:40Z blueeagle $
 */
 
 $whois = new Whois($bot);
@@ -139,7 +139,7 @@ class Whois extends BaseActiveModule
 		{
 			Return;
 		}
-		elseif (!$who["error"])
+		elseif (!($who instanceof BotError))
 		{
 			$result = "##whois_name##" . $who["nickname"] . "##end## is a level ";
 			$result .= "##whois_level##" . $who["level"] . "##end##";
@@ -202,7 +202,7 @@ class Whois extends BaseActiveModule
 
 				if ($online['status'] != -1)
 				{
-					$result .= " :: " . $online['content'];
+					$result .= " :: " . $online;
 				}
 			}
 
@@ -257,7 +257,7 @@ class Whois extends BaseActiveModule
 		}
 		else
 		{
-			$result = "Error: " . $who["errordesc"];
+			$result = $who;
 		}
 		return $result;
 	}

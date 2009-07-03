@@ -36,8 +36,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: 15_Colors.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-05 13:19:39 +0100 (fr, 05 des 2008) $
+* Revision: $Id: 15_Colors.php 1884 2008-12-05 12:19:39Z blueeagle $
 */
 
 $colors_core = new Colors_Core($bot);
@@ -265,22 +265,19 @@ class Colors_Core extends BasePassiveModule
 	function read_scheme_file($filename)
 	{
 		$theme_dir = "./themes/";
-		$ret['error'] = false;
 
 		// Make sure filename is valid
 		if (!preg_match("/^([a-z01-9-_]+)$/i", $filename))
 		{
-			$ret['error'] = TRUE;
-			$ret['errordesc'] = "Illegal filename for scheme file! The filename must only contain letters, numbers, - and _!";
-			return $ret;
+			$this->error->set("Illegal filename for scheme file! The filename must only contain letters, numbers, - and _!");
+			return $this->error;
 		}
 
 		$scheme_file = file($theme_dir . $filename . ".scheme.xml");
 		if (!$scheme_file)
 		{
-			$ret['error'] = TRUE;
-			$ret['errordesc'] = "Scheme file not existing or empty!";
-			return $ret;
+			$this->error->set("Scheme file not existing or empty!");
+			return $this->error;
 		}
 
 		foreach ($scheme_file AS $scheme_line)
@@ -295,22 +292,19 @@ class Colors_Core extends BasePassiveModule
 		$this -> no_tags = TRUE;
 		$this -> create_color_cache();
 
-		$ret['content'] = "Theme file " . $filename . " read, schemes updated!";
-		return $ret;
+		return "Theme file " . $filename . " read, schemes updated!";
 	}
 
 	// Creates a scheme file containing all schemes in the bot table
 	function create_scheme_file($filename, $name)
 	{
 		$theme_dir = "./themes/";
-		$ret['error'] = false;
 
 		// Make sure filename is valid
 		if (!preg_match("/^([a-z01-9-_]+)$/i", $filename))
 		{
-			$ret['error'] = TRUE;
-			$ret['errordesc'] = "Illegal filename for scheme file! The filename must only contain letters, numbers, - and _!";
-			return $ret;
+			$this->error->set("Illegal filename for scheme file! The filename must only contain letters, numbers, - and _!");
+			return $this->error;
 		}
 
 		$header = '<schemes name="Scheme for ' . ucfirst(strtolower($this -> bot -> botname)) . '" version="1.0" author="' . ucfirst(strtolower($name)) . '" link="">';
@@ -321,17 +315,15 @@ class Colors_Core extends BasePassiveModule
 		$handle = fopen($theme_dir . $filename, "w");
 		if (!$handle)
 		{
-			$ret['error'] = TRUE;
-			$ret['errordesc'] = "Can't open scheme file " . $filename . "!";
-			return $ret;
+			$this->error->set("Can't open scheme file " . $filename . "!");
+			return $this->error;
 		}
 		
 		$schemes = $this -> bot -> db -> select("SELECT * FROM #___color_schemes ORDER BY module ASC, name ASC");
 		if (empty($schemes))
 		{
-			$ret['error'] = TRUE;
-			$ret['errordesc'] = "No schemes defined!";
-			return $ret;
+			$this->error->set("No schemes defined!");
+			return $this->error;
 		}
 
 		$status = TRUE;
@@ -355,13 +347,11 @@ class Colors_Core extends BasePassiveModule
 
 		if (!$status)
 		{
-			$ret['error'] = TRUE;
-			$ret['errordesc'] = "Error while writing schemes!";
-			return $ret;
+			$this->error->set("Error while writing schemes!");
+			return $this->error;
 		}
 
-		$ret['content'] = "Scheme file " . $filename . " created!";
-		return $ret;
+		return "Scheme file " . $filename . " created!";
 	}
 
 	// Creates default theme file with given name

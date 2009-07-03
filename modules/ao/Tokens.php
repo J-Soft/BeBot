@@ -32,8 +32,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-12-03 18:32:34 +0100 (Wed, 03 Dec 2008) $
-* Revision: $Id: Tokens.php 1877 2008-12-03 17:32:34Z temar $
+* File last changed at $LastChangedDate: 2009-01-06 21:31:36 +0100 (ti, 06 jan 2009) $
+* Revision: $Id: Tokens.php 1946 2009-01-06 20:31:36Z temar $
 */
 
 $tokens = new tokens($bot); 
@@ -78,16 +78,19 @@ class tokens extends BaseActiveModule
 				{
 					if (!ctype_digit($vars[1]) || !ctype_digit($vars[2]))
 					{
-						$return["error"] = true;
-						$return["errordesc"] = "Values given are not numerical";
+						$this->error->set("Values given are not numerical");
+						return $this->error;
 					}
 					else
 					{
 						$who = $this -> bot -> core("whois") -> lookup($source);
+						if(!($who instanceof BotError))
+						{
 						$level = $who["level"];
 						if ($who["faction"] == 'Clan')
 						{
 							$clan = true;
+						}
 						}
 						
 						$return = $this -> ShowTokens($level, $vars[1], $vars[2], $clan);
@@ -97,15 +100,18 @@ class tokens extends BaseActiveModule
 				{
 					if (!ctype_digit($vars[1]) || !ctype_digit($vars[2]) || !ctype_digit($vars[3]))
 					{
-						$return["error"] = true;
-						$return["errordesc"] = "Values given are not numerical";
+						$this->error->set("Values given are not numerical");
+						return $this->error;
 					}
 					else
 					{
 						$who = $this -> bot -> core("whois") -> lookup($source);
+						if(!($who instanceof BotError))
+						{
 						if ($who["faction"] == 'Clan')
 						{
 							$clan = true;
+						}
 						}
 						$return = $this -> ShowTokens($vars[1], $vars[2], $vars[3], $clan);
 					}
@@ -127,22 +133,14 @@ class tokens extends BaseActiveModule
 					$inside .= "Veteran tokens give ##highlight##50##end## tokens and cost ##highlight##7##end## veteran points\n";
 					$inside .= "OFAB tokens give ##highlight##10##end##/##highlight##100##end## tokens and cost ##highlight##1000##end##/##highlight##10000##end## victory points\n";
 					
-					$return["content"] = "##normal##::: ##highlight##Token overview##end## ::: ".$this -> bot -> core("tools") -> make_blob("click to view", $inside);
+					return "##normal##::: ##highlight##Token overview##end## ::: ".$this -> bot -> core("tools") -> make_blob("click to view", $inside);
 				}
 				else
 				{
-					$return["error"] = true;
-					$return["errordesc"] = "##highlight##$msg##end## is not valid input. Please see <pre>help tokens ";
+					$this->error->set("##highlight##$msg##end## is not valid input. Please see <pre>help tokens ");
+					return $this->error;
 				}
 				
-				if ($return["error"] == true)
-				{
-					return $return["errordesc"];
-				}
-				else
-				{
-					return $return["content"];
-				}
 				break;
 			default:
 				return "Broken plugin, recieved unhandled command: $command";
@@ -157,9 +155,8 @@ class tokens extends BaseActiveModule
 		// Make sure our goal is larger than our current tokens
 		if ($goal == $current)
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "Your goal tokens can not be the same as your current tokens!";
-			return $return;
+			$this->error->set("Your goal tokens can not be the same as your current tokens!");
+			return $this->error;
 		}
 		elseif($goal < $current)
 		{
@@ -171,17 +168,15 @@ class tokens extends BaseActiveModule
 		// Make sure we have a legal level range
 		if (($level < 1) || ($level > 220)) 
 		{ 
-			$return["error"] = true;
-			$return["errordesc"] = "Enter a level between ##highlight##1##end## and ##highlight##220##end##!";
-			return $return;
+			$this->error->set("Enter a level between ##highlight##1##end## and ##highlight##220##end##!");
+			return $this->error;
    		}
 
 		// Make sure we have a sane token count for both goal and current
 		if (!is_finite($goal) || !is_finite($current))
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "Please enter sane values for both goal and current tokens!";
-			return $return;
+			$this->error->set("Please enter sane values for both goal and current tokens!");
+			return $this->error;
 		}
 
 		if ($level > 189) 
@@ -252,8 +247,7 @@ class tokens extends BaseActiveModule
 		$inside	.= "##highlight##**##end## OFAB tokens listed are the set of 10, thus ##highlight##". number_format($VPtoke) ."##end## will equal ##highlight##". number_format($VP2) ." tokens.##end####end##"; 		
 
 		$info = "Token calculator ::: " . $this -> bot -> core("tools") -> make_blob('Click for results', $inside);
-		$return["content"] = $info;
-		return $return;
+		return $info;
 	}
 } 
 ?> 

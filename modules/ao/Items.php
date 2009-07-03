@@ -33,8 +33,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: Items.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-06 22:54:37 +0100 (lø, 06 des 2008) $
+* Revision: $Id: Items.php 1898 2008-12-06 21:54:37Z blueeagle $
 */
 $VhItems = new VhItems($bot);
 
@@ -80,23 +80,33 @@ class VhItems extends BaseActiveModule
 				$url .= '&ql='.$ql;
 				$url .= '&icons='.$this->icons;
 				if ($this->color_header)
+				{
 					$url .= '&color_header='.$this->color_header;
+				}
 				if ($this->color_highlight)
+				{
 					$url .= '&color_highlight='.$this->color_highlight;
+				}
 				if ($this->color_normal)
+				{
 					$url .= '&color_normal='.$this->color_normal;
+				}
 
 				$result = $this -> bot -> core("tools") -> get_site($url, 1);
-				if(strstr($result['content'], 'mysql_real_escape_string')!==false)
+				//Again I do not see why we're looking for mysql_real_escape_string
+				if(strstr($result, 'mysql_real_escape_string')!==false)
+				{
 					return("Recieved garbled reply from vhabot!");
-				if (!empty($result["content"]))
-					return $result["content"];
+				}
+				return $result;
+			} 
 				else
-					return "Unable to query database";
-			} else {
+			{
 				return "Usage: items [quality] [item]";
 			}
-		} else {
+		} 
+		else 
+		{
 			$this -> bot -> send_help($name);
 		}
 	}

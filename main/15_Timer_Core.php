@@ -76,8 +76,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate$
-* Revision: $Id: 15_Timer_Core.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-11-19 02:46:44 +0000 (Wed, 19 Nov 2008) $
+* Revision: $Id: 15_Timer_Core.php 1944 2009-01-01 02:15:37Z temar $
 */
 
 $timer_core = new Timer_Core($bot);
@@ -413,15 +413,13 @@ class Timer_Core extends BasePassiveModule
 
 	function del_timer($deleter, $id, $silent = true)
 	{
-		$ret['error'] = false;
 		$deleter = ucfirst(strtolower($deleter));
 
 		$deltimer = $this -> bot -> db -> select("SELECT owner, name FROM #___timer WHERE id = " . $id);
 		if (empty($deltimer))
 		{
-			$ret['error'] = true;
-			$ret['errordesc'] = "##error##Invalid timer ID!";
-			return $ret;
+			$this->error->set("Invalid timer ID!");
+			return $this->error;
 		}
 
 		$dodelete = false;
@@ -443,9 +441,8 @@ class Timer_Core extends BasePassiveModule
 
 		if (!$dodelete)
 		{
-			$ret['error'] = true;
-			$ret['errordesc'] = "##error##You are not allowed to delete this timer!##end##";
-			return $ret;
+			$this->error->set("You are not allowed to delete this timer!");
+			return $this->error;
 		}
 
 		$this -> bot -> db -> query("DELETE FROM #___timer WHERE id = " . $id);
@@ -457,10 +454,9 @@ class Timer_Core extends BasePassiveModule
 			$this -> bot -> send_output($deltimer[0][0], $msg, "tell");
 		}
 
-		$ret['content'] = "The timer ##highlight##" . $deltimer[0][1] . "##end## was deleted!";
-
 		$this -> update_next_timer();
-		return $ret;
+		
+		return "The timer ##highlight##" . $deltimer[0][1] . "##end## was deleted!";
 	}
 
 	function list_timed_events($owner)

@@ -33,8 +33,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: Tier2.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2009-01-06 21:31:36 +0100 (ti, 06 jan 2009) $
+* Revision: $Id: Tier2.php 1946 2009-01-06 20:31:36Z temar $
 */
 
 $tier2 = new Tier2($bot);
@@ -717,6 +717,8 @@ class Tier2 extends BaseActiveModule
 		return $this -> users[$name]['profession'];
 
 		$result = $this -> bot -> core("whois") -> lookup($name);
+		if($result instanceof BotError)
+			Return "Unknown";
 		return $result["profession"];
 	}
 

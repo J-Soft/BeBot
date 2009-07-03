@@ -33,8 +33,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: SettingsUI.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-18 05:06:42 +0100 (to, 18 des 2008) $
+* Revision: $Id: SettingsUI.php 1926 2008-12-18 04:06:42Z temar $
 */
 
 $setconf = new SetConf($bot);
@@ -52,7 +52,7 @@ class SetConf extends BaseActiveModule
 		$this -> help['command']['settings'] = "Shows the settings interface";
 		$this -> help['command']['set <module> <setting> <value>'] = "Sets the setting <setting> for module <module> to <value>.";
 
-		$this -> register_command("all", "settings", "OWNER");
+		$this -> register_command("all", "settings", "SUPERADMIN");
 		$this -> register_alias("settings", "set");
 	}
 
@@ -238,9 +238,9 @@ class SetConf extends BaseActiveModule
 		$this -> bot -> core("settings") -> set_change_user($user);
 		$result = $this -> bot -> core("settings") -> save($module, $setting, $value);
 		$this -> bot -> core("settings") -> set_change_user("");
-		if ($result['error'])
+		if ($result instanceof BotError)
 		{
-			return $result['errordesc'];
+			return $result;
 		}
 		else
 		{

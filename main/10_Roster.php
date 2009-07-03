@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-12-07 18:26:41 +0100 (Sun, 07 Dec 2008) $
-* Revision: $Id: 10_Roster.php 1902 2008-12-07 17:26:41Z alreadythere $
+* File last changed at $LastChangedDate: 2009-01-05 07:57:41 +0100 (ma, 05 jan 2009) $
+* Revision: $Id: 10_Roster.php 1945 2009-01-05 06:57:41Z temar $
 */
 
 $roster_core = new Roster_Core($bot);
@@ -174,7 +174,7 @@ class Roster_Core extends BasePassiveModule
 			{
 				$person = $info[2];
 				$source = $info[1];
-				$id = $this -> bot -> core("chat") -> get_uid($person);
+				$id = $this -> bot -> core("player") -> id($person);
 				$this -> del ("Org Message", $id, $person, "from Org Message, kicked by $source");
 				$this -> bot -> send_gc("##highlight##$person ##end##has been kicked from the org by##highlight## $source##end##");
 				$this -> bot -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "",
@@ -183,7 +183,7 @@ class Roster_Core extends BasePassiveModule
 			else if (preg_match("/(.+) has left the organization./i", $msg, $info))
 			{
 				$person = $info[1];
-				$id = $this -> bot -> core("chat") -> get_uid($person);
+				$id = $this -> bot -> core("player") -> id($person);
 				$this -> del ("Org Message", $id, $person, "from Org Message");
 				$this -> bot -> send_gc("##highlight##$person ##end##has left the org");
 				$this -> bot -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "",
@@ -193,7 +193,7 @@ class Roster_Core extends BasePassiveModule
 			{
 				$inviter = $info[1];
 				$person = $info[2];
-				$id = $this -> bot -> core("chat") -> get_uid($person);
+				$id = $this -> bot -> core("player") -> id($person);
 				$this -> add ("Org Message", $id, $person, $inviter);
 				$this -> bot -> send_gc("Welcome##highlight## $person##end##!!!");
 				$this -> bot -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "",
@@ -301,7 +301,7 @@ class Roster_Core extends BasePassiveModule
 					{
 						if($member["id"] == "0" || $member["id"] == "-1" || $member["id"] == "" || $member["id"] == NULL || empty($member["id"]) || strlen($id) < 5)
 						{
-							$this -> bot -> log("ROSTER", "ID", "Get ID Failed for $name (ID: ".$member["id"].")");
+							$this -> bot -> log("ROSTER", "ID", "Get ID Failed for {$member['nickname']} (ID: ".$member["id"].")");
 						}
 						else
 						{
@@ -326,7 +326,7 @@ class Roster_Core extends BasePassiveModule
 					/*
 					Make sure the user is on the buddylist.
 					*/
-					$this -> bot -> core("chat") -> buddy_add($member["id"]);
+					$this -> bot -> core("chat") -> buddy_add($member["nickname"]);
 
 					/*
 					Update the timestamp, but only if its a member.
@@ -401,7 +401,7 @@ class Roster_Core extends BasePassiveModule
 			{
 				foreach ($buddies as $id => $value)
 				{
-					$name = $this -> bot -> core("chat") -> get_uname($id);
+					$name = $this -> bot -> core("player") -> name($id);
 					$member = $this -> bot -> db -> select("SELECT char_id, user_level, updated_at FROM #___users WHERE char_id = '" . $id . "' AND user_level >= '2'");
 					if(!empty($member))
 					{
@@ -438,12 +438,16 @@ class Roster_Core extends BasePassiveModule
 			{
 				foreach ($members as $member)
 				{
-					$id = $this -> bot -> core("chat") -> get_uid($member[1]);
+					$id = $this -> bot -> core("player") -> id($member[1]);
 
 					/*
 					Make sure we have an entry in the whois cache for the character.
 					*/
 					$whois = $this -> bot -> core("whois") -> lookup($member[1]);
+					if ($whois instanceof BotError)
+					{
+						Continue; // prob shouldnt skip this but it will stop the crashing
+					}
 
 					if($this -> bot -> game == "ao")
 					{
@@ -516,13 +520,13 @@ class Roster_Core extends BasePassiveModule
 			}
 			
 			//make sure all users are on buddy list
-			$buddylist = $this -> bot -> db -> select("SELECT nickname FROM #___users WHERE notify = 1", MYSQL_ASSOC);
+			$buddylist = $this -> bot -> db -> select("SELECT nickname FROM #___users WHERE notify = 1");
 			if (!empty($buddylist))
 			{
 				foreach ($buddylist as $user)
 				{
-					if(!$this -> bot -> core("chat") -> buddy_exists($user['nickname']))
-						$this -> bot -> core("chat") -> buddy_add($user['nickname']);
+					if(!$this -> bot -> core("chat") -> buddy_exists($user[0]))
+						$this -> bot -> core("chat") -> buddy_add($user[0]);
 				}
 			}
 
@@ -577,7 +581,7 @@ class Roster_Core extends BasePassiveModule
 			{
 				foreach ($members as $member)
 				{
-					$id = $this -> bot -> core("chat") -> get_uid($member[1]);
+					$id = $this -> bot -> core("player") -> id($member[1]);
 
 					/*
 					Catch deleted characters.
@@ -664,11 +668,7 @@ class Roster_Core extends BasePassiveModule
 	{
 		$this -> bot -> log("ROSTER", "ADD", "Adding $name $reason");
 		$result = $this -> bot -> core("user") -> add($source, $name, $id, 2, 1);
-		if ($result["error"])
-		{
-			$this -> bot -> log("ROSTER", "ERROR", $result["errordesc"]);
-		}
-		else
+		if (!($result instanceof BotError))
 		{
 			$this -> added++;
 		}
@@ -681,11 +681,7 @@ class Roster_Core extends BasePassiveModule
 	{
 		$this -> bot -> log("ROSTER", "DEL", "Deleting $name $reason");
 		$result = $this -> bot -> core("user") -> del($source, $name, $id, 1);
-		if ($result["error"])
-		{
-			$this -> bot -> log("ROSTER", "ERROR", $result["errordesc"]);
-		}
-		else
+		if (!($result instanceof BotError))
 		{
 			$this -> removed++;
 		}
@@ -696,12 +692,7 @@ class Roster_Core extends BasePassiveModule
 	function erase($source, $id, $nickname, $reason)
 	{
 		$this -> bot -> log("ROSTER", "ERASE", "Erasing $nickname $reason");
-		$result = $this -> bot -> core("user") -> erase($source, $nickname, 1, $id);
-		if ($result["error"])
-		{
-			$this -> bot -> log("ROSTER", "ERROR", $result["errordesc"]);
-		}
-
+		$this -> bot -> core("user") -> erase($source, $nickname, 1, $id);
 		$this -> bot -> core("chat") -> buddy_remove($id);
 	}
 
@@ -712,10 +703,10 @@ class Roster_Core extends BasePassiveModule
 			// Get the guild roster
 			$i = 0;
 			$xml_roster = $this -> bot -> core("tools") -> get_site("http://people.anarchy-online.com/org/stats/d/$dim/name/$id/basicstats.xml");
-			$faction = $this -> bot -> core("tools") -> xmlparse($xml_roster["content"], "side");
-			$orgname = $this -> bot -> core("tools") -> xmlparse($xml_roster["content"], "name");
+ 			$faction = $this -> bot -> core("tools") -> xmlparse($xml_roster, "side");
+ 			$orgname = $this -> bot -> core("tools") -> xmlparse($xml_roster, "name");
 			$this -> bot -> log("ROSTER", "UPDATE", "XML for the $faction guild $orgname obtained");
-			$xml_roster = explode("<member>", $xml_roster["content"]);
+ 			$xml_roster = explode("<member>", $xml_roster);
 			unset($xml_roster[0]); //Get rid of the header as it's not a member.
 			if (!empty($xml_roster))
 			{
@@ -737,7 +728,7 @@ class Roster_Core extends BasePassiveModule
 					$member["rank_id"] = $this -> bot -> core("tools") -> xmlparse($xml_member, "rank");
 					$member["rank"] = $this -> bot -> core("tools") -> xmlparse($xml_member, "rank_name");
 					$member["pictureurl"] = $this -> bot -> core("tools") -> xmlparse($xml_member, "photo_url");
-					$member["id"] = $this -> bot -> core("chat") -> get_uid($member["nickname"]); // Hey, don't get the character ID before you have a nickname!
+					$member["id"] = $this -> bot -> core("player") -> id($member["nickname"]); // Hey, don't get the character ID before you have a nickname!
 					if ($member['nickname'] !== ucfirst(strtolower($this -> bot -> botname)))
 					{
 						$members[]=$member;

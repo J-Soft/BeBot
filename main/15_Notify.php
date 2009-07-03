@@ -69,15 +69,12 @@ class Notify_Core extends BasePassiveModule
 
 	function add($source, $user)
 	{
-		$ret['error'] = FALSE;
-
 		$id = $this -> bot -> core("chat") -> get_uid($user);
 		$user = ucfirst(strtolower($user));
 		if ($id == 0)
 		{
-			$ret['error'] = TRUE;
-			$ret['errordesc'] = $user . " is no valid character name!";
-			return $ret;
+			$this->error->set($user . " is no valid character name!");
+			return $this->error;
 		}
 
 		// Make sure user is in users table
@@ -92,9 +89,8 @@ class Notify_Core extends BasePassiveModule
 			// Check if already on notify
 			if ($usr[0][0] == 1)
 			{
-				$ret['error'] = TRUE;
-				$ret['errordesc'] = $user . " is already on the notify list!";
-				return $ret;
+				$this->error->set($user . " is already on the notify list!");
+				return $this->error;
 			}
 		}
 
@@ -105,21 +101,17 @@ class Notify_Core extends BasePassiveModule
 		// Now add to notify list if not yet there
 		$this -> bot -> core("chat") -> buddy_add($id);
 
-		$ret['content'] = $user . " added to notify list!";
-		return $ret;
+		return $user . " added to notify list!";
 	}
 
 	function del($user)
 	{
-		$ret['error'] = FALSE;
-
 		$id = $this -> bot -> core("chat") -> get_uid($user);
 		$user = ucfirst(strtolower($user));
 		if ($id == 0)
 		{
-			$ret['error'] = true;
-			$ret['errordesc'] = $user . " is no valid character name!";
-			return $ret;
+			$this->error->set($user . " is no valid character name!");
+			return $this->error;
 		}
 
 		// Make sure $user is on notify (and in users table)
@@ -127,16 +119,14 @@ class Notify_Core extends BasePassiveModule
 
 		if (empty($usr))
 		{
-			$ret['error'] = true;
-			$ret['errordesc'] = $user . " is not on notify list!";
-			return $ret;
+			$this->error->set($user . " is not on notify list!");
+			return $this->error;
 		}
 
 		if ($usr[0][0] == 0)
 		{
-			$ret['error'] = true;
-			$ret['errordesc'] = $user . " is not on notify list!";
-			return $ret;
+			$this->error->set($user . " is not on notify list!");
+			return $this->error;
 		}
 
 		// Unflag notify for user in table and cache
@@ -148,8 +138,7 @@ class Notify_Core extends BasePassiveModule
 
 		$this -> bot -> db -> query("UPDATE #___online SET status_gc = 0 WHERE nickname = '" . $user . "' AND botname = '".$this -> bot -> botname."'");
 
-		$ret['content'] = $user . " removed from notify list!";
-		return $ret;
+		return $user . " removed from notify list!";
 	}
 
 	function list_cache()
@@ -157,7 +146,6 @@ class Notify_Core extends BasePassiveModule
 		$count = 0;
 
 		$notify_list = $this -> cache;
-
 		asort($notify_list);
 
 		foreach ($notify_list as $key => $value)

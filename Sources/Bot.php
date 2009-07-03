@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-12-25 17:32:15 +0100 (Thu, 25 Dec 2008) $
-* Revision: $Id: Bot.php 1937 2008-12-25 16:32:15Z temar $
+* File last changed at $LastChangedDate: 2009-03-09 01:58:35 +0000 (Mon, 09 Mar 2009) $
+* Revision: $Id: Bot.php 3 2009-03-09 01:58:35Z temar $
 */
 
 /*
@@ -81,10 +81,6 @@ sends a permission denied error to the apropriate location based on $type for $c
 
 get_site($url, $strip_headers, $server_timeout, $read_timeout):
 Retrives the content of a site
-- Returns array:
-$array["error"] - true if error was encountered, false if not.
-$array["errordesc"] - Error description if error was encountered.
-$array["content"] - String containing content of $url
 
 int_to_string($int)
 Used to convert an overflowed (unsigned) integer to a string with the correct positive unsigned integer value
@@ -97,6 +93,19 @@ If the passed string is not an integer large enough to overflow, the string is m
 - Returns an integer.
 */
 
+	define ('CHAT_AO_TELL',   bindec("00 00 00 001"));
+	define ('CHAT_AO_PGROUP', bindec("00 00 00 010"));
+	define ('CHAT_AO_GC',     bindec("00 00 00 100"));
+	define ('CHAT_AO',        bindec("00 00 00 111"));
+	define ('CHAT_IRC_PRIV',  bindec("00 00 01 000"));
+	define ('CHAT_IRC_CHAN',  bindec("00 00 10 000"));
+	define ('CHAT_IRC',       bindec("00 00 11 000"));
+	define ('CHAT_MSN_PRIV',  bindec("00 01 00 000"));
+	define ('CHAT_MSN_PUB',   bindec("00 10 00 000"));
+	define ('CHAT_MSN',       bindec("00 11 00 000"));
+	define ('CHAT_PRIVATE',   bindec("00 01 01 001"));
+	define ('CHAT_ALL',       bindec("11 1111111"));
+	
 define("SAME", 1);
 define("TELL", 2);
 define("GC", 4);
@@ -131,74 +140,185 @@ class Bot
 	var $proxy_server_address;
 	var $starttime;
 	var $commands;
-
-	private $module_links;
-	private $cron_times;
-	private $cron_job_timer;
-	private $cron_job_active;
-	private $cron_actived;
-	private $cron;
-	private $startup_time;
-	public $buddy_status = array();
-	public $glob;
-	public $botname;
-
-	/*
-	Constructor:
-	Prepares bot.
-	*/
-	function __construct($uname, $pwd, $botname, $dim, $botversion, $botversionname, $other_bots, &$aoc, &$irc, &$db, $commprefix, $crondelay, $telldelay, $maxsize, $recontime, $guildbot, $guildid, $guild, $log, $log_path, $log_timestamp, $use_proxy_server, $proxy_server_address, $proxy_server_port, $game, $accessallbots, $sixtyfourbit)
-	{
-		$this -> username = $uname;
-		$this -> password = $pwd;
-		$this -> botname = $botname;
-		$this -> dimension = ucfirst(strtolower($dim));
-		$this -> botversion = $botversion;
-		$this -> botversionname = $botversionname;
-		$this -> other_bots = $other_bots;
-		$this -> aoc = &$aoc;
-		$this -> irc = &$irc;
-		$this -> db = &$db;
-		$this -> commands = array();
-		$this -> commpre = $commprefix;
-		$this -> cron = array();
-		$this -> crondelay = $crondelay;
-		$this -> telldelay = $telldelay;
-		$this -> maxsize = $maxsize;
-		$this -> reconnecttime = $recontime;
-		$this -> guildbot = $guildbot;
-		$this -> guildid = $guildid;
-		$this -> guildname = $guild;
-		$this -> log = $log;
-		$this -> log_path = $log_path;
-		$this -> log_timestamp = $log_timestamp;
-		$this -> banmsgout = array();
-		$this -> use_proxy_server = $use_proxy_server;
-		$this -> proxy_server_address = explode(",", $proxy_server_address);
-		$this -> starttime = time();
-		$this -> sixtyfourbit = $sixtyfourbit;
-
-		$this -> module_links = array();
-
-		$this -> cron_times = array();
-		$this -> cron_job_activate = array();
-		$this -> cron_job_timer = array();
-		$this -> cron_activated = false;
-		$this -> game = $game;
-		$this -> accessallbots = $accessallbots;
-
-		$this -> glob = array();
-	}
-
-
-
-	/*
-	Connects the bot to AO's chat server
-	*/
-	function connect()
-	{
-		// Make sure all cronjobs are locked, we don't want to run any cronjob before we are logged in!
-		$this -> cron_activated = false;
+ 	public $owner;
+ 	public $super_admin;
+ 
+ 	private $module_links = array();
+ 	private $cron_times = array();
+ 	private $cron_job_timer = array();
+ 	private $cron_job_active = array();
+ 	private $cron_actived=false;
+ 	private $cron = array();
+  	private $startup_time;
+ 	
+  	public $buddy_status = array();
+ 	public $glob = array();
+  	public $botname;
+ 	public $bothandle; // == botname@dimension
+ 	public $debug = false;
+ 
+ 	public static $instance;
+ 
+ 	
+ 	public function factory($config_file=null)
+ 	{
+ 		require('./conf/ServerList.php');
+ 		if (!empty($config_file))
+ 		{
+ 			$config_file = ucfirst(strtolower($config_file)) . ".Bot.conf";
+ 		}
+ 		else
+ 		{
+ 			$config_file = "Bot.conf";
+ 		}
+ 		//Read config_file
+ 		require_once('conf/'.$config_file);
+ 		if(empty($ao_password) || $ao_password == "")
+ 		{
+ 			$fp = fopen('./conf/pw', 'r');
+ 			$ao_password = fread($fp, filesize('./conf/pw'));
+ 			fclose($fp);
+ 			$fp = fopen('./conf/pw', 'w');
+ 			fwrite($fp, "");
+ 			fclose($fp);
+ 		}
+ 		//Determine which game we are playing
+ 		if(!empty($server_list['ao'][$dimension]))
+ 		{
+ 			$game = 'ao';
+ 		}
+ 		elseif(!empty($server_list['aoc'][$dimension]))
+ 		{
+ 			$game = 'aoc';
+ 		}
+ 		else
+ 		{
+ 			die("Unable to find dimension '$dimension' in any game.");
+ 		}
+ 		
+ 		//Make sure that the log path exists.
+ 		$logpath = $log_path . "/" . strtolower($bot_name) . "@RK" . $dimension;
+ 		if (!file_exists($logpath))
+ 		{
+ 			mkdir($logpath);
+ 		}
+ 
+ 		//Determine bothandle
+ 		$bothandle = $bot_name."@".$dimension;
+ 		//Check if bot has already been created.
+ 		if(isset(self::$instance[$bothandle]))
+ 		{
+ 			return self::$instance[$bothandle];
+ 	}
+ 		//instantiate bot
+ 		$class = __CLASS__;
+ 		self::$instance[$bothandle] = new $class($bothandle);
+ 		self::$instance[$bothandle]->server = $server_list[$game][$dimension]['server'];
+ 		self::$instance[$bothandle]->port = $server_list[$game][$dimension]['port'];
+ 
+ 		//initialize bot.
+  		self::$instance[$bothandle]->username = $ao_username;
+  		self::$instance[$bothandle]->password = $ao_password;
+  		self::$instance[$bothandle]->botname = $bot_name;
+  		self::$instance[$bothandle]->dimension = ucfirst(strtolower($dimension));
+  		self::$instance[$bothandle]->botversion = BOT_VERSION;
+  		self::$instance[$bothandle]->botversionname = $bot_version_name;
+ 		self::$instance[$bothandle]->other_bots = $other_bots;
+ 		self::$instance[$bothandle]->commands = array();
+ 		self::$instance[$bothandle]->commpre = $command_prefix;
+ 		self::$instance[$bothandle]->crondelay = $cron_delay;
+ 		self::$instance[$bothandle]->telldelay = $tell_delay;
+ 		self::$instance[$bothandle]->maxsize = $max_blobsize;
+ 		self::$instance[$bothandle]->reconnecttime = $reconnect_time;
+ 		self::$instance[$bothandle]->guildbot = $guildbot;
+ 		self::$instance[$bothandle]->guildid = $guild_id;
+ 		self::$instance[$bothandle]->guildname = $guild;
+ 		self::$instance[$bothandle]->log = $log;
+ 		self::$instance[$bothandle]->log_path = $logpath;
+ 		self::$instance[$bothandle]->log_timestamp = $log_timestamp;
+ 		self::$instance[$bothandle]->banmsgout = array();
+ 		self::$instance[$bothandle]->use_proxy_server = $use_proxy_server;
+ 		self::$instance[$bothandle]->proxy_server_address = explode(",", $proxy_server_address);
+ 		self::$instance[$bothandle]->starttime = time();
+ 		self::$instance[$bothandle]->game = $game;
+ 		self::$instance[$bothandle]->accessallbots = $accessallbots;
+ 		self::$instance[$bothandle]->core_directories = $core_directories;
+ 		self::$instance[$bothandle]->module_directories = $module_directories;
+ 
+ 		//We need to keep these too.
+ 		self::$instance[$bothandle]->owner = $owner;
+ 		self::$instance[$bothandle]->super_admin = $super_admin;
+ 
+ 		// create new ConfigMagik-Object (HACXX ALERT! This should most likely be a singleton!)
+ 		self::$instance[$bothandle]->ini = ConfigMagik::get_instance($bothandle, "conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", true, true);
+ 		self::$instance[$bothandle]->register_module(self::$instance[$bothandle]->ini, 'ini');
+ 
+ 		//Instantiate singletons
+ 		self::$instance[$bothandle]->irc = &$irc; //To do: This should probably be a singleton aswell.
+ 		self::$instance[$bothandle]->aoc = AOChat::get_instance($bothandle);
+ 		self::$instance[$bothandle]->db = MySQL::get_instance($bothandle);
+ 
+ 		//Pass back the handle of the bot for future reference.
+ 		return($bothandle);
+ 	}
+ 	
+ 	public function get_instance($bothandle)
+ 		{
+ 		if(!isset(self::$instance[$bothandle]))
+ 		{
+ 			return false;
+ 		}
+ 		return self::$instance[$bothandle];
+ 		}
+ 
+ 	private function __construct()
+ 	{
+ 		//Empty
+ 	}
+ 
+ 	function load_files($section, $directory)
+ 	{
+ 		if(!is_dir($directory))
+ 		{
+ 			$this -> log("LOAD", "ERROR", "The specified directory '$directory' is unaccessible!");
+ 			return;
+ 		}
+ 		$bot = $this;
+ 		$section = ucfirst(strtolower($section));
+ 		$this->log(strtoupper($section), "LOAD", "Loading $section-modules from '$directory'");
+ 		$folder = dir("./$directory");
+ 		$filelist = array();
+ 		//Create an array of files loadable.
+ 		while ($module = $folder->read())
+ 		{
+ 			$is_disabled = $this -> ini -> get($module, $section);
+ 			if (!is_dir($module) && 
+ 				!preg_match("/^_/", $module) && 
+ 				preg_match("/\.php$/i", $module) && 
+ 				$is_disabled != "FALSE")
+ 		{
+ 				$filelist[]=$module;
+ 			}
+ 		}
+ 		if(!empty($filelist))
+ 		{
+ 			sort($filelist);
+ 			foreach($filelist as $file)
+ 			{
+ 				require_once("$directory/$file");
+ 				$this -> log(strtoupper($section), "LOAD", $file);
+ 			}
+ 		}
+ 		echo "\n";
+ 		}
+ 
+ 	/*
+ 	Connects the bot to AO's chat server
+ 	*/
+ 	function connect()
+ 	{
+ 		// Make sure all cronjobs are locked, we don't want to run any cronjob before we are logged in!
+ 		$this -> cron_activated = false;
 
 		// Get dimension server
 		switch($this -> dimension)
@@ -236,7 +356,7 @@ class Bot
 
 		// Open connection
 		$this -> log("LOGIN", "STATUS", "Connecting");
-		if (!$this -> aoc -> connect($server, $port, $this -> sixtyfourbit))
+		if (!$this -> aoc -> connect($this->server, $this->port, $this -> sixtyfourbit))
 		{
 			$this -> cron_activated = false;
 			$this -> disconnect();
@@ -489,7 +609,7 @@ class Bot
 
 			if ($this -> core("chat_queue") -> check_queue())
 			{
-				$this -> log("TELL", "OUT", "-> " . $this -> core("chat") -> get_uname($to) . ": " . $msg);
+				$this -> log("TELL", "OUT", "-> " . $this -> core("player") -> name($to) . ": " . $msg);
 				$msg = utf8_encode($msg);
 				$this -> aoc -> send_tell($to, $msg);
 			}
@@ -517,7 +637,7 @@ class Bot
 		if($parsecolors)
 			$msg = $this -> core("colors") -> parse($msg);
 
-		$gid = $this -> core("chat") -> get_uid($group);
+		$gid = $this -> core("player") -> id($group);
 
 		$send = true;
 		if($checksize)
@@ -711,6 +831,14 @@ class Bot
 	 * If $user may access the command $msg is handed over to the parser of the responsible module.
 	 * This function returns true if the $msg has been handled, and false otherwise.
 	 * $pgname is used to identify external private groups.
+	 
+	 This should be reworked to do things in the following manner
+	 *) Determine the access level of the person sending the message.
+	 *) If we can rule out that the message is not a command we go to the next step which should be relaying
+	 *) strip the prefix
+	 *) search the command library for a match and execute if found
+	 *) search the command library for a similar command, notify user about the typo and execute if found
+	 
 	 */
 	function handle_command_input($user, $msg, $channel, $pgname = NULL)
 	{
@@ -867,32 +995,46 @@ class Bot
 		return $found;
 	}
 
+	function incoming_chat($message)
+	{
+	
+	}
+
+
 	/*
 	Incoming Tell
 	*/
 	function inc_tell($args)
 	{
-		if (!preg_match("/is AFK .Away from keyboard./i", $args[1]) && !preg_match("/.tell (.+)help/i",$args[1]) && !preg_match("/I only listen to members of this bot/i",$args[1] ) && !preg_match("/I am away from my keyboard right now,(.+)your message has been logged./i",$args[1]) && !preg_match("/Away From Keyboard/i", $args[1]))
-		{
-			$user = $this -> core("chat") -> get_uname($args[0]);
+		//Get the name of the user. It's easier to handle... or is it?
+		$user = $this -> core("player") -> name($args[0]);
 			$found = false;
 
-			$args[1] = utf8_decode($args[1]);
-
 			// Ignore bot chat, no need to handle it's own output as input again
-			if (strtolower($this -> botname) == strtolower($user))
+		if ($user == BOTNAME)
 			{
 				// Danger will robinson. We just sent a tell to ourselves!!!!!!!!!
 				$this -> log("CORE", "INC_TELL", "Danger will robinson. Received tell from myself: $args[1]");
 				return;
 			}
 
-			$this -> log("TELL", "INC", $user . ": " . $args[1]);
+		//Silently ignore tells from other bots.
+		if (isset($this -> other_bots[$user])) //TO DO: Do we ever ucfirst(strtolower()) the other bots?
+		{
+			return;
+		}
 
-			if (!isset($this -> other_bots[$user]))
+		if (preg_match("/is AFK .Away from keyboard./i", $args[1]) || preg_match("/.tell (.+)help/i",$args[1]) || preg_match("/I only listen to members of this bot/i",$args[1] ) || preg_match("/I am away from my keyboard right now,(.+)your message has been logged./i",$args[1]) || preg_match("/Away From Keyboard/i", $args[1]))
 			{
-				$found = $this -> handle_command_input($user, $args[1], "tell");
+			//We probably sendt someone a tell when not here. Let's leave it at that.
+			return;
+		}
 
+		$args[1] = utf8_decode($args[1]);
+
+		$this -> log("TELL", "INC", $user . ": " . $args[1]);
+
+		$found = $this -> handle_command_input($user, $args[1], "tell");
 				$found = $this -> hand_to_chat($found, $user, $args[1], "tells");
 
 				if ($this -> command_error_text)
@@ -916,17 +1058,13 @@ class Bot
 				}
 				unset($this -> command_error_text);
 			}
-		}
-	}
-
-
 
 	/*
 	Buddy logging on/off
 	*/
 	function inc_buddy($args)
 	{
-		$user = $this -> core("chat") -> get_uname($args[0]);
+		$user = $this -> core("player") -> name($args[0]);
 		$mem = $this -> core("notify") -> check($user);
 
 		if($this -> game == "ao")
@@ -1017,7 +1155,7 @@ class Bot
 			}
 			$this -> core("Whois") -> update($who);
 
-			if($old_who["error"])
+			if($old_who instanceof BotError)
 			{
 				$old_who["level"] = 0;
 				$old_who["location"] = 0;
@@ -1157,12 +1295,12 @@ class Bot
 	*/
 	function inc_pgjoin($args)
 	{
-		$pgname = $this -> core("chat") -> get_uname($args[0]);
+		$pgname = $this -> core("player") -> name($args[0]);
 
 		if (empty($pgname) || $pgname == "")
 		$pgname = $this -> botname;
 
-		$user = $this -> core("chat") -> get_uname($args[1]);
+		$user = $this -> core("player") -> name($args[1]);
 
 		if (strtolower($pgname) == strtolower($this -> botname))
 		{
@@ -1203,12 +1341,12 @@ class Bot
 	*/
 	function inc_pgleave($args)
 	{
-		$pgname = $this -> core("chat") -> get_uname($args[0]);
+		$pgname = $this -> core("player") -> name($args[0]);
 
 		if (empty($pgname) || $pgname == "")
 		$pgname = $this -> botname;
 
-		$user = $this -> core("chat") -> get_uname($args[1]);
+		$user = $this -> core("player") -> name($args[1]);
 
 		if (strtolower($pgname) == strtolower($this -> botname))
 		{
@@ -1249,8 +1387,8 @@ class Bot
 	*/
 	function inc_pgmsg($args)
 	{
-		$pgname = $this -> core("chat") -> get_uname($args[0]);
-		$user = $this -> core("chat") -> get_uname($args[1]);
+		$pgname = $this -> core("player") -> name($args[0]);
+		$user = $this -> core("player") -> name($args[1]);
 		$found = false;
 
 		if (empty($pgname) || $pgname == "")
@@ -1268,14 +1406,14 @@ class Bot
 		{
 			if ($this -> core("settings") -> get("Core", "LogPGOutput"))
 			{
-				$this -> log("PGRP", "MSG", "[" . $this -> core("chat") -> get_uname($args[0]) . "] " .
+				$this -> log("PGRP", "MSG", "[" . $this -> core("player") -> name($args[0]) . "] " .
 				$user . ": " . $args[2]);
 			}
 			return;
 		}
 		else
 		{
-			$this -> log("PGRP", "MSG", "[" . $this -> core("chat") -> get_uname($args[0]) . "] " .
+			$this -> log("PGRP", "MSG", "[" . $this -> core("player") -> name($args[0]) . "] " .
 			$user . ": " . $args[2]);
 		}
 
@@ -1316,7 +1454,7 @@ class Bot
 	*/
 	function inc_pginvite($args)
 	{
-		$group = $this -> core("chat") -> get_uname($args[0]);
+		$group = $this -> core("player") -> name($args[0]);
 
 		if (!empty($this -> commands["pginvite"]))
 		{
@@ -1356,7 +1494,7 @@ class Bot
 				$msg = "[" . $group . "] ";
 			if ($args[1] != 0)
 			{
-				$msg .= $this -> core("chat") -> get_uname($args[1]) . ": ";
+				$msg .= $this -> core("player") -> name($args[1]) . ": ";
 			}
 			$msg .= $args[2];
 		}
@@ -1377,7 +1515,7 @@ class Bot
 		}
 		else
 		{
-			$user = $this -> core("chat") -> get_uname($args[1]);
+			$user = $this -> core("player") -> name($args[1]);
 		}
 		// Ignore bot chat, no need to handle it's own output as input again
 		if (strtolower($this -> botname) == strtolower($user))

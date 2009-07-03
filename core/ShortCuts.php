@@ -32,8 +32,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: ShortCuts.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-05 12:40:29 +0100 (fr, 05 des 2008) $
+* Revision: $Id: ShortCuts.php 1881 2008-12-05 11:40:29Z blueeagle $
 */
 
 $shortcuts_core = new ShortCuts_Core($bot);
@@ -112,26 +112,21 @@ class ShortCuts_Core extends BasePassiveModule
 	// Adds a new shortcut to table and cache, returns an error if the shortcut is already defined
 	function add($short, $long)
 	{
-		$return['error'] = FALSE;
-
 		if (isset($this -> short[strtolower($long)]))
 		{
-			$return['error'] = true;
-			$return['errordesc'] = 'The text ' . $long . ' already is in the databse with shortcut "' . $this -> short[strtolower($long)] . '"!';
-			return $return;
+			$this->error->set('The text ' . $long . ' already is in the databse with shortcut "' . $this -> short[strtolower($long)] . '"!');
+			return $this->error;
 		}
 		if (isset($this -> long[strtolower($short)]))
 		{
-			$return['error'] = true;
-			$return['errordesc'] = 'The shortcut ' . $short . ' is already defined for "' . $this -> long[strtolower($short)] . '"!';
-			return $return;
+			$this->error->set('The shortcut ' . $short . ' is already defined for "' . $this -> long[strtolower($short)] . '"!');
+			return $this->error;
 		}
 
-		$return['content'] = 'New shortcut "' . $short . '" added to database with corresponding long entry "' . $long . '".';
 		$this -> long[strtolower($short)] = $long;
 		$this -> short[strtolower($long)] = $short;
 		$this -> bot -> db -> query("INSERT INTO #___shortcuts (shortcut, long_desc) VALUES ('" . mysql_real_escape_string($short) . "', '" . mysql_real_escape_string($long) . "')");
-		return $return;
+		return 'New shortcut "' . $short . '" added to database with corresponding long entry "' . $long . '".';
 	}
 
 	// Removes an entry based on the shortcut
@@ -139,20 +134,14 @@ class ShortCuts_Core extends BasePassiveModule
 	{
 		if (!isset($this -> long[strtolower($short)]))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = 'The shortcut "' . $short . '" does not exist in the database!';
-			return $return;
+			$this->error->set('The shortcut "' . $short . '" does not exist in the database!');
+			return $this->error;
 		}
-
-		$return['error'] = FALSE;
-		$return['content'] = 'The shortcut "' . $short . '" and the corresponding long description "' . $this -> long[strtolower($short)]
-		. '" were deleted!';
 
 		unset($this -> short[strtolower($this -> long[strtolower($short)])]);
 		unset($this -> long[strtolower($short)]);
 		$this -> bot -> db -> query("DELETE FROM #___shortcuts WHERE shortcut = '" . mysql_real_escape_string($short) . "'");
-
-		return $return;
+		return 'The shortcut "'.$short.'" and the corresponding long description "' . $this -> long[strtolower($short)] . '" were deleted!';
 	}
 
 	// Removes an entry based on the long description
@@ -160,20 +149,16 @@ class ShortCuts_Core extends BasePassiveModule
 	{
 		if (!isset($this -> short[strtolower($long)]))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = 'The description "' . $long . '" does not exist in the database!';
-			return $return;
+			$this->error->set('The description "' . $long . '" does not exist in the database!');
+			return $this->error;
 		}
 
-		$return['error'] = FALSE;
-		$return['content'] = 'The description "' . $long . '" and the corresponding shortcut "' . $this -> short[strtolower($long)]
-		. '" were deleted!';
 
 		unset($this -> long[strtolower($this -> short[strtolower($long)])]);
 		unset($this -> short[strtolower($long)]);
 		$this -> bot -> db -> query("DELETE FROM #___shortcuts WHERE long_desc = '" . mysql_real_escape_string($long) . "'");
 
-		return $return;
+		return 'The description "' . $long . '" and the corresponding shortcut "' . $this -> short[strtolower($long)] . '" were deleted!';
 	}
 
 	// Removes an entry based on it's ID
@@ -182,21 +167,17 @@ class ShortCuts_Core extends BasePassiveModule
 		$ret = $this -> bot -> db -> select("SELECT shortcut, long_desc FROM #___shortcuts WHERE id = " . $id);
 		if (empty($ret))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = "No entry with the ID " . $id . " exists!";
-			return $return;
+			$this->error->set("No entry with the ID " . $id . " exists!");
+			return $this->error;
 		}
 
 		$ret[0][0] = stripslashes($ret[0][0]);
 		$ret[0][1] = stripslashes($ret[0][1]);
 
-		$return['error'] = false;
-		$return['content'] = "The entry with the ID " . $id . " has been deleted. Shortcut: " . $ret[0][0] . ", long description: " . $ret[0][1] . ".";
 		unset($this -> long[strtolower($ret[0][1])]);
 		unset($this -> short[strtolower($ret[0][0])]);
 		$this -> bot -> db -> query("DELETE FROM #___shortcuts WHERE id = " . $id);
-
-		return $return;
+		return "The entry with the ID " . $id . " has been deleted. Shortcut: " . $ret[0][0] . ", long description: " . $ret[0][1] . ".";
 	}
 }
 ?>

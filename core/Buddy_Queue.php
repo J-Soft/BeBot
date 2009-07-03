@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2007-07-25 11:54:01 -0700 (Wed, 25 Jul 2007) $
-* Revision: $Id: Queue.php 817 2007-07-25 18:54:01Z shadowmaster $
+* File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
+* Revision: $Id: Buddy_Queue.php 1 2008-11-04 06:00:45Z temar $
 */
 
 
@@ -77,7 +77,7 @@ class Buddy_Queue_Core extends BasePassiveModule
 			if (!($this -> bot -> core("chat") -> buddy_exists($uid)))
 			{
 				$this -> bot -> aoc -> buddy_add($uid);
-				$this -> bot -> log("BUDDY QUEUE", "BUDDY-ADD", $this -> bot -> core("chat") -> get_uname($uid));
+				$this -> bot -> log("BUDDY QUEUE", "BUDDY-ADD", $this -> bot -> core("player") -> name($uid));
 			}
 		}
 		else

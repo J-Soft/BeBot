@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-12-06 19:39:45 +0100 (Sat, 06 Dec 2008) $
-* Revision: $Id: OnlineDisplay.php 1890 2008-12-06 18:39:45Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-06 19:36:33 +0100 (lø, 06 des 2008) $
+* Revision: $Id: OnlineDisplay.php 1889 2008-12-06 18:36:33Z alreadythere $
 */
 
 $onlinedisplay = new OnlineDisplay($bot);

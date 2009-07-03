@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: Server.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-06 22:54:37 +0100 (lø, 06 des 2008) $
+* Revision: $Id: Server.php 1898 2008-12-06 21:54:37Z blueeagle $
 */
 
 /*
@@ -69,7 +69,7 @@ class Server extends BaseActiveModule
 	function server_load()
 	{
 		$server = $this -> bot -> core("tools") -> get_site("http://probes.funcom.com/ao.xml");
-		$server = explode("name=\"" . $this -> select_dimension() . "\"", $server["content"]);
+		$server = explode("name=\"" . $this -> select_dimension() . "\"", $server);
 		$server = explode("</dimension>", $server[1]);
 		preg_match("/display-name=\"(.+)\"/U", $server[0], $info);
 		$dim_name = $info[1];

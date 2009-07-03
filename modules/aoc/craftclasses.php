@@ -2,7 +2,7 @@
 /*
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg StensÃ¥s, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -29,8 +29,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-12-20 22:13:00 +0100 (Sat, 20 Dec 2008) $
-* Revision: $Id: Alias.php 1673 2008-07-23 15:44:39Z temar $
+* File last changed at $LastChangedDate: 2009-01-04 16:58:47 +0000 (Sun, 04 Jan 2009) $
+* Revision: $Id: craftclasses.php 89 2009-01-04 16:58:47Z temar $
 */
 
 ///////////////////////////////////
@@ -150,12 +150,15 @@ class craftclasses Extends BaseActiveModule
 		{
 			$id = $this -> bot -> core("chat") -> get_uid($name);
 			$result = $this -> bot -> core("whois") -> lookup($name);
+			if(!($result instanceof BotError))
+			{
 			if (empty($result["craft1"]) & $result["level"] > 40)
 			{
 				$msg = "You have no crafting information set and you are above level 40. Please use '/tell <botname> <pre>setcraft [class1] [class2]'. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None. If you havn't picked crafting classes yet this may be the time to do it.";
 				$this -> bot -> send_tell($name, $msg);
 			}
 		}
+	}
 	}
 }
 ?>

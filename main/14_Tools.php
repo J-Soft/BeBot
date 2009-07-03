@@ -33,7 +33,7 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-12-29 23:42:14 +0100 (Mon, 29 Dec 2008) $
+* File last changed at $LastChangedDate: 2008-12-29 23:42:14 +0100 (ma, 29 des 2008) $
 * Revision: $Id: 14_Tools.php 1939 2008-12-29 22:42:14Z temar $
 */
 
@@ -100,7 +100,9 @@ class tools extends BasePassiveModule
 				Return $this -> get_site_sock($url, $strip_headers, $server_timeout, $read_timeout);
 			}
 			else
+			{
 				Return $this -> get_site_curl($url, $strip_headers);
+		}
 		}
 		else
 		{
@@ -112,7 +114,7 @@ class tools extends BasePassiveModule
 	{
 		$return = $this -> get_site_data($url,$strip_headers,$server_timeout,$read_timeout);
 
-		if ($return["error"] && $this -> use_proxy_server && !empty($this -> proxy_server_address))
+		if (($return instanceof BotError) && $this -> use_proxy_server && !empty($this -> proxy_server_address))
 		{
 			echo "We're using a proxy\n";
 			foreach ($this -> proxy_server_address as $proxy)
@@ -120,7 +122,7 @@ class tools extends BasePassiveModule
 				echo "Trying proxy: ".$proxy."\n";
 				$return = $this -> get_site_data($url,$strip_headers,$server_timeout,$read_timeout,$proxy);
 
-				if (!($return["error"]))
+				if (!($return instanceof BotError))
 					break;
 			}
 		}
@@ -156,11 +158,8 @@ class tools extends BasePassiveModule
 
 		// Check to see if the socket failed to create.
 		if ($socket === false) {
-			$return["error"] = true;
-			$return["errordesc"] = "Socket failed to create.";
-			$return["content"] = socket_strerror(socket_last_error());
-
-			return $return;
+ 			$this->error->set("Failed to create socket. Error was: ".socket_strerror(socket_last_error()));
+ 			return $this->error;
 		}
 
 		$connect_result = socket_connect($socket, $address, $service_port);
@@ -168,11 +167,8 @@ class tools extends BasePassiveModule
 		// Make sure we have a connection
 		if ($connect_result === false)
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "Failed to connect to server";
-			$return["content"] = socket_strerror(socket_last_error());
-			
-			return $return;
+ 			$this->error->set("Failed to connect to server. Error was: ".socket_strerror(socket_last_error()));
+ 			return $this->error;
 		}
 
 		$bot_version = $this -> bot -> botversion;
@@ -194,29 +190,23 @@ class tools extends BasePassiveModule
 		// Make sure we wrote to the server okay.
 		if ($write_result === false)
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "Failed to write to server";
-			$return["content"] = socket_strerror(socket_last_error());
-			
-			return $return;
+ 			$this->error->set("Failed to write to server: ". socket_strerror(socket_last_error()));
+ 			return $this->error;
 		}
 
 		$return["content"] = "";
 		$read_result = socket_read($socket, 2048);
 		while ($read_result != "" && $read_result !== false)
 		{
-			$return["content"] .= $read_result;
+ 			$return .= $read_result;
 			$read_result = socket_read($socket, 2048);
 		}
 
 		// Make sure we got a response back from the server.
 		if ($read_result === false)
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "Failed to read response";
-			$return["content"] = socket_strerror(socket_last_error());
-			
-			return $return;
+			$this->error->set("Failed to read response: ".socket_strerror(socket_last_error()));
+ 			return $this->error;
 		}
 
 		$close_result = socket_close($socket);
@@ -224,18 +214,15 @@ class tools extends BasePassiveModule
 		// Make sure we closed our socket properly.  Open sockets are bad!
 		if ($close_result === false)
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "Failed to close socket";
-			$return["content"] = socket_strerror(socket_last_error());
-	
-			return $return;
+ 			$this->error->set("Failed to close socket: ".socket_strerror(socket_last_error()));
+ 			return $this->error;
 		}
 
 		// Did the calling function want http headers stripped?
 		if ($strip_headers)
 		{
-			$split = split("\r\n\r\n",$return['content']);
-			$return["content"] = $split[1];
+ 			$split = split("\r\n\r\n",$return);
+ 			$return = $split[1];
 		}
 
 		return $return;
@@ -278,14 +265,14 @@ class tools extends BasePassiveModule
 		curl_setopt ( $ch , CURLOPT_TIMEOUT, $timeout);
 
 		// The usual - get the data and close the session
-		$return["content"] = curl_exec($ch);
+		$return = curl_exec($ch);
 		curl_close($ch);
 
 		// Did the calling function want http headers stripped?
 		//if ($strip_headers)// already stripped?
 		//{
-		//	$split = split("\r\n\r\n",$return["content"]);
-		//	$return["content"] = $split[1];
+		//	$split = split("\r\n\r\n",$return);
+		//	$return = $split[1];
 		//}
 		
 	

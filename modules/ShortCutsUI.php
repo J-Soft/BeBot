@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: ShortCutsUI.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-18 05:06:42 +0100 (to, 18 des 2008) $
+* Revision: $Id: ShortCutsUI.php 1926 2008-12-18 04:06:42Z temar $
 */
 
 $shortcut_gui = new ShortCutGUI($bot);
@@ -43,7 +43,7 @@ class ShortCutGUI extends BaseActiveModule
 	{
 		parent::__construct(&$bot, get_class($this));
 
-		$this -> register_command("all", "shortcuts", "OWNER");
+		$this -> register_command("all", "shortcuts", "SUPERADMIN");
 		
 		$this -> help['description'] = "Allows you view, add and delete entries in the shortcut database.";
 		$this -> help['command']['shortcuts'] = "Shows currently existing shortcuts with corresponding long entries and allows deleting selected entries.";
@@ -83,26 +83,12 @@ class ShortCutGUI extends BaseActiveModule
 
 	function add($short, $long)
 	{
-		$ret = $this -> bot -> core("shortcuts") -> add($short, $long);
-
-		if ($ret['error'])
-		{
-			return "##error##" . $ret['errordesc'] . "##end##";
-		}
-
-		return $ret['content'];
+		return $this -> bot -> core("shortcuts") -> add($short, $long);
 	}
 
 	function del($id)
 	{
-		$ret = $this -> bot -> core("shortcuts") -> delete_id($id);
-
-		if ($ret['error'])
-		{
-			return "##error##" . $ret['errordesc'] . "##end##";
-		}
-
-		return $ret['content'];
+		return $this -> bot -> core("shortcuts") -> delete_id($id);
 	}
 }
 ?>

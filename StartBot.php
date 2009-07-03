@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2009-01-23 09:21:51 +0100 (Fri, 23 Jan 2009) $
-* Revision: $Id: StartBot.php 1959 2009-01-23 08:21:51Z temar $
+* File last changed at $LastChangedDate: 2009-03-09 01:58:35 +0000 (Mon, 09 Mar 2009) $
+* Revision: $Id: StartBot.php 3 2009-03-09 01:58:35Z temar $
 */
 
 /*

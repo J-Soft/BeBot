@@ -34,8 +34,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate$
-* Revision: $Id$
+* File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
+* Revision: $Id: BanManagerUI.php 1 2008-11-04 06:00:45Z temar $
 */
 
 $banmanager = new BanManager($bot);
@@ -173,13 +173,14 @@ class BanManager extends BaseActiveModule
 		}
 
 		$ban = $this -> bot -> core("security") -> set_ban($source, $user, $source, $reason, $endtime);
-		if ($ban['error'])
+		if (!($ban instanceof BotError))
 		{
-			return $ban['errordesc'];
-		}
 		if($this -> bot -> core("online") -> in_chat($user))
+			{
 			$this -> bot -> core("chat") -> pgroup_kick($user);
-		return $ban['content'];
+			}
+		}
+		return $ban;
 	}
 
 	function del_ban($source, $user)
@@ -192,11 +193,7 @@ class BanManager extends BaseActiveModule
 		}
 
 		$ban = $this -> bot -> core("security") -> rem_ban($source, $user, $source);
-		if ($ban['error'])
-		{
-			return $ban['errordesc'];
-		}
-		return $ban['content'];
+		return $ban;
 	}
 }
 ?>

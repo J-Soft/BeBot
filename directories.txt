@@ -20,6 +20,11 @@ case there must be a Botname.Bot.conf (with first letters uppercase as seen), wh
 contain all information usually found in Bot.conf (just copy the file over, and edit it then).
 Botname.MySQL.conf is optional in cases where you want to use different servers, users or databases.
 
+commodities
+===========
+The commodities directory contains classes that do not instantiate themselves but are used by other
+classes in the bot.
+
 core
 ====
 The core directory contains modules offering service not directly to users, but to other modules.

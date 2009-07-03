@@ -35,7 +35,7 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2009-01-01 02:59:39 +0100 (Thu, 01 Jan 2009) $
+* File last changed at $LastChangedDate: 2009-01-01 02:59:39 +0100 (to, 01 jan 2009) $
 * Revision: $Id: 03_Security.php 1942 2009-01-01 01:59:39Z temar $
 */
 
@@ -50,7 +50,7 @@ define("GUEST", 1);
 define("ANONYMOUS", 0);
 define("BANNED", -1);   // Outside range of MySQL TINYINT UNSIGNED
 
-$security = new Security_Core($bot, $owner, $super_admin);
+$security = new Security_Core($bot);
 
 /*
 The Class itself...
@@ -74,7 +74,7 @@ class Security_Core extends BaseActiveModule
 	Constructor:
 	Hands over a referance to the "Bot" class.
 	*/
-	function __construct(&$bot, $owner, $super_admin)
+	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
 
@@ -147,11 +147,11 @@ class Security_Core extends BaseActiveModule
 
 		$this -> enabled = FALSE;
 
-		$this -> owner = ucfirst(strtolower($owner));
+		$this -> owner = ucfirst(strtolower($bot->owner));
 		$this -> super_admin = array();
-		if (!empty($super_admin))
+		if (!empty($bot->super_admin))
 		{
-			foreach ($super_admin as $user => $value)
+			foreach ($bot->super_admin as $user => $value)
 			{
 				$this -> super_admin[ucfirst(strtolower($user))] = $value;
 			}
@@ -268,8 +268,6 @@ class Security_Core extends BaseActiveModule
 	*/
 	function command_handler($source, $msg, $msgtype)
 	{ // Start funciton handler
-		$return = false;
-
 		$vars = explode(' ', strtolower($msg));
 
 		$command = $vars[0];
@@ -282,6 +280,7 @@ class Security_Core extends BaseActiveModule
 					case "changelevel":
 						if($this -> check_access($source, "SUPERADMIN"))
 						{
+							//The following is in URGENT NEED of comments!
 							if (preg_match("/^security changelevel (Department) (Squad|Unit|Board) (Commander|Leader|Member) (.+)$/i", $msg, $info))
 							{
 								return $this -> change_level($info[2]." ".$info[3], $info[4], $info[1]); // SA
@@ -301,7 +300,8 @@ class Security_Core extends BaseActiveModule
 						}
 						else
 						{
-							return "Only SUPERADMINs can access the changelevel command.";
+							$this->error->set("Only SUPERADMINs can access the changelevel command.");
+							return $this->error;
 						}
 					break;
 					case "levels":
@@ -311,7 +311,8 @@ class Security_Core extends BaseActiveModule
 						}
 						else
 						{
-							return "Only SUPERADMINs can modify the access levels.";
+							$this->error->set("Only SUPERADMINs can modify the access levels.");
+							return $this->error;
 						}
 					case "whois":
 						if ($this -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Whois')))
@@ -320,7 +321,8 @@ class Security_Core extends BaseActiveModule
 						}
 						else
 						{
-							return "You must have ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Whois'))." access or higher to use <pre>security whois";
+							$this->error->set("You must have ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Whois'))." access or higher to use <pre>security whois");
+							return $this->error;
 						}
 					break;
 					case "whoami":
@@ -341,7 +343,8 @@ class Security_Core extends BaseActiveModule
 						}
 						else
 						{
-							return FALSE;
+							$this->error->set("You need to be GUEST or higher to access 'groups'");
+							return $this->error;
 						}
 					break;
 					default:
@@ -351,7 +354,8 @@ class Security_Core extends BaseActiveModule
 						}
 						else
 						{
-							return FALSE;
+							$this->error->set("You need to be GUEST or higher to access 'check_access'");
+							return $this->error;
 						}
 					break;
 				}
@@ -361,24 +365,24 @@ class Security_Core extends BaseActiveModule
 				{
 					if ($this -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Addgroupmember')))
 					{
-						$return = $this -> add_group_member($vars[1], $vars[2], $source);
+						return $this -> add_group_member($vars[1], $vars[2], $source);
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Addgroupmember'))."s and above can add group members.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Addgroupmember'))."s and above can add group members.");
+						return $this->error;
 					}
 				}
 				else
 				{
 					if ($this -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Adduser')))
 					{
-						$return = $this -> add_user($source, $vars[1]);
+						return $this -> add_user($source, $vars[1]);
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Adduser'))."s and above can add users.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Adduser'))."s and above can add users.");
+						return $this->error;
 					}
 				}
 				break;
@@ -387,24 +391,24 @@ class Security_Core extends BaseActiveModule
 				{
 					if ($this -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Remgroupmember')))
 					{
-						$return = $this -> rem_group_member($vars[1], $vars[2], $source);
+						return $this -> rem_group_member($vars[1], $vars[2], $source);
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Remgroupmember'))."s and above can remove group members.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Remgroupmember'))."s and above can remove group members.");
+						return $this->error;
 					}
 				}
 				else
 				{
 					if ($this -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Deluser')))
 					{
-						$return = $this -> del_user($source, $vars[1]);
+						return $this -> del_user($source, $vars[1]);
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Deluser'))."s and above can remove users.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Deluser'))."s and above can remove users.");
+						return $this->error;
 					}
 				}
 				break;
@@ -413,18 +417,17 @@ class Security_Core extends BaseActiveModule
 				{
 					if (preg_match("/^addgroup (.+?) (.+)$/i", $msg, $info))
 					{
-						$return = $this -> add_group($info[1], $info[2], $source);
+						return $this -> add_group($info[1], $info[2], $source);
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Not enough paramaters given. Try /tell <botname> <pre>addgroup groupname description.";
+						$this->error->set("Not enough paramaters given. Try /tell <botname> <pre>addgroup groupname description.");
 					}
 				}
 				else
 				{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Addgroup'))."s and above can add groups.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Addgroup'))."s and above can add groups.");
+						return $this->error;
 				}
 				break;
 			case 'delgroup':
@@ -432,18 +435,18 @@ class Security_Core extends BaseActiveModule
 				{
 					if (isset($vars[1]))
 					{
-						$return = $this -> del_group($vars[1], $source);
+						return $this -> del_group($vars[1], $source);
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Not enough paramaters given. Try /tell <botname> <pre>delgroup groupname.";
+						$this->error->set("Not enough paramaters given. Try /tell <botname> <pre>delgroup groupname.");
+						return $this->error;
 					}
 				}
 				else
 				{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Delgroup'))."s and above can delete groups.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Delgroup'))."s and above can delete groups.");
+						return $this->error;
 				}
 				break;
 			case 'admin':
@@ -462,72 +465,72 @@ class Security_Core extends BaseActiveModule
 				{
 					if ($this -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Addgroupmember')))
 					{
-						$return = $this -> add_group($info[1], $info[2], $source);
+						return $this -> add_group($info[1], $info[2], $source);
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Addgroup'))."s and above can add groups.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Addgroup'))."s and above can add groups.");
+						return $this->error;
 					}
 				}
 				else if (preg_match("/^admin group add ([a-zA-Z0-9]+)$/i", $msg, $info))
 				{
 					if ($this -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Addgroupmember')))
 					{
-						$return = $this -> add_group($info[1], " ", $source); // No group description
+						return $this -> add_group($info[1], " ", $source); // No group description
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Addgroup'))."s and above can add groups.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Addgroup'))."s and above can add groups.");
+						return $this->error;
 					}
 				}
 				else if (preg_match("/^admin group (remove|rem|del) ([a-zA-Z0-9]+)$/i", $msg, $info))
 				{
 					if ($this -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Delgroup')))
 					{
-						$return = $this -> del_group($info[2], $source);
+						return $this -> del_group($info[2], $source);
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Delgroup'))."s and above can delete groups.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Delgroup'))."s and above can delete groups.");
+						return $this->error;
 					}
 				}
 				else if (preg_match("/^admin add ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$/i", $msg, $info))
 				{
 					if ($this -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Addgroupmember')))
 					{
-						$return = $this -> add_group_member($info[2], $info[1], $source);
+						return $this -> add_group_member($info[2], $info[1], $source);
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Addgroupmember'))."s and above and add group members.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Addgroupmember'))."s and above and add group members.");
+						return($this->error);
 					}
 				}
 				else if (preg_match("/^admin (remove|rem|del) ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$/i", $msg, $info))
 				{
 					if ($this -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Remgroupmember')))
 					{
-						$return = $this -> rem_group_member($info[3], $info[2], $source);
+						return $this -> rem_group_member($info[3], $info[2], $source);
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Remgroupmember'))."s and above can remove group members.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Remgroupmember'))."s and above can remove group members.");
+						return $this->error;
 					}
 				}
 				else if (preg_match("/^admin (remove|rem|del) ([a-zA-Z0-9]+)$/i", $msg, $info))
 				{
 					if ($this -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Deluser')))
 					{
-						$return = $this -> del_user($source, $info[2]);
+						return $this -> del_user($source, $info[2]);
 					}
 					else
 					{
-						$return['error'] = TRUE;
-						$return['errordesc'] = "Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Deluser'))."s and above can delete users.";
+						$this->error->set("Only ".strtoupper($this -> bot -> core("settings") -> get('Security', 'Deluser'))."s and above can delete users.");
+						return $this->error;
 					}
 				}
 				else
@@ -538,14 +541,6 @@ class Security_Core extends BaseActiveModule
 			default:
 				$this -> bot -> send_tell($source, "Broken plugin, recieved unhandled command: $command");
 		}
-		if ($return['error'])
-		{
-			return $return['errordesc'];
-		}
-		else
-		{
-			return $return['content'];
-		}
 	} // End funciton handler
 
 	/*
@@ -553,50 +548,37 @@ class Security_Core extends BaseActiveModule
 	*/
 	function add_group($groupname, $description, $caller="Internal Process")
 	{ // Start function add_group()
-		$return['error'] = FALSE;
-		$return['errordesc'] = '';
-		$return['content'] = '';
 		$groupname = strtolower($groupname);
 		if ($groupname == "leader" || $groupname == "admin" || $groupname == "superadmin" || $groupname == "member"
 			|| $groupname == "guest" || $groupname == "anonymous" || $groupname == "owner")
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = ucfirst($groupname)." is a default group and cannot be created as a custom group.";
-			$return['content'] = ucfirst($groupname)." is a default group and cannot be created as a custom group.";
-			return $return;
+			$this->error->set(ucfirst($groupname)." is a default group and cannot be created as a custom group.");
+			return $this->error;
 		}
 		// Check for bad input.
 		if (is_numeric($groupname))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = "Group Names should not be all numbers.";
-			$return['content'] = "Group Names should not be all numbers.";
-			return $return;
+			$this->error->set("Group Names should not be all numbers.");
+			return $this->error;
 		}
 		if (strlen($groupname) < 5)
 		if (is_numeric($groupname))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = "Group Names should be five or more characters.";
-			$return['content'] = "Group Names should be five or more characters.";
-			return $return;
+			$this->error->set("Group Names should be five or more characters.");
+			return $this->error;
 		}
 		$groupname = str_replace (" ", "_", $groupname); // Replace Spaces with underscores.
 		$groupname = mysql_real_escape_string($groupname); // If any slashes are added, it's an invalid group.
 		if (strpos($groupname, "\\"))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = "Single quotes, double quotes, backslash and other special characters are not allowed in group names.";
-			$return['content'] = "Single quotes, double quotes, backslash and other special characters are not allowed in group names.";
-			return $return;
+			$this->error->set("Single quotes, double quotes, backslash and other special characters are not allowed in group names.");
+			return $this->error;
 		}
 		// Input should be good now...
 		if (isset($this -> cache['groups'][$groupname]['gid']))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = "Group ".$groupname." already exisits";
-			$return['content'] = "Group ".$groupname." already exisits";
-			return $return;
+			$this->error->set("Group ".$groupname." already exisits");
+			return $this->error;
 		}
 		$sql = "INSERT INTO #___security_groups (name, description) ";
 		$sql .= "VALUES ('".$groupname."', '".mysql_real_escape_string($description)."')";
@@ -608,11 +590,8 @@ class Security_Core extends BaseActiveModule
 		$tmp = array("gid" => $gid, "name" => $groupname, "description" => $description, "access_level" => 0);
 		$tmp['members'] = array();
 		$this -> cache_mgr("add", "groups", $tmp);
-		$return['error'] = FALSE;
-		$return['errordesc'] = '';
-		$return['content'] = "Created group ".$groupname." with anonymous level privlages.";
-		$this -> bot -> log("SECURITY", "ADDGROUP", $caller." ".$return['content']);
-		return $return;
+		$this -> bot -> log("SECURITY", "ADDGROUP", $caller." Created group ".$groupname." with anonymous level privileges.");
+		return "Created group ".$groupname." with anonymous level privileges.";
 	} // End function add_group()
 
 	/*
@@ -620,16 +599,11 @@ class Security_Core extends BaseActiveModule
 	*/
 	function del_group($target, $caller="Internal Process")
 	{ // Start function del_group()
-		$return['error'] = FALSE;
-		$return['errordesc'] = '';
-		$return['content'] = '';
 		$target = strtolower($target);
 		if ($target == "leader" || $target == "admin" || $target == "superadmin")
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = $target." cannot be deleted.";
-			$return['content'] = $target." cannot be deleted.";
-			return $return;
+			$this->error->set($target." cannot be deleted.");
+			return $this->error;
 		}
 		$target = mysql_real_escape_string($target);
 		if (is_numeric($target))
@@ -638,26 +612,21 @@ class Security_Core extends BaseActiveModule
 			$result = $this -> bot -> db -> select($sql);
 			if (!isset($this -> cache['groups'][$target]))
 			{
-				$return['error'] = TRUE;
-				$return['errordesc'] = "Group ID ".$target." not found.";
-				$return['content'] = "";
-				return $return;
+				$this->error->set("Group ID ".$target." not found.");
+				return $this->error;
 			}
 			$target = $this -> cache['groups'][$target]['name'];
 		}
 		if (!isset($this -> cache['groups'][$target]['gid']))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = "Group ".$target." does not exisit";
-			$return['content'] = "";
-			return $return;
+			$this->error->set("Group ".$target." does not exisit");
+			return $this->error;
 		}
 		$sql = "DELETE FROM #___security_members WHERE gid = '".$this -> cache['groups'][$target]['gid']."'";
 		$this -> bot -> db -> query($sql);
 		$sql = "DELETE FROM #___security_groups WHERE gid = '".$this -> cache['groups'][$target]['gid']."'";
 		$this -> bot -> db -> query($sql);
-		$return['content'] = "Deleted group ID ".$this -> cache['groups'][$target]['gid']." Name: ".$target.".";
-		$this -> bot -> log("SECURITY", "DELGROUP", $caller." ".$return['content']);
+		$this -> bot -> log("SECURITY", "DELGROUP", $caller." Deleted group ID ".$this -> cache['groups'][$target]['gid']." Name: ".$target.".");
 		$this -> cache_mgr("rem", "groups", $target);
 
 	// Clear the flexible security cache if it exists:
@@ -665,8 +634,7 @@ class Security_Core extends BaseActiveModule
 	{
 		$this -> bot -> core("flexible_security") -> clear_cache();
 	}
-
-		return $return;
+		return "Deleted group ID ".$this -> cache['groups'][$target]['gid']." Name: ".$target.".";
 	} // End function del_group()
 
 	/*
@@ -674,33 +642,25 @@ class Security_Core extends BaseActiveModule
 	*/
 	function add_group_member($target, $group, $caller="Internal Process")
 	{ // Start function add_group_member()
-		$return['error'] = FALSE;
-		$return['errordesc'] = '';
-		$return['content'] = '';
 		$target = ucfirst(strtolower($target));
 		$group = strtolower($group);
 		$uid = $this -> bot -> core("chat") -> get_uid($target);
 		if (!$uid)
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = $target." is not a valid character.";
-			$return['content'] = '';
-			return $return;
+			$this->error->set($target." is not a valid character.");
+			return $this->error;
 		}
 		$gid = $this -> get_gid($group);
 		if ($gid == -1)
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = "Unable to find group ID for ".$group." ".$group." may not exisit. Check your spelling and try again.";
-			$return['content'] = '';
-			return $return;
+			$this->error->set("Unable to find group ID for ".$group." ".$group." may not exisit. Check your spelling and try again.");
+			return $this->error;
 		}
 
 		if ($this -> get_access_level($caller) < $this -> cache['groups'][$gid]['access_level'])
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = "Your Access Level is less than the Access Level of ".$group.". You cannot add members to ".$group.".";
-			return $return;
+			$this->error->set("Your Access Level is less than the Access Level of ".$group.". You cannot add members to ".$group.".");
+			return $this->error;
 		}
 
 		if (!isset($this -> cache['groups'][$gid]['members'][$target]))
@@ -708,16 +668,14 @@ class Security_Core extends BaseActiveModule
 			$sql = "INSERT INTO #___security_members (name,gid) VALUES ('".$target."', ".$gid.")";
 			$this -> bot -> db -> query($sql);
 			$this -> cache_mgr("add", "groupmem", $group, $target);
-			$return['content'] = "Added ".$target." to group ".$group.".";
-			$this -> bot -> log("SECURITY", "GRPMBR", $caller." ".$return['content']);
+			$this -> bot -> log("SECURITY", "GRPMBR", $caller." Added ".$target." to group ".$group.".");
+			return ("Added ".$target." to group ".$group.".");
 		}
 		else
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = $target." is already a member of ".$group;
-			$return['content'] = '';
+			$this->error->set($target." is already a member of ".$group);
+			return $this->error;
 		}
-		return $return;
 	} // End function add_group_member()
 
 	/*
@@ -725,27 +683,20 @@ class Security_Core extends BaseActiveModule
 	*/
 	function rem_group_member($target, $group, $caller)
 	{ // Start function rem_group_member()
-		$return['error'] = FALSE;
-		$return['errordesc'] = '';
-		$return['content'] = '';
 		$target = ucfirst(strtolower($target));
 		$group = strtolower($group);
 		$uid = $this -> bot -> core("chat") -> get_uid($target);
 		if (!$uid)
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = $target." is not a valid character.";
-			$return['content'] = '';
-			return $return;
+			$this->error->set($target." is not a valid character.");
+			return $this->error;
 		}
 
 	$gid = $this -> get_gid($group);
 	if ($gid == -1)
 	{
-		$return['error'] = TRUE;
-		$return['errordesc'] = "Unable to find group ID for ".$group." ".$group." may not exisit. Check your spelling and try again.";
-		$return['content'] = '';
-		return $return;
+		$this->error->set("Unable to find group ID for ".$group." ".$group." may not exisit. Check your spelling and try again.");
+		return $this->error;
 	}
 
 
@@ -753,9 +704,8 @@ class Security_Core extends BaseActiveModule
 		{
 			if ($this -> get_access_level($caller) < $this -> cache['groups'][$group]['access_level'])
 			{
-				$return['error'] = TRUE;
-				$return['errordesc'] = "Your Access Level is lower than ".$group."'s Access Level. You cannot remove members from ".$group.".";
-				return $return;
+				$this->error->set("Your Access Level is lower than ".$group."'s Access Level. You cannot remove members from ".$group.".");
+				return $this->error;
 			}
 		}
 
@@ -764,15 +714,14 @@ class Security_Core extends BaseActiveModule
 			$sql = "DELETE FROM #___security_members WHERE name = '".$target."' AND gid = ".$this -> cache['groups'][$group]['gid'];
 			$this -> bot -> db -> query($sql);
 			$this -> cache_mgr("rem", "groupmem", $group, $target);
-			$return['content'] = "Removed ".$target." from ".$group;
-			$this -> bot -> log("SECURITY", "GRPMBR", $caller." ".$return['content']);
+			$this -> bot -> log("SECURITY", "GRPMBR", $caller." Removed ".$target." from ".$group);
+			return "Removed ".$target." from ".$group;
 		}
 		else
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = $target." is not a member of ".$group;
+			$this->error->set($target." is not a member of ".$group);
+			return $this->error;
 		}
-		return $return;
 	} // End function rem_group_member()
 
 	/*
@@ -786,26 +735,20 @@ class Security_Core extends BaseActiveModule
 		$target = ucfirst(strtolower($target));
 		$level = strtoupper($level);
 		$uid = $this -> bot -> core("chat") -> get_uid($target);
-		$return['error'] = FALSE;
-		$return['errordesc'] = '';
-		$return['content'] = '';
 		// Check to see if user is banned.
 		if ($this -> is_banned($target))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = $target." is banned.";
-			return $return;
+			$this->error->set($target." is banned.");
+			return $this->error;
 		}
 
 		// Get whois data & check for errors.
 		if($this -> bot -> game == "ao")
 		{
 			$who = $this -> bot -> core("whois") -> lookup($target);
-			if ($who['error'])
+			if ($who instanceof BotError)
 			{
-				$return['error'] = TRUE;
-				$return['errordesc'] = $who['errordesc'];
-				return $return;
+				return $who;
 			}
 		}
 
@@ -825,9 +768,8 @@ class Security_Core extends BaseActiveModule
 		// Check to see if they are already a member
 		if (isset($this -> cache[$cache][$target]))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = ucfirst($target)." is already a ".$level.".";
-			return $return;
+			$this->error->set(ucfirst($target)." is already a ".$level.".");
+			return $this->error;
 		}
 		else
 		{
@@ -836,9 +778,8 @@ class Security_Core extends BaseActiveModule
 			$sql .= "VALUES (".$uid.", '".$target."', '".mysql_real_escape_string($admin)."', ".time().", ".$lvlnum.", ".time().") ";
 			$sql .= "ON DUPLICATE KEY UPDATE added_by = VALUES(added_by), added_at = VALUES(added_at), user_level=VALUES(user_level), updated_at = VALUES(updated_at)";
 			$this -> bot -> db -> query($sql);
-			$return['content'] = "Added ".$target." as a ".$level;
-			$this -> bot -> log("SECURITY", "ADDUSER", $admin." ".$return['content']);
-			return $return;
+			$this -> bot -> log("SECURITY", "ADDUSER", $admin." Added ".$target." as a ".$level);
+			return "Added ".$target." as a ".$level;
 		}
 	} // End function add_user()
 
@@ -849,14 +790,10 @@ class Security_Core extends BaseActiveModule
 	{ // Start function del_user()
 		$admin = ucfirst(strtolower($admin));
 		$target = ucfirst(strtolower($target));
-		$return['error'] = FALSE;
-		$return['errordesc'] = '';
-		$return['content'] = '';
 		if (!isset($this -> cache["members"][$target]) && !isset($this -> cache["guests"][$target]))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = $target." is not a member of <botname>.";
-			return $return;
+			$this->error->set($target." is not a member of <botname>.");
+			return $this->error;
 		}
 		else
 		{
@@ -873,9 +810,8 @@ class Security_Core extends BaseActiveModule
 			$this -> bot -> core("notify") -> del($target);
 			$sql = "UPDATE #___users SET user_level = 0, deleted_by = '".mysql_real_escape_string($admin)."', deleted_at = ".time().", notify = 0 WHERE nickname = '".$target."'";
 			$this -> bot -> db -> query($sql);
-			$return['content'] = $target." has been removed from <botname>.";
-			$this -> bot -> log("SECURITY", "DELUSER", $admin." ".$return['content']);
-			return $return;
+			$this -> bot -> log("SECURITY", "DELUSER", $admin." ".$target." has been removed from <botname>.");
+			return $target." has been removed from <botname>.";
 		}
 	} // End function del_user()
 
@@ -887,29 +823,23 @@ class Security_Core extends BaseActiveModule
 	{ // Start function set_ban()
 		$admin = ucfirst(strtolower($admin));
 		$target = ucfirst(strtolower($target));
-		$return['error'] = FALSE;
-		$return['errordesc'] = '';
-		$return['content'] = '';
 
 		if (!$this -> bot -> core("chat") -> get_uid($target))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = $target." is not a valid character!";
-			return $return;
+			$this->error->set($target." is not a valid character!");
+			return $this->error;
 		}
 
 		if ($this -> check_access($target, "OWNER"))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = $target." is the bot owner and cannot be banned.";
-			return $return;
+			$this->error->set($target." is the bot owner and cannot be banned.");
+			return $this->error;
 		}
 
 		if(isset($this -> cache['banned'][$target]))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = $target." is already banned.";
-			return $return;
+			$this->error->set($target." is already banned.");
+			return $this->error;
 		}
 		elseif(isset($this -> cache['guests'][$target]))
 		{
@@ -926,11 +856,9 @@ class Security_Core extends BaseActiveModule
 		else // They are not in the member table at all.
 		{
 			$who = $this -> bot -> core("whois") -> lookup($target);
-			if ($who['error'])
+			if ($who instanceof BotError)
 			{
-				$return['error'] = TRUE;
-				$return['errordesc'] = $who['errordesc'];
-				return $return;
+				return $who;
 			}
 			$this -> cache_mgr("add", "banned", $target);
 			$sql = "INSERT INTO #___users (char_id,nickname,added_by,added_at,banned_by,banned_at,banned_for,banned_until,notify,user_level,updated_at) ";
@@ -940,9 +868,8 @@ class Security_Core extends BaseActiveModule
 		$this -> bot -> db -> query($sql);
 		$this -> bot -> core("player_notes") -> add($target, $admin, $reason, 1);
 		$this -> bot -> core("notify") -> del($target);
-		$return['content'] = "Banned ".$target." from " . $this -> bot -> botname . ".";
-		$this -> bot -> log("SECURITY", "BAN", $caller." ".$return['content']);
-		return $return;
+		$this -> bot -> log("SECURITY", "BAN", $caller." Banned ".$target." from " . $this -> bot -> botname . ".");
+		return "Banned ".$target." from " . $this -> bot -> botname . ".";
 	} // End function set_ban()
 
 	/*
@@ -952,22 +879,18 @@ class Security_Core extends BaseActiveModule
 	{ // Start function rem_ban()
 		$admin = ucfirst(strtolower($admin));
 		$target = ucfirst(strtolower($target));
-		$return['error'] = FALSE;
-		$return['errordesc'] = '';
-		$return['content'] = '';
 		if (!isset($this -> cache['banned'][$target]))
 		{
-			$return['error'] = TRUE;
-			$return['errordesc'] = $target." is not banned.";
-			return $return;
+			$this->error->set($target." is not banned.");
+			return $this->error;
 		}
 		else
 		{
 			$this -> cache_mgr("rem", "banned", $target);
 			$sql = "UPDATE #___users SET user_level = 0 WHERE nickname = '".$target."'";
 			$this -> bot -> db -> query($sql);
-			$return['content'] = "Unbanned ".$target." from " . $this -> bot -> botname . ". ".$target." is now anonymous.";
-			$this -> bot -> log("SECURITY", "BAN", $caller." ".$return['content']);
+			$return = "Unbanned ".$target." from " . $this -> bot -> botname . ". ".$target." is now anonymous.";
+			$this -> bot -> log("SECURITY", "BAN", $caller." ".$return);
 			return $return;
 		}
 	} // End function rem_ban()
@@ -1340,7 +1263,7 @@ class Security_Core extends BaseActiveModule
 	function get_access_level_player($player)
 	{ // Start function get_access_level()
 	
-		$uid = $this -> bot -> core("chat") -> get_uid($player);
+		$uid = $this -> bot -> core("player") -> id($player);
 		// If user does not exist return ANONYMOUS access right away
 		if (!$uid)
 		{
@@ -1594,7 +1517,7 @@ class Security_Core extends BaseActiveModule
 	function org_rank_access($player, $highest)
 	{ // Start function org_rank_access()
 		$who = $this -> bot -> core("whois") -> lookup($player, TRUE); // Do whois with no XML lookup, guild members should be cached...
-		if ($who['error'])
+		if ($who instanceof BotError)
 			return $highest;
 		if ($who['org'] <> $this -> bot -> guildname)
 			return $highest;
@@ -1607,7 +1530,7 @@ class Security_Core extends BaseActiveModule
 	function org_rank_id($player, $highest)
 	{ // Start function org_rank_access()
 		$who = $this -> bot -> core("whois") -> lookup($player, TRUE); // Do whois with no XML lookup, guild members should be cached...
-		if ($who['error'])
+		if ($who instanceof BotError)
 			return $highest;
 		if ($who['org'] <> $this -> bot -> guildname)
 			return $highest;

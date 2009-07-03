@@ -33,8 +33,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: StringFilter.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-05 13:02:28 +0100 (fr, 05 des 2008) $
+* Revision: $Id: StringFilter.php 1882 2008-12-05 12:02:28Z blueeagle $
 */
 
 $stringfilter_core = new stringfilter_core($bot);
@@ -135,15 +135,11 @@ class stringfilter_core extends BasePassiveModule
 	*/
 	function add_string($search, $new=NULL)
 	{ // Start function add_string()
-		$tmp['error'] = FALSE;
-		$tmp['errordesc'] = "";
-		$tmp['content'] = "";
 		$search = mysql_real_escape_string(strtolower($search));
 		if (isset($this -> stringlist[$search]))
 		{
-			$tmp['error'] = TRUE;
-			$tmp['errordesc'] = "The string '".$search."' is already on the filtered word list.";
-			return $tmp;
+			$this->error->set("The string '".$search."' is already on the filtered word list.");
+			return $this->error;
 		}
 		if (!is_null($new))
 		{
@@ -157,29 +153,24 @@ class stringfilter_core extends BasePassiveModule
 		}
 		$this -> bot -> db -> query($sql);
 		$this -> stringlist[$search] = $new;
-		$tmp['content'] = "Added '".$search."' to the filterd string list. It will be replaced with '".$new."'";
-		return $tmp;
+		return "Added '".$search."' to the filterd string list. It will be replaced with '".$new."'";
 	} // End function add_string()
 
 	function rem_string($search)
 	{ // Start function rem_string()
-		$tmp['error'] = FALSE;
-		$tmp['errordesc'] = "";
-		$tmp['content'] = "";
 		$search = mysql_real_escape_string(strtolower($search));
 		if (isset($this -> stringlist[$search]))
 		{
 			unset($this -> stringlist[$search]);
 			$sql = "DELETE FROM #___string_filter WHERE search = '".$search."'";
 			$this -> bot -> db -> query($sql);
-			$tmp['content'] = "Removed ".$search." from the filtered string list.";
+			return "Removed ".$search." from the filtered string list.";
 		}
 		else
 		{
-			$tmp['error'] = TRUE;
-			$tmp['errordesc'] = $search." is not on the filtered string list.";
+			$this->error->set($search." is not on the filtered string list.");
+			return $this->error;
 		}
-		return $tmp;
 	} // End function rem_string()
 
 	/*

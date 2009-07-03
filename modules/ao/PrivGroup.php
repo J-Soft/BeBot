@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: PrivGroup.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2009-01-06 21:31:36 +0100 (ti, 06 jan 2009) $
+* Revision: $Id: PrivGroup.php 1946 2009-01-06 20:31:36Z temar $
 */
 
 
@@ -291,7 +291,7 @@ class PrivGroup extends BaseActiveModule
 		$info = $this -> bot -> core("whois") -> lookup($name);
 
 		// Only "Name joined bot" if no whois entry was found
-		if ($info["error"])
+		if ($info instanceof BotError)
 		{
 			return "##highlight##" . $name . " ##end##" . $actionstring . " " . $this -> bot -> botname;
 		}

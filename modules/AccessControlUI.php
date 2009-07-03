@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: AccessControlUI.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-18 05:06:42 +0100 (to, 18 des 2008) $
+* Revision: $Id: AccessControlUI.php 1926 2008-12-18 04:06:42Z temar $
 */
 
 $accesscontrol_gui = new AccessControlGUI($bot);
@@ -62,15 +62,15 @@ class AccessControlGUI extends BaseActiveModule
 		$this -> channels = array("gc" => "##green##", "pgmsg" => "##white##", "tell" => "##seablue##");
 
 		/*
-		Create default access right for "commands" by OWNER if it is not set or set to DISABLED. You always want to be able to change the rights!
+		Create default access right for "commands" by SUPERADMIN if it is not set or set to DISABLED. You always want to be able to change the rights!
 		*/
 		if ($this -> bot -> core("access_control") -> get_min_access_level("commands") == OWNER + 1)
 		{
 			$this -> bot -> core("access_control") -> update_access("commands", "tell", "OWNER");
 		}
 
-		$this -> register_command("all", "channel", "OWNER");
-		$this -> register_command("all", "commands", "OWNER");
+		$this -> register_command("all", "channel", "SUPERADMIN");
+		$this -> register_command("all", "commands", "SUPERADMIN");
 
 		$this -> help['description'] = "Allows you to set access controls for all commands in any channel.";
 		$this -> help['command']['commands'] = "Shows the GUI for setting access controls";

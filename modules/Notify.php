@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: Notify.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-06 22:26:31 +0100 (lø, 06 des 2008) $
+* Revision: $Id: Notify.php 1895 2008-12-06 21:26:31Z blueeagle $
  */
 
 $notify = new Notify($bot);
@@ -134,22 +134,12 @@ class Notify extends BaseActiveModule
 
 	function add_notify($source, $user)
 	{
-		$ret = $this -> bot -> core("notify") -> add($source, $user);
-		if ($ret['error'])
-		{
-			return "##error##" . $ret['errordesc'] . "##end##";
-		}
-		return $ret['content'];
+		return $this -> bot -> core("notify") -> add($source, $user);
 	}
 
 	function del_notify($user)
 	{
-		$ret = $this -> bot -> core("notify") -> del($user);
-		if ($ret['error'])
-		{
-			return "##error##" . $ret['errordesc'] . "##end##";
-		}
-		return $ret['content'];
+		return $this -> bot -> core("notify") -> del($user);
 	}
 }
 ?>

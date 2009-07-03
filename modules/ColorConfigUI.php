@@ -30,8 +30,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: ColorConfigUI.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-18 05:06:42 +0100 (to, 18 des 2008) $
+* Revision: $Id: ColorConfigUI.php 1926 2008-12-18 04:06:42Z temar $
 */
 
 
@@ -46,8 +46,8 @@ class ColorConfig extends BaseActiveModule
 	{
 		parent::__construct(&$bot, get_class($this));
 
-		$this -> register_command('all', 'color', 'OWNER');
-		$this -> register_command('all', 'theme', 'OWNER');
+		$this -> register_command('all', 'color', 'SUPERADMIN');
+		$this -> register_command('all', 'theme', 'SUPERADMIN');
 
 		$this -> help['description'] = "Configures the colors used by the bot.";
 		$this -> help['command']['color'] = "Shows the interface to configure colors for the bot.";
@@ -236,12 +236,7 @@ class ColorConfig extends BaseActiveModule
 
 	function export_schemes($filename, $name)
 	{
-		$ret = $this -> bot -> core("colors") -> create_scheme_file($filename, $name);
-		if ($ret['error'])
-		{
-			return "##error##" . $ret['errordesc'] . "##end##";
-		}
-		return $ret['content'];
+		return $this -> bot -> core("colors") -> create_scheme_file($filename, $name);
 	}
 
 	function show_scheme_files()
@@ -261,12 +256,7 @@ class ColorConfig extends BaseActiveModule
 
 	function import_schemes($filename)
 	{
-		$ret = $this -> bot -> core("colors") -> read_scheme_file($filename);
-		if ($ret['error'])
-		{
-			return "##error##" . $ret['errordesc'] . "##end##";
-		}
-		return $ret['content'];
+		return $this -> bot -> core("colors") -> read_scheme_file($filename);
 	}
 }
 ?>

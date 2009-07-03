@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: User.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-07 18:55:01 +0100 (sø, 07 des 2008) $
+* Revision: $Id: User.php 1903 2008-12-07 17:55:01Z blueeagle $
 */
 
 $user_core = new User_Core($bot);
@@ -68,9 +68,6 @@ class User_Core extends BasePassiveModule
 	*/
 	function add ($source, $name, $id=0, $user_level, $silent=0)
 	{
-		$return["error"] = false;
-		$return["errordesc"] = '';
-		$return["content"] = '';
 		$change_level = false;
 
 		$name = ucfirst(strtolower($name));
@@ -78,17 +75,15 @@ class User_Core extends BasePassiveModule
 		// Check if we have been passed a name at all
 		if (empty($name))
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "You have to give a character to be added.";
-			return $return;
+			$this->error->set("You have to give a character to be added.");
+			return $this->error;
 		}
 
 		// Make sure $name is a valid character
-		if (!$this -> bot -> core("chat") -> get_uid($name))
+		if (!$this -> bot -> core("player") -> id($name))
 		{
-			$return["error"] = true;
-			$return["errordesc"] = $name . " is not a valid character!";
-			return $return;
+			$this->error->set($name . " is not a valid character!");
+			return $this->error;
 		}
 
 		// If we didn't get an id, look it up
@@ -100,9 +95,8 @@ class User_Core extends BasePassiveModule
 		// Make sure the character exsists.
 		if (!$id)
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "Player ##highlight##" . $name . " ##end##does not exist";
-			return $return;
+			$this->error->set("Player ##highlight##" . $name . " ##end##does not exist");
+			return $this->error;
 		}
 
 		//Make sure the user is not already added.
@@ -111,9 +105,8 @@ class User_Core extends BasePassiveModule
 		{
 			if ($result[0][1] == -1 && !($this -> bot -> guildbot))
 			{
-				$return["error"] = true;
-				$return["errordesc"] = "##highlight##" . $name . " ##end##is banned and cannot be added.";
-				return $return;
+				$this->error->set("##highlight##" . $result[0][0] . " ##end##is already a member.");
+				return $this->error;
 			}
 			else if (($result[0][1] != $user_level && $user_level > 0))
 			{
@@ -121,14 +114,13 @@ class User_Core extends BasePassiveModule
 			}
 			else
 			{
-				$return["error"] = true;
-				$return["errordesc"] = "##highlight##" . $result[0][0] . " ##end##is already a member.";
+				$this->error->set("##highlight##" . $result[0][0] . " ##end##is already a member.");
 				// Make sure correct name is in the table, same ID may have different names after name change.
 				if ($name != $result[0][0])
 				{
 					$this -> bot -> db -> query("UPDATE #___users SET nickname = '" . $name . "' where char_id = '" . $id . "'");
 				}
-				return $return;
+				return $this->error
 			}
 		}
 		$result = $this -> bot -> db -> select("SELECT char_id, user_level FROM #___users WHERE nickname = '" . $name . "'");
@@ -136,9 +128,8 @@ class User_Core extends BasePassiveModule
 		{
 			if ($result[0][1] == -1 && !($this -> bot -> guildbot))
 			{
-				$return["error"] = true;
-				$return["errordesc"] = "##highlight##" . $name . " ##end##is banned and cannot be added.";
-				return $return;
+				$this->error->set("##highlight##" . $name . " ##end##is banned and cannot be added.");
+				return $this->error
 			}
 			else
 			{
@@ -154,16 +145,15 @@ class User_Core extends BasePassiveModule
 		// Make sure we have a valid access level for the user.
 		else if ($user_level < 0)
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "##highlight##" . $level . " ##end##is not a valid access level. The plugin trying to add a user might be broken.";
-			return $return;
+			$this->error->set("##highlight##" . $level . " ##end##is not a valid access level. The plugin trying to add a user might be broken.");
+			return $this->error
 		}
 
 		if($this -> bot -> game == "ao")
 		{
 			// Add the user to the whois cache.
 			$members = $this -> bot -> core("whois") -> lookup ($name);
-			if ($members["error"] == true)
+			if ($members instanceof BotError)
 			{
 				$this -> bot -> log("USER", "ERROR", "Could not lookup $name whois.");
 				$members["id"] = $id;
@@ -225,8 +215,7 @@ class User_Core extends BasePassiveModule
 			$this -> bot -> core("security") -> cache_mgr("add", $cache, $name);
 		}
 
-		$return["content"] = "Player ##highlight##" . $name . " ##end##has been added to the bot as ". $this -> access_name($user_level);
-		return $return;
+		return "Player ##highlight##" . $name . " ##end##has been added to the bot as ". $this -> access_name($user_level);
 	}
 
 	/*
@@ -237,41 +226,34 @@ class User_Core extends BasePassiveModule
 	function del ($source, $name, $id=0, $silent=0)
 	{
 		$reroll = 0;
-		$return["error"] = false;
-		$return["errordesc"] = '';
-		$return["content"] = '';
 		$name = ucfirst(strtolower($name));
 
 		if (!ctype_alnum($name))
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "You have to give a character to be deleted.";
-			return $return;
+			$this->error->set("You have to give a character to be deleted.");
+			return $this->error;
 		}
 
 		// Check if we have a member by that name.
 		$result = $this -> bot -> db -> select("SELECT char_id, nickname, user_level FROM #___users WHERE nickname = '" . $name . "'");
 		if (empty($result))
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "##highlight##" . $name . " ##end##is not in the user table, and cannot be deleted.";
-			return $return;
+			$this->error->set("##highlight##" . $name . " ##end##is not in the user table, and cannot be deleted.");
+			return $this->error;
 		}
 
 		// Check if the member is already deleted.
 		else if ($result[0][2] == 0)
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "##highlight##" . $name . " ##end##is not a member.";
-			return $return;
+			$this->error->set("##highlight##" . $name . " ##end##is not a member.");
+			return $this->error;
 		}
 
 		// Make sure we are not trying to delete a banned member.
 		else if ($result[0][2] == -1)
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "##highlight##" . $name . " ##end##is banned and cannot be deleted.";
-			return $return;
+			$this->error->set("##highlight##" . $name . " ##end##is banned and cannot be deleted.");
+			return $this->error;
 		}
 
 		// Revoke the members
@@ -294,9 +276,8 @@ class User_Core extends BasePassiveModule
 			else
 			{
 				$this -> erase("Automated delete for invalid userid", $name);
-				$return["error"] = true;
-				$return["errordesc"] = "##highlight##" . $name . " ##end##does not appear to be a valid character. You might want to erase this user.";
-				return $return;
+ 				$this->error->set("##highlight##" . $name . " ##end##does not appear to be a valid character. You might want to erase this user.");
+ 				return $this->error;
 			}
 
 			// Rerolled character, we need to make sure our information is updated.
@@ -334,8 +315,7 @@ class User_Core extends BasePassiveModule
 
 			$this -> bot -> core("online") -> logoff($name);
 			$this -> bot -> core("notify") -> update_cache();
-			$return["content"] = "##highlight##" . $name . " ##end##has been removed from member list.";
-			return $return;
+			return "##highlight##" . $name . " ##end##has been removed from member list.";
 		}
 	}
 
@@ -348,31 +328,25 @@ class User_Core extends BasePassiveModule
 	{
 		$reroll = 0;
 		$deleted = 0;
-		$return["error"] = false;
-		$return["errordesc"] = '';
-		$return["content"] = '';
 
 		if (!ctype_alnum($name))
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "You have to give a character name to be erased.";
-			return $return;
+			$this->error->set("You have to give a character name to be erased.");
+			return $this->error;
 		}
 
 		$result = $this -> bot -> db -> select("SELECT char_id, nickname, user_level FROM #___users WHERE nickname = '" . $name . "'");
 		if (empty($result))
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "##highlight##" . $name . " ##end##is not in the user table, and cannot be erased.";
-			return $return;
+			$this->error->set("##highlight##" . $name . " ##end##is not in the user table, and cannot be erased.");
+			return $this->error;
 		}
 
 		//Make sure we are not trying to delete a banned member.
 		else if ($result[0][1] == -1)
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "##highlight##" . $name . " ##end##is banned and cannot be deleted.";
-			return $return;
+			$this->error->set("##highlight##" . $name . " ##end##is banned and cannot be deleted.");
+			return $this->error;
 		}
 		else
 		{
@@ -428,8 +402,7 @@ class User_Core extends BasePassiveModule
 
 			$this -> bot -> core("online") -> logoff($name);
 			$this -> bot -> core("notify") -> update_cache();
-			$return["content"] = "##highlight##" . $name . " ##end##has been erased from member list.";
-			return $return;
+			return "##highlight##" . $name . " ##end##has been erased from member list.";
 		}
 	}
 

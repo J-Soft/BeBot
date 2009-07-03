@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: Teams.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-12-07 20:34:11 +0100 (sø, 07 des 2008) $
+* Revision: $Id: Teams.php 1907 2008-12-07 19:34:11Z blueeagle $
 */
 require_once("Teams.inc");
 
@@ -321,10 +321,10 @@ class NewTeams extends BaseActiveModule
 
 	function GetPlayerInfo($name)
 	{
-		$uid = $this->bot -> core("chat") ->get_uid($name);
+		$uid = $this->bot -> core("player") -> id($name);
 		$result = $this -> bot -> core("whois") -> lookup($name);
 
-		if ($result["error"])
+		if ($result instanceof BotError)
 		{
 			$member[0] = $name;
 			$member[1] = "Unknown";

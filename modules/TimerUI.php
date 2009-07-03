@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate$
-* Revision: $Id: TimerUI.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
+* Revision: $Id: TimerUI.php 1944 2009-01-01 02:15:37Z temar $
 */
 
 $timergui = new TimerGUI($bot);
@@ -220,12 +220,7 @@ class TimerGUI extends BaseActiveModule
 
 	function rem_timer($name, $id)
 	{
-		$ret = $this -> bot -> core("timer") -> del_timer($name, $id, false);
-		if ($ret['error'])
-		{
-			return $ret['errordesc'];
-		}
-		return $ret['content'];
+		return $this -> bot -> core("timer") -> del_timer($name, $id, false);
 	}
 
 	// Shows all existing timer settings with their current values:s

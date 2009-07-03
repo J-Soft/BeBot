@@ -32,7 +32,7 @@
 *  USA
 *
 * File last changed at $LastChangedDate: 2007-07-25 11:54:01 -0700 (Wed, 25 Jul 2007) $
-* Revision: $Id: 15_AOChatWrapper.php 1833 2008-11-30 22:09:06Z alreadythere $
+* Revision: $Id: 15_AOChatWrapper.php 1910 2008-12-07 21:05:00Z blueeagle $
 */
 
 
@@ -59,36 +59,9 @@ class AOChatWrapper_Core extends BasePassiveModule
 	*/
 	function get_uid($user)
 	{
-		if(empty($user))
-		{
-			$this->error->set('No user specified');
-			// TODO: adapt all calls to get_uid() to check for instanceof BotError?
-			// return($this->error);
-			return false;
-		}
-
-		//Attempt to get uid from FC (This fails randomly)
-		$uid = $this -> bot -> aoc -> get_uid($user);
-
-		//When it fails attempt to get it from the cache.
-		if($uid === false)
-		{
-			$db_uid = $this -> bot -> db -> select("SELECT ID FROM #___whois WHERE nickname = '" . $user . "' LIMIT 1", MYSQL_ASSOC);
-
-			if (!empty($db_uid))
-			{
-				$uid = $db_uid[0]['ID'];
-			}
-			else
-			{
-				$this -> error -> set("I was unable to get the user id for user: '$user'");
-				// TODO: adapt all calls to get_uid() to check for instanceof BotError?
-				// return($this->error);
-				return false;
-			}
-		}
-
-		return $uid;
+		$user = ucfirst(strtolower($user));
+		$this->debug_output("Deprecated call to core('chat')->get_uid(). Use bot->core('player')->id($user)\n");
+		return $this->bot->core('player')->id($user);
 	}
 
 	/*
@@ -96,47 +69,36 @@ class AOChatWrapper_Core extends BasePassiveModule
 	*/
 	function get_uname($user)
 	{
-		if ($user === false || $user === 0 || $user === -1)
-		{
-			return false;
-		}
-
-		$name = $this -> bot -> aoc -> get_uname($user);
-
-		if($name === false || $name === 0 || $name === -1)
-		{
-			$db_name = $this -> bot -> db -> select("SELECT nickname FROM #___whois WHERE ID = '" . $user . "' OR nickname = '" . $user . "'");
-
-			if (!empty($db_name))
-			{
-				$name = $db_name[0][0];
-			}
-			else
-			{
-				$name = false;
-				$this -> bot -> log('GETUNAME', 'FAILED', "I was unable to get the user name belonging to: $user");
-			}
-		}
-		return $name;
+		$user = ucfirst(strtolower($user));
+		$this->debug_output("Deprecated call to core('chat')->get_uname(). Use bot->core('player')->name($user)\n");
+		return $this->bot->core('player')->name($user);
 	}
 
 	/* Buddies */
 	function buddy_add($user, $que = TRUE)
 	{
 		$add = true;
-		if (empty($user) || ($uid = $this -> get_uid($user)) === false)
+		if(is_numeric($user))
+			$uid = $user;
+		else
+			$uid = $this -> bot -> core('player') -> id($user);
+			
+		if ($uid instanceof BotError)
 		{
-			return false;
+			return $uid;
 		}
 		else
 		{
-			if (!($this -> bot -> aoc -> buddy_exists($uid)) && $uid != 0 && $uid != -1
-			&& $uid != $this -> get_uid($this -> bot -> botname) && $this -> get_uname($uid) != -1)
+			if (
+			!($this -> bot -> aoc -> buddy_exists($uid)) && 
+			$uid != $this -> bot->core('player')->id($this -> bot -> botname) && 
+			!($this -> bot -> core('player') -> name($uid) instanceof BotError)
+			)
 			{
 				if (!$que || $this -> bot -> core("buddy_queue") -> check_queue())
 				{
 					$this -> bot -> aoc -> buddy_add($uid);
-					$this -> bot -> log("BUDDY", "BUDDY-ADD", $this -> get_uname($uid));
+					$this -> bot -> log("BUDDY", "BUDDY-ADD", $this -> bot -> core('player') -> name($uid));
 					return true;
 				}
 				else
@@ -153,7 +115,7 @@ class AOChatWrapper_Core extends BasePassiveModule
 	function buddy_remove($user)
 	{
 		$add = false;
-		if (empty($user) || ($uid = $this -> get_uid($user)) === false)
+		if (empty($user) || ($uid = $this -> bot->core('player')->id($user)) === false)
 		{
 			return false;
 		}

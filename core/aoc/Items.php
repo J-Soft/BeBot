@@ -127,12 +127,12 @@ class Items_Core extends BasePassiveModule
 		$url .= '?single=1';
 		$url .= '&id='.$words;
 		$result = $this -> bot -> core("tools") -> get_site($url, 1);
-		if(strstr($result['content'], 'mysql_real_escape_string')!==false)
+		//A comment explaining the logic of this check would be appreciated! Why are we looking for mysql_real_escape_string here?
+		if(strstr($result, 'mysql_real_escape_string')!==false)
+		{
 			return("Error in query to database");
-		if (!empty($result["content"]))
-			return $result["content"];
-		else
-			return "Error in query to database";
+		}
+		return $result;
 	}
 
 	function search_item_db($words)
@@ -141,11 +141,7 @@ class Items_Core extends BasePassiveModule
 		$url .= '?search='.urlencode($words);
 		$url .= '&botname='.$this->bot->botname;
 		$url .= '&pre='.urlencode($this -> bot -> commpre);
-		$result = $this -> bot -> core("tools") -> get_site($url, 1);
-		if (!empty($result["content"]))
-			return $result["content"];
-		else
-			return "Error in query to database";
+		return $this -> bot -> core("tools") -> get_site($url, 1);
 	}
 }
 ?>

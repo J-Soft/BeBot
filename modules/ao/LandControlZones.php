@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate$
-* Revision: $Id: LandControlZones.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
+* Revision: $Id: LandControlZones.php 1944 2009-01-01 02:15:37Z temar $
 */
 
 $landcontrol = new LandControlZones($bot);

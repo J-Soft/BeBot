@@ -70,9 +70,8 @@ function get_site($url, $strip_headers = 0, $server_timeout = 15, $read_timeout 
 	// Make sure the socket was created successfully
 	if (!$fd)
 	{
-		$return["error"] = true;
-		$return["errordesc"] = "Errno: $errno Errstr: $errstr";
-		return $return;
+		$this->error->set("Errno: $errno Errstr: $errstr");
+		return $this->error;
 	}
 	else
 	{
@@ -101,23 +100,18 @@ function get_site($url, $strip_headers = 0, $server_timeout = 15, $read_timeout 
 		// Make sure we haven't timed out while waiting for a response
 		if ($results["timed_out"] == 1)
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "Timed out while reading from ". $get_url["host"];
-			$return["content"] = "";
+			$this->error->set("Timed out while reading from ". $get_url["host"]);
 			fclose($fd);
-			return $return;
+			return $this->error;
 		}
 
 		// Successfull query with no errors from the server
 		if (ereg("200 OK", $http_response) || ereg("302 Found", $http_response))
 		{
-			$return["error"] = false;
-			$return["content"] = "";
-
 			// Read the contents
 			while (!feof($fd))
 			{
-				$return["content"] .= fgets($fd, 1024);
+				$return .= fgets($fd, 1024);
 			}
 
 			$results = stream_get_meta_data($fd);
@@ -125,18 +119,16 @@ function get_site($url, $strip_headers = 0, $server_timeout = 15, $read_timeout 
 			// Make sure we didn't time out while reading the response again.
 			if ($results["timed_out"] == 1)
 			{
-				$return["error"] = true;
-				$return["errordesc"] = "Timed out while reading from " . $get_url["host"];
-				$return["content"] = "";
+				$this->error->set("Timed out while reading from " . $get_url["host"]);
 				fclose($fd);
-				return $return;
+				return $this->error;
 			}
 
 			// Did the calling function want http headers stripped?
 			if ($strip_headers)
 			{
-				$split = split("\r\n\r\n",$return["content"]);
-				$return["content"] = $split[1];
+				$split = split("\r\n\r\n",$return);
+				$return = $split[1];
 			}
 
 			fclose($fd);
@@ -145,10 +137,9 @@ function get_site($url, $strip_headers = 0, $server_timeout = 15, $read_timeout 
 		// Did not return 200 OK :(
 		else
 		{
-			$return["error"] = true;
-			$return["errordesc"] = "Server returned: $http_response";
+			$this->error->set("Server returned: $http_response");
 			fclose($fd);
-			return $return;
+			return $this->error;
 		}
 	}
 }
@@ -193,17 +184,17 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC))
 	}
 	$org_cont = get_site($baseurl . "/org/stats/d/" . $dimension . "/name/" . $orgid['org_id'] . "/basicstats.xml", 0, 60, 60);
 	$httpqueries++;
-	if ($org_cont['error'])
+	if ($org_cont instanceof BotError)
 	{
 		echo "     Could not get roster for " . $orgid['org_name'] . " (" . $orgid['org_id'] . ")!\n";
-		echo "     " . $org_cont['errordesc'] . "\n";
+		echo "     " . $org_cont->message() . "\n";
 		$failedrosterlookup++;
 	}
 	else
 	{
-		$orgname = mysql_real_escape_string(xmlparse($org_cont['content'], "name"));
-		$orgfaction = xmlparse($org_cont['content'], "side");
-		$org = explode("<member>", $org_cont['content']);
+		$orgname = mysql_real_escape_string(xmlparse($org_cont, "name"));
+		$orgfaction = xmlparse($org_cont, "side");
+		$org = explode("<member>", $org_cont);
 
 		if ($show_org_names)
 		{
@@ -333,9 +324,9 @@ if ($do_unorged_users)
 		}
 		$content_arr = get_site($baseurl . "/character/bio/d/" . $dimension . "/name/" . strtolower($user['nickname']) . "/bio.xml");
 		$httpqueries++;
-		if (!$content_arr['error'])
+		if (!$content_arr instanceof BotError)
 		{
-			$content = $content_arr['content'];
+			$content = $content_arr;
 			$who["nick"] = xmlparse($content, "nick");
 			$who["firstname"] = mysql_real_escape_string(xmlparse($content, "firstname"));
 			$who["lastname"] = mysql_real_escape_string(xmlparse($content, "lastname"));

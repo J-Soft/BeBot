@@ -31,16 +31,16 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-12-21 06:39:27 +0100 (Sun, 21 Dec 2008) $
+* File last changed at $LastChangedDate: 2008-12-21 06:39:27 +0100 (sø, 21 des 2008) $
 * Revision: $Id: Whois.php 1933 2008-12-21 05:39:27Z temar $
 */
 
 /*
 whois($name):
 Preform an XML lookup for $name
+- On error returns
+instanceof BotError with description of the error.
 - Returns array:
-$array["error"] - true if error was encountered, false if not.
-$array["errordesc"] - Error description if error was encountered.
 $array["id"] - Character id
 $array["nickname"] - Character nickname
 $array["firstname"] - Character first name or NULL
@@ -253,17 +253,14 @@ class Whois_Core extends BasePassiveModule
 
 		$name = ucfirst(strtolower($name));
 
-		$who["error"] = false;
-		$uid = $this -> bot -> core("chat") -> get_uid($name);
+		$uid = $this -> bot -> core("player") -> id($name);
 		/*
 		Make sure we havent been passed a bogus name.
 		*/
-		if (!$uid)
+		if ($uid instanceof BotError)
 		{
-			$who["error"] = true;
-			$who["errordesc"] = "$name appears to be a non exsistant character.";
-
-			return $who;
+			$this->error->set("$name appears to be a non exsistant character.");
+			return $this->error;
 		}
 
 		// Check cache for entry first.
@@ -331,15 +328,15 @@ class Whois_Core extends BasePassiveModule
 			if (empty($lookup))
 			{
 				// No old data exists, return error:
-				$who["error"] = true;
-				$who["errordesc"] = "No chached character data was found for $name, but no web lookup mode was requested!";
+				$this->error->set("No chached character data was found for $name, but no web lookup mode was requested!");
+				return $this->error;
 			}
 			else
 			{
 				// only cache valid entries
 				$this -> add_to_cache($who);
-			}
 			return $who;
+		}
 		}
 
 		/*
@@ -349,30 +346,30 @@ class Whois_Core extends BasePassiveModule
 		/*
 		We got a result.
 		*/
-		if ($result["error"] == false)
+		if (!($result instanceof BotError))
 		{
 			$who["id"] = $uid;
-			$who["nickname"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "nick");
-			$who["firstname"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "firstname");
-			$who["lastname"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "lastname");
-			$who["level"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "level");
-			$who["gender"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "gender");
-			$who["breed"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "breed");
-			$who["profession"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "profession");
-			$who["faction"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "faction");
-			$who["rank"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "rank");
-			$who["rank_id"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "rank_id");
+			$who["nickname"] = $this -> bot -> core("tools") -> xmlparse($result, "nick");
+			$who["firstname"] = $this -> bot -> core("tools") -> xmlparse($result, "firstname");
+			$who["lastname"] = $this -> bot -> core("tools") -> xmlparse($result, "lastname");
+			$who["level"] = $this -> bot -> core("tools") -> xmlparse($result, "level");
+			$who["gender"] = $this -> bot -> core("tools") -> xmlparse($result, "gender");
+			$who["breed"] = $this -> bot -> core("tools") -> xmlparse($result, "breed");
+			$who["profession"] = $this -> bot -> core("tools") -> xmlparse($result, "profession");
+			$who["faction"] = $this -> bot -> core("tools") -> xmlparse($result, "faction");
+			$who["rank"] = $this -> bot -> core("tools") -> xmlparse($result, "rank");
+			$who["rank_id"] = $this -> bot -> core("tools") -> xmlparse($result, "rank_id");
 			if ($who["rank_id"] == '')
 			$who["rank_id"] = '0';
-			$who["org"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "organization_name");
-			$who["org_id"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "organization_id");
+			$who["org"] = $this -> bot -> core("tools") -> xmlparse($result, "organization_name");
+			$who["org_id"] = $this -> bot -> core("tools") -> xmlparse($result, "organization_id");
 			if ($who["org_id"] == '')
 			$who["org_id"] = '0';
-			$who["at_id"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "defender_rank_id");
+			$who["at_id"] = $this -> bot -> core("tools") -> xmlparse($result, "defender_rank_id");
 			if ($who["at_id"] == '')
 			$who["at_id"] = '0';
 			$who["at"] = $this -> alien_rank_name[$who["at_id"]];
-			$who["pictureurl"] = $this -> bot -> core("tools") -> xmlparse($result["content"], "pictureurl");
+			$who["pictureurl"] = $this -> bot -> core("tools") -> xmlparse($result, "pictureurl");
 
 			/*
 			Update our cache
@@ -396,16 +393,15 @@ class Whois_Core extends BasePassiveModule
 		*/
 		else
 		{
-			$who["error"] = TRUE;
-			$who["errordesc"] = "Character lookup could not be completed. people.anarchy-online.com and www.auno.org lookups have failed and no cached data is available.";
-			return $who;
+			$this->error->set("Character lookup could not be completed. people.anarchy-online.com and www.auno.org lookups have failed and no cached data is available.");
+			return $this->error;
 		}
 	}
 
 	/*
 	Get player XML data. If lookup via FunCom fails, try Auno.
 	Return whatever we get. If both FunCom and Auno's XML fail,
-	you rewrite $xml["errordesc"].
+	you rewrite $xml->description.
 	*/
 	function get_playerxml($name)
 	{ // Start function get_playerxml()
@@ -444,7 +440,7 @@ class Whois_Core extends BasePassiveModule
 		if ($this -> bot -> core("settings") -> get("Statistics", "Enabled"))
 			$this -> bot -> core("statistics") -> capture_statistic("Whois","Lookup",$site1NAME);
 
-		if ($xml["error"] && $site2NAME)
+		if (($xml instanceof BotError) && $site2NAME)
 		{
 			$xml = $this -> bot -> core("tools") -> get_site($site2URL);
 			$xml = $this -> check_xml($xml);
@@ -452,11 +448,11 @@ class Whois_Core extends BasePassiveModule
 			if ($this -> bot -> core("settings") -> get("Statistics", "Enabled"))
 				$this -> bot -> core("statistics") -> capture_statistic("Whois","Lookup",$site2NAME);
 		}
-		if ($xml["error"])
+		if ($xml instanceof BotError)
 		{
 			// If we get here, both Auno and FunCom XML lookups have failed.
 			// Rewrite the error message to reflect this before returning.
-			$xml["errordesc"] = "people.anarchy-online.com and www.auno.org lookups have failed.";
+			$xml->set_description("people.anarchy-online.com and www.auno.org lookups have failed.");
 
 			if ($this -> bot -> core("settings") -> get("Statistics", "Enabled"))
 				$this -> bot -> core("statistics") -> capture_statistic("Whois","Lookup","BadName");
@@ -470,18 +466,19 @@ class Whois_Core extends BasePassiveModule
 	*/
 	function check_xml($xml)
 	{ // Start function check_xml()
-		if ($xml["error"])
+		if ($xml instanceof BotError)
+		{
 		return $xml; // The XML is bad to start with, no more checking needed.
-		$nickname = $this -> bot -> core("tools") -> xmlparse($xml["content"], "nick");
+		}
+		$nickname = $this -> bot -> core("tools") -> xmlparse($xml, "nick");
 		/*
 		We have an empty nick despite having gotten a valid responce from Funcom XML? Bail!
 		This should __never__ happen, but you can never rule out errors on Funcom's end.
 		*/
 		if ($nickname == '')
 		{
-			$xml["error"] = TRUE;
-			$xml["errordesc"] = "Could not parse XML data.";
-			return $xml;
+			$this->error->set("Could not parse XML data.");
+			return $this->error;
 		}
 		else
 		return $xml; // If we get here, all should be well.
@@ -498,7 +495,7 @@ class Whois_Core extends BasePassiveModule
 		if ($who["id"] == 0 || $who["id"] === false)
 		{
 			$this -> bot -> log('Whois', 'Update', $who["nickname"] . " had an invalid user ID! UID: " . $who["id"]);
-			$who["id"] = $this -> bot -> core("chat") -> get_uid($who["nickname"]);
+			$who["id"] = $this -> bot -> core("player") -> id($who["nickname"]);
 		}
 
 
@@ -589,7 +586,7 @@ class Whois_Core extends BasePassiveModule
 
 		$online = $this -> bot -> core("online") -> get_online_state($whois['nickname']);
 
-		$window .= "##normal## Status: " . $online['content'] . $seen ."##end##\n";
+		$window .= "##normal## Status: " . $online . $seen ."##end##\n";
 
 		if($online['status'] <= 0)
 		{

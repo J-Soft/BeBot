@@ -66,7 +66,7 @@ class IRC extends BaseActiveModule
 		parent::__construct(&$bot, get_class($this));
 
 		$this -> register_module("irc");
-		$this -> register_command("all", "irc", "OWNER");
+		$this -> register_command("all", "irc", "SUPERADMIN");
 		$this -> register_command("all", "irconline", "GUEST");
 
 		$this -> register_event("pgjoin");
@@ -106,7 +106,7 @@ class IRC extends BaseActiveModule
 		$this -> bot -> core("settings") -> create("Irc", "ChannelKey", "", "What is the IRC channel key if any?");
 		$this -> bot -> core("settings") -> create("Irc", "Nick", $this -> bot -> botname, "Which nick should the bot use in IRC?");
 		$this -> bot -> core("settings") -> create("Irc", "IrcGuildPrefix", $guildprefix, "Which prefix should ingame guild chat relayed to IRC get?");
-		$this -> bot -> core("settings") -> create("Irc", "IrcGuestPrefix", $pgroupprefix, "Which prefix should ingame chat in the chat groupf of the bot relayed to IRC get?");
+		$this -> bot -> core("settings") -> create("Irc", "IrcGuestPrefix", $pgroupprefix, "Which prefix should ingame chat in the chat group of the bot relayed to IRC get?");
 		$this -> bot -> core("settings") -> create("Irc", "GuildPrefix", "[IRC]", "Which prefix should IRC chat relayed to ingame chat get?");
 		$this -> bot -> core("settings") -> create("Irc", "AnnounceTo", "both", "Where should joins and leaves to the IRC channel be announced to?", "none;gc;pgmsg;both");
 		$this -> bot -> core("settings") -> create("Irc", "AnnounceWhat", $announcewhat, "Which events should be announced to IRC? None, only buddies logging on, only joins to the chatgroup or both?", "none;buddies;joins;both");
@@ -133,42 +133,63 @@ class IRC extends BaseActiveModule
 		$this -> bot -> db -> query("UPDATE #___online SET status_gc = 0 WHERE botname = '".$this -> bot -> botname . " - IRC'");
 	}
 
-
-	function command_handler($name, $msg, $source)
-	{
-		if (preg_match("/^irc connect$/i", $msg, $info))
-			Return ($this -> irc_connect($name));
-		else if (preg_match("/^irc disconnect$/i", $msg, $info))
-			Return ($this -> irc_disconnect());
-		else if (preg_match("/^irc server (.*)$/i", $msg, $info))
-			Return ($this -> change_server($info[1]));
-		else if (preg_match("/^irc port (.*)$/i", $msg, $info))
-			Return ($this -> change_port($info[1]));
-		else if (preg_match("/^irc channel (.*)$/i", $msg, $info))
-			Return ($this -> change_chan($info[1]));
-		else if (preg_match("/^irc channelkey (.*)$/i", $msg, $info))
-			Return ($this -> change_chankey($info[1]));
-		else if (preg_match("/^irc nick (.*)$/i", $msg, $info))
-			Return ($this -> change_nick($info[1]));
-		else if (preg_match("/^irc ircprefix (.*)$/i", $msg, $info))
-			Return ($this -> change_ircprefix($info[1]));
-		else if (preg_match("/^irc guildprefix (.*)$/i", $msg, $info))
-			Return ($this -> change_guildprefix($info[1]));
-		else if (preg_match("/^irc reconnect (on|off)$/i", $msg, $info))
-			Return ($this -> change_reconnect($info[1]));
-		else if (preg_match("/^irc relayguildname (.*)$/i", $msg, $info))
-			Return ($this -> change_relayguildname($info[1]));
-		else if (preg_match("/^irc itemref (aodb|auno)$/i", $msg, $info))
-			Return ($this -> change_itemref($info[1]));
-		else if (preg_match("/^irc chat (gc|pgroup|both)$/i", $msg, $info))
-			Return ($this -> change_chat($info[1]));
-		else if (preg_match("/^irconline$/i", $msg, $info))
-			Return ($this -> names());
-		else if (preg_match("/^irconline (.*)$/i", $msg, $info))
-			Return FALSE;
-		else
-			Return ("/tell <botname> <pre>help irc");
-	}
+  	function command_handler($name, $msg, $source)
+  	{
+ 		$com = $this->parse_com($msg);
+ 		switch (strtolower($com['com']))
+ 		{
+ 			case 'irc':
+ 				switch(strtolower($com['sub']))
+ 				{
+ 					case 'connect':
+ 						return $this->irc_connect($name);
+ 					break;
+ 					case 'disconnect':
+ 						return $this->irc_disconnect();
+ 					break;
+ 					case 'server':
+ 						return $this->change_server($com['args']);
+ 					break;
+ 					case 'port':
+ 						return $this->change_port($com['args']);
+ 					break;
+ 					case 'channel':
+ 						return $this->change_chan($com['args']);
+ 					break;
+ 					case 'channelkey':
+ 						return $this->change_chankey($com['args']);
+ 					break;
+ 					case 'nick':
+ 						return $this->change_nick($com['args']);
+ 					break;
+ 					case 'ircprefix':
+ 						return $this->change_ircprefix($com['args']);
+ 					break;
+ 					case 'guildprefix':
+ 						return $this->change_guildprefix($com['args']);
+ 					break;
+ 					case 'reconnect':
+ 						if(($com['args']=='on')||($com['args']=='off'))
+ 							return $this->reconnect($com['args']);
+ 					break;
+ 					case 'relayguildname':
+ 						return $this->change_relayguildname($com['args']);
+ 					break;
+ 					case 'itemref':
+ 						if(($com['args']=='auno')||($com['args']=='aodb'))
+ 							return $this->change_itemref($com['args']);
+ 					break;
+ 					case 'chat':
+ 						if(($com['args']=='gc')||($com['args']=='pg')||($com['args']=='both'))
+ 							return $this->change_chat($com['args']);
+ 					break;
+ 				}
+ 			break;
+ 			case 'irconline':
+ 				return $this->names();
+ 			break;
+ 		}
+  	}
 
 
 
@@ -335,7 +356,6 @@ class IRC extends BaseActiveModule
 			$res = $this -> bot -> core("timer") -> list_timed_events("IRC");
 			if (!empty($res))
 			{
-				//print_r($res);
 				foreach ($res as $con)
 				{
 					$this -> bot -> core("timer") -> del_timer("IRC", $con['id']);
@@ -394,7 +414,7 @@ class IRC extends BaseActiveModule
 							$id = $this -> bot -> core("chat") -> get_uid($name);
 							$who = $this -> bot -> core("whois") -> lookup($name);
 
-							if ($who['error'])
+							if ($who instanceof BotError)
 							{
 								$res = $name . " logged on";
 							}
@@ -527,6 +547,11 @@ class IRC extends BaseActiveModule
 	*/
 	function change_chan($new)
 	{
+ 		//Make sure the channel has a leading #
+ 		if(substr($new, 0, 1)!=='#')
+ 		{
+ 			$new = '#'.$new;
+ 		}
 		$this -> bot -> core("settings") -> save("Irc", "Channel", $new);
 
 		if ($this -> irc == null)
@@ -672,46 +697,77 @@ class IRC extends BaseActiveModule
 	*/
 	function irc_connect($name = "")
 	{
-		if ($this -> bot -> core("settings") -> get("Irc", "Server") != "")
-		{
-			if (($name != "") && ($name != "c"))
-			$this -> bot -> send_tell($name, "Connecting to IRC server: " . $this -> bot -> core("settings") -> get("Irc", "Server"));
-			else if ($name == "")
-			$this -> bot -> send_gc("Connecting to IRC server: " . $this -> bot -> core("settings") -> get("Irc", "Server"));
+ 		$server = $this -> bot -> core('settings') -> get('Irc', 'Server');
+ 		$channel = $this -> bot -> core('settings') -> get('Irc', 'Channel');
+ 		$nick = $this -> bot -> core('settings') -> get('Irc', 'Nick');
+ 		//Sanity check some values.
+ 		if(empty($server))
+ 		{
+ 			$this->error->set("An IRC server was not defined. Please see <pre>settings irc");
+ 			return $this->error;
+ 		}
+ 		
+ 		if(
+ 			(empty($channel)) ||
+ 			($channel === '#')
+ 		)
+ 		{
+ 			$this->error->set("An IRC channel was not defined. Please see <pre>settings irc");
+ 			return $this->error;
+ 		}
+ 		
+ 		if(empty($nick))
+ 		{
+ 			$this->error->set("A Nickname was not defined. Please see <pre>settings irc");
+ 			return $this->error;
+ 		}
+ 		
+ 		//Make sure that the channel name is prefixed with a '#'
+ 		if(substr($channel, 0, 1)!=='#')
+ 		{
+ 			$this->bot->core('settings')->save('Irc', 'Channel', '#'.$channel);
+ 		}
+ 		
+		if (($name != "") && ($name != "c"))
+		$this -> bot -> send_tell($name, "Connecting to IRC server: " . $this -> bot -> core("settings") -> get("Irc", "Server"));
+		else if ($name == "")
+		$this -> bot -> send_gc("Connecting to IRC server: " . $this -> bot -> core("settings") -> get("Irc", "Server"));
 
-			$this -> irc = &new Net_SmartIRC();
-			$this -> irc -> setUseSockets(TRUE);
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, $this -> bot -> commpre . 'online', $this -> bot -> commands["tell"]["irc"], 'irc_online');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, $this -> bot -> commpre . 'whois', $this -> bot -> commands["tell"]["irc"], 'irc_whois');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, $this -> bot -> commpre . 'is (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_is');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'command', $this -> bot -> commands["tell"]["irc"], 'command');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'is (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_is');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'tell (.*)', $this -> bot -> commands["tell"]["irc"], 'ao_msg');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'online', $this -> bot -> commands["tell"]["irc"], 'irc_online');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'command', $this -> bot -> commands["tell"]["irc"], 'command');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'uid (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_uid');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_NAME,'.*', $this -> bot -> commands["tell"]["irc"], 'irc_query');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_recieve');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_JOIN, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_join');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_NICKCHANGE, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_nick');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_PART, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_part');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUIT, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_part');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_KICK, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_part');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre.'is (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_is');
+		$this -> irc = &new Net_SmartIRC();
+		$this -> irc -> setUseSockets(TRUE);
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, $this -> bot -> commpre . 'online', $this -> bot -> commands["tell"]["irc"], 'irc_online');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, $this -> bot -> commpre . 'whois', $this -> bot -> commands["tell"]["irc"], 'irc_whois');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, $this -> bot -> commpre . 'is (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_is');
+ 		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, $this -> bot -> commpre . 'level (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_level');
+ 		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, $this -> bot -> commpre . 'lvl (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_level');
+ 		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, $this -> bot -> commpre . 'pvp (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_level');
+ 		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'level (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_level');
+ 		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'lvl (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_level');
+ 		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'pvp (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_level');
+ 		//$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'command', $this -> bot -> commands["tell"]["irc"], 'command');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'is (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_is');
+ 		//$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'tell (.*)', $this -> bot -> commands["tell"]["irc"], 'ao_msg');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'online', $this -> bot -> commands["tell"]["irc"], 'irc_online');
+ 		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'whois', $this -> bot -> commands["tell"]["irc"], 'irc_whois');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'uid (.*)', $this -> bot -> commands["tell"]["irc"], 'irc_uid');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_NAME,'.*', $this -> bot -> commands["tell"]["irc"], 'irc_query');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_recieve');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_JOIN, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_join');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_NICKCHANGE, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_nick');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_PART, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_part');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUIT, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_part');
+		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_KICK, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_part');
+ 		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, '.*', $this -> bot -> commands["tell"]["irc"], 'irc_recieve_msg');
+		$this -> irc -> setCtcpVersion($this -> bot -> botversionname . " (" . $this -> bot -> botversion . ")");
+		$this -> irc -> setAutoReconnect((($this -> bot -> core("settings") -> get("Irc", "Reconnect")) ? 1 : 0));
+		$this -> irc -> connect($this -> bot -> core("settings") -> get("Irc", "Server"), $this -> bot -> core("settings") -> get("Irc", "Port"));
+		$this -> irc -> login($this -> bot -> core("settings") -> get("Irc", "Nick"), 'BeBot', 0, 'BeBot');
+		$this -> irc -> join(array($this -> bot -> core("settings") -> get("Irc", "Channel")), $this -> bot -> core("settings") -> get("Irc", "Channelkey"));
+		$this -> register_event("cron", "1sec");
+		$this -> bot -> core("settings") -> save("irc", "connected", TRUE);
+		$this -> bot -> db -> query("UPDATE #___online SET status_gc = 0 WHERE botname = '".$this -> bot -> botname . " - IRC'");
 
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre.'online', $this -> bot -> commands["tell"]["irc"], 'irc_online');
-			$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'whois', $this -> bot -> commands["tell"]["irc"], 'irc_whois');
-			$this -> irc -> setCtcpVersion($this -> bot -> botversionname . " (" . $this -> bot -> botversion . ")");
-			$this -> irc -> setAutoReconnect((($this -> bot -> core("settings") -> get("Irc", "Reconnect")) ? 1 : 0));
-			$this -> irc -> connect($this -> bot -> core("settings") -> get("Irc", "Server"), $this -> bot -> core("settings") -> get("Irc", "Port"));
-			$this -> irc -> login($this -> bot -> core("settings") -> get("Irc", "Nick"), 'BeBot', 0, 'BeBot');
-			$this -> irc -> join(array($this -> bot -> core("settings") -> get("Irc", "Channel")), $this -> bot -> core("settings") -> get("Irc", "Channelkey"));
-			$this -> register_event("cron", "1sec");
-			$this -> bot -> core("settings") -> save("irc", "connected", TRUE);
-			$this -> bot -> db -> query("UPDATE #___online SET status_gc = 0 WHERE botname = '".$this -> bot -> botname . " - IRC'");
-
-			return "Done connecting...";
-		}
+		return "Done connecting...";
 	}
 
 	/*
@@ -740,7 +796,8 @@ class IRC extends BaseActiveModule
 	{
 		if ((strtolower($data -> message) != strtolower(str_replace("\\", "", $this -> bot -> commpre . 'online'))) &&
 		(strtolower($data -> message) != strtolower(str_replace("\\", "", $this -> bot -> commpre . 'is'))) &&
-		(strtolower($data -> message) != strtolower(str_replace("\\", "", $this -> bot -> commpre . 'whois'))))
+ 		(strtolower($data -> message) != strtolower(str_replace("\\", "", $this -> bot -> commpre . 'whois')))&&
+			(strtolower($data -> message) != strtolower(str_replace("\\", "", $this -> bot -> commpre . 'level'))))
 		{
 			$msg = str_replace("<", "&lt;", $data -> message);
 			$msg = str_replace(">", "&gt;", $msg);
@@ -964,7 +1021,7 @@ class IRC extends BaseActiveModule
 		{
 			$this -> whois[$name] = $this->target;
 		}
-		elseif (!$who["error"])
+		elseif (!($who instanceof BotError))
 		{
 			$at = "(AT " . $who["at_id"] . " - " . $who["at"] . ") ";
 			$result = "\"" . $who["nickname"] . "\"";
@@ -1009,7 +1066,7 @@ class IRC extends BaseActiveModule
 		}
 		else
 		{
-			$result = "Error: " . $who["errordesc"];
+			$result = $who;
 		}
 		return $result;
 	}
@@ -1106,5 +1163,70 @@ class IRC extends BaseActiveModule
 			} return $msg;
 		} else return 'Not connected to IRC';
 	}
+	
+ 	/*
+ 	Level command for irc
+ 	*/
+ 	function irc_level(&$irc, &$data)
+ 	{
+ 		if ($data -> type == SMARTIRC_TYPE_QUERY)
+ 			$target = $data -> nick;
+ 		else
+ 			$target = $this -> bot -> core("settings") -> get("Irc", "Channel");
+ 
+ 		$msg = explode(" ", $data -> message, 2);
+ 
+ 		$msg = $this -> bot -> commands["tell"]["level"] -> get_level($msg[1]);
+ 		$msg = $this -> strip_formatting($msg);
+ 		
+ 		if (!empty($msg))
+ 			$this -> irc -> message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
+ 	}
+ 
+ 	function irc_recieve_msg(&$irc, &$data)
+ 	{
+ 		$msg = explode(" ", $data -> message, 2);
+ 		Switch($msg[0])
+ 		{
+ 			case $this -> bot -> commpre.'is':
+ 			case $this -> bot -> commpre.'online':
+ 			case $this -> bot -> commpre.'whois':
+ 			case $this -> bot -> commpre.'uid':
+ 			case $this -> bot -> commpre.'level':
+ 			case $this -> bot -> commpre.'lvl':
+ 			case $this -> bot -> commpre.'pvp':
+ 				Break; //These should of been handled elsewere
+ 			case 'is':
+ 				$data -> message = $this -> bot -> commpre.$data -> message;
+ 				$this -> irc_is(&$irc, &$data);
+ 				Break;
+ 			case 'online':
+ 				$data -> message = $this -> bot -> commpre.$data -> message;
+ 				$this -> irc_online(&$irc, &$data);
+ 				Break;
+ 			case 'whois':
+ 				$data -> message = $this -> bot -> commpre.$data -> message;
+ 				$this -> irc_whois(&$irc, &$data);
+ 				Break;
+ 			case 'uid':
+ 				$data -> message = $this -> bot -> commpre.$data -> message;
+ 				$this -> irc_uid(&$irc, &$data);
+ 				Break;
+ 			case 'level':
+ 			case 'lvl':
+ 			case 'pvp':
+ 				$data -> message = $this -> bot -> commpre.$data -> message;
+ 				$this -> irc_level(&$irc, &$data);
+ 				Break;
+ 			Default:
+ 				if ($data -> type == SMARTIRC_TYPE_QUERY)
+ 					$target = $data -> nick;
+ 				else
+ 					$target = $this -> bot -> core("settings") -> get("Irc", "Channel");
+ 
+ 				$msg = "Error: Unknown Command ".$msg[0];
+ 				$this -> irc -> message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
+ 		}
+ 	}
 }
 ?>

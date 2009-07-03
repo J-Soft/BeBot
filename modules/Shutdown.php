@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2009-01-20 16:20:22 +0100 (Tue, 20 Jan 2009) $
-* Revision: $Id: Shutdown.php 1957 2009-01-20 15:20:22Z temar $
+* File last changed at $LastChangedDate: 2009-03-09 01:58:35 +0000 (Mon, 09 Mar 2009) $
+* Revision: $Id: Shutdown.php 3 2009-03-09 01:58:35Z temar $
 */
 
 $sdrs = new Shutdown($bot);
