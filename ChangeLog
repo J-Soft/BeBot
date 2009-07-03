@@ -1,4 +1,27 @@
 -------------
+Version 0.7.0
+-------------
+- Moved aochat event handling out of Main.php and in to AOChat.php
+- Added signal events to AOChat events
+- Made Bot.php, AOChat.php and MySQL.php conform to the singleton design pattern
+- Moved ConfigMagik out of main and into Source and converted it to use the singleton design pattern.
+- Moved the configuration reading from Main.php and into Bot.php
+- Added debugging function toggled by a bot variable.
+- Changed most Commands to SuperAdmin instead of Owner as Superadmin should be almost as good as owner but isn't owner.
+- Moved the server list into it's own file and changed the way game and server is detected. Dimension 0-3 are no longer valid and are replaced by Testlive, Atlantean, Rimor and Die neue welt. No backwards compatibility implimented
+- Added level command to IRC (coded by nyt), Prefix no longer Required for /msg botname in IRC, /msg botname now Output error if unknown command.
+- Created a commodities directory for class files that do not instantiate themselves
+
++Possible BREAKAGE! - Peliminary testing shows modules appear to be working as expected.
++- AoC is still broken until someone fixes the AoC spesific modules. (I ain't got no account)
++- Moving from Status array to BotError. This WILL cause breakage until the checks have been converted aswell.
++- Moving uid/uname cache from AOChat to core/PlayerList.php. Calls to core("chat")->get_u* are now depricated and PlayerList does return BotError on failures.
++- rosterupdate seems to output alot of errors todo with failed to get whois
+ 
++Known breakage
++- IRC module fails to process commands given in IRC.
+
+-------------
 Version 0.6.4
 -------------
 - Reversing stripping of control characters on text from IRC for now.

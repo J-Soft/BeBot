@@ -155,7 +155,8 @@ class Alts_Core extends BasePassiveModule
 	*/
 	function main($char)
 	{
-		$char = ucfirst(strtolower($this -> bot -> core("chat") -> get_uname($char)));
+		$char = ucfirst(strtolower($char));
+// 		$char = ucfirst(strtolower($this -> bot -> core("chat") -> get_uname($char)));
 		if (isset($this -> mains[$char]))
 		{
 			return $this -> mains[$char];
@@ -171,7 +172,10 @@ class Alts_Core extends BasePassiveModule
 	*/
 	function get_alts($char)
 	{
-		$char = $this -> bot -> core("chat") -> get_uname($char);
+		if(is_numeric($char))
+		{
+			$char = $this -> bot -> core("player") -> name($char);
+		}
 
 		$ret = array();
 		if (isset($this -> alts[ucfirst(strtolower($char))]))
@@ -239,10 +243,12 @@ class Alts_Core extends BasePassiveModule
 	*/
 	function fancy_output($name, $returntype)
 	{
-		if($this -> bot -> core("chat") -> get_uid($name))
+		if($this -> bot -> core("player") -> id($name))
 		{
 			$name = ucfirst(strtolower($name));
 			$whois = $this -> bot -> core("whois") -> lookup($name);
+			if ($whois instanceof BotError)
+				$whois = array('nickname' => $name);
 			$main = $this -> main($name);
 			$alts = $this -> get_alts($main);
 
@@ -286,11 +292,13 @@ class Alts_Core extends BasePassiveModule
 
 					$online = $this -> bot -> core("online") -> get_online_state($alt);
 					if ($online['status'] != -1)
-						$window .= " " . $online['content'];
+						$window .= " " . $online;
 
 					if ($this -> bot -> core("settings") -> get('Alts', 'Detail'))
 					{
 						$whoisalt = $this -> bot -> core("whois") -> lookup($alt);
+						if ($whoisalt instanceof BotError)
+							$whoisalt = array('nickname' => $alt);
 						if (!empty($whoisalt['level']))
 						{
 							$window .= "\n##normal## - (##highlight##" . $whoisalt['level'] . "##end##";
