@@ -119,7 +119,14 @@ class ConfigMagik
 		else           $this->PROCESS_SECTIONS = false;
 		// get requested value
 		if ( $this->PROCESS_SECTIONS) {
-			$value = $this->VARS[$section][$key];
+			if (isset($this->VARS[$section][$key]))
+			{
+				$value = $this->VARS[$section][$key];
+			}else if(isset($this->VARS[$key])){
+				$value = $this->VARS[$key];
+			}else{
+				return null;
+			}
 		}else{
 			$value = $this->VARS[$key];
 		}

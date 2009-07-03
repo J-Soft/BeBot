@@ -3,7 +3,7 @@
 /*
 Detect if we are being run from a shell or if someone is stupid enough to try and run from a web browser.
 */
-if ((!empty($_SERVER[HTTP_HOST])) || (!empty($_SERVER[HTTP_USER_AGENT])))
+if ((!empty($_SERVER['HTTP_HOST'])) || (!empty($_SERVER['HTTP_USER_AGENT'])))
 {
 	die("BeBot does not support being run from a web server and it is inherently dangerous to do so!\nFor your own good and for the safety of your account information, please do not attempt to run BeBot from a web server!");
 }

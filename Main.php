@@ -40,7 +40,7 @@ $bot_version = BOT_VERSION;
 $php_version = phpversion();
 
 // Set the time zone to UTC
-date_default_timezone_set(UTC);
+date_default_timezone_set('UTC');
 
 /*
 OS detection, borrowed from Angelsbot.
