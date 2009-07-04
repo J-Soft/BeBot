@@ -126,6 +126,16 @@ class Logon extends BaseActiveModule
 					if($spam)
 					{
 						$id = $this -> bot -> core("chat") -> get_uid($name);
+						if (!isset($this -> last_log["on"][$name]))
+						{
+							$this -> last_log["on"][$name] = 0;
+						}
+						
+						if (!isset($this -> last_log["off"][$name]))
+						{
+							$this -> last_log["off"][$name] = 0;
+						}
+						
 						if ($msg == 1)
 						{
 							if ($this -> last_log["on"][$name] < (time() - 5))

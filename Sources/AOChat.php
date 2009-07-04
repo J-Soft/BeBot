@@ -912,15 +912,21 @@ class AOChat
 	function buddy_exists($who)
 	{
 		if(!is_numeric($who))
+		{
 			$uid = $this->bot->core('player')->id($who);
+		}
 		else
+		{
 			$uid = $who;
+		}
 			
 		if($uid instanceof BotError)
 		{
 			return false;
 		}
-		return (int)$this->buddies[$uid];
+		
+		$return = (int)$this->buddies[$uid];
+		return $return;
 	}
 
 	function buddy_online($who)

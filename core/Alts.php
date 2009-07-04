@@ -283,7 +283,7 @@ class Alts_Core extends BasePassiveModule
 	{
 		if (!empty($alts))
 		{
-			$window.= "##normal##:::  $main's alts  :::##end##\n";
+			$window = "##normal##:::  $main's alts  :::##end##\n";
 			foreach ($alts as $alt)
 			{
 				if($alt != $whois['nickname'] || $this -> bot -> core("settings") -> get('Alts', "incAll"))

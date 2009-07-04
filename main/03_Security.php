@@ -1381,7 +1381,7 @@ class Security_Core extends BaseActiveModule
 		// when they leave chat again:
 		if ($this -> bot -> core("settings") -> get("Security", "GuestInChannel")
 		&& !$this -> bot -> core("online") -> in_chat($player)
-		&& $this -> cache['online'][$player])
+		&& (isset($this -> cache['online'][$player])))
 		{
 			// Unset online cache:
 			unset($this -> cache['online'][$player]);

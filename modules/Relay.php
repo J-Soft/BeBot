@@ -403,7 +403,7 @@ class Relay extends BaseActiveModule
 	{
 		if($cron == 300)
 		{
-			if(!$this -> guildnameset)
+			if(!isset($this -> guildnameset))
 			{
 				//guildname is not neccessarily set before the bot connects so create those settings here.
 				$this -> bot -> core("settings") -> create('Relay', 'Pgname', $this -> bot -> guildname . ' Guest', 'What name should we show when we relay from the private group?');
@@ -597,23 +597,33 @@ class Relay extends BaseActiveModule
 
 	function extpgjoin($pgname, $name, $cron=FALSE)
 	{
+		$onmsg = "";
 		if(!$cron && $name != $this -> bot -> botname)
+		{
 			Return;
+		}
+
 		if ($this -> bot -> core("settings") -> get('Relay', 'Status') && 
 		($cron || strtolower($this -> bot -> core("settings") -> get('Relay', 'Relay')) == strtolower($pgname)))
 		{
 			$online = $this -> bot -> db -> select("SELECT nickname, status_gc, status_pg, level FROM #___online WHERE (status_gc = 1 OR status_pg = 1) AND botname = '".$this -> bot -> botname."' ORDER BY nickname");
 			if(empty($online))
+			{
 				$online = "";
+			}
 			else
 			{
 				foreach($online as $on)
 				{
 					$level = $on[3];
 					if($on[1] == 1)
+					{
 						$onmsg .= $on[0].",gc,$level;";
+					}
 					if($on[2] == 1)
+					{
 						$onmsg .= $on[0].",pg;";
+					}
 				}
 			}
 			if(!empty($onmsg))
@@ -623,7 +633,9 @@ class Relay extends BaseActiveModule
 			$msg = "online $onmsg";
 			$this -> relay_to_bot($msg, FALSE, "gcrc");
 			if(!$cron)
+			{
 				$this -> relay_to_bot("onlinereq", FALSE, "gcrc");
+			}
 		}
 	}
 
