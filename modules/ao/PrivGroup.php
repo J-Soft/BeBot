@@ -298,11 +298,11 @@ class PrivGroup extends BaseActiveModule
 
 		foreach ($info as $key => $value)
 		{
-			$string = eregi_replace("#!" . $key . "!#", "##highlight##" . $value . "##end##", $string);
-			$string = eregi_replace("~!" . $key . "!~", $value, $string);
+			$string = preg_replace("/#!$key!#/i", "##highlight##$value##end##", $string);
+			$string = preg_replace("/~!$key!~/i", $value, $string);
 		}
 
-		$string  = eregi_replace("#!BOTNAME!#", $this -> bot -> botname, $string);
+		$string  = preg_replace("/#!BOTNAME!#/i", $this -> bot -> botname, $string);
 
 		return $string;
 	}
