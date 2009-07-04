@@ -857,9 +857,9 @@ class Net_SmartIRC_base
             if ($this->_autoretry == true && $tries < 5) {
                 $this->reconnect();
                 $tries++;
-            } else {
-                die();
-            }
+            }// else {
+              //  die(); Dont die as this kills bot!
+            //}
         } else {
             $this->log(SMARTIRC_DEBUG_CONNECTION, 'DEBUG_CONNECTION: connected', __FILE__, __LINE__);
             

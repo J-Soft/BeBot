@@ -19,7 +19,12 @@
 * to make it very easy to port existing Anarchy Online projects to Age of
 * Conan. Some things like the private channels are not currently supported
 * by the Age of Conan game client, but still works on the server. The
-* functions related to these has been kept in order secure backward compability.
+* functions related to these has been kept in order to secure backward compability.
+* 
+* With AoC update 1.05 the login protocol changed so that the bot can not login
+* directly to the chat server. It first has to login to the actual game world
+* (universe) like a normal player. After that it discards packets from the
+* game world and gets disconnected from it after a while, but stays in the chat server.
 *
 * A disassembly of the official java chat client[1] for Anarchy Online
 * and Slicer's AO::Chat perl module[2] were used as a reference for this
@@ -205,8 +210,9 @@ class AOChat
 	}
 
 	/* Network stuff */
-	function connect($server = "default", $port = "default")
+	function connect($server = "default", $port = "default", $sixtyfourbit = FALSE)
 	{
+		$this -> sixtyfourbit = $sixtyfourbit;
 		if($this -> game == "ao")
 		{
 			if($server == "default")
@@ -220,11 +226,11 @@ class AOChat
 		}
 
 		if($this->state !== "connect")
-		die("AOChat: not expecting connect.\n");
+			die("AOChat: not expecting connect.\n");
 
 		$s = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		if(!is_resource($s)) /* this is fatal */
-		die("Could not create socket.\n");
+			die("Could not create socket.\n");
 
 		$this->socket = $s;
 		$this->state = "auth";
@@ -1484,22 +1490,29 @@ class AOChat
 	function SafeDecHexReverseEndian($value)
 	{
 		$result = "";
-		$hex   = dechex($this -> ReduceTo32Bit($value));
-		$len   = strlen($hex);
-
-		while($len < 8)
+		if(!$this -> sixtyfourbit)
 		{
-			$hex = "0$hex";
-			$len++;
-		}
+			$hex   = dechex($this -> ReduceTo32Bit($value));
+			$len   = strlen($hex);
 
-		if (!function_exists("str_split"))
-		{
-			$bytes = $this -> my_str_split($hex, 2);
+			while($len < 8)
+			{
+				$hex = "0$hex";
+				$len++;
+			}
+
+			if (!function_exists("str_split"))
+			{
+				$bytes = $this -> my_str_split($hex, 2);
+			}
+			else
+			{
+				$bytes = str_split($hex, 2);
+			}
 		}
 		else
 		{
-			$bytes = str_split($hex, 2);
+			$bytes = unpack("H*", pack("L*", $value));
 		}
 
 		for($i = 3; $i >= 0; $i--)
@@ -2067,9 +2080,9 @@ $GLOBALS["msg_cat"] = array(
 "The tower (TOWER) in (ZONE) was just reduced to (HEALTH) % health!",
 "s(TOWER)/s(ZONE)/i(HEALTH)"),
 ),
-508 => array(0x04e87e7 => array(AOEM_ORG_JOIN,
-"{NAME} has joined the organization.",
-"s{NAME}"),
+508 => array(0xa5849e7 => array(AOEM_ORG_JOIN,
+"{INVITER} invited {NAME} to your organization.",
+"s{INVITER}/s{NAME}"),
 0x2360067 => array(AOEM_ORG_KICK,
 "{KICKER} kicked {NAME} from the organization.",
 "s{KICKER}/s{NAME}"),

@@ -96,19 +96,19 @@ class Server extends BaseActiveModule
 			}
 		}
 
-		$inside = "<font color=CCInfoHeadline>:::: " . $dim_name . " Server Status ::::</font><font color=CCInfoText>\n\n";
-		$inside .= "<font color=CCInfoText>Player distribution in % of total players online.</font>\n\n";
+		$inside = "##ao_ccheader##:::: " . $dim_name . " Server Status ::::##end####lightyellow##\n\n";
+		$inside .= "##lightyellow##Player distribution in % of total players online.##end##\n\n";
 
-		$inside .= "<font color=CCInfoHeader>Servers (Playfield: Load - Players)</font>\n";
+		$inside .= "<font color=CCInfoHeader>Servers (Playfield: Load - Players)##end##\n";
 
 		foreach ($playfields as $key => $val)
 		{
 			if ($playfields[$key]['status'] == 1)
-				$inside .= " " . $key . ": <font color=CCCCTextColor>" . $playfields[$key]['load'] . " - " . $playfields[$key]['players'] . "%</font>\n";
+				$inside .= " " . $key . ": ##highlight##" . $playfields[$key]['load'] . " - " . $playfields[$key]['players'] . "%##end##\n";
 			else if ($playfields[$key]['status'] == 2)
-				$inside .= " ##yellow##" . $key . "##end##: <font color=CCCCTextColor>" . $playfields[$key]['load'] . " - " . $playfields[$key]['players'] . "%</font>\n";
+				$inside .= " ##yellow##" . $key . "##end##: ##highlight##" . $playfields[$key]['load'] . " - " . $playfields[$key]['players'] . "%##end##\n";
 			else
-				$inside .= " ##red##" . $key . "##end##: <font color=CCCCTextColor>" . $playfields[$key]['load'] . " - " . $playfields[$key]['players'] . "%</font>\n";
+				$inside .= " ##red##" . $key . "##end##: ##highlight##" . $playfields[$key]['load'] . " - " . $playfields[$key]['players'] . "%##end##\n";
 
 		}
 

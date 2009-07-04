@@ -217,6 +217,7 @@ class IRC extends BaseActiveModule
 			$ircmsg .= $name . ': ';
 		}
 		$ircmsg .= $msg;
+		$ircmsg = htmlspecialchars_decode($ircmsg);
 		$this -> irc -> message(SMARTIRC_TYPE_CHANNEL, $this -> bot -> core("settings") -> get("Irc", "Channel"), $ircmsg);
 		return true;
 	}
@@ -427,7 +428,7 @@ class IRC extends BaseActiveModule
 								$alts = " :: Alt of " . $main;
 							}
 
-							$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "", '3**** '.$res.$alts);
+							$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "", chr(2).chr(3).'3***'.chr(2)." ".$res.$alts);
 							$this -> last_log["on"][$name] = time();
 						}
 					}
@@ -435,7 +436,7 @@ class IRC extends BaseActiveModule
 					{
 						if ($this -> last_log["off"][$name] < (time() - 5))
 						{
-							$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "",'3**** '.$name.' has logged off.');
+							$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "", chr(2).chr(3).'3***'.chr(2)." " .$name. " has logged off.");
 							$this -> last_log["off"][$name] = time();
 						}
 					}
@@ -472,7 +473,7 @@ class IRC extends BaseActiveModule
 		if ((strtolower($this -> bot -> core("settings") -> get("Irc", "AnnounceWhat")) == "joins")
 		|| (strtolower($this -> bot -> core("settings") -> get("Irc", "AnnounceWhat")) == "both"))
 		{
-			$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "IrcGuestprefix"), "", '3**** '.$name.' has joined the guest channel.');
+			$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "IrcGuestprefix"), "", chr(2).chr(3).'3***'.chr(2).' ' .$name.' has joined the guest channel.');
 		}
 	}
 
@@ -489,7 +490,7 @@ class IRC extends BaseActiveModule
 		if ((strtolower($this -> bot -> core("settings") -> get("Irc", "AnnounceWhat")) == "joins")
 		|| (strtolower($this -> bot -> core("settings") -> get("Irc", "AnnounceWhat")) == "both"))
 		{
-			$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "IrcGuestprefix"), "", '3**** '.$name.' has left the guest channel.');
+			$this -> send_irc($this -> bot -> core("settings") -> get("Irc", "IrcGuestprefix"), "", chr(2).chr(3).'3***'.chr(2).' ' .$name.' has left the guest channel.');
 		}
 	}
 
@@ -784,9 +785,9 @@ class IRC extends BaseActiveModule
 		if (($data -> nick != $this -> bot -> core("settings") -> get("Irc", "Nick"))
 		&& (strtolower($this -> bot -> core("settings") -> get("Irc", "AnnounceTo")) != "none"))
 		{
-			$msg = " ##highlight##" . $data -> nick . "##end## has logged##highlight## on##end##.";
+			$msg = "##irc_group##" . $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . "##end## ##highlight##" . $data -> nick . "##end## has logged##highlight## on##end##.";
 
-			$this -> bot -> send_output("", $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . $msg,
+			$this -> bot -> send_output("", $msg,
 			$this -> bot -> core("settings") -> get("Irc", "AnnounceTo"));
 		}
 		if (($data -> nick != $this -> bot -> core("settings") -> get("Irc", "Nick")))
@@ -795,7 +796,11 @@ class IRC extends BaseActiveModule
 			$this -> bot -> db -> query("INSERT INTO #___online (nickname, botname, status_gc) VALUES ('" . $data -> nick
 					. "', '" . $this -> bot -> botname . " - IRC', 1) ON DUPLICATE KEY UPDATE status_gc = 1");
 		}
-			
+		if ($this -> bot -> core("settings") -> get("Irc", "Useguildrelay")
+		&& $this -> bot -> core("settings") -> get("Relay", "Relay"))
+		{
+			$this -> bot -> core("relay") -> relay_to_bot($msg);
+		}		
 		if(!empty($this -> ircmsg))
 		{
 			foreach($this -> ircmsg as $send)
@@ -811,15 +816,18 @@ class IRC extends BaseActiveModule
 		if (($data -> nick != $this -> bot -> core("settings") -> get("Irc", "Nick"))
 		&& (strtolower($this -> bot -> core("settings") -> get("Irc", "AnnounceTo")) != "none"))
 		{
-			$msg = " ##highlight##" . $data -> nick . "##end## has logged##highlight## off##end##.";
-
-			$this -> bot -> send_output("", $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . $msg,
+			$msg = "##irc_group##" . $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . "##end## ##highlight##" . $data -> nick . "##end## has logged##highlight## off##end## (" . $data -> message . ").";
+			$this -> bot -> send_output("", $msg,
 			$this -> bot -> core("settings") -> get("Irc", "AnnounceTo"));
 		}
 		if (($data -> nick != $this -> bot -> core("settings") -> get("Irc", "Nick")))
 			unset($this -> irconline[strtolower($data -> nick)]);
 			$this -> bot -> db -> query("UPDATE #___online SET status_gc = 0 WHERE botname = '".$this -> bot -> botname . " - IRC' AND nickname = '".$data -> nick."'");
-
+		if ($this -> bot -> core("settings") -> get("Irc", "Useguildrelay")
+		&& $this -> bot -> core("settings") -> get("Relay", "Relay"))
+		{
+			$this -> bot -> core("relay") -> relay_to_bot($msg);
+		}	
 		if(!empty($this -> ircmsg))
 		{
 			foreach($this -> ircmsg as $send)
@@ -1044,12 +1052,16 @@ class IRC extends BaseActiveModule
 			unset($this -> irconline[strtolower($data -> nick)]);
 			$this -> irconline[strtolower($data -> message)] = strtolower($data -> message);
 		}
-		if ((strtolower($this -> bot -> core("settings") -> get("Irc", "Chat")) == "both") ||
-		(strtolower($this -> bot -> core("settings") -> get("Irc", "Chat")) == "pgroup"))
-			$this -> bot -> send_pgroup($data -> nick . ' is now known as ' . $data -> message);
-		if ((strtolower($this -> bot -> core("settings") -> get("Irc", "Chat")) == "both") ||
-		(strtolower($this -> bot -> core("settings") -> get("Irc", "Chat")) == "gc"))
-			$this -> bot -> send_gc($data -> nick . ' is now known as ' . $data -> message);
+
+		$txt = "##irc_group##" . $this -> bot -> core("settings") -> get("Irc", "Guildprefix") . "##end## ##irc_user##" . $data -> nick . "##end####irc_text## is known as##end## ##irc_user##" . $data -> message . "##end##";
+
+		$this -> bot -> send_output("", $txt, $this -> bot -> core("settings") -> get("Irc", "Chat"));
+
+		if ($this -> bot -> core("settings") -> get("Irc", "Useguildrelay") && $this -> bot -> core("settings") -> get("Relay", "Relay"))
+		{
+			$this -> bot -> core("relay") -> relay_to_bot($txt);
+		}
+
 		$this -> bot -> db -> query("UPDATE #___online SET nickname = '".$data -> message."' WHERE botname = '".$this -> bot -> botname . " - IRC' AND nickname = '".$data -> nick."'");
 	}
 	

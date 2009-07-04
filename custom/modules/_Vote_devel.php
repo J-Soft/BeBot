@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2007-07-25 20:54:01 +0200 (ons, 25 jul 2007) $
-* Revision: $Id: _ExampleModule.php 817 2007-07-25 18:54:01Z shadowmaster $
+* File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
+* Revision: $Id: _Vote_devel.php 1 2008-11-04 06:00:45Z temar $
 */
 
 /*

@@ -77,6 +77,8 @@ class Raffle extends BaseActiveModule
 		$this -> help['command']['raffle leave']="Leaves the current raffle.";
 		$this -> help['notes'] = "Notes for the help goes in here.";
 
+		$this -> bot -> core("settings") -> create("Raffle", "timer", 0, "How Long shold a Raffle Last? 0 = disabled");
+		$this -> bot -> core("colors") -> define_scheme("raffle", "highlight", "yellow");
 	}
 
 
@@ -125,9 +127,9 @@ class Raffle extends BaseActiveModule
 
 			natsort($this -> users);
 
-			$results = "<font color=CCInfoHeadline>::::: Raffle Results :::::</font><font color=CCInfoText>\n\n";
-			$results .= "<font color=CCCCTextColor>" . $this -> admin . "</font> raffled <font color=CCCCTextColor>" . $this -> item_blank;
-			$results .= "</font>. I rolled 10000 times. The results where:\n\n";
+			$results = "##ao_ccheader##::::: Raffle Results :::::##end####lightyellow##\n\n";
+			$results .= "##highlight##" . $this -> admin . "##end## raffled ##highlight##" . $this -> item_blank;
+			$results .= "##end##. I rolled 10000 times. The results where:\n\n";
 
 			$winner = "";
 			$res = "";
@@ -138,16 +140,16 @@ class Raffle extends BaseActiveModule
 				if ($count == 1)
 				$winner = $key;
 
-				$res = "<font color=CCCCTextColor>". $count . ".</font> $key <font color=CCCCTextColor>" . $points . " points</font>\n" . $res;
+				$res = "##highlight##". $count . ".##end## $key ##highlight##" . $points . " points##end##\n" . $res;
 				$count--;
 			}
 
 			$results .= $res;
 
-			$this -> output("\n<font color=#ffff00>--------------------------------------------------------</font>\n" .
-			"  <font color=#ffff00>" . $winner . "</font> has won the raffle for <font color=#ffff00>" .
-			$this -> item . "</font>! :: " . $this -> bot -> core("tools") -> make_blob("view results", $results) . "\n" .
-			"<font color=#ffff00>----------------------------------------------------------</font>");
+			$this -> output("\n##raffle_highlight##--------------------------------------------------------##end##\n" .
+			"  ##raffle_highlight##" . $winner . "##end## has won the raffle for ##raffle_highlight##" .
+			$this -> item . "##end##! :: " . $this -> bot -> core("tools") -> make_blob("view results", $results) . "\n" .
+			"##raffle_highlight##----------------------------------------------------------##end##");
 
 			$this -> users = "";
 			$this -> item = "";
@@ -174,7 +176,7 @@ class Raffle extends BaseActiveModule
 		$this -> bot -> core("security") -> check_access($name, "admin")))
 		{
 
-			$this -> output("<font color=#ffff00>$name</font> has canceled the raffle.");
+			$this -> output("##raffle_highlight##$name##end## has canceled the raffle.");
 
 			$this -> users = "";
 			$this -> item = "";
@@ -192,14 +194,19 @@ class Raffle extends BaseActiveModule
 	/*
 	Reannounces raffle
 	*/
-	function raffle_reannounce($name)
+	function raffle_reannounce($name, $secs=FALSE)
 	{
 		if (isset($this -> item) &&(($this -> admin == $name) || $this -> bot -> core("security") -> check_access($name, "admin")))
 		{
-			$this -> output("\n<font color=#ffff00>--------------------------------------------------------</font>\n" .
-			"  The raffle for <font color=#ffff00>" . $this -> item . "</font> is still running :: " .
-			$this -> click_join("join") . "\n" .
-			"<font color=#ffff00>----------------------------------------------------------</font>");
+			$output = "\n##raffle_highlight##--------------------------------------------------------##end##\n" .
+			"  The raffle for ##raffle_highlight##" . $this -> item . "##end## ";
+			if($secs)
+				$output .= "has $secs Seconds Remaining :: ";
+			else
+				$output .= "is still running :: ";
+			$output .= $this -> click_join("join") . "\n" .
+			"##raffle_highlight##----------------------------------------------------------##end##";
+			$this -> output($output);
 		}
 		else if (!isset($this -> item))
 		$this -> bot -> send_tell($name, "There is no raffle currently running.");
@@ -216,11 +223,11 @@ class Raffle extends BaseActiveModule
 	{
 		if (isset($this -> item) &&(($this -> admin == $name) || $this -> bot -> core("security") -> check_access($name, "admin")))
 		{
-			$this -> output("\n<font color=#ffff00>----------------------------------------------------------</font>\n" .
-			"  The raffle for <font color=#ffff00>" . $this -> item . "</font> wil be " .
-			"<font color=#ffff00>closing soon</font> :: " .
+			$this -> output("\n##raffle_highlight##----------------------------------------------------------##end##\n" .
+			"  The raffle for ##raffle_highlight##" . $this -> item . "##end## wil be " .
+			"##raffle_highlight##closing soon##end## :: " .
 			$this -> click_join("join") . "\n" .
-			"<font color=#ffff00>----------------------------------------------------------</font>");
+			"##raffle_highlight##----------------------------------------------------------##end##");
 		}
 		else if (!isset($this -> item))
 		$this -> bot -> send_tell($name, "There is no raffle currently running.");
@@ -238,7 +245,7 @@ class Raffle extends BaseActiveModule
 		if (($this -> admin == $name) || $this -> bot -> core("security") -> check_access($name, "admin"))
 		{
 			$this -> output = $chan;
-			$this -> output("Raffle output set to <font color=#ffff00>" . $chan . ".");
+			$this -> output("Raffle output set to ##raffle_highlight##" . $chan . ".");
 		}
 		else
 		$this -> bot -> send_tell($name, "You did not start the raffle nore are you bot administrator.");
@@ -259,7 +266,7 @@ class Raffle extends BaseActiveModule
 		{
 			$this -> users[$name] = 1;
 			$this -> bot -> send_tell($name, "You have joined the raffle. " . $this -> click_join("leave"), 1);
-			$this -> output("<font color=#ffff00>" . $name . "</font> has <font color=#ffff00>joined</font>" .
+			$this -> output("##raffle_highlight##" . $name . "##end## has ##raffle_highlight##joined##end##" .
 			" the raffle ::" . $this -> click_join("join"), 1);
 		}
 	}
@@ -279,7 +286,7 @@ class Raffle extends BaseActiveModule
 		{
 			unset($this -> users[$name]);
 			$this -> bot -> send_tell($name, "You have left the raffle. " . $this -> click_join("join"), 1);
-			$this -> output("<font color=#ffff00>" . $name . "</font> has <font color=#ffff00>left</font>" .
+			$this -> output("##raffle_highlight##" . $name . "##end## has ##raffle_highlight##left##end##" .
 			" the raffle :: " . $this -> click_join("join"), 1);
 		}
 	}
@@ -293,15 +300,32 @@ class Raffle extends BaseActiveModule
 	{
 		if (empty($this -> item))
 		{
+			$itemref = explode(" ", $item, 5);
+			if(strtolower($itemref[0]) == "&item&")
+			{
+				$item = $this -> bot -> core("tools") -> make_item($itemref[1], $itemref[2], $itemref[3], $itemref[4], TRUE);
+			}
 			$this -> item = $item;
 			$this -> item_blank = preg_replace("/<\/a>/U", "", preg_replace("/<a href(.+)>/sU", "", $item));
 			$this -> users = "";
 			$this -> admin = $name;
+			$timer = $this -> bot -> core("settings") -> get("Raffle", "timer");
+			if($timer > 0)
+			{
+				$this -> register_event("cron", "2sec");
+				$this -> end = time() + $timer;
+				if($timer > 20)
+					$this -> announce = 2;
+				elseif($timer > 10)
+					$this -> announce = 1;
+				else
+					$this -> announce = 0;
+			}
 
-			$output = "\n<font color=#ffff00>----------------------------------------------------------</font>\n";
-			$output .= "  <font color=#ffff00>" . $name . "</font> has started a raffle for <font color=#ffff00>" .
-			$item . "</font> :: " . $this -> click_join("join");
-			$output .= "\n<font color=#ffff00>----------------------------------------------------------</font>";
+			$output = "\n##raffle_highlight##----------------------------------------------------------##end##\n";
+			$output .= "  ##raffle_highlight##" . $name . "##end## has started a raffle for ##raffle_highlight##" .
+			$item . "##end## :: " . $this -> click_join("join");
+			$output .= "\n##raffle_highlight##----------------------------------------------------------##end##";
 
 			$this -> output ($output);
 
@@ -324,7 +348,7 @@ class Raffle extends BaseActiveModule
 		return "You did not start the raffle and are not a bot admin.";
 		else
 		{
-			$inside = "<font color=CCInfoHeadline>:::: Raffle Administration ::::</font><font color=CCInfoHeader>\n\n";
+			$inside = "##ao_ccheader##:::: Raffle Administration ::::##end##<font color=CCInfoHeader>\n\n";
 			$inside .= "Output channel: \n";
 			$inside .= $this -> bot -> core("tools") -> chatcmd(
 			"raffle output guild", "Guild")." ";
@@ -354,7 +378,7 @@ class Raffle extends BaseActiveModule
 
 			$inside .= ":: ".$this -> bot -> core("tools") -> chatcmd(
 			"raffle result", "Show winner!")." ::\n";
-			return "Raffle <font color=#ffff00>Admin</font> menu: " . $this -> bot -> core("tools") -> make_blob("click to view", $inside);
+			return "Raffle ##raffle_highlight##Admin##end## menu: " . $this -> bot -> core("tools") -> make_blob("click to view", $inside);
 		}
 	}
 
@@ -365,8 +389,8 @@ class Raffle extends BaseActiveModule
 	*/
 	function click_join($val)
 	{
-		$inside = "<font color=CCInfoHeadline>:::: Join/Leave Raffle ::::</font><font color=CCInfoText>\n\n";
-		$inside .= "Raffle for: <font color=CCCCTextColor>" . $this -> item_blank . "</font>\n\n";
+		$inside = "##ao_ccheader##:::: Join/Leave Raffle ::::##end####lightyellow##\n\n";
+		$inside .= "Raffle for: ##highlight##" . $this -> item_blank . "##end##\n\n";
 		$inside .= "- ".$this -> bot -> core("tools") -> chatcmd(
 		"raffle join", "Join the raffle")."\n";
 		$inside .= "- ".$this -> bot -> core("tools") -> chatcmd(
@@ -385,6 +409,37 @@ class Raffle extends BaseActiveModule
 		$this -> bot -> send_gc($msg, $low);
 		if (($this -> output == "group") || ($this -> output == "both"))
 		$this -> bot -> send_pgroup($msg);
+	}
+
+	function cron()
+	{
+		if($this -> announce == 2 && ($this -> end - time()) < 20)
+		{
+			$this -> raffle_reannounce($this -> admin, 20);
+			$this -> announce = 1;
+		}
+		if($this -> announce == 1 && ($this -> end - time()) < 10)
+		{
+			$this -> raffle_reannounce($this -> admin, 10);
+			$this -> announce = 0;
+		}
+		if ($this -> end < time())
+		{
+			$this -> unregister_event("cron", "2sec");
+			if(!empty($this -> users))
+			{
+				$this -> raffle_result($this -> admin);
+			}
+			else
+			{
+				$this -> output("Raffle for ".$this -> item." ended with no users.");
+
+				$this -> users = "";
+				$this -> item = "";
+				$this -> admin = "";
+				$this -> item_blank = "";
+			}
+		}
 	}
 }
 ?>

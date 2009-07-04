@@ -181,7 +181,7 @@ class Roll extends BaseActiveModule
 			$result['name'] = $name;
 			$result['time'] = time();
 			$result['limit'] = 'heads/tails';
-			$result['result'] = ((rand(1, 2)) ? 'heads' : 'tails');
+			$result['result'] = (rand(0, 1) ? 'heads' : 'tails');
 			$result['target'] = $target;
 			$this -> lastroll[$name] = time();
 			$this -> roll_info[] = $result;

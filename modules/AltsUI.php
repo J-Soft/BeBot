@@ -119,6 +119,8 @@ class Alts extends BaseActiveModule
 					case 'rem':
 					case 'del':
 						return $this -> del_alt($vars[2], $vars[3]);
+					case 'confirm':
+						return $this -> confirm($vars[3], $vars[2]);
 					default:
 						return "Unknown Subcommand: ##highlight##".$vars[1]."##end##";
 				}
@@ -221,6 +223,8 @@ class Alts extends BaseActiveModule
 		}
 		$this -> bot -> db -> query("INSERT INTO #___alts (alt, main) VALUES ('$alt', '$main')");
 		$this -> bot -> core("alts") -> add_alt($main, $alt);
+		if($this -> bot -> exists_module("points"))
+			$this -> bot -> core("points") -> check_alts($main);
 		return "##highlight##$alt##end## has been registered as a new alt of ##highlight##$main##end##.";
 	}
 

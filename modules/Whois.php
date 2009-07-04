@@ -54,7 +54,8 @@ class Whois extends BaseActiveModule
 		$this -> help['command']['whois <name>']="Shows information about player <name>.";
 
 		$this -> register_command("all", "whois", "GUEST");
-		$this -> register_event("buddy");
+		if($this -> bot -> game == "aoc")
+			$this -> register_event("buddy");
 
 		$this -> bot -> core("colors") -> define_scheme("whois", "alienlevel", "lightgreen");
 		$this -> bot -> core("colors") -> define_scheme("whois", "level", "lightbeige");
@@ -103,11 +104,13 @@ class Whois extends BaseActiveModule
 	{
 		if($this -> bot -> game == "aoc")
 		{
-			if((!$this -> bot -> core("notify") -> check($name)) && isset($this -> name[$name]))
+			if(isset($this -> name[$name]))
 			{
-				$msg = $this -> whois_player($this -> name[$name], $name, $this -> origin[$name]);
+				$user = $this -> name[$name];
+				$origin = $this -> origin[$name];
+				$msg = $this -> whois_player($user, $name, $origin);
 				//$this -> irc -> message(SMARTIRC_TYPE_CHANNEL, $this -> whois[$name], $this -> whois[$name]);
-				$this -> bot -> send_output($this -> name[$name], $msg, $this -> origin[$name]);
+				$this -> bot -> send_output($user, $msg, $origin);
 				unset($this -> name[$name]);
 				unset($this -> origin[$name]);
 			}
@@ -119,16 +122,25 @@ class Whois extends BaseActiveModule
 	*/
 	function whois_player($source, $name, $origin)
 	{
+		$name = ucfirst(strtolower($name));
+		if ($this -> bot -> game == "aoc")
+		{
+			$this -> name[$name] = $source;
+			$this -> origin[$name] = $origin;
+		}
 		$who = $this -> bot -> core("whois") -> lookup($name);
 
-		if (!$who)
+		if ($this -> bot -> game == "aoc" && $who)
 		{
-			$this -> name[ucfirst(strtolower($name))] = $source;
-			$this -> origin[ucfirst(strtolower($name))] = $origin;
+			unset($this -> name[$name]);
+			unset($this -> origin[$name]);
+		}
+		if(!$who)
+		{
+			Return;
 		}
 		elseif (!$who["error"])
 		{
-
 			$result = "##whois_name##" . $who["nickname"] . "##end## is a level ";
 			$result .= "##whois_level##" . $who["level"] . "##end##";
 			if($this -> bot -> game == "ao")
@@ -234,7 +246,7 @@ class Whois extends BaseActiveModule
 				}
 				$result .= " :: " . $this -> bot -> core("whois") -> whois_details($source, $who);
 			}
-			else if ($this -> bot -> core("settings") -> get("Whois", "Alts") == TRUE)
+			elseif ($this -> bot -> core("settings") -> get("Whois", "Alts"))
 			{
 				$alts = $this -> bot -> core("alts") -> show_alt($name);
 				if ($alts['alts'])

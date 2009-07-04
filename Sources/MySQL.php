@@ -71,6 +71,7 @@ class MySQL
 		}
 		else
 		{
+			$master_tablename = str_ireplace("<botname>", strtolower($botname), $master_tablename);
 			$this -> master_tablename = $master_tablename;
 		}
 
@@ -80,8 +81,13 @@ class MySQL
 		}
 		else
 		{
+			$table_prefix = str_ireplace("<botname>", strtolower($botname), $table_prefix);
 			$this -> table_prefix = $table_prefix;
 		}
+		if($nounderscore)
+			$this -> underscore = "";
+		else
+			$this -> underscore = "_";
 
 		$this -> connect(true);
 
@@ -155,8 +161,8 @@ class MySQL
 	function error($text, $fatal = false)
 	{
 		$msg = mysql_error();
-		echo "MySQL error (# " . $this -> error_count . ") on query: $text\n";
-		echo "$msg\n";
+		$this -> error_count++;
+		$this -> bot -> log("MySQL", "ERROR", "(# " . $this -> error_count . ") on query: $text\n$msg", TRUE);
 
 		// If this error is occuring while we are trying to first connect to the database when starting
 		// rthe bot its a fatal error.
@@ -284,7 +290,7 @@ class MySQL
 			}
 			else
 			{
-				$tablename = $this -> table_prefix . "_" . $table;
+				$tablename = $this -> table_prefix . $this -> underscore . $table;
 			}
 			$this -> query("INSERT INTO " . $this -> master_tablename . " (internal_name, prefix, use_prefix) VALUES ('" . $table . "', '" . $this -> table_prefix . "', 'true')");
 		}
@@ -293,7 +299,7 @@ class MySQL
 			// entry exists, create the correct tablename:
 			if ($name[0][2] == 'true' && !empty($this -> table_prefix))
 			{
-				$tablename = $name[0][1] . "_" . $table;
+				$tablename = $name[0][1] . $this -> underscore . $table;
 			}
 			else
 			{
@@ -334,11 +340,13 @@ class MySQL
 			if (((strtolower($use_prefix) == 'true') || ($use_prefix === true)) && !empty($this -> table_prefix))
 			{
 				$prefix = $this -> table_prefix;
-				$tablename = $prefix . "_" . $table;
+				$tablename = $prefix . $this -> underscore . $table;
+				$use_prefix = 'true';
 			}
 			else
 			{
 				$tablename = $table;
+				$use_prefix = 'false';
 			}
 
 			$this -> query("INSERT INTO " . $this -> master_tablename . " (internal_name, prefix, use_prefix) VALUES ('" . $table . "', '" . $prefix . "', '" . $use_prefix . "')");
@@ -348,7 +356,7 @@ class MySQL
 			// entry exists, create the correct tablename:
 			if ($name[0][2] == 'true' && !empty($this -> table_prefix))
 			{
-				$tablename = $name[0][1] . "_" . $table;
+				$tablename = $name[0][1] . $this -> underscore . $table;
 			}
 			else
 			{

@@ -147,7 +147,7 @@ class Bot
 	Constructor:
 	Prepares bot.
 	*/
-	function __construct($uname, $pwd, $botname, $dim, $botversion, $botversionname, $other_bots, &$aoc, &$irc, &$db, $commprefix, $crondelay, $telldelay, $maxsize, $recontime, $guildbot, $guildid, $guild, $log, $log_path, $log_timestamp, $use_proxy_server, $proxy_server_address, $proxy_server_port, $game, $accessallbots)
+	function __construct($uname, $pwd, $botname, $dim, $botversion, $botversionname, $other_bots, &$aoc, &$irc, &$db, $commprefix, $crondelay, $telldelay, $maxsize, $recontime, $guildbot, $guildid, $guild, $log, $log_path, $log_timestamp, $use_proxy_server, $proxy_server_address, $proxy_server_port, $game, $accessallbots, $sixtyfourbit)
 	{
 		$this -> username = $uname;
 		$this -> password = $pwd;
@@ -176,6 +176,7 @@ class Bot
 		$this -> use_proxy_server = $use_proxy_server;
 		$this -> proxy_server_address = explode(",", $proxy_server_address);
 		$this -> starttime = time();
+		$this -> sixtyfourbit = $sixtyfourbit;
 
 		$this -> module_links = array();
 
@@ -235,7 +236,7 @@ class Bot
 
 		// Open connection
 		$this -> log("LOGIN", "STATUS", "Connecting");
-		if (!$this -> aoc -> connect($server, $port))
+		if (!$this -> aoc -> connect($server, $port, $this -> sixtyfourbit))
 		{
 			$this -> cron_activated = false;
 			$this -> disconnect();
@@ -292,6 +293,7 @@ class Bot
 		$this -> core("settings") -> create("Core", "ColorizeTells", TRUE, "Should tells going out be colorized on default? Notice: Modules can set a nocolor flag before sending out tells.");
 		$this -> core("settings") -> create("Core", "ColorizeGC", TRUE, "Should output to guild chat be colorized using the current theme?");
 		$this -> core("settings") -> create("Core", "ColorizePGMSG", TRUE, "Should output to private group be colorized using the current theme?");
+		$this -> core("settings") -> create("Core", "BanReason", TRUE, "Should the Details on the Ban be Given to user when he tries to use bot?");
 
 		// Tell modules that the bot is connected
 		if (!empty($this -> commands["connect"]))
@@ -401,12 +403,27 @@ class Bot
 	*/
 	function send_ban($to, $msg=FALSE)
 	{
-		if (!isset($this -> banmsgout[$to]))
+		if(!isset($this -> banmsgout[$to]) || $this -> banmsgout[$to] < (time() - 60 * 5))
 		{
 			$this -> banmsgout[$to] = time();
 			if ($msg === FALSE)
 			{
-				$this -> send_tell($to, "You are banned from <botname>.");
+				if($this -> core("settings") -> get("Core", "BanReason"))
+				{
+					$why = $this -> db -> select("SELECT banned_by, banned_for, banned_until FROM #___users WHERE nickname = '".$to."'");
+					if($why[0][2] > 0)
+					{
+						$until = "Temporary ban until " .  gmdate($this -> core("settings") -> get("Time", "FormatString"), $why[0][2]);
+					}
+					else
+					{
+						$until = "Permanent ban.";
+					}
+					$why = " by ##highlight##".$why[0][0]."##end## for Reason: ##highlight##".$why[0][1]."##end##\n".$until;
+				}
+				else
+					$why = ".";
+				$this -> send_tell($to, "You are banned from <botname>".$why);
 			}
 			else
 			{
@@ -1479,6 +1496,8 @@ class Bot
 		// Change Encrypted Text to a Simple thing to say its encripted
 		$msg = preg_replace('/gcr &\$enc\$& ([a-z0-9]+) ([a-z0-9]+) ([a-z0-9]+) /U', "gcr <Encryted Message>", $msg);
 		$msg = preg_replace('/gcr &\$enc\$& ([a-z0-9]+) ([a-z0-9]+) ([a-z0-9]+)/', "gcr <Encryted Message>", $msg);
+		
+		$msg = $this -> replace_string_tags($msg);
 
 		if ($this -> log_timestamp == 'date')
 			$timestamp = "[" . gmdate("Y-m-d") . "]\t";

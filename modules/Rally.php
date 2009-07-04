@@ -56,7 +56,7 @@ class Rally extends BaseActiveModule
 
 		$this -> help['description'] = 'Sets a rallying point for the raid.';
 		$this -> help['command']['rally']="Shows the current rally point.";
-		$this -> help['command']['rally <playfield> <x-coord> <y-coord>']="Sets a rally point in playfield <playfield> at <x-coord> X <y-coord>";
+		$this -> help['command']['rally <playfield> <x-coord> <y-coord> <notes>']="Sets a rally point in playfield <playfield> at <x-coord> X <y-coord>, <notes> is optional";
 		$this -> help['command']['rally clear'] = "Clear the rally pont.";
 		$this -> help['note']="<playfield> may also be the last parameter given.";
 	}
@@ -66,13 +66,15 @@ class Rally extends BaseActiveModule
 	function command_handler($name, $msg, $origin)
 	{
 		if (preg_match("/^rally$/i", $msg))
-		return $this -> rallyinfo;
+			return $this -> rallyinfo;
 		else if (preg_match("/^rally (rem|del|clear)$/i", $msg, $info))
-		return $this -> del_rally($name);
+			return $this -> del_rally($name);
 		else if (preg_match("/^rally ([a-zA-Z0-9]+) ([0-9]+) ([0-9]+)$/i", $msg, $info))
-		return $this -> set_rally($info[1], $info[2], $info[3], "");
+			return $this -> set_rally($info[1], $info[2], $info[3], "");
 		else if (preg_match("/^rally ([a-zA-Z0-9]+) ([0-9]+) ([0-9]+) (.*)$/i", $msg, $info))
-		return $this -> set_rally($info[1], $info[2], $info[3], $info[4]);
+			return $this -> set_rally($info[1], $info[2], $info[3], $info[4]);
+		else
+			return("To set Rally: <pre>rally &lt;playfield&gt; &lt;x-coord&gt; &lt;y-coord&gt; &lt;notes&gt");
 	}
 
 

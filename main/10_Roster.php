@@ -75,7 +75,7 @@ class Roster_Core extends BasePassiveModule
 		$this -> register_event("cron", "24hour");
 		$this -> register_event("connect");
 
-		$this -> bot -> core("settings") -> create("Members", "LastRosterUpdate", 1, "Last time we completed an ", NULL, TRUE, 2);
+		$this -> bot -> core("settings") -> create("Members", "LastRosterUpdate", 1, "Last time we completed a Roster update", NULL, TRUE, 2);
 		$this -> bot -> core("settings") -> create('Members', 'Roster', 'XML', 'What should we use to look up organization information? (Fallback means that if XML fails the cache will be used)', 'XML;WhoisCache;Fallback');
 		$this -> bot -> core("settings") -> create("Members", "Update", TRUE, "Should the roster be updated automaticly?");
 		$this -> startup = TRUE;
@@ -189,14 +189,15 @@ class Roster_Core extends BasePassiveModule
 				$this -> bot -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "",
 				"$person has Left the Org");
 			}
-			else if (preg_match("/(.+) has joined the organization./i", $msg, $info))
+			else if (preg_match("/(.+) invited (.+) to your organization./i", $msg, $info))
 			{
-				$person = $info[1];
+				$inviter = $info[1];
+				$person = $info[2];
 				$id = $this -> bot -> core("chat") -> get_uid($person);
-				$this -> add ("Org Message", $id, $person, "from Org Message");
+				$this -> add ("Org Message", $id, $person, $inviter);
 				$this -> bot -> send_gc("Welcome##highlight## $person##end##!!!");
 				$this -> bot -> send_irc($this -> bot -> core("settings") -> get("Irc", "Ircguildprefix"), "",
-				"$person has Joined the Org ");
+				"$person has been invited to the org by $inviter");
 			}
 		}
 	}
@@ -231,7 +232,7 @@ class Roster_Core extends BasePassiveModule
 		if (($this -> lastrun + (60 * 60 * 6)) >= time() && $force == false)
 		{
 			$this -> bot -> log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
-			$this -> bot -> send_gc("##normal##".$msg."Roster update not scheduled ::: System ready##end##");
+			$this -> bot -> send_gc("##normal##".$msg."Roster update not scheduled ::: ".BOT_VERSION_NAME." v.". BOT_VERSION. " ready##end##");
 			Return;
 		}
 
@@ -242,7 +243,7 @@ class Roster_Core extends BasePassiveModule
 		}
 		$this -> running = TRUE;
 
-		$this -> bot -> log("ROSTER", "UPDATE", "Starting roster update");
+		$this -> bot -> log("ROSTER", "UPDATE", "Starting roster update for guild id: ".$this -> bot -> guildid." on RK".$this -> bot -> dimension);
 		$this -> bot -> send_gc("##normal##".$msg."Roster update starting ::: System busy##end##");
 
 		// Get the guild roster
@@ -525,14 +526,28 @@ class Roster_Core extends BasePassiveModule
 				}
 			}
 
+			$msg = "";
+			if ($this -> added > 0)
+			{
+				$msg .= "Added $this -> added members ::: ";
+			}
+			if ($this -> removed > 0)
+			{
+				$msg .= "Removed $this -> removed members ::: ";
+			}
+			if ($this -> rerolled > 0)
+			{
+				$msg .= "$this -> removed members was found to have rerolled ::: ";
+			}
+			
 			$this -> bot -> core("settings") -> save("members", "LastRosterUpdate", time());
-			$this -> bot -> log("ROSTER", "UPDATE", "Roster update complete. Added " . $this -> added . " members and removed " . $this -> removed . " of which " . $this -> rerolled . " was rerolled.",true);
-			$this -> bot -> send_gc("##normal##Roster update completed ::: System ready##end##");
+			$this -> bot -> log("ROSTER", "UPDATE", "Roster update complete. $msg",true);
+			$this -> bot -> send_gc("##normal##Roster update completed. ::: $msg" .BOT_VERSION_NAME. " v.". $this -> bot -> bot_version. " ready##end##");
 		}
 		else
 		{
 			$this -> bot -> log("ROSTER", "UPDATE", "Roster update failed. Funcom XML returned 0 members.",true);
-			$this -> bot -> send_gc("##normal##Roster update failed! Funcom XML returned 0 members ::: System ready##end##");
+			$this -> bot -> send_gc("##normal##Roster update failed! Funcom XML returned 0 members ::: " .BOT_VERSION_NAME. " v.".BOT_VERSION." ready##end##");
 		}
 
 		$this -> bot -> core("notify") -> update_cache();
@@ -558,7 +573,7 @@ class Roster_Core extends BasePassiveModule
 		{
 			$this -> bot -> log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
 			if($this -> bot -> game == "ao")
-				$this -> bot -> send_pgroup("##normal##".$msg."Roster update not scheduled ::: System ready##end##");
+				$this -> bot -> send_pgroup("##normal##".$msg."Roster update not scheduled ::: ".BOT_VERSION_NAME." v.".BOT_VERSION." ready##end##");
 		}
 		else
 		{
@@ -654,7 +669,7 @@ class Roster_Core extends BasePassiveModule
 			}
 			$this -> bot -> core("settings") -> save("members", "LastRosterUpdate", time());
 			$this -> bot -> log("CRON", "ROSTER", "Cleaning buddylist done. $num buddies removed.");
-			$this -> bot -> send_pgroup("##normal##Roster update completed ::: System ready##end##");
+			$this -> bot -> send_pgroup("##normal##Roster update completed ::: ".BOT_VERSION_NAME." v.".BOT_VERSION." ready##end##");
 		}
 		$this -> running = FALSE;
 	}
@@ -709,9 +724,11 @@ class Roster_Core extends BasePassiveModule
 		if (($this -> bot -> core("settings") -> get("Members", "Roster") == "XML" || $this -> bot -> core("settings") -> get("Members", "Roster") == "Fallback") && $this -> bot -> game == "ao")
 		{
 			// Get the guild roster
+			$i = 0;
 			$xml_roster = $this -> bot -> core("tools") -> get_site("http://people.anarchy-online.com/org/stats/d/$dim/name/$id/basicstats.xml");
 			$faction = $this -> bot -> core("tools") -> xmlparse($xml_roster["content"], "side");
 			$orgname = $this -> bot -> core("tools") -> xmlparse($xml_roster["content"], "name");
+			$this -> bot -> log("ROSTER", "UPDATE", "XML for the $faction guild $orgname obtained");
 			$xml_roster = explode("<member>", $xml_roster["content"]);
 			unset($xml_roster[0]); //Get rid of the header as it's not a member.
 			if (!empty($xml_roster))
@@ -739,7 +756,9 @@ class Roster_Core extends BasePassiveModule
 					{
 						$members[]=$member;
 					}
+					$i++;
 				}
+				$this -> bot -> log("ROSTER", "UPDATE", "XML for the $faction guild $orgname contained $i member entries");
 			}
 		}
 

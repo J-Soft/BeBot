@@ -210,7 +210,7 @@ class Alias extends BaseActiveModule
 	{ 
 		$name = ucfirst(strtolower($name));
 		// Create Header
-		$inside = "<center><font color=CCInfoHeadline>:::: Alias List ::::</font></center>\n";
+		$inside = "<center>##ao_ccheader##:::: Alias List ::::##end##</center>\n";
 		$aliases = $this -> alias;
 		if (!empty($aliases))
 		{
@@ -218,7 +218,7 @@ class Alias extends BaseActiveModule
 			{
 				foreach ($aliases as $alias => $nickname)
 				{
-					$inside .= "\n<font color=CCInfoText>" . $alias;
+					$inside .= "\n##lightyellow##" . $alias;
 					$inside .= "   ".$this -> bot -> core("tools") -> chatcmd("whois ".$nickname, $nickname);
 				}
 			}
@@ -229,14 +229,14 @@ class Alias extends BaseActiveModule
 				{
 					if($main == $nickname)
 					{
-						$inside .= "\n<font color=CCInfoText>" . $alias;
+						$inside .= "\n##lightyellow##" . $alias;
 						$inside .= "   ".$this -> bot -> core("tools") -> chatcmd("whois ".$nickname, $nickname);
 					}
 				}
 			}
 		}
 		else
-			$inside = "<center><font color=CCInfoHeadline>:::: No Alias's Found ::::</font></center>\n";
+			$inside = "<center>##ao_ccheader##:::: No Alias's Found ::::##end##</center>\n";
 		if ($name == "List")
 			$forwho = "Alias List :: ";
 		else

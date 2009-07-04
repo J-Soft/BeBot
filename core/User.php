@@ -131,6 +131,25 @@ class User_Core extends BasePassiveModule
 				return $return;
 			}
 		}
+		$result = $this -> bot -> db -> select("SELECT char_id, user_level FROM #___users WHERE nickname = '" . $name . "'");
+		if (!empty($result))
+		{
+			if ($result[0][1] == -1 && !($this -> bot -> guildbot))
+			{
+				$return["error"] = true;
+				$return["errordesc"] = "##highlight##" . $name . " ##end##is banned and cannot be added.";
+				return $return;
+			}
+			else
+			{
+				// Ok, we already have someone with the same name, double check userid's and erase the old user to avoid problems.
+				if ($id != $result[0][0])
+				{
+					$this -> erase("", $name, TRUE, $result[0][0]);
+				}
+			}
+		}		
+		
 
 		// Make sure we have a valid access level for the user.
 		else if ($user_level < 0)
@@ -274,6 +293,7 @@ class User_Core extends BasePassiveModule
 			}
 			else
 			{
+				$this -> erase("Automated delete for invalid userid", $name);
 				$return["error"] = true;
 				$return["errordesc"] = "##highlight##" . $name . " ##end##does not appear to be a valid character. You might want to erase this user.";
 				return $return;
@@ -461,6 +481,20 @@ class User_Core extends BasePassiveModule
 			default:
 				return 0;
 
+		}
+	}
+	
+	// Grab the userid associated with a name in the users database
+	function get_db_uid($name)
+	{
+		$result = $this -> bot -> db -> select("SELECT char_id FROM #___users WHERE nickname = '" . $name . "'");
+		if (!empty($result))
+		{
+			return $result[0][0];
+		}
+		else
+		{
+			return 0;
 		}
 	}
 }

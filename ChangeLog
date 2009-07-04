@@ -1,4 +1,58 @@
 -------------
+Version 0.6.4
+-------------
+- Reversing stripping of control characters on text from IRC for now.
+- htmlspecialchars_decode text going to IRC to decode &amp; and similar.
+- Updated port for AoC server Ishtar.
+- IRC join/part/quit messages now properly prefixed on IRC and are also relayed over guild relay if UseGuildRelay is set for IRC module.
+- IRC part/quit messages are now relayed ingame.
+- Fixed flip command
+- Added the option to make reason required for !ban add
+- Added a check for botname_rules.txt before getting rules.txt
+- Lots of Changes to Raid module, lots of new function and features including restart/crash support, raid logging, raid control interface, punish raiders, move countdown, min level and also fixed alot of problems with output to wrong place or unnessesary spam
+- Lots of Changes to Bid module, lots of new function and deatures including useing points log, !bid cancel, !bid all, and more
+
+-------------
+Version 0.6.3
+-------------
+- Fixed stripping of control characters on text from IRC (logon/logoff)
+- Fixed a bug where the quotes module would crash if there where no quotes in the database
+- Added option to relay to suffix relayed text with a characters main. Controlled using !set relay showmain on/off
+- Added option to truncate the name of the main character for relayed text.
+- No Longer invites because of a bot restart if autoinvite is on, they will get invited if they were in PG before restart anyway
+- Added Option to have News Spammed at PGjoin.
+- Added improved handling of rerolled characters.
+- Whois table is no longer wiped for AoC bots upon startup.
+- Updated AO server information due to changed ports.
+- Fixed bug #380461 causing the AOC Autouseradd module to never add silently.
+
+
+-------------
+Version 0.6.2
+-------------
+- Fixed double removal on !is calls for people not on the notify list
+- Fixed Tyranny Port
+- Fixed Update to whois table
+- Fixed Check for in PG for mass invite
+- Fixed Links in Main blob for maintenance
+- Added Optional Timer to Raffle as well as support for Item output useing &item& lowid highid ql name
+- Fixed pgleave in Raid
+- Added a Fix for blobs that are too large for preg_match
+- Added Relaying of Buddy Actions to Allow !online to include other org (when dif host)
+- Improved Relay Bot responsed on getting bot into the pg
+- Added Encription of Chat option to relay (req mhash & mcrypt)
+- Added ignore setting for those users who maybe not want in your gc but want to still have relay with other org
+- Added option of not having other org prefix shown
+- Added Raid Status to !online
+- Changed link inside !online to use !alts if alts arnt shows in whois (can be changed to use !alts by setting too)
+- Added Option to view all alts inc the name you used inside alts Blob
+- Added a Trigger in alts module for a check in points module
+- Added a Reason part to add and Remove Points
+- Added Logging of points
+- Improved working and added some check to help prevent points being on wrong char
+- Fixed Issue with Default preference not being cached when changed
+
+-------------
 Version 0.6.1
 -------------
 - Fixed a bug in buddy list handling of the Roster core.
@@ -13,6 +67,7 @@ Version 0.6.1
 - Updated All US and some EU Servers with New names and ip's
 - Added sending of shutdown/restart reason
 - Now allows password to be entered on loading of StartBot.php
+
 
 -------------
 Version 0.6.0

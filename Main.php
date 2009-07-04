@@ -31,11 +31,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2009-01-24 22:05:05 +0100 (Sat, 24 Jan 2009) $
-* Revision: $Id: Main.php 1961 2009-01-24 21:05:05Z alreadythere $
+* File last changed at $LastChangedDate: 2009-01-24 21:08:06 +0000 (Sat, 24 Jan 2009) $
+* Revision: $Id: Main.php 1963 2009-01-24 21:08:06Z alreadythere $
 */
 
-$bot_version = "0.6.2";
+$bot_version = "0.6.4.dev";
 $php_version = phpversion();
 
 /*
@@ -44,28 +44,6 @@ Detect if we are being run from a shell or if someone is stupid enough to try an
 if ((!empty($_SERVER[HTTP_HOST])) || (!empty($_SERVER[HTTP_USER_AGENT])))
 {
 	die("BeBot does not support being run from a web server and it is inherently dangerous to do so!\nFor your own good and for the safety of your account information, please do not attempt to run BeBot from a web server!");
-}
-
-echo "
-===================================================\n
-    _/_/_/              _/_/_/                _/   \n
-   _/    _/    _/_/    _/    _/    _/_/    _/_/_/_/\n
-  _/_/_/    _/_/_/_/  _/_/_/    _/    _/    _/     \n
- _/    _/  _/        _/    _/  _/    _/    _/      \n
-_/_/_/      _/_/_/  _/_/_/      _/_/        _/_/   \n
-         An Anarchy Online Chat Automaton          \n
-                     And                           \n
-          An Age of Conan Chat Automaton           \n
-             v.$bot_version - PHP $php_version     \n
-===================================================\n
-";
-
-usleep(1500000);
-
-// The minimum required PHP version to run.
-if((float)phpversion() < 5.2)
-{
-	die("BeBot requires PHP version 5.2.0 or later to work.\n");
 }
 
 /*
@@ -80,6 +58,46 @@ if (empty($os))
 if (preg_match("/^windows/i", $os))
 {
 	$os_windows = true;
+}
+
+/*
+Check if we are running on a 64bit system or not
+*/
+if (PHP_INT_SIZE == 4)
+{
+	$sixtyfourbit = false;
+	$osbit = "32bit";
+}
+else
+{
+	$sixtyfourbit = true;
+	$osbit = "64bit";
+}
+
+
+
+echo "
+===================================================\n
+    _/_/_/              _/_/_/                _/   \n
+   _/    _/    _/_/    _/    _/    _/_/    _/_/_/_/\n
+  _/_/_/    _/_/_/_/  _/_/_/    _/    _/    _/     \n
+ _/    _/  _/        _/    _/  _/    _/    _/      \n
+_/_/_/      _/_/_/  _/_/_/      _/_/        _/_/   \n
+         An Anarchy Online Chat Automaton          \n
+                     And                           \n
+          An Age of Conan Chat Automaton           \n
+             v.$bot_version - PHP $php_version     \n
+			 OS: $os                               \n
+	Your operating system is detected as $osbit    \n
+===================================================\n
+";
+
+usleep(1500000);
+
+// The minimum required PHP version to run.
+if((float)phpversion() < 5.2)
+{
+	die("BeBot requires PHP version 5.2.0 or later to work.\n");
 }
 
 /*
@@ -202,8 +220,9 @@ $db = new MySQL(ucfirst(strtolower($bot_name)));
 echo "Creating MySQL class!\n";
 $aoc = new AOChat("callback", $game);
 echo "Creating AOChat class!\n";
-$bot = new Bot($ao_username, $ao_password, $bot_name, $dimension, $bot_version, $bot_version_name, $other_bots, $aoc, $irc, $db, $command_prefix, $cron_delay, $tell_delay, $max_blobsize, $reconnect_time, $guildbot, $guild_id, $guild, $log, $logpath, $log_timestamp, $use_proxy_server, $proxy_server_address, $proxy_server_port, $game, $accessallbots);
+$bot = new Bot($ao_username, $ao_password, $bot_name, $dimension, $bot_version, $bot_version_name, $other_bots, $aoc, $irc, $db, $command_prefix, $cron_delay, $tell_delay, $max_blobsize, $reconnect_time, $guildbot, $guild_id, $guild, $log, $logpath, $log_timestamp, $use_proxy_server, $proxy_server_address, $proxy_server_port, $game, $accessallbots, $sixtyfourbit);
 echo "Creating main Bot class!\n";
+$db -> bot = $bot;
 
 /*
 Make sure we no longer keep username and password in memory.

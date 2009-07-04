@@ -108,7 +108,7 @@ class Quotes Extends BaseActiveModule
 			$num = $this -> bot -> db -> select("SELECT id FROM #___quotes ORDER BY id DESC");
 			$result = $this -> bot -> db -> select("SELECT * FROM #___quotes");
 
-			if($num[0][0] > 0)
+			if (!empty($result))
 			{
 				$found = false;
 				while ($found == false)

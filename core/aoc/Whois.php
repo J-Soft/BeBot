@@ -40,8 +40,6 @@ $whois_core = new Whois_Core($bot);
 
 class Whois_Core extends BasePassiveModule
 {
-	var $bot;
-
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
@@ -72,7 +70,6 @@ class Whois_Core extends BasePassiveModule
 					KEY used (used)
 				)");
 
-		$this -> bot -> db -> query("TRUNCATE table ".$this -> bot -> db -> define_tablename("whois", "false") );
 
 		$this -> register_module("whois");
 		$this -> register_event("cron", "1hour");
@@ -92,7 +89,7 @@ class Whois_Core extends BasePassiveModule
 
 	function update_table()
 	{
-		if ($this -> bot -> db -> get_version("whois") == 2)
+		if ($this -> bot -> db -> get_version("whois") == 3)
 		{
 			return;
 		}
@@ -321,13 +318,6 @@ class Whois_Core extends BasePassiveModule
 			return $who;
 		}
 
-		// Make sure $name is a valid character
-		if (!$this -> bot -> core("chat") -> get_uid($name))
-		{
-			$who["error"] = true;
-			$who["errordesc"] = $name . " is not a valid character!";
-			return $who;
-		}
 		$id = $this -> bot -> core("chat") -> get_uid($name);
 		// Make sure the character exsists.
 		if (!$id)
@@ -419,12 +409,14 @@ class Whois_Core extends BasePassiveModule
 
 		if(0 == $whois['online'])
 		{
-			$window .= " Last Online: ##highlight##".date("Y-m-d h:i",$whois['location'])."##end##\n";
+			// For offline users 'location' contains the last online time in milliseconds since 1970!
+			$window .= " ##normal##Last Online: ##highlight##".gmdate("Y-m-d h:i",$whois['location'])."##end##\n";
 		}
 
 		if ($this -> bot -> core("settings") -> get('Whois', 'Debug'))
-			$window .= " Character ID: ##highlight##" . $this -> bot -> core("tools") -> int_to_string($whois['id']) . "##end####end##\n\n";
-
+		{
+			$window .= " ##normal##Character ID: ##highlight##" . $this -> bot -> core("tools") -> int_to_string($whois['id']) . "##end####end##\n\n";
+		}
 
 		if ($this -> bot -> core("security") -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Whois')))
 		{

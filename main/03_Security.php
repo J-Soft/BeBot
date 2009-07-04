@@ -185,12 +185,12 @@ class Security_Core extends BaseActiveModule
 	{ // Start function connect()
 		// Bind the command to the bot
 		// Can't be done earlier as otherwise we'd end in a requirement loop with access control
-		$this -> register_command("all", "security", "OWNER");
-		$this -> register_command("all", "adduser", "OWNER");
-		$this -> register_command("all", "deluser", "OWNER");
-		$this -> register_command("all", "addgroup", "OWNER");
-		$this -> register_command("all", "delgroup", "OWNER");
-		$this -> register_command("all", "admin", "OWNER");
+		$this -> register_command("all", "security", "SUPERADMIN");
+		$this -> register_command("all", "adduser", "SUPERADMIN");
+		$this -> register_command("all", "deluser", "SUPERADMIN");
+		$this -> register_command("all", "addgroup", "SUPERADMIN");
+		$this -> register_command("all", "delgroup", "SUPERADMIN");
+		$this -> register_command("all", "admin", "SUPERADMIN");
 
 		$this -> enable();
 
@@ -696,7 +696,7 @@ class Security_Core extends BaseActiveModule
 			return $return;
 		}
 
-		if ($this -> get_access_level($caller) < $this -> cache['groups'][$gid]['access_level'])
+		if (strtolower($caller) != "internal process" && $this -> get_access_level($caller) < $this -> cache['groups'][$gid]['access_level'])
 		{
 			$return['error'] = TRUE;
 			$return['errordesc'] = "Your Access Level is less than the Access Level of ".$group.". You cannot add members to ".$group.".";
@@ -1122,42 +1122,42 @@ class Security_Core extends BaseActiveModule
 			{
 				$superadmins .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$superadmins .= "\n";
-				$superadmins .= "        ".$this -> make_group_member_list($group['gid']);
+				$superadmins .= $this -> make_group_member_list($group['gid']);
 				$superadmins .= "\n";
 			}
 			elseif ($group['access_level'] == ADMIN)
 			{
 				$admins .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$admins .= "\n";
-				$admins .= "        ".$this -> make_group_member_list($group['gid']);
+				$admins .= $this -> make_group_member_list($group['gid']);
 				$admins .= "\n";
 			}
 			elseif ($group['access_level'] == LEADER)
 			{
 				$leaders .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$leaders .= "\n";
-				$leaders .= "        ".$this -> make_group_member_list($group['gid']);
+				$leaders .= $this -> make_group_member_list($group['gid']);
 				$leaders .= "\n";
 			}
 			elseif ($group['access_level'] == MEMBER)
 			{
 				$members .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$members .= "\n";
-				$members .= "        ".$this -> make_group_member_list($group['gid']);
+				$members .= $this -> make_group_member_list($group['gid']);
 				$members .= "\n";
 			}
 			elseif ($group['access_level'] == GUEST)
 			{
 				$guests .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$guests .= "\n";
-				$guests .= "        ".$this -> make_group_member_list($group['gid']);
+				$guests .= $this -> make_group_member_list($group['gid']);
 				$guests .= "\n";
 			}
 			elseif ($group['access_level'] == ANONYMOUS)
 			{
 				$anon .= " + ".$group['name']." (".stripslashes($group['description']).") ";
 				$anon .= "\n";
-				$anon .= "        ".$this -> make_group_member_list($group['gid']);
+				$anon .= $this -> make_group_member_list($group['gid']);
 				$anon .= "\n";
 			}
 		}
@@ -1183,11 +1183,13 @@ class Security_Core extends BaseActiveModule
 		$tmp = "";
 		if (empty($this -> cache['groups'][$gid]['members']))
 		{
-			return "- No members.";
+			return "        - No members.";
 		}
-		foreach ($this -> cache['groups'][$gid]['members'] as $member)
+		$users = $this -> cache['groups'][$gid]['members'];
+		sort($users);
+		foreach ($users as $member)
 		{
-			$tmp .= "- ".$member."\n";
+			$tmp .= "        - ".$member."\n";
 		}
 		return rtrim($tmp);
 	} // End function make_group_member_list()
@@ -1337,10 +1339,23 @@ class Security_Core extends BaseActiveModule
 	*/
 	function get_access_level_player($player)
 	{ // Start function get_access_level()
+	
+		$uid = $this -> bot -> core("chat") -> get_uid($player);
 		// If user does not exist return ANONYMOUS access right away
-	if (!$this -> bot -> core("chat") -> get_uid($player))
+		if (!$uid)
+		{
 			return 0;
-
+		}
+		
+		$dbuid = $this -> bot -> core("user") -> get_db_uid($player);
+		if ($uid && $dbuid && ($uid != $dbuid))
+		{
+			// Danger rodger wilco. We have a rerolled player which have not yet been deleted from users table.
+			//$this -> bot -> core("user") -> erase("Security", $player, FALSE, $uid);
+			//echo "Debug1: $uid does not match $dbuid \n";
+			return 0;
+		}
+			
 		$player = ucfirst(strtolower($player));
 		// Check #1: Check Owner and SuperAdmin from Bot.conf.
 		if ($player == $this -> owner)
@@ -1465,6 +1480,22 @@ class Security_Core extends BaseActiveModule
 			}
 		}
 
+		$uid = $this -> bot -> core("chat") -> get_uid($player);
+		// If user does not exist return ANONYMOUS access right away
+		if (!$uid)
+		{
+			return 0;
+		}
+		
+		$dbuid = $this -> bot -> core("user") -> get_db_uid($player);
+		if ($uid && $dbuid && ($uid != $dbuid))
+		{
+			// Danger rodger wilco. We have a rerolled player which have not yet been deleted from users table.
+			//$this -> bot -> core("user") -> erase("Security", $player, FALSE, $uid);
+			//echo "Debug: $uid does not match $dbuid \n";
+			return 0;
+		}
+		
 		// If alts should not be queried just return the access level for $player
 		if (!$this -> bot -> core("settings") -> get("Security", "Usealts"))
 		{

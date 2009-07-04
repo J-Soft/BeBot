@@ -106,7 +106,7 @@ class AutoUserAdd extends BasePassiveModule
 		else
 			$silent = 1;
 
-		$this -> bot -> core("user") -> add($this -> bot -> botname, $name, 0, MEMBER, 0, $silent);
+		$this -> bot -> core("user") -> add($this -> bot -> botname, $name, 0, MEMBER, $silent);
 
 		if(!empty($this -> hooks))
 		{

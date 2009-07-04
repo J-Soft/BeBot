@@ -70,6 +70,7 @@ class Alts_Core extends BasePassiveModule
 		$this -> bot -> core("settings") -> create ('Alts', "Detail", True, "Show level and profession in the alts list");
 		$this -> bot -> core("settings") -> create ('Alts', "LastSeen", True, "Show the time we last saw an alt if they are offline");
 		$this -> bot -> core("settings") -> create ('Alts', "Confirmation", FALSE, "Does the Alt have to Confirm him Self as an Alt after being Added?");
+		$this -> bot -> core("settings") -> create ('Alts', "incAll", FALSE, "Should the Alt that was used to call the info also be listed inside the blob?");
 	}
 
 	function update_table()
@@ -186,8 +187,8 @@ class Alts_Core extends BasePassiveModule
 
 	function old_output($who, $returntype=0)
 	{
-		$main = $this -> bot -> core("alts") -> main($who);
-		$alts = $this -> bot -> core("alts") -> get_alts($main);
+		$main = $this -> main($who);
+		$alts = $this -> get_alts($main);
 
 		if (empty($alts))
 		{
@@ -242,11 +243,11 @@ class Alts_Core extends BasePassiveModule
 		{
 			$name = ucfirst(strtolower($name));
 			$whois = $this -> bot -> core("whois") -> lookup($name);
-			$main = $this -> bot -> core("alts") -> main($name);
-			$alts = $this -> bot -> core("alts") -> get_alts($main);
+			$main = $this -> main($name);
+			$alts = $this -> get_alts($main);
 
 			//If this is not the main set the main as the first alt listed
-			if($name != $main)
+			if($name != $main || ($alts && $this -> bot -> core("settings") -> get('Alts', "incAll")))
 			{
 				array_unshift($alts, $main);
 			}
@@ -274,14 +275,12 @@ class Alts_Core extends BasePassiveModule
 	*/
 	function make_info_blob($whois, $main, $alts='', $returntype)
 	{
-
-
 		if (!empty($alts))
 		{
 			$window.= "##normal##:::  $main's alts  :::##end##\n";
 			foreach ($alts as $alt)
 			{
-				if($alt != $whois['nickname'])
+				if($alt != $whois['nickname'] || $this -> bot -> core("settings") -> get('Alts', "incAll"))
 				{
 					$window .= $this -> bot -> core("tools") -> chatcmd("whois ".$alt, $alt)."</a>";
 

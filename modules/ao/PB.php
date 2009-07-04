@@ -210,7 +210,7 @@ class PB extends BaseActiveModule
 		// 1st lets check for pocketbosses that contain the string
 		foreach($haystack as $straw)
 		{
-			echo "is $search in ".$straw[0]."\n";
+			//echo "is $search in ".$straw[0]."\n";
 			if(stristr($straw[0], $search))
 				$smallerhaystack[] = $straw;
 		}

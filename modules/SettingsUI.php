@@ -63,21 +63,17 @@ class SetConf extends BaseActiveModule
 	*/
 	function command_handler($name, $msg, $source)
 	{ // Start function process_command()
-		if (preg_match("/^settings (.+?) (.+?) (.+)$/i", $msg, $info))
+		$msg = explode(" ", $msg, 4);
+		Switch(count($msg))
 		{
-			return $this -> change_setting($name, $info[1], $info[2], $info[3]);
-		}
-		elseif (preg_match("/^settings (.+?) (.+?)$/i", $msg, $info))
-		{
-			return $this -> change_setting($info[1], $info[2], "");
-		}
-		elseif (preg_match("/^settings (.+)$/i", $msg, $info))
-		{
-			return $this -> show_module($info[1]);
-		}
-		else
-		{
-			return $this -> show_all_modules();
+			case 4:
+				return $this -> change_setting($name, $msg[1], $msg[2], $msg[3]);
+			case 3:
+				return $this -> change_setting($msg[1], $msg[2], "");
+			case 2:
+				return $this -> show_module($msg[1]);
+			Default:
+				return $this -> show_all_modules();
 		}
 	} // End function process_command()
 

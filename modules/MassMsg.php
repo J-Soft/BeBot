@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 *
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: MassMsg.php 1833 2008-11-30 22:09:06Z alreadythere $
+* File last changed at $LastChangedDate: 2009-03-12 04:45:44 +0000 (Thu, 12 Mar 2009) $
+* Revision: $Id: MassMsg.php 5 2009-03-12 04:45:44Z temar $
 */
 
 
@@ -100,7 +100,8 @@ class MassMsg extends BaseActiveModule
 		
 		$msg = $this -> bot -> core("colors") -> parse($msg);
 
-		if(!$this -> bot -> core('settings') -> get('MassMsg', 'tell_to_PG_users'))
+		$inchattell = $this -> bot -> core('settings') -> get('MassMsg', 'tell_to_PG_users');
+		if(!$inchattell)
 		{
 			//Send to PG and ignore all in PG
 			$this -> bot -> send_pgroup("\n".$msg, NULL, TRUE, FALSE);
@@ -140,7 +141,7 @@ class MassMsg extends BaseActiveModule
 			//If they want messages they will get them regardless of type
 			if($massmsg)
 			{
-				if($this -> bot -> core("online") -> in_chat($recipient))
+				if(!$inchattell && $this -> bot -> core("online") -> in_chat($recipient))
 				{
 					$status[$recipient]['sent']=FALSE;
 					$status[$recipient]['pg']=true;
@@ -161,14 +162,22 @@ class MassMsg extends BaseActiveModule
 			{
 				if($massinv)
 				{
-					//Check if they've already gotten the tell so we don't spam unneccessarily.
-					if(!$status[$recipient]['sent'])
+					if($this -> bot -> core("online") -> in_chat($recipient))
 					{
-						$this->bot->send_tell($recipient, $message, 0, FALSE, TRUE, FALSE);
-						$status[$recipient]['sent']=true;
+						$status[$recipient]['sent']=FALSE;
+						$status[$recipient]['pg']=true;
 					}
-					$this->bot->core('chat')->pgroup_invite($recipient);
-					$status[$recipient]['invited']=true;
+					else
+					{
+						//Check if they've already gotten the tell so we don't spam unneccessarily.
+						if(!$status[$recipient]['sent'])
+						{
+							$this->bot->send_tell($recipient, $message, 0, FALSE, TRUE, FALSE);
+							$status[$recipient]['sent']=true;
+						}
+						$this->bot->core('chat')->pgroup_invite($recipient);
+						$status[$recipient]['invited']=true;
+					}
 				}
 				else
 				{
@@ -199,9 +208,20 @@ class MassMsg extends BaseActiveModule
 				else
 					$window.=" - Invite to pgroup: ##error##blocked by preferences##end##";
 			}
+			if(strtolower($this -> bot -> botname) == "bangbot")
+			{
+				if($status['sent'] || $status['pg'])
+				{
+						//Update announce count...
+					$result = $this -> bot -> db -> select("SELECT announces FROM stats WHERE nickname = '" . $recipient . "'");
+					if (!empty($result))
+					{
+						$this -> bot -> db -> query("UPDATE stats SET announces = announces+1 WHERE nickname = '" . $recipient . "'");
+					}
+				}
+			}
 		}
 		return($this->bot->core('tools')->make_blob('report', $window));
 	}
-		
 }
 ?>

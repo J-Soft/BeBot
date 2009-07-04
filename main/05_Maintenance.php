@@ -91,7 +91,7 @@ class Maintenance extends BaseActiveModule
 					}
 				}
 				else
-					return $this -> main($name, $origin);
+					return $this -> main($origin);
 			default:
 				return "Broken plugin, recieved unhandled command: $command in Maintenance.php";
 		}
@@ -99,7 +99,7 @@ class Maintenance extends BaseActiveModule
 
 	function connect()
 	{
-		$this -> register_command("all", "maintenance", "OWNER");
+		$this -> register_command("all", "maintenance", "SUPERADMIN");
 		$this -> bot -> core("settings") -> create("Maintenance", "info", "", "Info saved while restarting, blank when not doing maintenance.", NULL, TRUE, 2);
 
 	/*	$info = $this -> bot -> core("settings") -> get("Maintenance", "info");

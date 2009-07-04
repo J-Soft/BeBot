@@ -108,7 +108,7 @@ class tools extends BasePassiveModule
 		}
 	}
 
-	function get_site_sock($url, $strip_headers = 0, $server_timeout = 25, $read_timeout = 30)
+	function get_site_sock($url, $strip_headers = 0, $server_timeout = 5, $read_timeout = 10)
 	{
 		$return = $this -> get_site_data($url,$strip_headers,$server_timeout,$read_timeout);
 
@@ -148,6 +148,7 @@ class tools extends BasePassiveModule
 
 			/* Get the port for the WWW service. */
 			$service_port = getservbyname('www', 'tcp');
+
 		}
 
 		/* Create a TCP/IP socket. */
@@ -158,6 +159,7 @@ class tools extends BasePassiveModule
 			$return["error"] = true;
 			$return["errordesc"] = "Socket failed to create.";
 			$return["content"] = socket_strerror(socket_last_error());
+
 			return $return;
 		}
 
@@ -169,6 +171,7 @@ class tools extends BasePassiveModule
 			$return["error"] = true;
 			$return["errordesc"] = "Failed to connect to server";
 			$return["content"] = socket_strerror(socket_last_error());
+			
 			return $return;
 		}
 
@@ -194,6 +197,7 @@ class tools extends BasePassiveModule
 			$return["error"] = true;
 			$return["errordesc"] = "Failed to write to server";
 			$return["content"] = socket_strerror(socket_last_error());
+			
 			return $return;
 		}
 
@@ -211,6 +215,7 @@ class tools extends BasePassiveModule
 			$return["error"] = true;
 			$return["errordesc"] = "Failed to read response";
 			$return["content"] = socket_strerror(socket_last_error());
+			
 			return $return;
 		}
 
@@ -222,13 +227,14 @@ class tools extends BasePassiveModule
 			$return["error"] = true;
 			$return["errordesc"] = "Failed to close socket";
 			$return["content"] = socket_strerror(socket_last_error());
+	
 			return $return;
 		}
 
 		// Did the calling function want http headers stripped?
 		if ($strip_headers)
 		{
-			$split = split("\r\n\r\n",$return["content"]);
+			$split = split("\r\n\r\n",$return['content']);
 			$return["content"] = $split[1];
 		}
 
@@ -236,7 +242,7 @@ class tools extends BasePassiveModule
 
 	}
 
-	function get_site_curl($url, $strip_headers)
+	function get_site_curl($url, $strip_headers, $timeout = 10)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -267,6 +273,9 @@ class tools extends BasePassiveModule
 
 		// Optional: Return the result instead of printing it
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		
+		// Specify a timeout
+		curl_setopt ( $ch , CURLOPT_TIMEOUT, $timeout);
 
 		// The usual - get the data and close the session
 		$return["content"] = curl_exec($ch);
@@ -278,6 +287,8 @@ class tools extends BasePassiveModule
 		//	$split = split("\r\n\r\n",$return["content"]);
 		//	$return["content"] = $split[1];
 		//}
+		
+	
 		Return $return;
 	}
 

@@ -70,7 +70,7 @@ class Gemcut extends BaseActiveModule {
     //         Colour                        // Tier 1       // Tier 2       // Tier 3     // Tier 4       // Tier 5     // Tier 6
     $this->gem_types["black"]  = array(array("Obsidian",     "Onyx",         "Jet",        "Black Jasper", "Nightstar",  "Black Diamond"));
     $this->gem_types["blue"]   = array(array("Azurite",      "Lapis Lazuli", "Turqoise",   "Aquamarine",   "Sapphire",   "Star Saphire"));
-    $this->gem_types["green"]  = array(array("Chrysophrase", "Malachite",    "Peridot",    "Sphene",       "Jade",       "Emerald"));
+    $this->gem_types["green"]  = array(array("Chrysoprase", "Malachite",    "Peridot",    "Sphene",       "Jade",       "Emerald"));
     $this->gem_types["orange"] = array(array("Carnelian",    "Tiger Eye",    "Chalcedony", "Sunstone",     "Fire Agate", "Padpaasahsa"));
     $this->gem_types["purple"] = array(array("Rose Quartz",  "Iolite",       "Amethyst",   "Duskstone",    "Royal Azel", "Tyrian Sapphire"));
     $this->gem_types["red"]    = array(array("Spinel",       "Jasper",       "Garnet",     "Blood Opal",   "Ruby",       "Star Ruby"));
@@ -311,7 +311,7 @@ class Gemcut extends BaseActiveModule {
   function gemtiers($msg) {
     switch ($msg) {
       case 1:
-        $txt = "Tier 1 gems are (level 40-49): Obsidian, Azurite, Chrysophrase, Carnelian, Rose Quartz, Spinel, Quartz and Citrine. Drops in: Field of the Dead or Noble District.";
+        $txt = "Tier 1 gems are (level 40-49): Obsidian, Azurite, Chrysoprase, Carnelian, Rose Quartz, Spinel, Quartz and Citrine. Drops in: Field of the Dead or Noble District.";
         break;
       case 2:
         $txt = "Tier 2 gems are (level 50-59): Onyx, Lapis Lazuli, Malachite, Tiger Eye, Iolite, Jasper, Zircon and Chrysoberyl. Drops in: Eiglophian Mountains.";

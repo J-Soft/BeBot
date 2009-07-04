@@ -64,6 +64,8 @@ class BanManager extends BaseActiveModule
 		$this -> bot -> core("command_alias") -> register("ban", "blacklist");
 
 		$this -> register_event("cron", "5min");
+
+		$this -> bot -> core("settings") -> create("Ban", "ReqReason", FALSE, "is a Reason Required?");
 	}
 
 	function cron()
@@ -96,7 +98,7 @@ class BanManager extends BaseActiveModule
 		elseif (preg_match("/^ban rem ([a-z0-9]+)$/i", $msg, $info))
 			return $this -> del_ban($name, $info[1]);
 
-		return FALSE;
+		return $this -> bot -> send_help($name, "ban");
 	}
 
 	function show_ban_list()
@@ -144,6 +146,10 @@ class BanManager extends BaseActiveModule
 
 		if ($reason == "")
 		{
+			if($this -> bot -> core("settings") -> get("Ban", "ReqReason"))
+			{
+				Return("Reason Required for adding Bans");
+			}
 			$reason = "None given.";
 		}
 
