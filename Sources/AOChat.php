@@ -24,7 +24,8 @@
 * With AoC update 1.05 the login protocol changed so that the bot can not login
 * directly to the chat server. It first has to login to the actual game world
 * (universe) like a normal player. After that it discards packets from the
-* game world and gets disconnected from it after a while, but stays in the chat server.
+* game world and gets disconnected from it after a while, but stays in the chat
+* server. Thanks go out to Chaoz from official AoC forums, who provided the patch.
 *
 * A disassembly of the official java chat client[1] for Anarchy Online
 * and Slicer's AO::Chat perl module[2] were used as a reference for this
