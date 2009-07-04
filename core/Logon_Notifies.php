@@ -72,6 +72,8 @@ class Logon_Notifies_Core extends BasePassiveModule
 		$this -> modules = array();
 		$this -> cron_running = 0;
 		$this -> notifies = array();
+		
+		$this -> waiting = FALSE;
 
 		$this -> bot -> core("settings") -> create("Logon_Notifies", "Notify_Delay", 5, "How many seconds should be waited after logon of a buddy till any notifies are sent to him?", "0;1;2;3;4;5;10;15;30");
 		$this -> bot -> core("settings") -> create("Logon_Notifies", "Enabled", TRUE, "Are notifies on logon enabled or disabled?");

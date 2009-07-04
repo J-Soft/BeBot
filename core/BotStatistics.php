@@ -46,7 +46,13 @@ class BotStatistics_Core extends BasePassiveModule
 		$this -> bot -> core("settings") -> create("Bots", "DB", "", "Use dif Database? (Restart Required)");
 
 		if ($this -> bot -> core("settings") -> get ("bots", "DB") !== "")
+		{
 			$this -> DB = $this -> bot -> core("settings") -> get ("bots", "DB").".";
+		}
+		else
+		{
+			$this -> DB = "";
+		}
 
 		$this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS ".$this -> DB.$this -> bot -> db -> define_tablename("bots", "false")." (
 				ID INT NOT NULL auto_increment PRIMARY KEY,
