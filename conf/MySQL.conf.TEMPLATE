@@ -34,7 +34,7 @@
 	If you have $table_prefix Defined your tables will be prefixed as above with a _ added on
 	if you dont want the _ added uncomment below
 	*/
-	$nounderscore = TRUE;
+	$nounderscore = FALSE;
 
 	/*
 	Master prefix table.
