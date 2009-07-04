@@ -109,7 +109,7 @@ function get_site($url, $strip_headers = 0, $server_timeout = 15, $read_timeout 
 		}
 
 		// Successfull query with no errors from the server
-		if (ereg("200 OK", $http_response) || ereg("302 Found", $http_response))
+		if (preg_match("/(200 OK|302 Found)/", $http_response))
 		{
 			$return["error"] = false;
 			$return["content"] = "";
