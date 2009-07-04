@@ -806,7 +806,7 @@ class AOChat
 			{
 				if ( !is_resource( $chatServerPacket->args[0] ) )
 				{
-					displayConanError( $chatServerPacket->args[0] );
+					$this -> displayConanError( $chatServerPacket->args[0] );
 				}
 				else
 				{
