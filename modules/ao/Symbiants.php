@@ -66,7 +66,7 @@ class Symb_sql extends BaseActiveModule
 		
 		$this -> register_command("all", "symb", "GUEST");
 		
-		$this->help['command']['description'].= "Advanced search for symbiants and pocket bosses.";
+		$this->help['description']= "Advanced search for symbiants and pocket bosses.";
 		$this->help['command']['symb <level>[-<level2>]']="Find symbs of QL level. If [-<level2>] is specified it finds symbs between the two"; 
 		$this->help['command']['symb <slot>']="Finds symbiant for the given slot.";
 		$this->help['command']['symb <unit>']="Find a symbiant for the given <unit>.";

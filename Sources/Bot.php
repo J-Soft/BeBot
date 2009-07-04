@@ -221,8 +221,8 @@ class Bot
   		self::$instance[$bothandle]->password = $ao_password;
   		self::$instance[$bothandle]->botname = $bot_name;
   		self::$instance[$bothandle]->dimension = ucfirst(strtolower($dimension));
-  		self::$instance[$bothandle]->botversion = BOT_VERSION;
-  		self::$instance[$bothandle]->botversionname = $bot_version_name;
+  		self::$instance[$bothandle]->botversion = 'BOT_VERSION';
+  		self::$instance[$bothandle]->botversionname = 'BOT_VERSION_NAME';
  		self::$instance[$bothandle]->other_bots = $other_bots;
  		self::$instance[$bothandle]->commands = array();
  		self::$instance[$bothandle]->commpre = $command_prefix;
@@ -246,8 +246,23 @@ class Bot
  		self::$instance[$bothandle]->module_directories = $module_directories;
  
  		//We need to keep these too.
- 		self::$instance[$bothandle]->owner = $owner;
- 		self::$instance[$bothandle]->super_admin = $super_admin;
+		if (isset($owner))
+		{
+			self::$instance[$bothandle]->owner = $owner;
+		}
+		else
+		{
+			self::$instance[$bothandle]->owner = null;
+		}
+		
+		if (isset($super_admin))
+		{
+			self::$instance[$bothandle]->super_admin = $super_admin;
+		}
+		else
+		{
+			self::$instance[$bothandle]->super_admin = null;
+		}
  
  		// create new ConfigMagik-Object (HACXX ALERT! This should most likely be a singleton!)
  		self::$instance[$bothandle]->ini = ConfigMagik::get_instance($bothandle, "conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", true, true);
@@ -257,6 +272,7 @@ class Bot
  		self::$instance[$bothandle]->irc = &$irc; //To do: This should probably be a singleton aswell.
  		self::$instance[$bothandle]->aoc = AOChat::get_instance($bothandle);
  		self::$instance[$bothandle]->db = MySQL::get_instance($bothandle);
+		
  
  		//Pass back the handle of the bot for future reference.
  		return($bothandle);
@@ -356,7 +372,7 @@ class Bot
 
 		// Open connection
 		$this -> log("LOGIN", "STATUS", "Connecting");
-		if (!$this -> aoc -> connect($this->server, $this->port, $this -> sixtyfourbit))
+		if (!$this -> aoc -> connect($this->server, $this->port))
 		{
 			$this -> cron_activated = false;
 			$this -> disconnect();

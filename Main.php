@@ -36,6 +36,7 @@
 */
 
 define('BOT_VERSION', "0.7.0.bzr(snapshot)");
+define('BOT_VERSION_NAME', "BeBot");
 $bot_version = BOT_VERSION;
 $php_version = phpversion();
 
@@ -56,22 +57,6 @@ if (preg_match("/^windows/i", $os))
 	$os_windows = true;
 }
 
-/*
-Check if we are running on a 64bit system or not
-*/
-if (PHP_INT_SIZE == 4)
-{
-	$sixtyfourbit = false;
-	$osbit = "32bit";
-}
-else
-{
-	$sixtyfourbit = true;
-	$osbit = "64bit";
-}
-
-
-
 echo "
 ===================================================\n
     _/_/_/              _/_/_/                _/   \n
@@ -84,7 +69,6 @@ _/_/_/      _/_/_/  _/_/_/      _/_/        _/_/   \n
           An Age of Conan Chat Automaton           \n
           v.$bot_version - PHP $php_version        \n
 		  OS: $os                                  \n
-	Your operating system is detected as $osbit    \n
 ===================================================\n
 ";
 
@@ -110,7 +94,14 @@ require_once "./Sources/Dispatcher2.php";
 Creating the bot.
 */
 echo "Creating main Bot class!\n";
-$bothandle = Bot::factory($argv[1]);
+if (isset($argv[1]))
+{
+	$bothandle = Bot::factory($argv[1]);
+}
+else
+{
+	$bothandle = Bot::factory();
+}
 $bot = Bot::get_instance($bothandle);
   
 //Load modules.

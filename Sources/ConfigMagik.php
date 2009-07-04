@@ -256,7 +256,7 @@ class ConfigMagik
 		 * PHP's own method is used for parsing the ini-file instead of own code.
 		 * It's robust enough ;-)
 		 */
-		$this->VARS = parse_ini_file( $path, $this->PROCESS_SECTIONS);
+		$this->VARS = @parse_ini_file( $path, $this->PROCESS_SECTIONS);
 		return true;
 	}
 

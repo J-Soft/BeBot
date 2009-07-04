@@ -46,7 +46,7 @@ class Net_SmartIRC_messagehandler extends Net_SmartIRC_irccommands
         if ($this->_channelsyncing == true) {
             if ($this->_nick == $ircdata->nick) {
                 $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: joining channel: '.$ircdata->channel, __FILE__, __LINE__);
-                $channel = &new Net_SmartIRC_channel();
+                $channel = new Net_SmartIRC_channel();
                 $channel->name = $ircdata->channel;
                 $this->_channels[strtolower($channel->name)] = &$channel;
                 
@@ -57,7 +57,7 @@ class Net_SmartIRC_messagehandler extends Net_SmartIRC_irccommands
             
             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: '.$ircdata->nick.' joins channel: '.$ircdata->channel, __FILE__, __LINE__);
             $channel = &$this->_channels[strtolower($ircdata->channel)];
-            $user = &new Net_SmartIRC_channeluser();
+            $user = new Net_SmartIRC_channeluser();
             $user->nick = $ircdata->nick;
             $user->ident = $ircdata->ident;
             $user->host = $ircdata->host;
@@ -315,7 +315,7 @@ class Net_SmartIRC_messagehandler extends Net_SmartIRC_irccommands
                                 
                 $channel = &$this->_channels[strtolower($ircdata->channel)];
                 
-                $user = &new Net_SmartIRC_channeluser();
+                $user = new Net_SmartIRC_channeluser();
                 $user->ident = $ircdata->rawmessageex[4];
                 $user->host = $ircdata->rawmessageex[5];
                 $user->server = $ircdata->rawmessageex[6];
@@ -363,7 +363,7 @@ class Net_SmartIRC_messagehandler extends Net_SmartIRC_irccommands
             $userarray = explode(' ', rtrim($ircdata->message));
             $userarraycount = count($userarray);
             for ($i = 0; $i < $userarraycount; $i++) {
-                $user = &new Net_SmartIRC_channeluser();
+                $user = new Net_SmartIRC_channeluser();
                 
                 $usermode = substr($userarray[$i], 0, 1);
                 switch ($usermode) {

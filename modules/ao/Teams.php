@@ -228,7 +228,7 @@ class NewTeams extends BaseActiveModule
 				{
 					if(isset($this->pgroup[$name]))
 					{
-						$member =& new TeamMember($this->pgroup[$name][0],$this->pgroup[$name][1],$this->pgroup[$name][2],$this->pgroup[$name][3]);
+						$member = new TeamMember($this->pgroup[$name][0],$this->pgroup[$name][1],$this->pgroup[$name][2],$this->pgroup[$name][3]);
 						$team =& $this->GetTeam($num);
 						$teammembers =& $team->GetTeamMembers();
 						print_r(get_object_vars($teammembers));
@@ -284,8 +284,8 @@ class NewTeams extends BaseActiveModule
 			if(isset($this->pgroup[$name]))
 			{
 				$this->DelTeamMember($name,$executer);
-				$member = &new TeamMember($this->pgroup[$name][0],$this->pgroup[$name][1],$this->pgroup[$name][2],$this->pgroup[$name][3],true);
-				$team = &new Team($member,$teamname);
+				$member = new TeamMember($this->pgroup[$name][0],$this->pgroup[$name][1],$this->pgroup[$name][2],$this->pgroup[$name][3],true);
+				$team = new Team($member,$teamname);
 				++$this->numteams;
 				$this->pgroup[$name][4] = false;
 				$this->AddTeam($team);

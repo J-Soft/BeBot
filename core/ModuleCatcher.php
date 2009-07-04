@@ -35,7 +35,7 @@
 * Revision: $Id: ModuleCatcher.php 3 2008-08-02 21:25:41Z temar $
 */
 
-$modulecatcher_core = new ModuleCatcher_Core($bot, $core_directories, $module_directories);
+$modulecatcher_core = new ModuleCatcher_Core($bot, $bot -> core_directories, $bot -> module_directories);
 
 /*
 The Class itself...

@@ -63,6 +63,7 @@ class MySQL
 		$this -> error_count = 0;
 		$this -> last_error = 0;
 		$this -> last_reconnect = 0;
+		$this -> underscore = "_";
 
 		/*
 		Load up config
@@ -98,10 +99,11 @@ class MySQL
 			$table_prefix = str_ireplace("<botname>", strtolower($botname), $table_prefix);
 			$this -> table_prefix = $table_prefix;
 		}
-		if($nounderscore)
+		
+		if(isset($nounderscore))
+		{
 			$this -> underscore = "";
-		else
-			$this -> underscore = "_";
+		}
 
 		$this -> connect(true);
 

@@ -733,7 +733,7 @@ class IRC extends BaseActiveModule
 		else if ($name == "")
 		$this -> bot -> send_gc("Connecting to IRC server: " . $this -> bot -> core("settings") -> get("Irc", "Server"));
 
-		$this -> irc = &new Net_SmartIRC();
+		$this -> irc = new Net_SmartIRC();
 		$this -> irc -> setUseSockets(TRUE);
 		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, $this -> bot -> commpre . 'online', $this -> bot -> commands["tell"]["irc"], 'irc_online');
 		$this -> irc -> registerActionhandler(SMARTIRC_TYPE_CHANNEL, $this -> bot -> commpre . 'whois', $this -> bot -> commands["tell"]["irc"], 'irc_whois');

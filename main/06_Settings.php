@@ -132,7 +132,6 @@ class Settings_Core extends BasePassiveModule
 		}
 		else
 		{
-			
 			$this -> maintenance = FALSE;
 		}
 	}
@@ -404,7 +403,7 @@ class Settings_Core extends BasePassiveModule
 			if (!$result)
 			{
 				$this->error->set("Setting ".$setting." for module ".$module." was not created because it already exists.");
-				if($this -> maintenance)
+				if(isset($this -> maintenance))
 				{
 					$this -> bot -> core("maintenance") -> new_data[strtolower(stripslashes($module))][strtolower(stripslashes($setting))] = array($datatype, stripslashes($longdesc), stripslashes($defaultoptions), $hidden, $disporder);
 				}
@@ -420,7 +419,7 @@ class Settings_Core extends BasePassiveModule
 				}
 			}
 		}
-		if($this -> maintenance)
+		if(isset($this -> maintenance))
 		{
 			$this -> bot -> core("maintenance") -> new_data[strtolower(stripslashes($module))][strtolower(stripslashes($setting))] = array($datatype, stripslashes($longdesc), stripslashes($defaultoptions), $hidden, $disporder);
 		}

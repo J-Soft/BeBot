@@ -294,6 +294,11 @@ class TowerAttack extends BaseActiveModule
 
 		if ($attack)
 		{
+			if (!isset($this -> suppress[$infos["def_guild"]]))
+			{
+				$this -> suppress[$infos["def_guild"]] = 0;
+			}
+			
 			$infos["time"] = time();
 			$player = $this -> bot -> core("whois") -> lookup($infos["off_player"]);
 			if($player instanceof BotError)
@@ -452,7 +457,7 @@ class TowerAttack extends BaseActiveModule
 
 		foreach ($infos AS $key => $value)
 		{
-			$string = eregi_replace("#!" . $key . "!#", $value, $string);
+			$string = str_ireplace("#!" . $key . "!#", $value, $string);
 		}
 
 		return $string;

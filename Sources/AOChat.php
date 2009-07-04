@@ -151,6 +151,20 @@ class AOChat
 		$this->game = $this->bot->game;
 		$this->disconnect();
 		$this->login_num = 0;
+		/*	
+		Check if we are running on a 64bit system or not
+		*/
+		if (PHP_INT_SIZE == 4)
+		{
+			$phpbit = "32 bit";
+			$this -> sixtyfourbit = false;
+		}
+		else
+		{
+			$phpbit = "64 bit";
+			$this -> sixtyfourbit =true;
+		}	
+		echo "PHP install detected as being $phpbit\n";
 	}
 
 	public function get_instance($bothandle)
@@ -182,9 +196,8 @@ class AOChat
 	}
 
 	/* Network stuff */
-	function connect($server = "default", $port = "default", $sixtyfourbit = FALSE)
+	function connect($server = "default", $port = "default")
 	{
-		$this -> sixtyfourbit = $sixtyfourbit;
 		if($server == "default")
 		{
 			if($this -> game == "ao")
@@ -695,6 +708,7 @@ class AOChat
 
 	function lookup_group($arg, $type=0)
 	{
+		$is_gid = false;
 		//This should probably be moved out of AOChat and into core/PlayerList.php
 		if($type && ($is_gid = (strlen($arg) === 5 && (ord($arg[0])&~0x80) < 0x10)))
 		{
@@ -1145,7 +1159,9 @@ class AOChat
 		}
 
 		for($i = 3; $i >= 0; $i--)
-		$result .= $bytes[$i];
+		{
+			$result .= $bytes[$i];
+		}
 
 		return $result;
 	}
