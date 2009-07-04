@@ -420,7 +420,7 @@ class AOChat
 		//Get the bot instance
 		$bot = Bot::get_instance($this->bothandle);
 		//Get the aochat dispatcher.
-		$dispatcher = Event_Dispatcher::getInstance();
+		$dispatcher = Event_Dispatcher2::getInstance();
 		//Include a the signal_message (Should probably be included somewhere else)
 		require_once('Dispatcher/signal_message.php');
 		
@@ -448,7 +448,7 @@ class AOChat
 
 		switch ($type)
 		{
-//system
+			//system
 			case AOCP_LOGIN_SEED :
 				$this->serverseed = $packet->args[0];
 				break;
@@ -461,7 +461,7 @@ class AOChat
 			case AOCP_GROUP_ANNOUNCE:
 				list($gid, $name, $status) = $packet->args;
 				$signal = new signal_message('aochat', $gid, $name);
-				$dispatcher->post($signal, 'onGroupAnnounce', null, false, false);
+				$dispatcher->post($signal, 'onGroupAnnounce');
 				unset($signal);
 				
 				//TO DO: Group caching should most likely be done somewhere else.
@@ -473,18 +473,18 @@ class AOChat
 				$bot -> inc_gannounce($packet->args);
 				break;
 
-//invites
+			//invites
 			case AOCP_PRIVGRP_INVITE:
 				// Event is a privgroup invite
 				list($gid) = $packet->args;
 				$signal = new signal_message('aochat', $gid, 'invite');
-				$dispatcher->post($signal, 'onGroupInvite', null, false, false);
+				$dispatcher->post($signal, 'onGroupInvite');
 				
 				//Deprecated call: Should listen to the signal already sendt.
 				$bot -> inc_pginvite($packet->args);
 				break;
 
-//buddy/player
+			//buddy/player
 			case AOCP_CLIENT_NAME :
 			case AOCP_CLIENT_LOOKUP :
 				//Cross-game compatibility
@@ -499,11 +499,11 @@ class AOChat
 				$name = ucfirst(strtolower($name));
 			
 				$signal = new signal_message('aochat', 'bot', array($id, $name));
-				$dispatcher->post($signal, 'onPlayerName', null, false, false);
+				$dispatcher->post($signal, 'onPlayerName');
 				unset($signal);
 				
 				// TO DO: Remove uid->uname cache from AOChat.php and handle that in core/PlayerList.php
-/*				$this->id[$id]   = $name;
+				/*$this->id[$id]   = $name;
 				$this->id[$name] = $id;*/
 				break;
 
@@ -513,11 +513,11 @@ class AOChat
 				$signal = new signal_message('aochat', $id, $status);
 				if($status)
 				{
-					$dispatcher->post($signal, 'onBuddyJoin', null, false, false);
+					$dispatcher->post($signal, 'onBuddyJoin');
 					}
 				else
 				{
-					$dispatcher->post($signal, 'onBuddyLeave', null, false, false);
+					$dispatcher->post($signal, 'onBuddyLeave');
 				}
 				unset($signal);
 
@@ -538,7 +538,7 @@ class AOChat
 
 			case AOCP_BUDDY_REMOVE :
 				$signal = new signal_message('aochat', 'system', $id);
-				$dispatcher->post($signal, 'onBuddyRemove', null, false, false);
+				$dispatcher->post($signal, 'onBuddyRemove');
 				unset($signal);
 				
 				//TO DO: This should probably be cached somewhere else.
@@ -550,7 +550,7 @@ class AOChat
 				//Deprecated call. Should listen to the signal already sendt.
 				list($id, $name) = $packet->args;
 				$signal = new signal_message('aochat', $id, 'join');
-				$dispatcher->post($signal, 'onPgJoin', null, false, false);
+				$dispatcher->post($signal, 'onPgJoin');
 				unset($signal);
 
 				//Deprecated call, Should listen to the signal already sendt.
@@ -560,19 +560,19 @@ class AOChat
 				// Event is someone leaveing the privgroup
 				list($id, $name) = $packet->args;
 				$signal = new signal_message('aochat', $id, 'leave');
-				$dispatcher->post($signal, 'onPgLeave', null, false, false);
+				$dispatcher->post($signal, 'onPgLeave');
 				unset($signal);
 				
 				//Deprecated call. Should listen to the signal already sendt.
 				$bot -> inc_pgleave($packet->args);
 				break;
-//Messages
+			//Messages
 			case AOCP_MSG_PRIVATE:
 				// Event is a tell
 				// Tells should always be commands
 				list($id, $message) = $packet->args;
 				$signal = new signal_message('aochat', $id, $message);
-				$dispatcher->post($signal, 'onTell', null, false, false);
+				$dispatcher->post($signal, 'onTell');
 				unset($signal);
 				
 				//Deprecated call. Should listen to the signal already sendt.
@@ -582,7 +582,7 @@ class AOChat
 				// Event is a privgroup message
 				list(,$id, $message) = $packet->args;
 				$signal = new signal_message('aochat', $id, $message);
-				$dispatcher->post($signal, 'onPgMessage', null, false, false);
+				$dispatcher->post($signal, 'onPgMessage');
 				//Check if this is a command
 				//If it is not post it to all observers of the PRIVGRP_MESSAGE channel.
 				//Deprecated call. Should listen to the signal already sendt.
@@ -595,11 +595,11 @@ class AOChat
 				{
 					$em = new AOExtMsg($packet->args[2]);
 					if($em->type != AOEM_UNKNOWN)
-		{
+					{
 						$packet->args[2] = $em->text;
 						$packet->args[] = $em;
 					}
-		}
+				}
 
 				// Event is a group message (guildchat, towers etc)
 				// Check if it is a command
@@ -607,8 +607,19 @@ class AOChat
 				//Deprecated call. Should listen to the signal already sendt.
 				$bot -> inc_gmsg($packet->args);
 				break;
+			// Events currently being debugged for possible inclusion
+			case AOCP_MSG_VICINITYA:
+				$bot -> log ("MAIN", "DEBUG", "Vicinity announcement");
+				print_r($packet->args);
+			// Events we ignore
+			// Character list upon login
+			case AOCP_LOGIN_CHARLIST:
+			// AO server pings
+			case AOCP_PING:
+				break;
 			default:
-				// $bot -> log ("MAIN", "TYPE", "Uhandeled packet type $type");
+				$bot -> log ("MAIN", "TYPE", "Uhandeled packet of type $type:");
+				print_r($packet->args);
 				break;	
 		}
 

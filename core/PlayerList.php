@@ -8,7 +8,7 @@ class PlayerList extends BasePassiveModule
 	{
 		parent::__construct($bot, get_class($this));
 		$this->register_module('player');
-		$dispatcher = Event_Dispatcher::getInstance();
+		$dispatcher = Event_Dispatcher2::getInstance();
 		$dispatcher->addObserver(array($this, 'signal_handle'), 'onPlayerName');
 	}
 	

@@ -552,10 +552,7 @@ class Colors_Core extends BasePassiveModule
 		// Go ahead and replace all tags
 		foreach ($this -> color_tags as $tag => $font)
 		{
-			/*** FIXME ***/
-			// eregi_replace is depreciated as of PHP 5.3 and will eventually be removed.
-			// The way of handling this might want to be reconsidered as well to see if there are better ways to handle it.
-			$text = eregi_replace($tag, $font, $text);
+			$text = str_ireplace($tag, $font, $text);
 		}
 
 		return $text;

@@ -1011,7 +1011,7 @@ class Bot
 			$found = false;
 
 			// Ignore bot chat, no need to handle it's own output as input again
-		if ($user == BOTNAME)
+		if ($user == 'BOTNAME')
 			{
 				// Danger will robinson. We just sent a tell to ourselves!!!!!!!!!
 				$this -> log("CORE", "INC_TELL", "Danger will robinson. Received tell from myself: $args[1]");

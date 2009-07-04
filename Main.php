@@ -82,8 +82,8 @@ _/_/_/      _/_/_/  _/_/_/      _/_/        _/_/   \n
          An Anarchy Online Chat Automaton          \n
                      And                           \n
           An Age of Conan Chat Automaton           \n
-             v.$bot_version - PHP $php_version     \n
-			 OS: $os                               \n
+          v.$bot_version - PHP $php_version        \n
+		  OS: $os                                  \n
 	Your operating system is detected as $osbit    \n
 ===================================================\n
 ";
@@ -99,20 +99,13 @@ MySQL.php: Used to communicate with the MySQL database
 AOChat.php: Interface to communicate with AO chat servers
 Bot.php: The actual bot itself.
 */
-
-echo "Loading required files...\n RequirementCheck.php...";
 require_once "./Sources/RequirementCheck.php";
-echo "success...\n MySQL.php...";
 require_once "./Sources/MySQL.php";
-echo "success...\n AOChat.php...";
 require_once "./Sources/AOChat.php";
-echo "success...\n ConfigMagik.php...";
 require_once "./Sources/ConfigMagik.php";
-echo "success...\n Bot.php...";
 require_once "./Sources/Bot.php";
-echo "success...\n Dispatcher.php...";
-require_once "./Sources/Dispatcher.php";
-echo "success...\n All required files loaded.\n";
+require_once "./Sources/Dispatcher2.php";
+
 /*
 Creating the bot.
 */
