@@ -448,7 +448,7 @@ class TowerAttack extends BaseActiveModule
 
 		foreach ($infos AS $key => $value)
 		{
-			$string = eregi_replace("#!" . $key . "!#", $value, $string);
+			$string = preg_replace("/#!$key!#/i", $value, $string);
 		}
 
 		return $string;
