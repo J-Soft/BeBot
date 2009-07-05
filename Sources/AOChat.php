@@ -1618,14 +1618,10 @@ class AOExtMsg
 		$typ = $GLOBALS["msg_cat"][$category][$instance][0];
 		$fmt = $GLOBALS["msg_cat"][$category][$instance][1];
 		$enc = $GLOBALS["msg_cat"][$category][$instance][2];
-		
-		echo "AOChat Debug: msg: $msg \nenc: $enc\n";
-
 		$args = array();
 
 		foreach(explode("/", $enc) as $eone)
 		{
-			echo "eone: $eone \n";
 			$ename = substr($eone, 1);
 			$msg = substr($msg, 1); // skip the data type id
 			switch($eone[0])
