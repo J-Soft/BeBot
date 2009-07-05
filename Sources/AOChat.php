@@ -1605,22 +1605,30 @@ class AOChat
 	}
 }
 
+/* There is a bug in php before 5.3 with long integers as array keys under linux 32 bit.
+ * See here: http://bugs.php.net/46701
+ * The following conversion to (string) is a workaround and can be removed once php 5.3
+ * is widely used. This php version must then be described to be the minimum requirement
+ * for the bot!
+ * Also look for that line in this file, which was changed too:
+ * $pmap = $GLOBALS["aochat-rpcpacketmap"][$dir][(string)$type];
+ */
 $GLOBALS["aochat-rpcpacketmap"] = array(
 "in" => array(
-	RPC_UNIVERSE_CHALLENGE			=> array("name"=>"Login Challenge",				"args"=>"S"),
-	RPC_UNIVERSE_AUTHENTICATED		=> array("name"=>"Login Authenticated",			"args"=>"IIISII"),
-	RPC_UNIVERSE_ERROR				=> array("name"=>"Login Error",					"args"=>"I"),
-	RPC_TERRITORY_INITACK			=> array("name"=>"Player Authenticated",		"args"=>"S"),
-	RPC_TERRITORY_CHARACTERLIST		=> array("name"=>"Player Characterlist",		"args"=>"II"),
-	RPC_TERRITORY_GETCHATSERVER		=> array("name"=>"Receive Chatserver",			"args"=>"InIII"),
-	RPC_TERRITORY_ERROR				=> array("name"=>"Error while logging in",		"args"=>"I")),
+	(string)RPC_UNIVERSE_CHALLENGE			=> array("name"=>"Login Challenge",				"args"=>"S"),
+	(string)RPC_UNIVERSE_AUTHENTICATED		=> array("name"=>"Login Authenticated",			"args"=>"IIISII"),
+	(string)RPC_UNIVERSE_ERROR				=> array("name"=>"Login Error",					"args"=>"I"),
+	(string)RPC_TERRITORY_INITACK			=> array("name"=>"Player Authenticated",		"args"=>"S"),
+	(string)RPC_TERRITORY_CHARACTERLIST		=> array("name"=>"Player Characterlist",		"args"=>"II"),
+	(string)RPC_TERRITORY_GETCHATSERVER		=> array("name"=>"Receive Chatserver",			"args"=>"InIII"),
+	(string)RPC_TERRITORY_ERROR				=> array("name"=>"Error while logging in",		"args"=>"I")),
 "out" => array(
-	RPC_UNIVERSE_INIT				=> array("name"=>"Login Init",					"args"=>"SSI"),
-	RPC_UNIVERSE_ANSWERCHALLENGE	=> array("name"=>"Login Answer Challenge",		"args"=>"S"),
-	RPC_UNIVERSE_ACCOUNT			=> array("name"=>"Login Player Account",		"args"=>"II"),
-	RPC_TERRITORY_INIT				=> array("name"=>"Player Init",					"args"=>"II"),
-	RPC_TERRITORY_STARTUP			=> array("name"=>"Player Startup",				"args"=>""),
-	RPC_TERRITORY_LOGINCHARACTER	=> array("name"=>"Login Character",				"args"=>"ISS"))
+	(string)RPC_UNIVERSE_INIT				=> array("name"=>"Login Init",					"args"=>"SSI"),
+	(string)RPC_UNIVERSE_ANSWERCHALLENGE	=> array("name"=>"Login Answer Challenge",		"args"=>"S"),
+	(string)RPC_UNIVERSE_ACCOUNT			=> array("name"=>"Login Player Account",		"args"=>"II"),
+	(string)RPC_TERRITORY_INIT				=> array("name"=>"Player Init",					"args"=>"II"),
+	(string)RPC_TERRITORY_STARTUP			=> array("name"=>"Player Startup",				"args"=>""),
+	(string)RPC_TERRITORY_LOGINCHARACTER	=> array("name"=>"Login Character",				"args"=>"ISS"))
 );
 
 /* The AOChatPacket class - turning packets into binary blobs and binary
@@ -1841,7 +1849,7 @@ class RPCPacket
 		$this->args 		= array();
 		$this->type 		= $type;
 		$this->dir  		= $dir;
-		$pmap = $GLOBALS["aochat-rpcpacketmap"][$dir][$type];
+		$pmap = $GLOBALS["aochat-rpcpacketmap"][$dir][(string)$type];
 
 		if(!$pmap)
 		{
