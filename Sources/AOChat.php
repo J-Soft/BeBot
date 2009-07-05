@@ -1112,28 +1112,6 @@ class AOChat
 		return $value;
 	}
 
-	/*
-	* str_split is a PHP 5+ function, PHP4 needs this.
-	*/
-	function my_str_split($str, $length = 1)
-	{
-		if ($length < 1)
-		{
-			return false;
-		}
-
-		$strlen = strlen($str);
-		$ret = array();
-
-		for ($i = 0; $i < $strlen; $i += $length)
-		{
-			$ret[] = substr($str, $i, $length);
-		}
-
-		return $ret;
-	}
-
-
 	// On linux systems, unpack("H*", pack("L*", <value>)) returns differently than on Windows.
 	// This can be used instead of unpack/pack to get the value we need.
 	function SafeDecHexReverseEndian($value)
@@ -1150,14 +1128,7 @@ class AOChat
 				$len++;
 			}
 
-			if (!function_exists("str_split"))
-			{
-				$bytes = $this -> my_str_split($hex, 2);
-			}
-			else
-			{
-				$bytes = str_split($hex, 2);
-			}
+			$bytes = str_split($hex, 2);
 		}
 		else
 		{
@@ -1647,11 +1618,14 @@ class AOExtMsg
 		$typ = $GLOBALS["msg_cat"][$category][$instance][0];
 		$fmt = $GLOBALS["msg_cat"][$category][$instance][1];
 		$enc = $GLOBALS["msg_cat"][$category][$instance][2];
+		
+		echo "AOChat Debug: msg: $msg \nenc: $enc\n";
 
 		$args = array();
 
-		foreach(split("/", $enc) as $eone)
+		foreach(explode("/", $enc) as $eone)
 		{
+			echo "eone: $eone \n";
 			$ename = substr($eone, 1);
 			$msg = substr($msg, 1); // skip the data type id
 			switch($eone[0])
