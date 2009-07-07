@@ -303,7 +303,10 @@ class Roster_Handler extends BaseActiveModule
 	*/
 	function cron()
 	{
-		$buddies = $this -> bot -> core('player') -> get_cache();
+		/*** FIXME ***/
+		// This does not make any sense to me, what does the uid/name cache has to do with the number of buddies on the bot?
+		//$buddies = $this -> bot -> core('player') -> get_cache();
+		$buddies = $this -> bot -> aoc -> buddies;
 		$buddy_count = count($buddies);
 
 		$notify_db = $this -> bot -> db -> select("SELECT count(notify) FROM #___users WHERE notify = 1");

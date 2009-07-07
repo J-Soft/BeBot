@@ -625,7 +625,7 @@ class Bot
 
 			if ($this -> core("chat_queue") -> check_queue())
 			{
-				$this -> log("TELL", "OUT", "-> " . $this -> core("player") -> name($to) . ": " . $msg);
+				$this -> log("TELL", "OUT", "-> " . $to . $msg);
 				$msg = utf8_encode($msg);
 				$this -> aoc -> send_tell($to, $msg);
 			}

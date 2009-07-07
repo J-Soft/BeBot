@@ -468,8 +468,15 @@ class Whois_Core extends BasePassiveModule
 	{ // Start function check_xml()
 		if ($xml instanceof BotError)
 		{
-		return $xml; // The XML is bad to start with, no more checking needed.
+			return $xml; // The XML is bad to start with, no more checking needed.
 		}
+
+		if (strpos($xml, '404 Not Found') !== 0)
+		{
+			$this->error->set("404 Not Found error encountered");
+			return $this->error;
+		}
+		
 		$nickname = $this -> bot -> core("tools") -> xmlparse($xml, "nick");
 		/*
 		We have an empty nick despite having gotten a valid responce from Funcom XML? Bail!

@@ -664,19 +664,29 @@ class AOChat
 		$timelimit = time()+$timeout;
 		array_unshift($stack, array('user'=>$u, 'timeout'=>$timelimit));
 
-// 		var_dump($stack);
+		// var_dump($stack);
 
 		$pq = new AOChatPacket("out", AOCP_CLIENT_LOOKUP, $u, $this->game);
 		$this->send_packet($pq);
 
-		for($i=0; $i<2000 && !$this->bot->core('player')->exists($stack[0]['user']) && $stack[0]['timeout'] > time(); $i++)
+		/*** FIXME ***/
+		// This is really ugly, and we really need to detect if we recieve a Client Lookup packet as the lookup could be negative or null.
+		// In those cases this loop would run 200 times or for 15 seconds even if we have gotten a reply.
+		// We now detect when we recieve the AOCP_CLIENT_LOOKUP package so we don't loop uneccecary. Maybe add some error catching in the event we do complete 200 loops?
+		for($i=0; ($i<200) && (!$this->bot->core('player')->exists($stack[0]['user'])) && ($stack[0]['timeout'] > time()) && (!isset($p)); $i++)
 			{
-				$this->get_packet();
+				$pr = $this->get_packet();
+				if ($pr -> type == AOCP_CLIENT_LOOKUP)
+				{
+					$p = true;
+				}
 			}
 		array_shift($stack);
 		if(!$this->bot->core('player')->exists($u))
+		{
 			return false;
 		}
+	}
 
 // 	function get_uid($user)
 // 	{
