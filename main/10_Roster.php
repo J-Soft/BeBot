@@ -232,7 +232,6 @@ class Roster_Core extends BasePassiveModule
 		if (($this -> lastrun + (60 * 60 * 6)) >= time() && $force == false)
 		{
 			$this -> bot -> log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
-			$this -> bot -> send_gc("##normal##".$msg."Roster update not scheduled ::: ".BOT_VERSION_NAME." v.". BOT_VERSION. " ready##end##");
 			Return;
 		}
 
@@ -248,7 +247,9 @@ class Roster_Core extends BasePassiveModule
 
 		// Get the guild roster
 		if($this -> bot -> game == "ao")
+		{
 			$members = $this -> parse_org($this -> bot -> dimension, $this -> bot -> guildid);
+		}
 
 		/*
 		Only run the update if the XML returns more than one member, otherwise we skip the update.
@@ -278,6 +279,7 @@ class Roster_Core extends BasePassiveModule
 				foreach ($members as $member)
 				{
 					$db_member = $db_members[$member["nickname"]];
+		
 					/*
 					If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
 					its a new member we havent picked up for some reason.
@@ -348,7 +350,10 @@ class Roster_Core extends BasePassiveModule
 					foreach($db_members as $dbmember)
 					{
 						if($dbmember[2] < 2)
+						{
 							continue;
+						}
+
 						/*
 						Catch newly added members and give them their first update timestamp
 						*/
@@ -439,15 +444,11 @@ class Roster_Core extends BasePassiveModule
 				foreach ($members as $member)
 				{
 					$id = $this -> bot -> core("player") -> id($member[1]);
-
+					
 					/*
 					Make sure we have an entry in the whois cache for the character.
 					*/
 					$whois = $this -> bot -> core("whois") -> lookup($member[1]);
-					if ($whois instanceof BotError)
-					{
-						Continue; // prob shouldnt skip this but it will stop the crashing
-					}
 
 					if($this -> bot -> game == "ao")
 					{
@@ -457,12 +458,14 @@ class Roster_Core extends BasePassiveModule
 						/*
 						If we still have no updates for this member after 2 days, remove.
 						*/
+
 						if (!$id)
 						{
 							if ((($member[4] + 172800) <= time()) && ($member[4] != 0))
 							{
 								$this -> erase("Roster", $member[0], $member[1], "as the character appears to have been deleted.");
 								$this -> removed++;
+								continue;
 							}
 							else
 							{
@@ -470,6 +473,11 @@ class Roster_Core extends BasePassiveModule
 							}
 						}
 
+						if ($whois instanceof BotError)
+						{
+							Continue; // prob shouldnt skip this but it will stop the crashing
+						}
+						
 						/*
 						Catch rerolled characters.
 						*/
@@ -481,6 +489,7 @@ class Roster_Core extends BasePassiveModule
 							}
 							$this -> erase("Roster", $member[0], $member[1], "as the character appears to have been rerolled. Old: $member[0] New: $id");
 							$this -> removed++;
+							continue;
 						}
 
 						/*
@@ -495,6 +504,7 @@ class Roster_Core extends BasePassiveModule
 							{
 								$this -> del("Roster-XML", $member[0], $member[1], "removed");
 								$this -> removed++;
+								continue;
 							}
 							else
 							{
@@ -546,12 +556,12 @@ class Roster_Core extends BasePassiveModule
 			
 			$this -> bot -> core("settings") -> save("members", "LastRosterUpdate", time());
 			$this -> bot -> log("ROSTER", "UPDATE", "Roster update complete. $msg",true);
-			$this -> bot -> send_gc("##normal##Roster update completed. ::: $msg" .BOT_VERSION_NAME. " v.". $this -> bot -> bot_version. " ready##end##");
+			$this -> bot -> send_gc("##normal##Roster update completed. ::: $msg ##end##");
 		}
 		else
 		{
 			$this -> bot -> log("ROSTER", "UPDATE", "Roster update failed. Funcom XML returned 0 members.",true);
-			$this -> bot -> send_gc("##normal##Roster update failed! Funcom XML returned 0 members ::: " .BOT_VERSION_NAME. " v.".BOT_VERSION." ready##end##");
+			$this -> bot -> send_gc("##normal##Roster update failed! Funcom XML returned 0 members ##end##");
 		}
 
 		$this -> bot -> core("notify") -> update_cache();
@@ -576,8 +586,6 @@ class Roster_Core extends BasePassiveModule
 		if (($this -> lastrun + (60 * 60 * 6)) >= time() && $force == false)
 		{
 			$this -> bot -> log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
-			if($this -> bot -> game == "ao")
-				$this -> bot -> send_pgroup("##normal##".$msg."Roster update not scheduled ::: ".BOT_VERSION_NAME." v.".BOT_VERSION." ready##end##");
 		}
 		else
 		{
@@ -673,7 +681,7 @@ class Roster_Core extends BasePassiveModule
 			}
 			$this -> bot -> core("settings") -> save("members", "LastRosterUpdate", time());
 			$this -> bot -> log("CRON", "ROSTER", "Cleaning buddylist done. $num buddies removed.");
-			$this -> bot -> send_pgroup("##normal##Roster update completed ::: ".BOT_VERSION_NAME." v.".BOT_VERSION." ready##end##");
+			$this -> bot -> send_pgroup("##normal##Roster update completed ##end##");
 		}
 		$this -> running = FALSE;
 	}
