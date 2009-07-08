@@ -1,4 +1,4 @@
--------------
+﻿-------------
 Version 0.7.0
 -------------
 - Moved aochat event handling out of Main.php and in to AOChat.php
@@ -29,7 +29,7 @@ Version 0.7.0
 +- IRC module fails to process commands given in IRC.
 
 
-﻿-------------
+-------------
 Version 0.6.4
 -------------
 - Modified the network protocol to work with AoC 1.05
@@ -43,6 +43,8 @@ Version 0.6.4
 - Lots of Changes to Raid module, lots of new function and features including restart/crash support, raid logging, raid control interface, punish raiders, move countdown, min level and also fixed alot of problems with output to wrong place or unnessesary spam
 - Lots of Changes to Bid module, lots of new function and deatures including useing points log, !bid cancel, !bid all, and more
 - Corrected some color codes and time zone for "last online" in !whois (AoC only)
+- Changed help for !aliasadmin (which didn't exist) to !alias admin
+- Bot doesn't tell people that there are "No news." upon login any more. Only if they ask for "!news".
 
 -------------
 Version 0.6.3
