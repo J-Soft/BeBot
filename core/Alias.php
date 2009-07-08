@@ -133,7 +133,7 @@ class Alias extends BaseActiveModule
 				}
 				break;
 			default:
-				Return("Broken plugin, recieved unhandled command: ".$vars[0]);
+				Return("Broken plugin, received unhandled command: ".$vars[0]);
 		}
 	}
 
