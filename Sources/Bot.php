@@ -381,14 +381,30 @@ class Bot
 			die("The bot is restarting.\n");
 		}
 
-		// Authenticate
-		$this -> log("LOGIN", "STATUS", "Authenticating");
-		$this -> aoc -> authenticate($this -> username, $this -> password);
+        // AoC authentication is a bit different
+        if ( $this -> game == "aoc" )
+        {
+			$this -> log("LOGIN", "STATUS", "Authenticating");
+			if ( $this -> aoc -> authenticateConan($this -> username,$this -> password, $this -> botname) == false )
+			{
+			   $this -> cron_activated = false;
+			   $this -> disconnect();
+			   $this -> log("CONN", "ERROR", "Failed authenticating to server. Retrying in " . $this -> reconnecttime . " seconds.");
+			   sleep($this -> reconnecttime);
+			   die("The bot is restarting.\n");
+			}
+		}
+		else
+		{
+			// Authenticate
+			$this -> log("LOGIN", "STATUS", "Authenticating");
+			$this -> aoc -> authenticate($this -> username, $this -> password);
 
-		// Login the bot character
-		$this -> log("LOGIN", "STATUS", "Logging in");
-		$this -> aoc -> login(ucfirst(strtolower($this -> botname)));
-
+			// Login the bot character
+			$this -> log("LOGIN", "STATUS", "Logging in");
+			$this -> aoc -> login(ucfirst(strtolower($this -> botname)));
+		}
+		
 		/*
 		We're logged in. Make sure we no longer keep username and password in memory.
 		*/
@@ -641,8 +657,18 @@ class Bot
 	*/
 	function send_pgroup($msg, $group = NULL, $checksize = TRUE, $parsecolors=TRUE)
 	{
+        // Never send any privategroup message in AoC, because this would disconnect the bot
+        if ($this -> game == "aoc")
+		{
+			/*** FIXME ***/
+			// We need to eradicate calls to this from all modules for sanitys sake.
+            return FALSE;	
+		}
+	
 		if ($group == NULL)
+		{
 			$group = $this -> botname;
+		}
 
 		if ($group == $this -> botname && $this -> core("settings") -> get("Core", "DisablePGMSG"))
 		{
@@ -651,7 +677,9 @@ class Bot
 
 		// parse all color tags:
 		if($parsecolors)
+		{
 			$msg = $this -> core("colors") -> parse($msg);
+		}
 
 		$gid = $this -> core("player") -> id($group);
 
@@ -659,11 +687,13 @@ class Bot
 		if($checksize)
 		{
 			if (preg_match("/<a href=\"(.+)\">/isU", $msg, $info))
+			{
 				if (strlen($info[1]) > $this -> maxsize)
 				{
 					$this -> cut_size($msg, "pgroup", $group);
 					$send = false;
 				}
+			}
 		}
 
 		if ($send)
@@ -681,7 +711,9 @@ class Bot
 				$this -> aoc -> send_privgroup($gid,$msg);
 			}
 			else
+			{
 				$this -> aoc -> send_privgroup($gid,$msg);
+			}
 		}
 	}
 
