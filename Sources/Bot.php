@@ -767,7 +767,7 @@ class Bot
 		}
 	}
 
-	function send_output($source, $msg, $type)
+	function send_output($source, $msg, $type, $low=0)
 	{
 		// Parse color tags now to be sure they don't get changed by output filters
 		$msg = $this -> core("colors") -> parse($msg);
@@ -790,7 +790,7 @@ class Bot
 			case '0':
 			case '1':
 			case 'tell':
-				$this -> send_tell($source, $msg);
+				$this -> send_tell($source, $msg, $low);
 				break;
 			case '2':
 			case 'pgroup':
@@ -799,11 +799,11 @@ class Bot
 				break;
 			case '3':
 			case 'gc':
-				$this -> send_gc($msg);
+				$this -> send_gc($msg, $low);
 				break;
 			case '4':
 			case 'both':
-				$this -> send_gc($msg);
+				$this -> send_gc($msg, $low);
 				$this -> send_pgroup($msg);
 				break;
 			default:
