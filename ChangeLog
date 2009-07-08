@@ -1,4 +1,4 @@
--------------
+﻿-------------
 Version 0.6.4
 -------------
 - Reversing stripping of control characters on text from IRC for now.
@@ -11,6 +11,7 @@ Version 0.6.4
 - Added a check for botname_rules.txt before getting rules.txt
 - Lots of Changes to Raid module, lots of new function and features including restart/crash support, raid logging, raid control interface, punish raiders, move countdown, min level and also fixed alot of problems with output to wrong place or unnessesary spam
 - Lots of Changes to Bid module, lots of new function and deatures including useing points log, !bid cancel, !bid all, and more
+- Corrected some color codes and time zone for "last online" in !whois (AoC only)
 
 -------------
 Version 0.6.3
