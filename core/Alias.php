@@ -57,9 +57,9 @@ class Alias extends BaseActiveModule
 		$this -> help['command']['alias add <Alias>']="Add Alias.";
 		$this -> help['command']['alias del <Alias>']="Delete Alias.";
 		$this -> help['command']['alias rem <Alias>']="Delete Alias.";
-		$this -> help['command']['aliasadmin add <nickname> <Alias>']="Add Alias to Nickname.";
-		$this -> help['command']['aliasadmin del <Alias>']="Delete Alias.";
-		$this -> help['command']['aliasadmin rem <Alias>']="Delete Alias.";
+		$this -> help['command']['alias admin add <nickname> <Alias>']="Add Alias to Nickname.";
+		$this -> help['command']['alias admin del <Alias>']="Delete Alias.";
+		$this -> help['command']['alias admin rem <Alias>']="Delete Alias.";
 		$this -> help['command']['alias <name>']="Show Alias's Asosiated with <name> and Alts.";
 		$this -> help['command']['alias']="Show Alias's Asosiated with you and your Alts.";
 		$this -> help['command']['alias list']="Show all Alias's.";
