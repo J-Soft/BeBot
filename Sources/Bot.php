@@ -1192,7 +1192,7 @@ class Bot
 			$who["nickname"] = $user;
 			$who["online"] = $args[1];
 			$who["level"] = $args[2];
-			$who["location"] = $args[3];
+			$who["location"] = $args[3]; // For offline users 'location' contains the last online time in milliseconds since 1970!
 			$class_name = $this -> core("Whois") -> class_name[$args[4]];
 			$who["class"] = $class_name;
 			$lookup = $this -> db -> select("SELECT * FROM #___craftingclass WHERE name = '" . $user . "'", MYSQL_ASSOC);
