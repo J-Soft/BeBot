@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,36 +30,29 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2007-07-25 11:54:01 -0700 (Wed, 25 Jul 2007) $
-* Revision: $Id: Identify.php 817 2007-07-25 18:54:02Z shadowmaster $
 */
-
-
 $identify = new Identify($bot);
-
 /*
 The Class itself...
 */
 class Identify extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_command('all', 'identify', 'GUEST');
-		$this -> register_alias("identify", "bio");
-
-		$this -> help['description'] = "Identify the end result of a given item. Useful for biomaterial, galactic gems, and other misc items.";
-		$this -> help['command']['identify <item>'] = "Identifies the object <item>.";
-		$this -> help['notes'] = "<item> must be an item reference. Multiple items may be posted at a time.";
+		$this->register_command('all', 'identify', 'GUEST');
+		$this->register_alias("identify", "bio");
+		$this->help['description'] = "Identify the end result of a given item. Useful for biomaterial, galactic gems, and other misc items.";
+		$this->help['command']['identify <item>'] = "Identifies the object <item>.";
+		$this->help['notes'] = "<item> must be an item reference. Multiple items may be posted at a time.";
 	}
 
 	function command_handler($name, $msg, $origin)
 	{
-		if (preg_match("/^identify (.+)$/i",$msg,$info))
+		if (preg_match("/^identify (.+)$/i", $msg, $info))
 		{
-			return $this -> item_parser($info[1]);
+			return $this->item_parser($info[1]);
 		}
 		else
 			return "0 Items Posted";
@@ -67,36 +60,32 @@ class Identify extends BaseActiveModule
 
 	function item_parser($msg)
 	{
-		$items = preg_split('/<\/a>/', $msg, -1, PREG_SPLIT_NO_EMPTY);
+		$items = preg_split('/<\/a>/', $msg, - 1, PREG_SPLIT_NO_EMPTY);
 		//$items = explode("><",$msg);
-
 		foreach ($items as $item)
 		{
 			if (preg_match("/<a href=\"itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)\">/i", $item, $info))
 			{
-				$return .= $this -> identify_item($info[1],$info[2], $info[3]);
-				$count++;
-
+				$return .= $this->identify_item($info[1], $info[2], $info[3]);
+				$count ++;
 			}
 		}
-
-		if($count == 0)
+		if ($count == 0)
 		{
 			Return ("0 Items Posted");
 		}
-		if($count == 1)
+		if ($count == 1)
 		{
 			$return = str_replace("\n", " ", $return);
 			return $count . " item posted :: " . $return;
 		}
 		else
-			return $count . " items posted :: " . $this -> bot -> core("tools") -> make_blob("click to view", $return);
+			return $count . " items posted :: " . $this->bot->core("tools")->make_blob("click to view", $return);
 	}
-
 
 	function identify_item($low, $high, $ql)
 	{
-		switch($high)
+		switch ($high)
 		{
 			// List all the AI Biomaterial items
 			case 247103:
@@ -189,7 +178,6 @@ class Identify extends BaseActiveModule
 				$purpose = "Used for making high QL buildings";
 				$type = "Kyr'Ozch Viral Serum";
 				break;
-
 			//List all the Alaapaa stuff (gems/robe)
 			case 269800:
 				$highid = 168432;
@@ -246,7 +234,6 @@ class Identify extends BaseActiveModule
 				$purpose = "Agent, Bureaucrat, Nano-Technician, or Meta-Physicist Robe";
 				$type = "Robe of City Lights";
 				break;
-
 			//Turn Spirit Pouches
 			case 246236:
 				$highid = 215071;
@@ -254,7 +241,6 @@ class Identify extends BaseActiveModule
 				$purpose = "Clan Adventurer weapon upgrade";
 				$type = "Turn Spirit of the Masked Adjutant";
 				break;
-
 			//List all the 2007 Christmas presents
 			case 205842:
 				$highid = 205841;
@@ -289,24 +275,18 @@ class Identify extends BaseActiveModule
 			case 274213:
 				$purpose = "Random Gift: Candy Cane, Double Candy Canes, The Naughty List Bikini Top/Bottom/Boxers, Gingerbread Man/Woman/Heart, Santa Leet Doll, Gingerbread House, Snowman";
 				break;
-
 			//List a default in case we don't find anything that matches.
 			default:
 				$purpose = "Unknown Item";
 		}
-
 		if (empty($lowid))
 			$lowid = $highid;
-
 		$return = "##highlight##QL " . $ql . "##end## :: ";
-
-		if (!empty($type))
+		if (! empty($type))
 		{
-			$return .= $this -> bot -> core("tools") -> make_item($lowid, $highid, $ql, $type, true) . "\n";
+			$return .= $this->bot->core("tools")->make_item($lowid, $highid, $ql, $type, true) . "\n";
 		}
-
 		$return .= $purpose . "\n";
-
 		return $return;
 	}
 }

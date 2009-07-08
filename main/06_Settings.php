@@ -7,7 +7,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -33,11 +33,7 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-12-05 16:28:55 +0100 (fr, 05 des 2008) $
-* Revision: $Id: 06_Settings.php 1887 2008-12-05 15:28:55Z blueeagle $
 */
-
 /*
 Main Functions:
 
@@ -83,9 +79,7 @@ string2array($string)
 Converts a string to an array. Array elements should be seperated by a
 semicolon. Returns an array.
 */
-
 $settings = new Settings_Core($bot);
-
 /*
 The Class itself...
 */
@@ -102,8 +96,7 @@ class Settings_Core extends BasePassiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS " . $this -> bot -> db -> define_tablename("settings", "true") . "
+		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("settings", "true") . "
 		              (module varchar(25) NOT NULL,
 		               setting varchar(50) NOT NULL,
 		               value varchar(255) NOT NULL,
@@ -113,26 +106,22 @@ class Settings_Core extends BasePassiveModule
 		               hidden BOOLEAN DEFAULT 0,
 		               disporder INT UNSIGNED NOT NULL DEFAULT 1,
 		               PRIMARY KEY (module, setting))");
-
-		$this -> register_module("settings");
-		$this -> register_event("connect");
-		$this -> register_event("cron", "1hour");
-
-		$this -> create("Settings", "Log", TRUE, "Should changes to settings and the loading of the settings be shown in the log? Errors are always logged!");		
-		$this -> update_settings_table();
-		$this -> load_all();
-
-		$this -> callbacks = array();
-		$this -> change_user = "";
-
-		if($this -> exists("Maintenance", "info") && $this -> get("Maintenance", "info") != "")
+		$this->register_module("settings");
+		$this->register_event("connect");
+		$this->register_event("cron", "1hour");
+		$this->create("Settings", "Log", TRUE, "Should changes to settings and the loading of the settings be shown in the log? Errors are always logged!");
+		$this->update_settings_table();
+		$this->load_all();
+		$this->callbacks = array();
+		$this->change_user = "";
+		if ($this->exists("Maintenance", "info") && $this->get("Maintenance", "info") != "")
 		{
-			$this -> maintenance = TRUE;
-			$this -> create("Settings", "Log", TRUE, "Should changes to settings and the loading of the settings be shown in the log? Errors are always logged!");		
+			$this->maintenance = TRUE;
+			$this->create("Settings", "Log", TRUE, "Should changes to settings and the loading of the settings be shown in the log? Errors are always logged!");
 		}
 		else
 		{
-			$this -> maintenance = FALSE;
+			$this->maintenance = FALSE;
 		}
 	}
 
@@ -143,12 +132,12 @@ class Settings_Core extends BasePassiveModule
 	*/
 	function cron()
 	{ // Start function cron()
-		$this -> load_all();
+		$this->load_all();
 	} // End function cron()
 
 	function connect()
 	{
-		$this -> load_all();
+		$this->load_all();
 	}
 
 	/*
@@ -156,7 +145,7 @@ class Settings_Core extends BasePassiveModule
 	*/
 	function exists($module, $setting)
 	{
-		return isset($this -> settings_cache[strtolower($module)][strtolower($setting)]);
+		return isset($this->settings_cache[strtolower($module)][strtolower($setting)]);
 	}
 
 	/*
@@ -166,13 +155,13 @@ class Settings_Core extends BasePassiveModule
 	{ // Start function get()
 		$module = strtolower($module);
 		$setting = strtolower($setting);
-		if (isset($this -> settings_cache[$module][$setting]))
+		if (isset($this->settings_cache[$module][$setting]))
 		{
-			return $this -> settings_cache[$module][$setting];
+			return $this->settings_cache[$module][$setting];
 		}
 		else
 		{
-			$this -> error -> set ("SETTINGS", "ERROR", "The setting named ".$setting." for setting group ".$module." does not exisit.");
+			$this->error->set("SETTINGS", "ERROR", "The setting named " . $setting . " for setting group " . $module . " does not exisit.");
 			return $this->error;
 		}
 	} // End function get()
@@ -180,16 +169,16 @@ class Settings_Core extends BasePassiveModule
 	/*
 	Retrives all of a modules settings from the database.
 	*/
-	function get_all($module)	
+	function get_all($module)
 	{ // Start function get_all()
 		$module = strtolower($module);
-		if (!empty($this -> settings_cache[$module]))
+		if (! empty($this->settings_cache[$module]))
 		{
-			return $this -> settings_cache[$module];
+			return $this->settings_cache[$module];
 		}
 		else
 		{
-			$this->error->set("No settings exisit for group ".$module.".");
+			$this->error->set("No settings exisit for group " . $module . ".");
 			return $this->error;
 		}
 	} // End function get_all()
@@ -200,10 +189,10 @@ class Settings_Core extends BasePassiveModule
 	function load_all()
 	{ // Start function load_all()
 		$sql = "SELECT module,setting,value,datatype FROM #___settings";
-		$result = $this -> bot -> db -> select($sql);
+		$result = $this->bot->db->select($sql);
 		if (empty($result))
 		{
-			$this -> settings_cache = array();
+			$this->settings_cache = array();
 			$this->error->set("No settings loaded from database. It's possible that no settings exisit.");
 			return $this->error;
 		}
@@ -216,14 +205,14 @@ class Settings_Core extends BasePassiveModule
 				$value = $data[2];
 				$datatype = $data[3];
 				if ($datatype == "array")
-				$value = $this -> string2array($value);
+					$value = $this->string2array($value);
 				else
-				$value = $this -> set_data_type($value, $datatype);
-				$this -> settings_cache[$module][$setting] = $value;
+					$value = $this->set_data_type($value, $datatype);
+				$this->settings_cache[$module][$setting] = $value;
 			}
-			if ($this -> get("Settings", "Log"))
+			if ($this->get("Settings", "Log"))
 			{
-				$this -> bot -> log("SETTINGS", "LOAD", "Loaded settings from database.");
+				$this->bot->log("SETTINGS", "LOAD", "Loaded settings from database.");
 			}
 		}
 	} // End function load_all()
@@ -231,26 +220,26 @@ class Settings_Core extends BasePassiveModule
 	/*
 	Saves a setting to the database and updates the settings array.
 	*/
-	function save($module, $setting, $value, $noupdate=FALSE)
+	function save($module, $setting, $value, $noupdate = FALSE)
 	{ // Start function save()
 		// Remove Spaces
-		$module = $this -> remove_space($module);
+		$module = $this->remove_space($module);
 		$setting = trim($setting);
-		$setting = $this -> remove_space($setting);
+		$setting = $this->remove_space($setting);
 		// Make sure the setting exists already, otherwise fail.
-		if (!isset($this -> settings_cache[strtolower($module)][strtolower($setting)]))
+		if (! isset($this->settings_cache[strtolower($module)][strtolower($setting)]))
 		{
-			if (!is_null($this -> settings_cache[strtolower($module)][strtolower($setting)]))
+			if (! is_null($this->settings_cache[strtolower($module)][strtolower($setting)]))
 			{
-				$this->error->set("Setting ".$setting." for module ".$module." could not be saved. ".$setting." does not exist.");
+				$this->error->set("Setting " . $setting . " for module " . $module . " could not be saved. " . $setting . " does not exist.");
 				return $this->error;
 			}
 		}
 		// Figure out what type of data we have.
-		$datatype = $this -> get_data_type($value);
+		$datatype = $this->get_data_type($value);
 		if ($datatype == "unknown")
 		{
-			$this->error->set("Setting ".$setting." for module ".$module." could not be saved. Datatype is unknown or not supported.");
+			$this->error->set("Setting " . $setting . " for module " . $module . " could not be saved. Datatype is unknown or not supported.");
 			return $this->error;
 		}
 		elseif ($datatype == "array")
@@ -260,17 +249,16 @@ class Settings_Core extends BasePassiveModule
 		elseif ($datatype == "bool")
 		{
 			if ($value)
-			$value = "TRUE";
+				$value = "TRUE";
 			else
-			$value = "FALSE";
+				$value = "FALSE";
 		}
 		elseif ($datatype == "null" || strtolower($value) == "null")
 		{
 			$value = "null";
 			$datatype = "null";
 		}
-
-		$status = $this -> check_data($module, $setting, $value);
+		$status = $this->check_data($module, $setting, $value);
 		if ($status instanceof BotError)
 		{
 			return $status;
@@ -279,50 +267,44 @@ class Settings_Core extends BasePassiveModule
 		$module_sql = mysql_real_escape_string(strval($module));
 		$setting_sql = mysql_real_escape_string(strval($setting));
 		$value_sql = mysql_real_escape_string(strval($value));
-
 		if ($noupdate)
 		{
-			$sql = "INSERT IGNORE INTO #___settings (module, setting, value, datatype) VALUES ('".$module_sql."','".$setting_sql."','".$value_sql."','".$datatype."')";
+			$sql = "INSERT IGNORE INTO #___settings (module, setting, value, datatype) VALUES ('" . $module_sql . "','" . $setting_sql . "','" . $value_sql . "','" . $datatype . "')";
 		}
 		else
 		{
 			// $dupkey = "ON DUPLICATE KEY UPDATE value = '".$value_sql."', datatype = '".$datatype."'";
 			// $sql = "INSERT ".$into.$values.$dupkey;
-			$sql = "UPDATE #___settings SET value = '".$value_sql."',datatype = '".$datatype."' WHERE module = '".$module_sql."' AND setting ='".$setting_sql."'";
+			$sql = "UPDATE #___settings SET value = '" . $value_sql . "',datatype = '" . $datatype . "' WHERE module = '" . $module_sql . "' AND setting ='" . $setting_sql . "'";
 		}
-		$result = $this -> bot -> db -> returnQuery($sql);
-
+		$result = $this->bot->db->returnQuery($sql);
 		if ($result)
 		{
-			if ($this -> get("Settings", "Log"))
+			if ($this->get("Settings", "Log"))
 			{
-				$this -> bot -> log("SETTINGS", "SAVED", $setting." for module ".$module." set to ".$value." as datatype ".$datatype);
+				$this->bot->log("SETTINGS", "SAVED", $setting . " for module " . $module . " set to " . $value . " as datatype " . $datatype);
 			}
-			$oldvalue = $this -> settings_cache[strtolower($module)][strtolower($setting)];
-			$this -> settings_cache[strtolower($module)][strtolower($setting)] = $this -> set_data_type($value, $datatype);
-
-			if (isset($this -> callbacks[strtolower($module)][strtolower($setting)]))
+			$oldvalue = $this->settings_cache[strtolower($module)][strtolower($setting)];
+			$this->settings_cache[strtolower($module)][strtolower($setting)] = $this->set_data_type($value, $datatype);
+			if (isset($this->callbacks[strtolower($module)][strtolower($setting)]))
 			{
-				foreach ($this -> callbacks[strtolower($module)][strtolower($setting)] as $mods)
+				foreach ($this->callbacks[strtolower($module)][strtolower($setting)] as $mods)
 				{
 					if ($mods != NULL)
 					{
-						$mods -> settings($this -> change_user, strtolower($module), strtolower($setting),
-							$this -> settings_cache[strtolower($module)][strtolower($setting)],
-							$oldvalue);
+						$mods->settings($this->change_user, strtolower($module), strtolower($setting), $this->settings_cache[strtolower($module)][strtolower($setting)], $oldvalue);
 					}
 				}
 			}
 		}
 		else
 		{
-			$this->error->set("Could not save setting ".stripslashes($setting)." for module ".stripslashes($module)." to database. SQL: ".$sql);
-			$this -> change_user = "";
+			$this->error->set("Could not save setting " . stripslashes($setting) . " for module " . stripslashes($module) . " to database. SQL: " . $sql);
+			$this->change_user = "";
 			return $this->error;
 		}
 		// Unset change_user, this change is done:
-		$this -> change_user = "";
-
+		$this->change_user = "";
 		return $status;
 	} // End function save()
 
@@ -331,14 +313,14 @@ class Settings_Core extends BasePassiveModule
 	TODO: This should most likely be split in smaller functions
 	Also we're suffering from a slight case of inner-platform effect.
 	*/
-	function create ($module, $setting, $value, $longdesc, $defaultoptions="", $hidden=FALSE, $disporder=1)
+	function create($module, $setting, $value, $longdesc, $defaultoptions = "", $hidden = FALSE, $disporder = 1)
 	{ // Start function create()
 		// FIXME: Maybe check to see if the setting exists before going farther?
 		$sql = "SELECT";
 		// Remove whitespace from $module, $setting, and $value
-		$module = $this -> remove_space($module);
-		$setting = $this -> remove_space($setting);
-		$datatype = $this -> get_data_type($value);
+		$module = $this->remove_space($module);
+		$setting = $this->remove_space($setting);
+		$datatype = $this->get_data_type($value);
 		// Convert $value to a string.
 		if ($datatype == "bool")
 		{
@@ -352,76 +334,77 @@ class Settings_Core extends BasePassiveModule
 			$value = "null";
 		elseif (is_array($value))
 		{
-			$value = $this -> array2string($value);
+			$value = $this->array2string($value);
 			$hidden = TRUE; // I am not dealing with arrays in the settings menu. :D
 		}
 		else
 			$value = strval($value);
-		if (!is_numeric($disporder))
+		if (! is_numeric($disporder))
 			$disporder = 1;
 		else
 			$disporder = intval($disporder);
-		// Check for anything that will prevent the setting from being saved to the database.
-		$status = $this -> check_data($module, $setting, $value, $longdesc, $defaultoptions);
+			// Check for anything that will prevent the setting from being saved to the database.
+		$status = $this->check_data($module, $setting, $value, $longdesc, $defaultoptions);
 		if ($status instanceof BotError)
 		{
 			return $status;
 		}
 		// Not really needed, but doing it anyway.
-		if ($hidden) $hidden = 1;
-		else $hidden = 0;
-
-		// Make sure any strings are escaped for MySQL.
+		if ($hidden)
+			$hidden = 1;
+		else
+			$hidden = 0;
+			// Make sure any strings are escaped for MySQL.
 		$module = mysql_real_escape_string($module);
 		$setting = mysql_real_escape_string($setting);
 		$valuesql = mysql_real_escape_string($value);
 		$longdesc = mysql_real_escape_string($longdesc);
 		$defaultoptions = mysql_real_escape_string($defaultoptions);
-		$sql = "SELECT longdesc, defaultoptions, hidden, disporder FROM #___settings WHERE module = '".$module."' AND setting = '".$setting."'";
-		$check = $this -> bot -> db -> select($sql);
-		if(!empty($check))
+		$sql = "SELECT longdesc, defaultoptions, hidden, disporder FROM #___settings WHERE module = '" . $module . "' AND setting = '" . $setting . "'";
+		$check = $this->bot->db->select($sql);
+		if (! empty($check))
 		{
 			$check = $check[0];
-			if($check[0] != stripslashes($longdesc) || $check[1] != stripslashes($defaultoptions) || $check[2] != stripslashes($hidden) || $check[3] != stripslashes($disporder))
+			if ($check[0] != stripslashes($longdesc) || $check[1] != stripslashes($defaultoptions) || $check[2] != stripslashes($hidden) || $check[3] != stripslashes($disporder))
 			{
-				$sql = "UPDATE #___settings SET longdesc = '".$longdesc."', defaultoptions = '".$defaultoptions;
-				$sql .= "', hidden = ".$hidden.", disporder = ".$disporder." WHERE module = '".$module."' AND setting = '".$setting."'";
-				$this -> bot -> db -> query($sql);
-				if ($this -> get("Settings", "Log"))
+				$sql = "UPDATE #___settings SET longdesc = '" . $longdesc . "', defaultoptions = '" . $defaultoptions;
+				$sql .= "', hidden = " . $hidden . ", disporder = " . $disporder . " WHERE module = '" . $module . "' AND setting = '" . $setting . "'";
+				$this->bot->db->query($sql);
+				if ($this->get("Settings", "Log"))
 				{
-					$this -> bot -> log("SETTINGS", "UPDATED", "Updated values for ".stripslashes($setting)." for module ".stripslashes($module));
+					$this->bot->log("SETTINGS", "UPDATED", "Updated values for " . stripslashes($setting) . " for module " . stripslashes($module));
 				}
 			}
 		}
 		else
 		{
 			$sql = "INSERT INTO #___settings (module, setting, value, datatype, longdesc, defaultoptions, hidden, disporder) ";
-			$sql .= "VALUES ('".$module."', '".$setting."', '".$valuesql."', '".$datatype."', '".$longdesc."', '".$defaultoptions;
-			$sql .= "', ".$hidden.", ".$disporder.") ON DUPLICATE KEY UPDATE longdesc = VALUES(longdesc), ";
+			$sql .= "VALUES ('" . $module . "', '" . $setting . "', '" . $valuesql . "', '" . $datatype . "', '" . $longdesc . "', '" . $defaultoptions;
+			$sql .= "', " . $hidden . ", " . $disporder . ") ON DUPLICATE KEY UPDATE longdesc = VALUES(longdesc), ";
 			$sql .= "defaultoptions = VALUES(defaultoptions), hidden = VALUES(hidden), disporder = VALUES(disporder)";
-			$result = $this -> bot -> db -> returnQuery($sql);
-			if (!$result)
+			$result = $this->bot->db->returnQuery($sql);
+			if (! $result)
 			{
-				$this->error->set("Setting ".$setting." for module ".$module." was not created because it already exists.");
-				if(isset($this -> maintenance))
+				$this->error->set("Setting " . $setting . " for module " . $module . " was not created because it already exists.");
+				if (isset($this->maintenance))
 				{
-					$this -> bot -> core("maintenance") -> new_data[strtolower(stripslashes($module))][strtolower(stripslashes($setting))] = array($datatype, stripslashes($longdesc), stripslashes($defaultoptions), $hidden, $disporder);
+					$this->bot->core("maintenance")->new_data[strtolower(stripslashes($module))][strtolower(stripslashes($setting))] = array($datatype , stripslashes($longdesc) , stripslashes($defaultoptions) , $hidden , $disporder);
 				}
 				return $this->error;
 				// $this -> bot -> log("SETTINGS", "WARNING", $status['errordesc']); // FIXME: Comment this when done debugging.
 			}
 			else
 			{
-				$this -> settings_cache[strtolower($module)][strtolower($setting)] = $this -> set_data_type($value, $datatype);
-				if ($this -> get("Settings", "Log"))
+				$this->settings_cache[strtolower($module)][strtolower($setting)] = $this->set_data_type($value, $datatype);
+				if ($this->get("Settings", "Log"))
 				{
-					$this -> bot -> log("SETTINGS", "Created", "Created ".stripslashes($setting)." for module ".stripslashes($module)." with value of ".$value);
+					$this->bot->log("SETTINGS", "Created", "Created " . stripslashes($setting) . " for module " . stripslashes($module) . " with value of " . $value);
 				}
 			}
 		}
-		if(isset($this -> maintenance))
+		if (isset($this->maintenance))
 		{
-			$this -> bot -> core("maintenance") -> new_data[strtolower(stripslashes($module))][strtolower(stripslashes($setting))] = array($datatype, stripslashes($longdesc), stripslashes($defaultoptions), $hidden, $disporder);
+			$this->bot->core("maintenance")->new_data[strtolower(stripslashes($module))][strtolower(stripslashes($setting))] = array($datatype , stripslashes($longdesc) , stripslashes($defaultoptions) , $hidden , $disporder);
 		}
 		return $status;
 	} // End function create()
@@ -433,56 +416,56 @@ class Settings_Core extends BasePassiveModule
 	$what Is the property that is being updated: longdesc, defaultoptions, hidden, or disporder.
 	$to is the new value for $what. 
 	*/
-	function update ($module, $setting, $what, $to)
+	function update($module, $setting, $what, $to)
 	{ // Start function update()
-		$this -> bot -> log("SETTINGS", "Notice:", "Please note: update() is discontinued and may be removed in the future. create() does updates if changes to the definition of a setting is needed. Called for setting $module $setting");
-		$module = $this -> remove_space($module);
-		$setting = $this -> remove_space($setting);
+		$this->bot->log("SETTINGS", "Notice:", "Please note: update() is discontinued and may be removed in the future. create() does updates if changes to the definition of a setting is needed. Called for setting $module $setting");
+		$module = $this->remove_space($module);
+		$setting = $this->remove_space($setting);
 		$what = mysql_real_escape_string($what);
 		$to = mysql_real_escape_string($to);
 		$what = strtolower($what);
 		$to = strtolower($to);
-		$sql = "UPDATE #___settings SET ".$what." = '".$to."' WHERE module = '".$module."' AND setting = '".$setting."'";
-		$this -> bot -> db -> query($sql);
-		if ($this -> get("Settings", "Log"))
+		$sql = "UPDATE #___settings SET " . $what . " = '" . $to . "' WHERE module = '" . $module . "' AND setting = '" . $setting . "'";
+		$this->bot->db->query($sql);
+		if ($this->get("Settings", "Log"))
 		{
-			$this -> bot -> log("SETTINGS", "UPDATE", "Set ".stripslashes($what)." for setting [".stripslashes($module)."][".stripslashes($setting)."] to ".stripslashes($to));
+			$this->bot->log("SETTINGS", "UPDATE", "Set " . stripslashes($what) . " for setting [" . stripslashes($module) . "][" . stripslashes($setting) . "] to " . stripslashes($to));
 		}
 	} // End function update()
-	
+
 	/*
 	Deletes a setting or group of settings from the database.
 	*/
-	function del ($module, $setting=NULL)
+	function del($module, $setting = NULL)
 	{ // Start function del()
 		// Remove whitespace from $module, $setting, and $value
-		$module = $this -> remove_space($module);
-		$setting = $this -> remove_space($setting);
+		$module = $this->remove_space($module);
+		$setting = $this->remove_space($setting);
 		if (is_null($setting)) // Delete a setting group.
 		{
-			if (!isset($this -> settings_cache[strtolower($module)]))
+			if (! isset($this->settings_cache[strtolower($module)]))
 			{
-				$this->error->set("Setting ".$setting." for module ".$module." does not exisit.");
+				$this->error->set("Setting " . $setting . " for module " . $module . " does not exisit.");
 				return $this->error;
 			}
 			else
 			{
-				$sql = "DELETE FROM #___settings WHERE module = '".mysql_real_escape_string($module)."'";
-				$this -> bot -> db -> query($sql);
-				unset($this -> settings_cache[strtolower($module)]);
+				$sql = "DELETE FROM #___settings WHERE module = '" . mysql_real_escape_string($module) . "'";
+				$this->bot->db->query($sql);
+				unset($this->settings_cache[strtolower($module)]);
 				return "Deleted settings for $module.";
 			}
 		}
-		else if (!isset($this -> settings_cache[strtolower($module)][strtolower($setting)]))
+		else if (! isset($this->settings_cache[strtolower($module)][strtolower($setting)]))
 		{
-			$this->error->set("Setting ".$setting." for module ".$module." does not exisit.");
+			$this->error->set("Setting " . $setting . " for module " . $module . " does not exisit.");
 			return $this->error;
 		}
 		else
 		{
-			unset($this -> settings_cache[strtolower($module)][strtolower($setting)]);
-			$sql = "DELETE FROM #___settings WHERE module = '".mysql_real_escape_string($module)."' AND setting = '".mysql_real_escape_string($setting)."'";
-			$this -> bot -> db -> query($sql);
+			unset($this->settings_cache[strtolower($module)][strtolower($setting)]);
+			$sql = "DELETE FROM #___settings WHERE module = '" . mysql_real_escape_string($module) . "' AND setting = '" . mysql_real_escape_string($setting) . "'";
+			$this->bot->db->query($sql);
 			return "Deleted setting '$setting' from '$module'.";
 		}
 	} // End function del()
@@ -491,20 +474,19 @@ class Settings_Core extends BasePassiveModule
 	Make sure information is OK to save.
 	For now, just checks length, but other checks can be added.
 	*/
-	function check_data($module, $setting, $value, $longdesc=NULL, $defaultoptions=NULL)
+	function check_data($module, $setting, $value, $longdesc = NULL, $defaultoptions = NULL)
 	{ // Start function check_data()
 		// Pack the data into an array so we can easily itterate through it.
-		$check[0] = array("module", $module);
-		$check[1] = array("setting", $setting);
-		$check[2] = array("value", $value);
-		$check[3] = array("longdesc", $longdesc);
-		$check[4] = array("defaultoptions", $defaultoptions);
-
+		$check[0] = array("module" , $module);
+		$check[1] = array("setting" , $setting);
+		$check[2] = array("value" , $value);
+		$check[3] = array("longdesc" , $longdesc);
+		$check[4] = array("defaultoptions" , $defaultoptions);
 		foreach ($check as $data)
 		{
 			if (strlen(strval($data[1])) > 255) // Must be 255 or less characters.
 			{
-				$this->error->set($data[0]." is longer than 255 characters.");
+				$this->error->set($data[0] . " is longer than 255 characters.");
 				return $this->error;
 			}
 		}
@@ -517,19 +499,19 @@ class Settings_Core extends BasePassiveModule
 	function get_data_type($value)
 	{ // Start function get_data_type()
 		if (is_bool($value))
-		return "bool";
+			return "bool";
 		elseif (is_null($value))
-		return "null";
+			return "null";
 		elseif (is_int($value))
-		return "int";
+			return "int";
 		elseif (is_float($value))
-		return "float";
+			return "float";
 		elseif (is_string($value))
-		return "string";
+			return "string";
 		elseif (is_array($value))
-		return "array";
+			return "array";
 		else
-		return "unknown";
+			return "unknown";
 	} // End function get_data_dype()
 
 	function set_data_type($value, $datatype)
@@ -545,9 +527,9 @@ class Settings_Core extends BasePassiveModule
 		{ // Start switch ($datatype)
 			case "bool":
 				if ($value == "TRUE")
-				$value = TRUE;
+					$value = TRUE;
 				else
-				$value = FALSE;
+					$value = FALSE;
 				break;
 			case "null":
 				$value = NULL;
@@ -573,15 +555,15 @@ class Settings_Core extends BasePassiveModule
 	*/
 	function update_settings_table()
 	{
-		$schemaversion = $this -> bot -> db -> get_version("settings");
-		Switch($schemaversion)
+		$schemaversion = $this->bot->db->get_version("settings");
+		Switch ($schemaversion)
 		{
 			case 1:
 				$sql = "ALTER IGNORE TABLE #___settings ADD COLUMN disporder INT UNSIGNED NOT NULL DEFAULT 1";
-				$this -> bot -> log("SETTINGS", "UPDATE", "Settings Table updated to schema version 2");
-				$this -> bot -> db -> update_table("settings", "disporder", "add", $sql);
+				$this->bot->log("SETTINGS", "UPDATE", "Settings Table updated to schema version 2");
+				$this->bot->db->update_table("settings", "disporder", "add", $sql);
 		}
-		$this -> bot -> db -> set_version("settings", 2);
+		$this->bot->db->set_version("settings", 2);
 		/*$done = FALSE;		
 		while ($done == FALSE):			
 			// Upgrade from Schema 1.0 to 1.5.
@@ -644,13 +626,12 @@ class Settings_Core extends BasePassiveModule
 	The following functions aren't really needed,
 	but they make debugging and format changes easier.
 	*/
-
 	/*
 	Removes spaces from a string
 	*/
 	function remove_space($string)
 	{ // Start function remove_space()
-		return str_replace (" ", "_", $string);
+		return str_replace(" ", "_", $string);
 	} // End function remove_space()
 
 	/*
@@ -672,33 +653,29 @@ class Settings_Core extends BasePassiveModule
 
 	function set_change_user($name)
 	{
-		$this -> change_user = $name;
+		$this->change_user = $name;
 	}
 
 	function register_callback($module, $setting, &$reg_module)
 	{
 		$module_name = get_class($reg_module);
-
-		if (isset($this -> callbacks[strtolower($module)][strtolower($setting)][$module_name]))
+		if (isset($this->callbacks[strtolower($module)][strtolower($setting)][$module_name]))
 		{
 			return "$module_name has the setting $setting of the module $module already registered!";
 		}
-
-		$this -> callbacks[strtolower($module)][strtolower($setting)][$module_name] = &$reg_module;
+		$this->callbacks[strtolower($module)][strtolower($setting)][$module_name] = &$reg_module;
 		return false;
 	}
 
 	function unregister_callback($module, $setting, &$reg_module)
 	{
 		$module_name = get_class($reg_module);
-
-		if (!isset($this -> callbacks[strtolower($module)][strtolower($setting)][$module_name]))
+		if (! isset($this->callbacks[strtolower($module)][strtolower($setting)][$module_name]))
 		{
 			return "$module_name has the setting $setting of the module $module already registered!";
 		}
-
-		$this -> callbacks[strtolower($module)][strtolower($setting)][$module_name] = NULL;
-		unset($this -> callbacks[strtolower($module)][strtolower($setting)][$module_name]);
+		$this->callbacks[strtolower($module)][strtolower($setting)][$module_name] = NULL;
+		unset($this->callbacks[strtolower($module)][strtolower($setting)][$module_name]);
 		return false;
 	}
 } // End of Class

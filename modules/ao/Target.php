@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,47 +30,36 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (sø, 30 nov 2008) $
-* Revision: $Id: Target.php 1833 2008-11-30 22:09:06Z alreadythere $
 */
-
 $target = new Target($bot);
-
-
 /*
 The Class itself...
 */
 class Target extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-        $this -> register_command("all", "target", "LEADER");
-
-        if ($this -> bot -> guildbot)
-        {
-        	$def = "both";
-        }
-        else
-        {
-        	$def = "pgmsg";
-        }
-        $this -> bot -> core("settings") -> create("Target", "Channel", $def, "Which channel should be used for output of the target spam?", "pgmsg;gc;both");
-
-        $this -> help['description'] = 'Calls a target';
-		$this -> help['command']['target']="Calls for attack on <target>.";
+		$this->register_command("all", "target", "LEADER");
+		if ($this->bot->guildbot)
+		{
+			$def = "both";
+		}
+		else
+		{
+			$def = "pgmsg";
+		}
+		$this->bot->core("settings")->create("Target", "Channel", $def, "Which channel should be used for output of the target spam?", "pgmsg;gc;both");
+		$this->help['description'] = 'Calls a target';
+		$this->help['command']['target'] = "Calls for attack on <target>.";
 	}
-
-
 
 	function command_handler($name, $msg, $origin)
 	{
-		$this -> call_target($name, $msg);
+		$this->call_target($name, $msg);
 		return false;
 	}
-
 
 	/*
 	Makes the message
@@ -79,16 +68,12 @@ class Target extends BaseActiveModule
 	{
 		$msg = explode(" ", $msg);
 		$message = "";
-		for ($i = 1; $i < count($msg); $i++)
-		$message .= $msg[$i] . " ";
-
+		for ($i = 1; $i < count($msg); $i ++)
+			$message .= $msg[$i] . " ";
 		$inside = "<font color=CCInfoHeadline>:::: ASSIST TARGET ::::</font>\n\n";
 		$inside .= " - <a href='chatcmd:///macro $name /assist $name'>Make assist macro</a>\n\n";
 		$inside .= " - <a href='chatcmd:///assist $name'>Assist $name</a>\n\n";
-
-		$this -> bot -> send_output($name, "ALL ASSIST <font color=#ffff00>$name</font>! " .
-		"Target is <font color=#ff1111>&gt;&gt;<font color=#ffff00> $message</font>&lt;&lt;</font> :: " .
-		$this -> bot -> core("tools") -> make_blob("click for more", $inside), $this -> bot -> core("settings") -> get("target", "channel"));
+		$this->bot->send_output($name, "ALL ASSIST <font color=#ffff00>$name</font>! " . "Target is <font color=#ff1111>&gt;&gt;<font color=#ffff00> $message</font>&lt;&lt;</font> :: " . $this->bot->core("tools")->make_blob("click for more", $inside), $this->bot->core("settings")->get("target", "channel"));
 	}
 }
 ?>

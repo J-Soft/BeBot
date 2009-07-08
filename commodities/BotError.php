@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,11 +30,7 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-07-23 16:44:39 +0100 (Wed, 23 Jul 2008) $
-* Revision: $Id: Alias.php 1673 2008-07-23 15:44:39Z temar $
 */
-
 class BotError
 {
 	private $bot;
@@ -42,54 +38,54 @@ class BotError
 	private $is_fatal;
 	private $description;
 	private $source;
-	
+
 	function __construct(&$bot, $module)
 	{
-		$this-> status=false;
-		$this->is_fatal=false;
-		$this->description='';
-		$this->source=$module;
-		$this->bot=$bot;
+		$this->status = false;
+		$this->is_fatal = false;
+		$this->description = '';
+		$this->source = $module;
+		$this->bot = $bot;
 	}
-	
+
 	function status()
 	{
 		return $this->status;
 	}
-	
+
 	function reset()
 	{
-		$this->status=false;
-		$this->is_fatal=false;
-		$this->description='';
+		$this->status = false;
+		$this->is_fatal = false;
+		$this->description = '';
 	}
-	
-	function set($description, $log=true, $fatal=false)
+
+	function set($description, $log = true, $fatal = false)
 	{
 		$this->description = $description;
-		$this->is_error=true;
+		$this->is_error = true;
 		$this->is_fatal = $fatal;
-		if($log)
+		if ($log)
 		{
-			$this -> bot -> log('ERROR', $this->source, $description);
+			$this->bot->log('ERROR', $this->source, $description);
 		}
-		if($fatal)
+		if ($fatal)
 		{
-			$this -> bot -> log('FATAL', $this->source, $description);
+			$this->bot->log('FATAL', $this->source, $description);
 			exit(1);
 		}
 	}
-	
+
 	function set_description($description)
 	{
-		$this->description=$description;
+		$this->description = $description;
 	}
-		
+
 	function get()
 	{
 		return $this->description;
 	}
-	
+
 	function message()
 	{
 		return "##error##Error: ##end##The module ##highlight##{$this->source}##end## returned the error ##error##{$this->description}##end##";

@@ -50,7 +50,6 @@
  *
  *
  */
-
 /**
  * A Notification object
  *
@@ -77,155 +76,145 @@
  */
 class Event_Notification2 extends Event_Dispatcher2
 {
-    /**
-     * Default state of the notification
-     */
-    const DEFAULT_STATE = 0;
+	/**
+	 * Default state of the notification
+	 */
+	const DEFAULT_STATE = 0;
+	/**
+	 * Notification has been cancelled
+	 */
+	const CANCELLED_STATE = 1;
+	/**
+	 * name of the notofication
+	 * @var string
+	 */
+	protected $notificationName;
+	/**
+	 * object of interesed (the sender of the notification, in most cases)
+	 * @var object
+	 */
+	protected $notificationObject;
+	/**
+	 * additional information about the notification
+	 * @var mixed
+	 */
+	protected $notificationInfo = array();
+	/**
+	 * state of the notification
+	 *
+	 * This may be:
+	 * - self::DEFAULT_STATE
+	 * - self::CANCELLED_STATE
+	 *
+	 * @var integer
+	 */
+	protected $notificationState = self::DEFAULT_STATE;
+	/**
+	 * amount of observers that received this notification
+	 * @var mixed
+	 */
+	protected $notificationCount = 0;
 
-    /**
-     * Notification has been cancelled
-     */
-    const CANCELLED_STATE = 1;
+	/**
+	 * Constructor
+	 *
+	 * @param object $object The object of interest for the notification,
+	 *                       usually is the posting object
+	 * @param string $name   Notification name
+	 * @param array  $info   Free information array
+	 *
+	 * @return void
+	 */
+	public function __construct($object, $name, array $info = array())
+	{
+		$this->notificationObject = $object;
+		$this->notificationName = $name;
+		$this->notificationInfo = $info;
+	}
 
-    /**
-     * name of the notofication
-     * @var string
-     */
-    protected $notificationName;
+	/**
+	 * For information purposed and for purposes on loggin, so
+	 * you may add the class to log like $log($oEvent)
+	 * where $oEvent is this object
+	 *
+	 * @return string with info about this object
+	 */
+	public function __toString()
+	{
+		$ret = 'Event_Notification2 object. "Event notification name":' . $this->notificationName;
+		return $ret;
+	}
 
-    /**
-     * object of interesed (the sender of the notification, in most cases)
-     * @var object
-     */
-    protected $notificationObject;
+	/**
+	 * Returns the notification name
+	 *
+	 * @return  string Notification name
+	 */
+	function getNotificationName()
+	{
+		return $this->notificationName;
+	}
 
-    /**
-     * additional information about the notification
-     * @var mixed
-     */
-    protected $notificationInfo = array();
+	/**
+	 * Returns the contained object
+	 *
+	 * @return  object Contained object
+	 */
+	public function getNotificationObject()
+	{
+		return $this->notificationObject;
+	}
 
-    /**
-     * state of the notification
-     *
-     * This may be:
-     * - self::DEFAULT_STATE
-     * - self::CANCELLED_STATE
-     *
-     * @var integer
-     */
-    protected $notificationState = self::DEFAULT_STATE;
+	/**
+	 * Returns the user info array
+	 *
+	 * @return  array user info
+	 */
+	public function getNotificationInfo()
+	{
+		return $this->notificationInfo;
+	}
 
-    /**
-     * amount of observers that received this notification
-     * @var mixed
-     */
-    protected $notificationCount = 0;
+	/**
+	 * Increase the internal count
+	 *
+	 * @access   public
+	 * @return void
+	 */
+	public function increaseNotificationCount()
+	{
+		++ $this->notificationCount;
+	}
 
+	/**
+	 * Get the number of posted notifications
+	 * This info is usefull for testing and debuging
+	 *
+	 * @return   int
+	 */
+	public function getNotificationCount()
+	{
+		return $this->notificationCount;
+	}
 
-    /**
-     * Constructor
-     *
-     * @param object $object The object of interest for the notification,
-     *                       usually is the posting object
-     * @param string $name   Notification name
-     * @param array  $info   Free information array
-     *
-     * @return void
-     */
-    public function __construct($object, $name, array $info = array())
-    {
-        $this->notificationObject = $object;
-        $this->notificationName   = $name;
-        $this->notificationInfo   = $info;
-    }
+	/**
+	 * Cancel the notification
+	 *
+	 * @return   void
+	 */
+	public function cancelNotification()
+	{
+		$this->notificationState = self::CANCELLED_STATE;
+	}
 
-    /**
-     * For information purposed and for purposes on loggin, so
-     * you may add the class to log like $log($oEvent)
-     * where $oEvent is this object
-     *
-     * @return string with info about this object
-     */
-    public function __toString()
-    {
-        $ret = 'Event_Notification2 object. "Event notification name":'.
-        $this->notificationName;
-         
-        return $ret;
-    }
-
-    /**
-     * Returns the notification name
-     *
-     * @return  string Notification name
-     */
-    function getNotificationName()
-    {
-        return $this->notificationName;
-    }
-
-    /**
-     * Returns the contained object
-     *
-     * @return  object Contained object
-     */
-    public function getNotificationObject()
-    {
-        return $this->notificationObject;
-    }
-
-    /**
-     * Returns the user info array
-     *
-     * @return  array user info
-     */
-    public function getNotificationInfo()
-    {
-        return $this->notificationInfo;
-    }
-
-    /**
-     * Increase the internal count
-     *
-     * @access   public
-     * @return void
-     */
-    public function increaseNotificationCount()
-    {
-        ++$this->notificationCount;
-    }
-
-    /**
-     * Get the number of posted notifications
-     * This info is usefull for testing and debuging
-     *
-     * @return   int
-     */
-    public function getNotificationCount()
-    {
-        return $this->notificationCount;
-    }
-
-    /**
-     * Cancel the notification
-     *
-     * @return   void
-     */
-    public function cancelNotification()
-    {
-        $this->notificationState = self::CANCELLED_STATE;
-    }
-
-    /**
-     * Checks whether the notification has been cancelled
-     *
-     * @return   boolean
-     */
-    public function isNotificationCancelled()
-    {
-        return ($this->notificationState === self::CANCELLED_STATE);
-    }
+	/**
+	 * Checks whether the notification has been cancelled
+	 *
+	 * @return   boolean
+	 */
+	public function isNotificationCancelled()
+	{
+		return ($this->notificationState === self::CANCELLED_STATE);
+	}
 }
-
 ?>

@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,71 +30,59 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2007-08-15 12:31:53 -0700 (Wed, 15 Aug 2007) $
-* Revision: $Id: Ping.php 918 2007-08-15 19:31:53Z ebag333 $
 */
-
 $ping = new ping($bot);
-
 /*
 The Class itself...
 */
 class ping extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> verify = array();
-
-		$this -> register_command('all', 'ping', 'OWNER');
-		$this -> register_command('all', 'tracert', 'OWNER');
-
-		$this -> help['description'] = 'Runs a ping or trace route to chat server that the bot is currently running on.';
-		$this -> help['command']['ping']="Pings the current chat server and shows the result.";
-		$this -> help['command']['tracert']="Runs a trace route to the current chat server and shows the result.";
-
-		$this -> bot -> core("settings") -> create("Ping", "Server", "Windows", "Is the server running Windows or Linux/Unix?", "Windows;Linux");
-		$this -> bot -> core("settings") -> create("Ping", "PingCount", 4, "How many times should we ping the server?", "1;2;3;4;5;7;10");
+		$this->verify = array();
+		$this->register_command('all', 'ping', 'OWNER');
+		$this->register_command('all', 'tracert', 'OWNER');
+		$this->help['description'] = 'Runs a ping or trace route to chat server that the bot is currently running on.';
+		$this->help['command']['ping'] = "Pings the current chat server and shows the result.";
+		$this->help['command']['tracert'] = "Runs a trace route to the current chat server and shows the result.";
+		$this->bot->core("settings")->create("Ping", "Server", "Windows", "Is the server running Windows or Linux/Unix?", "Windows;Linux");
+		$this->bot->core("settings")->create("Ping", "PingCount", 4, "How many times should we ping the server?", "1;2;3;4;5;7;10");
 	}
 
 	function command_handler($name, $msg, $origin)
 	{
 		if (preg_match("/^ping$/i", $msg))
 		{
-			return $this -> ping_server();
+			return $this->ping_server();
 		}
 		else if (preg_match("/^tracert$/i", $msg))
 		{
-			return $this -> tracert_server();
+			return $this->tracert_server();
 		}
 	}
 
 	function ping_server()
 	{
-		$count = $this -> bot -> core("settings") -> get("Ping", "PingCount");
-		$host = $this -> select_dimension(); //Dimension we're on
-
+		$count = $this->bot->core("settings")->get("Ping", "PingCount");
+		$host = $this->select_dimension(); //Dimension we're on
 		// replace bad chars
-		$host= preg_replace ("/[^A-Za-z0-9.-]/","",$host);
-		$count= preg_replace ("/[^0-9]/","",$count);
-
+		$host = preg_replace("/[^A-Za-z0-9.-]/", "", $host);
+		$count = preg_replace("/[^0-9]/", "", $count);
 		//check target IP or domain
-		if ($this -> bot -> core("settings") -> get("Ping", "Server") == "Linux")
+		if ($this->bot->core("settings")->get("Ping", "Server") == "Linux")
 		{
-		 $results = system("ping -c$count -w$count $host", $details);
-		 system("killall ping");
+			$results = system("ping -c$count -w$count $host", $details);
+			system("killall ping");
 		}
 		else
 		{
-		 $results = exec("ping -n $count $host", $details);
+			$results = exec("ping -n $count $host", $details);
 		}
-
 		$msg = "<b>Server:</b> " . $host . "\n";
 		$msg .= "<b>Ping Count:</b> " . $count . "\n\n";
 		$msg .= "<b>Results:</b>\n";
-
 		if (empty($results))
 			$msg .= "Could not find results.  Please check <i>!settings ping</i> and verify you have the correct system type selected.";
 		else
@@ -104,33 +92,28 @@ class ping extends BaseActiveModule
 				$msg .= $value . "\n";
 			}
 		}
-
-		return "Ping results :: " . $this -> bot -> core("tools") -> make_blob("click to view", $msg);
+		return "Ping results :: " . $this->bot->core("tools")->make_blob("click to view", $msg);
 	}
 
 	function tracert_server()
 	{
-		$count = $this -> bot -> core("settings") -> get("Ping", "PingCount");
-		$host = $this -> select_dimension(); //Dimension we're on
-
+		$count = $this->bot->core("settings")->get("Ping", "PingCount");
+		$host = $this->select_dimension(); //Dimension we're on
 		// replace bad chars
-		$host= preg_replace ("/[^A-Za-z0-9.-]/","",$host);
-		$count= preg_replace ("/[^0-9]/","",$count);
-
+		$host = preg_replace("/[^A-Za-z0-9.-]/", "", $host);
+		$count = preg_replace("/[^0-9]/", "", $count);
 		//check target IP or domain
-		if ($this -> bot -> core("settings") -> get("Ping", "Server") == "Linux")
+		if ($this->bot->core("settings")->get("Ping", "Server") == "Linux")
 		{
-		 $results = system("traceroute $host", $details);
-		 system("killall -q traceroute");
+			$results = system("traceroute $host", $details);
+			system("killall -q traceroute");
 		}
 		else
 		{
-		 $results = exec("tracert $host", $details);
+			$results = exec("tracert $host", $details);
 		}
-
 		$msg = "<b>Server:</b> " . $host . "\n";
 		$msg .= "<b>Results:</b>\n";
-
 		if (empty($results))
 			$msg .= "Could not find results.  Please check <i>!settings ping</i> and verify you have the correct system type selected.";
 		else
@@ -140,8 +123,7 @@ class ping extends BaseActiveModule
 				$msg .= $value . "\n";
 			}
 		}
-
-		return "Trace route results :: " . $this -> bot -> core("tools") -> make_blob("Click to view", $msg);
+		return "Trace route results :: " . $this->bot->core("tools")->make_blob("Click to view", $msg);
 	}
 
 	/*
@@ -149,11 +131,11 @@ class ping extends BaseActiveModule
 	*/
 	function select_dimension()
 	{
-		switch($this -> bot -> dimension)
+		switch ($this->bot->dimension)
 		{
 			case 0:
 				return "chat.dt.funcom.com";
-			case 1;
+			case 1:
 				return "chat.d1.funcom.com";
 			case 2:
 				return "chat.d2.funcom.com";
@@ -163,6 +145,5 @@ class ping extends BaseActiveModule
 				return false;
 		}
 	}
-
 }
 ?>

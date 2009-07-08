@@ -4,8 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
-* Copyright (C) 2008 Allan Noer.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -31,24 +30,18 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2009-03-09 01:58:35 +0000 (Mon, 09 Mar 2009) $
-* Revision: $Id: Whois.php 3 2009-03-09 01:58:35Z temar $
 */
-
 $whois_core = new Whois_Core($bot);
-
 class Whois_Core extends BasePassiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
 		/*
 		Create tables for our whois cache if it does not already exsist.
 		*/
-		$this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS " . $this -> bot -> db -> define_tablename("whois", "false")
-				. " (
+		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("whois", "false") . " (
 					ID int(15) NOT NULL default '0',
 					nickname varchar(15) NOT NULL default '',
 					level tinyint(3) unsigned NOT NULL default '1',
@@ -69,43 +62,35 @@ class Whois_Core extends BasePassiveModule
 					KEY updated (updated),
 					KEY used (used)
 				)");
-
-
-		$this -> register_module("whois");
-		$this -> register_event("cron", "1hour");
-
-		$this -> cache = array();
-		$this -> class_name = array();
-		$this -> create_name_cache();
-		$this -> register_event("buddy");
-
-		$this -> bot -> core("settings") -> create("Whois", "MaxCacheSize", 100, "What is the maximum number of whois entries that should be cached internally in the bot at the same time to reduce load on the SQL server?", "10;25;50;75;100;200;300;500;1000");
-		$this -> bot -> core("settings") -> create("Whois", "MaxTimeInCache", 3, "After how many hours in the internal query cache should an entry be removed because it could be outdated or free memory should be freed? This setting does not affect database entries in any way.", "1;2;3;4;5;6;7;8;9;10;11;12");
-		$this -> bot -> core("settings") -> create("Whois", "TimeValid", 1, "After how many days should the whois information in a database entry be considered outdated and looked for an update? NOTICE: Only use values higher then one day if you have trouble connecting to the FC website or are running the external updating script.", "1;2;3;4;5");
-		$this -> bot -> core("settings") -> create ('Whois', "Debug", False, "Show debug information (such as Character ID, Org ID, etc)");
-
-		$this -> update_table();
+		$this->register_module("whois");
+		$this->register_event("cron", "1hour");
+		$this->cache = array();
+		$this->class_name = array();
+		$this->create_name_cache();
+		$this->register_event("buddy");
+		$this->bot->core("settings")->create("Whois", "MaxCacheSize", 100, "What is the maximum number of whois entries that should be cached internally in the bot at the same time to reduce load on the SQL server?", "10;25;50;75;100;200;300;500;1000");
+		$this->bot->core("settings")->create("Whois", "MaxTimeInCache", 3, "After how many hours in the internal query cache should an entry be removed because it could be outdated or free memory should be freed? This setting does not affect database entries in any way.", "1;2;3;4;5;6;7;8;9;10;11;12");
+		$this->bot->core("settings")->create("Whois", "TimeValid", 1, "After how many days should the whois information in a database entry be considered outdated and looked for an update? NOTICE: Only use values higher then one day if you have trouble connecting to the FC website or are running the external updating script.", "1;2;3;4;5");
+		$this->bot->core("settings")->create('Whois', "Debug", False, "Show debug information (such as Character ID, Org ID, etc)");
+		$this->update_table();
 	}
 
 	function update_table()
 	{
-		if ($this -> bot -> db -> get_version("whois") == 3)
+		if ($this->bot->db->get_version("whois") == 3)
 		{
 			return;
 		}
-
-		switch ($this -> bot -> db -> get_version("whois"))
+		switch ($this->bot->db->get_version("whois"))
 		{
 			case 1: // Update Table version to prevent repeat update calls
-				//was an update for a setting which isnt used in AoC
+			//was an update for a setting which isnt used in AoC
 			case 2:
-				$this -> bot -> db -> update_table("whois", "class1", "modify",
-					"ALTER IGNORE TABLE #___whois modify `class1` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL");
-				$this -> bot -> db -> update_table("whois", "class2", "modify",
-					"ALTER IGNORE TABLE #___whois modify `class2` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL");
+				$this->bot->db->update_table("whois", "class1", "modify", "ALTER IGNORE TABLE #___whois modify `class1` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL");
+				$this->bot->db->update_table("whois", "class2", "modify", "ALTER IGNORE TABLE #___whois modify `class2` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL");
 			default:
 		}
-		$this -> bot -> db -> set_version("whois", 3);
+		$this->bot->db->set_version("whois", 3);
 	}
 
 	/*
@@ -113,64 +98,62 @@ class Whois_Core extends BasePassiveModule
 	*/
 	function buddy($name, $online, $level, $location, $class)
 	{
-		$user = $this -> bot -> core("player") -> id($name);
-
+		$user = $this->bot->core("player")->id($name);
 		$who = array();
 		$who["id"] = $user;
 		$who["nickname"] = $name;
-		if(!array_key_exists($name, $this -> bot -> buddy_status))
+		if (! array_key_exists($name, $this->bot->buddy_status))
 			$who["online"] = 0;
 		else
 		{
-			if(4 == ($this -> bot -> buddy_status[$name] & 4))
+			if (4 == ($this->bot->buddy_status[$name] & 4))
 				$who["online"] = 3;
-			else if(2 == ($this -> bot -> buddy_status[$name] & 2))
+			else if (2 == ($this->bot->buddy_status[$name] & 2))
 				$who["online"] = 2;
-			else if(1 == ($this -> bot -> buddy_status[$name] & 1))
+			else if (1 == ($this->bot->buddy_status[$name] & 1))
 				$who["online"] = 1;
 			else
 				$who["online"] = 0;
 		}
-
 		$who["level"] = $level;
 		$who["location"] = $location;
-		$class_name = $this -> class_name[$class];
+		$class_name = $this->class_name[$class];
 		if ($class_name == "")
 		{
 			$class_name = "Commoner";
 		}
 		$who["class"] = $class_name;
-		$lookup = $this -> bot -> db -> select("SELECT * FROM #___craftingclass WHERE name = '" . $name . "'", MYSQL_ASSOC);
-		if (!empty($lookup))
+		$lookup = $this->bot->db->select("SELECT * FROM #___craftingclass WHERE name = '" . $name . "'", MYSQL_ASSOC);
+		if (! empty($lookup))
 		{
 			$who["craft1"] = $lookup[0]['class1'];
 			$who["craft2"] = $lookup[0]['class2'];
 		}
-		$this -> update($who);
+		$this->update($who);
 	}
 
 	function create_name_cache()
 	{
-		$this -> class_name[0]  = "Commoner";
-		$this -> class_name[18] = "Barbarian";
-		$this -> class_name[20] = "Guardian";
-		$this -> class_name[22] = "Conqueror";
-		$this -> class_name[24] = "Priest of Mitra";
-		$this -> class_name[26] = "Scoin of Set";
-		$this -> class_name[28] = "Tempest of Set";
-		$this -> class_name[29] = "Bear Shaman";
-		$this -> class_name[31] = "Dark Templar";
-		$this -> class_name[34] = "Assassin";
-		$this -> class_name[39] = "Ranger";
-		$this -> class_name[41] = "Necromancer";
-		$this -> class_name[42] = "Lich";
-		$this -> class_name[43] = "Herald of Xotli";
-		$this -> class_name[44] = "Demonologist";
+		$this->class_name[0] = "Commoner";
+		$this->class_name[18] = "Barbarian";
+		$this->class_name[20] = "Guardian";
+		$this->class_name[22] = "Conqueror";
+		$this->class_name[24] = "Priest of Mitra";
+		$this->class_name[26] = "Scoin of Set";
+		$this->class_name[28] = "Tempest of Set";
+		$this->class_name[29] = "Bear Shaman";
+		$this->class_name[31] = "Dark Templar";
+		$this->class_name[34] = "Assassin";
+		$this->class_name[39] = "Ranger";
+		$this->class_name[41] = "Necromancer";
+		$this->class_name[42] = "Lich";
+		$this->class_name[43] = "Herald of Xotli";
+		$this->class_name[44] = "Demonologist";
 	}
 
 	function cron()
 	{
-		$this -> cleanup_cache();
+		$this->cleanup_cache();
 	}
 
 	// Removes old entries from cache to make room for new ones
@@ -178,16 +161,16 @@ class Whois_Core extends BasePassiveModule
 	// If none meets this requirement the oldest entry gets removed to free one spot
 	function cleanup_cache()
 	{
-		$oldesttime = -1;
+		$oldesttime = - 1;
 		$oldestname = "";
 		$thistime = time();
-		foreach ($this -> cache as $nick => $who)
+		foreach ($this->cache as $nick => $who)
 		{
-			if ($who["timestamp"] < $thistime - 60 * 60 * $this -> bot -> core("settings") -> get("Whois", "MaxTimeInCache"))
+			if ($who["timestamp"] < $thistime - 60 * 60 * $this->bot->core("settings")->get("Whois", "MaxTimeInCache"))
 			{
-				unset($this -> cache[$nick]);
+				unset($this->cache[$nick]);
 			}
-			else if ($oldesttime == -1)
+			else if ($oldesttime == - 1)
 			{
 				$oldesttime = $who["timestamp"];
 				$oldestname = $nick;
@@ -198,19 +181,18 @@ class Whois_Core extends BasePassiveModule
 				$oldestname = $nick;
 			}
 		}
-
-		if (count($this -> cache) >= $this -> bot -> core("settings") -> get("Whois", "MaxCacheSize"))
+		if (count($this->cache) >= $this->bot->core("settings")->get("Whois", "MaxCacheSize"))
 		{
-			unset($this -> cache[$oldestname]);
+			unset($this->cache[$oldestname]);
 		}
 	}
 
 	// Remove $who from cache
 	function remove_from_cache($who)
 	{
-		if (isset($this -> cache[$who]))
+		if (isset($this->cache[$who]))
 		{
-			unset($this -> cache[$who]);
+			unset($this->cache[$who]);
 		}
 	}
 
@@ -218,54 +200,49 @@ class Whois_Core extends BasePassiveModule
 	function add_to_cache($who)
 	{
 		// If cache has grown to maximum size clean it up
-		if (count($this -> cache) >= $this -> bot -> core("settings") -> get("Whois", "MaxCacheSize"))
+		if (count($this->cache) >= $this->bot->core("settings")->get("Whois", "MaxCacheSize"))
 		{
-			$this -> cleanup_cache();
+			$this->cleanup_cache();
 		}
-
 		// We got room now, just add the new entry to cache
 		$who["timestamp"] = time();
-		$this -> cache[ucfirst(strtolower($who["nickname"]))] = $who;
+		$this->cache[ucfirst(strtolower($who["nickname"]))] = $who;
 	}
 
 	/*
 	Internal whois function with caching.
 	Heavily modified to work with AoC
 	*/
-	function lookup($name, $noupdate=false)
+	function lookup($name, $noupdate = false)
 	{
-		if ($this -> bot -> core("settings") -> get("Statistics", "Enabled"))
-			$this -> bot -> core("statistics") -> capture_statistic("Whois","Lookup");
-
+		if ($this->bot->core("settings")->get("Statistics", "Enabled"))
+			$this->bot->core("statistics")->capture_statistic("Whois", "Lookup");
 		$name = ucfirst(strtolower($name));
-
-		$uid = $this -> bot -> core("player") -> id($name);
+		$uid = $this->bot->core("player")->id($name);
 		/*
 		Make sure we havent been passed a bogus name.
 		*/
-		if (!$uid)
+		if (! $uid)
 		{
 			$this->error->set("$name appears to be a non exsistant character.");
 			return $this->error;
 		}
-
 		// Check cache for entry first.
-		if (isset($this -> cache[$name]))
+		if (isset($this->cache[$name]))
 		{
 			// return entry if cached one isn't outdated yet
-			if ($this -> cache[$name]["timestamp"] >= time() - 60 * 60 * $this -> bot -> core("settings") -> get("Whois", "MaxTimeInCache"))
+			if ($this->cache[$name]["timestamp"] >= time() - 60 * 60 * $this->bot->core("settings")->get("Whois", "MaxTimeInCache"))
 			{
-				return $this -> cache[$name];
+				return $this->cache[$name];
 			}
-
 			// entry outdated, remove it and get it from db again
-			unset($this -> cache[$name]);
+			unset($this->cache[$name]);
 		}
-		$lookup = $this -> bot -> db -> select("SELECT * FROM #___whois WHERE nickname = '" . $name . "'", MYSQL_ASSOC);
+		$lookup = $this->bot->db->select("SELECT * FROM #___whois WHERE nickname = '" . $name . "'", MYSQL_ASSOC);
 		/*
 		If we have a result, we assume we might need to use it in case funcom XML is unresponsive.
 		*/
-		if (!empty($lookup))
+		if (! empty($lookup))
 		{
 			$who["id"] = $lookup[0]['ID'];
 			$who["nickname"] = $lookup[0]['nickname'];
@@ -276,25 +253,22 @@ class Whois_Core extends BasePassiveModule
 			$who["location"] = $lookup[0]['location'];
 			$who["craft1"] = $lookup[0]['craft1'];
 			$who["craft2"] = $lookup[0]['craft2'];
-
 			// Check if user id needs to be updated, only done if entry in DB has 0 as UID:
-			if ($lookup[0]['ID'] == 0 || $lookup[0]['ID'] == -1)
+			if ($lookup[0]['ID'] == 0 || $lookup[0]['ID'] == - 1)
 			{
-				$this -> bot -> db -> query("UPDATE #___whois SET ID = '" . $uid . "' WHERE nickname = '" . $name . "'");
+				$this->bot->db->query("UPDATE #___whois SET ID = '" . $uid . "' WHERE nickname = '" . $name . "'");
 				$lookup[0]['ID'] = $uid;
 				$who["id"] = $uid;
 			}
-
 			/*
 			If the result isn't stale yet and the userid's match, use it.
 			*/
-			if ($lookup[0]['updated'] >= (time() - ($this -> bot -> core("settings") -> get("whois", "timevalid") * 24 * 3600)) && $lookup[0]['ID'] == $uid)
+			if ($lookup[0]['updated'] >= (time() - ($this->bot->core("settings")->get("whois", "timevalid") * 24 * 3600)) && $lookup[0]['ID'] == $uid)
 			{
-				$this -> add_to_cache($who);
+				$this->add_to_cache($who);
 				return $who;
 			}
 		}
-
 		/*
 		If noupdate = true and old data exists, return the old data.
 		If noupdate = true but no old data, return error.
@@ -310,19 +284,18 @@ class Whois_Core extends BasePassiveModule
 			else
 			{
 				// only cache valid entries
-				$this -> add_to_cache($who);
+				$this->add_to_cache($who);
 			}
 			return $who;
 		}
-
-		$id = $this -> bot -> core("player") -> id($name);
+		$id = $this->bot->core("player")->id($name);
 		// Make sure the character exsists.
-		if (!$id)
+		if (! $id)
 		{
- 			$this->error->set("Player ##highlight##" . $name . " ##end##does not exist");
- 			return $this->error;
+			$this->error->set("Player ##highlight##" . $name . " ##end##does not exist");
+			return $this->error;
 		}
-		$this -> bot -> core("chat") -> buddy_add($id);
+		$this->bot->core("chat")->buddy_add($id);
 		return false;
 	}
 
@@ -336,7 +309,7 @@ class Whois_Core extends BasePassiveModule
 			$this->bot->log("WHOIS", "CHECK_XML", "For some reason I was passed a BotError. This shouldn't happen!");
 			return $xml; // The XML is bad to start with, no more checking needed. Should not have made it this far!
 		}
-		$nickname = $this -> bot -> core("tools") -> xmlparse($xml, "nick");
+		$nickname = $this->bot->core("tools")->xmlparse($xml, "nick");
 		/*
 		We have an empty nick despite having gotten a valid responce from Funcom XML? Bail!
 		This should __never__ happen, but you can never rule out errors on Funcom's end.
@@ -347,7 +320,7 @@ class Whois_Core extends BasePassiveModule
 			return $this->error;
 		}
 		else
-		return $xml; // If we get here, all should be well.
+			return $xml; // If we get here, all should be well.
 	} // End function check_xml()
 
 	/*
@@ -357,29 +330,19 @@ class Whois_Core extends BasePassiveModule
 	{ // Start function update()
 		//Adding in some validation and error handling due to an unknown bug (work around).
 		//If ID is stops being 0, then remove this code.
-
 		if ($who["id"] == 0 || $who["id"] === false)
 		{
-			$this -> bot -> log('Whois', 'Update', $who["nickname"] . " had an invalid user ID! UID: " . $who["id"]);
-			$who["id"] = $this -> bot -> core("player") -> id($who["nickname"]);
+			$this->bot->log('Whois', 'Update', $who["nickname"] . " had an invalid user ID! UID: " . $who["id"]);
+			$who["id"] = $this->bot->core("player")->id($who["nickname"]);
 		}
-
-
 		if ($who["id"] != 0 || $who["id"] !== false)
 		{
 			/*
 			Update our database cache
 			*/
-			$this -> bot -> db -> query("INSERT INTO #___whois (id, nickname, level,"
-			. " class, craft1, craft2, location, online, updated)"
-			. " VALUES ('" . $who["id"] . "', '" . $who["nickname"] . "', '" . $who["level"] . "', '" . $who["class"] . "', '" . $who["craft1"] . "', '" . $who["craft2"] . "', " . $who["location"] . ", " . $who["online"] . ", "
-			. "'" . time() . "') ON DUPLICATE KEY UPDATE id = VALUES(id), "
-			. "level = VALUES(level), class = VALUES(class), craft1 = VALUES(craft1), craft2 = VALUES(craft2), online = VALUES(online), location = VALUES(location), "
-			. " updated = VALUES(updated) ");
-
+			$this->bot->db->query("INSERT INTO #___whois (id, nickname, level," . " class, craft1, craft2, location, online, updated)" . " VALUES ('" . $who["id"] . "', '" . $who["nickname"] . "', '" . $who["level"] . "', '" . $who["class"] . "', '" . $who["craft1"] . "', '" . $who["craft2"] . "', " . $who["location"] . ", " . $who["online"] . ", " . "'" . time() . "') ON DUPLICATE KEY UPDATE id = VALUES(id), " . "level = VALUES(level), class = VALUES(class), craft1 = VALUES(craft1), craft2 = VALUES(craft2), online = VALUES(online), location = VALUES(location), " . " updated = VALUES(updated) ");
 			// Clear from memory cache
-			$this -> remove_from_cache($who["nickname"]);
-
+			$this->remove_from_cache($who["nickname"]);
 			return TRUE;
 		}
 		else
@@ -390,151 +353,120 @@ class Whois_Core extends BasePassiveModule
 	{
 		$seen = "";
 		$alts = "";
-
 		$window = "\n##normal##Name:##end## ##highlight##{$whois['nickname']}##end##\n";
-
 		$window .= " ##normal##Level:##end## ##highlight##{$whois['level']}##end##\n";
 		$window .= " ##normal##Class:##end## ##highlight##{$whois['class']}##end##\n";
-
-		if(!empty($whois['craft1']))
+		if (! empty($whois['craft1']))
 		{
 			$window .= " ##normal##Craft Class 1:##end## ##highlight##{$whois['craft1']}##end##\n";
 		}
-		if(!empty($whois['craft2']))
+		if (! empty($whois['craft2']))
 		{
 			$window .= " ##normal##Craft Class 2:##end## ##highlight##{$whois['craft2']}##end##\n";
 		}
-
-		if(0 == $whois['online'])
+		if (0 == $whois['online'])
 		{
 			// For offline users 'location' contains the last online time in milliseconds since 1970!
-			$window .= " ##normal##Last Online: ##highlight##".gmdate("Y-m-d h:i",$whois['location'])."##end##\n";
+			$window .= " ##normal##Last Online: ##highlight##" . gmdate("Y-m-d h:i", $whois['location']) . "##end##\n";
 		}
-
-		if ($this -> bot -> core("settings") -> get('Whois', 'Debug'))
+		if ($this->bot->core("settings")->get('Whois', 'Debug'))
 		{
-			$window .= " ##normal##Character ID: ##highlight##" . $this -> bot -> core("tools") -> int_to_string($whois['id']) . "##end####end##\n\n";
+			$window .= " ##normal##Character ID: ##highlight##" . $this->bot->core("tools")->int_to_string($whois['id']) . "##end####end##\n\n";
 		}
-
-		if ($this -> bot -> core("security") -> check_access($source, $this -> bot -> core("settings") -> get('Security', 'Whois')))
+		if ($this->bot->core("security")->check_access($source, $this->bot->core("settings")->get('Security', 'Whois')))
 		{
-			$access = $this -> bot -> core("security") -> get_access_level($whois['nickname']);
-			$this -> bot -> core("security") -> get_access_name($access);
-			$window .= " ##normal##Bot access: ##highlight##" . ucfirst(strtolower($this -> bot -> core("security") -> get_access_name($access)));
-
-			if ($this -> bot -> core("settings") -> get('Whois', 'Debug'))
+			$access = $this->bot->core("security")->get_access_level($whois['nickname']);
+			$this->bot->core("security")->get_access_name($access);
+			$window .= " ##normal##Bot access: ##highlight##" . ucfirst(strtolower($this->bot->core("security")->get_access_name($access)));
+			if ($this->bot->core("settings")->get('Whois', 'Debug'))
 				$window .= " ($access)";
-
 			$window .= " ##end####end##\n\n";
 		}
-
-
-		$online = $this -> bot -> core("online") -> get_online_state($whois['nickname']);
-
-		$window .= "##normal## Status: " . $online . $seen ."##end##\n";
-
-		if($online['status'] <= 0)
+		$online = $this->bot->core("online")->get_online_state($whois['nickname']);
+		$window .= "##normal## Status: " . $online . $seen . "##end##\n";
+		if ($online['status'] <= 0)
 		{
-			if ($this -> bot -> core("settings") -> get("Whois", "LastSeen"))
+			if ($this->bot->core("settings")->get("Whois", "LastSeen"))
 			{
-				$lastseen = $this -> bot -> core("online") -> get_last_seen($whois['nickname']);
+				$lastseen = $this->bot->core("online")->get_last_seen($whois['nickname']);
 				if ($lastseen)
 				{
-					$window .= "##normal## Last Seen: ##highlight##" . gmdate($this -> bot -> core("settings") -> get("time", "formatstring"), $lastseen) . "##end####end##\n";
+					$window .= "##normal## Last Seen: ##highlight##" . gmdate($this->bot->core("settings")->get("time", "formatstring"), $lastseen) . "##end####end##\n";
 				}
 			}
 		}
-
-		if ($this -> bot -> core("settings") -> get('Whois', 'Debug'))
+		if ($this->bot->core("settings")->get('Whois', 'Debug'))
 		{
-			$whois_debug = $this -> bot -> db -> select("SELECT updated FROM #___whois WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC);
-
-			$user_debug = $this -> bot -> db -> select("SELECT id,notify,user_level,added_by,added_at,deleted_by,deleted_at,updated_at FROM #___users WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC);
-
+			$whois_debug = $this->bot->db->select("SELECT updated FROM #___whois WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC);
+			$user_debug = $this->bot->db->select("SELECT id,notify,user_level,added_by,added_at,deleted_by,deleted_at,updated_at FROM #___users WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC);
 			$window .= "\n##red## Debug Information:##end##\n";
-			if (!empty($whois_debug[0]['updated']))
-				$window .= " ##normal##Whois Updated Time: ##highlight## " . gmdate($this -> bot -> core("settings") -> get("time", "formatstring"), $whois_debug[0]['updated']) . "##end##\n";
-
-			if (!empty($user_debug[0]['id']))
+			if (! empty($whois_debug[0]['updated']))
+				$window .= " ##normal##Whois Updated Time: ##highlight## " . gmdate($this->bot->core("settings")->get("time", "formatstring"), $whois_debug[0]['updated']) . "##end##\n";
+			if (! empty($user_debug[0]['id']))
 			{
-				if (!empty($user_debug[0]['added_by']))
+				if (! empty($user_debug[0]['added_by']))
 				{
 					$window .= " ##normal##User Added By: ##highlight## " . $user_debug[0]['added_by'] . "##end##\n";
-					$window .= " ##normal##User Added At: ##highlight## " . gmdate($this -> bot -> core("settings") -> get("time", "formatstring"), $user_debug[0]['added_at']) . "##end##\n";
+					$window .= " ##normal##User Added At: ##highlight## " . gmdate($this->bot->core("settings")->get("time", "formatstring"), $user_debug[0]['added_at']) . "##end##\n";
 				}
-				if (!empty($user_debug[0]['deleted_by']))
+				if (! empty($user_debug[0]['deleted_by']))
 				{
 					$window .= " ##normal##User Deleted By: ##highlight## " . $user_debug[0]['deleted_by'] . "##end##\n";
-					$window .= " ##normal##User Deleted At: ##highlight## " . gmdate($this -> bot -> core("settings") -> get("time", "formatstring"), $user_debug[0]['deleted_at']) . "##end##\n";
+					$window .= " ##normal##User Deleted At: ##highlight## " . gmdate($this->bot->core("settings")->get("time", "formatstring"), $user_debug[0]['deleted_at']) . "##end##\n";
 				}
-				$window .= " ##normal##User Updated At: ##highlight## " . gmdate($this -> bot -> core("settings") -> get("time", "formatstring"), $user_debug[0]['updated_at']) . "##end##\n";
-
+				$window .= " ##normal##User Updated At: ##highlight## " . gmdate($this->bot->core("settings")->get("time", "formatstring"), $user_debug[0]['updated_at']) . "##end##\n";
 				$flag_count = 0;
-
 				if ($user_debug[0]['notify'] == 1)
 				{
 					if ($flag_count >= 1)
 						$flag .= ", ";
-
 					$flag .= "Notify";
-					$flag_count++;
+					$flag_count ++;
 				}
-
 				if ($user_debug[0]['user_level'] == 2)
 				{
 					if ($flag_count >= 1)
 						$flag .= ", ";
-
 					$flag .= "Member";
-					$flag_count++;
+					$flag_count ++;
 				}
-
 				if ($user_debug[0]['user_level'] == 1)
 				{
 					if ($flag_count >= 1)
 						$flag .= ", ";
-
 					$flag .= "Guest";
-					$flag_count++;
+					$flag_count ++;
 				}
-
 				if ($user_debug[0]['user_level'] == 0)
 				{
 					if ($flag_count >= 1)
 						$flag .= ", ";
-
 					$flag .= "Not a Member";
-					$flag_count++;
+					$flag_count ++;
 				}
-
 				if ($flag_count >= 1)
 				{
 					$window .= " ##normal##Flags: ##highlight##\n";
 					$window .= $flag . "\n##end####end##";
 				}
 			}
-
 		}
-
-		if ($this -> bot -> core("settings") -> get("Whois", "Alts") == TRUE)
+		if ($this->bot->core("settings")->get("Whois", "Alts") == TRUE)
 		{
-			$alts = $this -> bot -> core("alts") -> show_alt($whois['nickname'], 1);
+			$alts = $this->bot->core("alts")->show_alt($whois['nickname'], 1);
 			if ($alts['alts'])
 			{
-				$window .= "\n". $alts['list'];
+				$window .= "\n" . $alts['list'];
 			}
 		}
-
-		if ($this -> bot -> core("settings") -> get("Whois", "ShowOptions") == TRUE)
+		if ($this->bot->core("settings")->get("Whois", "ShowOptions") == TRUE)
 		{
 			$window .= "\n##normal##::: Options :::##end##\n";
-			$window .= $this -> bot -> core("tools") -> chatcmd('addbuddy ' . $whois['nickname'], 'Add to buddylist', 'cc') . "\n";
-			$window .= $this -> bot -> core("tools") -> chatcmd('rembuddy ' . $whois['nickname'], 'Remove from buddylist', 'cc') . "\n";
+			$window .= $this->bot->core("tools")->chatcmd('addbuddy ' . $whois['nickname'], 'Add to buddylist', 'cc') . "\n";
+			$window .= $this->bot->core("tools")->chatcmd('rembuddy ' . $whois['nickname'], 'Remove from buddylist', 'cc') . "\n";
 			//$window .= $this -> bot -> core("tools") -> chatcmd('history ' . $whois['nickname'], 'Character history') . "\n";
 		}
-
-		return ($this -> bot -> core("tools") -> make_blob("Details", $window));
+		return ($this->bot->core("tools")->make_blob("Details", $window));
 	}
-
 }
 ?>

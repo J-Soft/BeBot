@@ -5,7 +5,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -31,52 +31,40 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: AFK.php 1833 2008-11-30 22:09:06Z alreadythere $
 */
-
 /*
 Add a "_" at the beginning of the file (_AFK.php) if you do not want it to be loaded.
 */
-
 $afk = new AFK($bot);
-
-Class AFK extends BaseActiveModule
+class AFK extends BaseActiveModule
 {
 	var $afk;
 
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> afk = array();
-		$this -> afkalias = array();
-
+		$this->afk = array();
+		$this->afkalias = array();
 		$this->register_command("all", "afk", 'MEMBER');
-
 		$this->register_event("privgroup");
 		$this->register_event("gmsg", "org");
 		$this->register_event("buddy");
-
 		//Create default_level access levels
-		$this -> help['description'] = "Shows other players that you are afk.";
-		$this -> help['command']['afk <message>'] = "Sets you afk with <message>";
-		$this -> help['notes'] = "This command does not affect nor is it affected by the in-game command /afk.";
-
-		$this -> bot -> core("settings") -> create("Afk", "Alias", TRUE, "Should Alias's be used with AFK?");
-		$this -> bot -> core("settings") -> create("Afk", "noprefix", FALSE, "Can no prefix with AFK be used to go AFK?");
-		$this -> bot -> core("settings") -> create("Afk", "brb_noprefix", FALSE, "Can no prefix with BRB be used to go AFK?");
-
-		$this -> bot -> core("command_alias") -> register("afk", "brb");
+		$this->help['description'] = "Shows other players that you are afk.";
+		$this->help['command']['afk <message>'] = "Sets you afk with <message>";
+		$this->help['notes'] = "This command does not affect nor is it affected by the in-game command /afk.";
+		$this->bot->core("settings")->create("Afk", "Alias", TRUE, "Should Alias's be used with AFK?");
+		$this->bot->core("settings")->create("Afk", "noprefix", FALSE, "Can no prefix with AFK be used to go AFK?");
+		$this->bot->core("settings")->create("Afk", "brb_noprefix", FALSE, "Can no prefix with BRB be used to go AFK?");
+		$this->bot->core("command_alias")->register("afk", "brb");
 	}
 
 	function command_handler($name, $msg, $origin)
 	{
-		$this -> error->reset();
-		$com = $this->parse_com($msg, array('com', 'args'));
-		$this -> gone($name, $com['args']);
-		return("##highlight##$name##end## is now AFK.");
+		$this->error->reset();
+		$com = $this->parse_com($msg, array('com' , 'args'));
+		$this->gone($name, $com['args']);
+		return ("##highlight##$name##end## is now AFK.");
 	}
 
 	/*
@@ -84,112 +72,112 @@ Class AFK extends BaseActiveModule
 	*/
 	function privgroup($name, $msg)
 	{
-		if($this -> acheck($name))
+		if ($this->acheck($name))
 		{
-			$timegone = $this -> afk_time($name);
-			$this -> back($name);
-			$msgs = $this -> msgs($name);
-			$this -> bot -> send_output($name, $name . " is back. AFK for (".$timegone.")  ".$msgs, "both");
+			$timegone = $this->afk_time($name);
+			$this->back($name);
+			$msgs = $this->msgs($name);
+			$this->bot->send_output($name, $name . " is back. AFK for (" . $timegone . ")  " . $msgs, "both");
 		}
-		if ($this -> bot -> core("settings") -> get("Afk", "noprefix"))
+		if ($this->bot->core("settings")->get("Afk", "noprefix"))
 		{
-			if(preg_match("/^afk (.*)/i", $msg, $afkmsg))
+			if (preg_match("/^afk (.*)/i", $msg, $afkmsg))
 			{
-				$this -> gone($name, $afkmsg[1]);
-				$this -> bot -> send_output($name, $name . " is now AFK.", "both");
+				$this->gone($name, $afkmsg[1]);
+				$this->bot->send_output($name, $name . " is now AFK.", "both");
 			}
 			elseif (preg_match("/^afk/i", $msg))
 			{
-				$this -> gone($name);
-				$this -> bot -> send_output($name, $name . " is now AFK.", "both");
+				$this->gone($name);
+				$this->bot->send_output($name, $name . " is now AFK.", "both");
 			}
 		}
-		elseif ($this -> bot -> core("settings") -> get("Afk", "brb_noprefix"))
+		elseif ($this->bot->core("settings")->get("Afk", "brb_noprefix"))
 		{
-			if(preg_match("/^brb (.*)/i", $msg, $afkmsg))
+			if (preg_match("/^brb (.*)/i", $msg, $afkmsg))
 			{
-				$this -> gone($name, $afkmsg[1]);
-				$this -> bot -> send_output($name, $name . " is now AFK.", "both");
+				$this->gone($name, $afkmsg[1]);
+				$this->bot->send_output($name, $name . " is now AFK.", "both");
 			}
 			elseif (preg_match("/^brb/i", $msg))
 			{
-				$this -> gone($name, "");
-				$this -> bot -> send_output($name, $name . " is now AFK.", "both");
+				$this->gone($name, "");
+				$this->bot->send_output($name, $name . " is now AFK.", "both");
 			}
 		}
-		if(!empty($this -> afk))
-			$msgcheck = $this -> msg_check($name, "", $msg);
-		if(!empty($msgcheck))
-			$this -> bot -> send_pgroup($msgcheck);
+		if (! empty($this->afk))
+			$msgcheck = $this->msg_check($name, "", $msg);
+		if (! empty($msgcheck))
+			$this->bot->send_pgroup($msgcheck);
 	}
 
 	function gmsg($name, $group, $msg)
 	{
-		if($this -> acheck($name))
+		if ($this->acheck($name))
 		{
-			$timegone = $this -> afk_time($name);
-			$this -> back($name);
-			$msgs = $this -> msgs($name);
-			$this -> bot -> send_output($name, $name . " is back. AFK for (".$timegone.") ".$msgs, "both");
+			$timegone = $this->afk_time($name);
+			$this->back($name);
+			$msgs = $this->msgs($name);
+			$this->bot->send_output($name, $name . " is back. AFK for (" . $timegone . ") " . $msgs, "both");
 		}
-		if ($this -> bot -> core("settings") -> get("Afk", "noprefix"))
+		if ($this->bot->core("settings")->get("Afk", "noprefix"))
 		{
-			if(preg_match("/^afk (.*)/i", $msg, $afkmsg))
+			if (preg_match("/^afk (.*)/i", $msg, $afkmsg))
 			{
-				$this -> gone($name, $afkmsg[1]);
-				$this -> bot -> send_output($name, "##highlight##$name##end## is now AFK.", "both");
+				$this->gone($name, $afkmsg[1]);
+				$this->bot->send_output($name, "##highlight##$name##end## is now AFK.", "both");
 				Return;
 			}
 			elseif (preg_match("/^afk/i", $msg))
 			{
-				$this -> gone($name);
-				$this -> bot -> send_output($name, "##highlight##$name##end## is now AFK.", "both");
+				$this->gone($name);
+				$this->bot->send_output($name, "##highlight##$name##end## is now AFK.", "both");
 				Return;
 			}
 		}
-		elseif ($this -> bot -> core("settings") -> get("Afk", "brb_noprefix"))
+		elseif ($this->bot->core("settings")->get("Afk", "brb_noprefix"))
 		{
-			if(preg_match("/^brb (.*)/i", $msg, $afkmsg))
+			if (preg_match("/^brb (.*)/i", $msg, $afkmsg))
 			{
-				$this -> gone($name, $afkmsg[1]);
-				$this -> bot -> send_output($name, "##highlight##$name##end## is now AFK.", "both");
+				$this->gone($name, $afkmsg[1]);
+				$this->bot->send_output($name, "##highlight##$name##end## is now AFK.", "both");
 			}
 			elseif (preg_match("/^brb/i", $msg))
 			{
-				$this -> gone($name, "");
-				$this -> bot -> send_output($name, "##highlight##$name##end## is now AFK.", "both");
+				$this->gone($name, "");
+				$this->bot->send_output($name, "##highlight##$name##end## is now AFK.", "both");
 			}
 		}
-		if(!empty($this -> afk))
-			$msgcheck = $this -> msg_check($name, $group, $msg);
-		if(!empty($msgcheck))
-			$this -> bot -> send_gc($msgcheck);
+		if (! empty($this->afk))
+			$msgcheck = $this->msg_check($name, $group, $msg);
+		if (! empty($msgcheck))
+			$this->bot->send_gc($msgcheck);
 	}
 
 	function msg_check($name, $group, $msg)
 	{
 		$found = false;
-		foreach($this -> afk as $key=>$value)
+		foreach ($this->afk as $key => $value)
 		{
-			if(preg_match("/$key\b/i", $msg))
+			if (preg_match("/$key\b/i", $msg))
 			{
-				$this -> afkmsgs[$key][] = array (time(), $name, $msg);
-				return ($key." has been AFK for ".$this -> afk_time($key)." (" . $value[msg]. ").");
+				$this->afkmsgs[$key][] = array(time() , $name , $msg);
+				return ($key . " has been AFK for " . $this->afk_time($key) . " (" . $value[msg] . ").");
 			}
 		}
-		if ($this -> bot -> core("settings") -> get("Afk", "Alias"))
+		if ($this->bot->core("settings")->get("Afk", "Alias"))
 		{
-			if(!$found)
+			if (! $found)
 			{
-				if(!empty($this -> afkalias))
+				if (! empty($this->afkalias))
 				{
-					foreach($this -> afkalias as $key2 => $value)
+					foreach ($this->afkalias as $key2 => $value)
 					{
-						if(preg_match("/$key2\b/i", $msg))
+						if (preg_match("/$key2\b/i", $msg))
 						{
-							$this -> afkmsgs[$value][$this -> afkmsgid] = array (time(), $name, $msg);
-							$this -> afkmsgid++;
-							return ($value . " has been AFK for ".$this -> afk_time($value)." (" . $this -> afk[$value][msg] . ").");
+							$this->afkmsgs[$value][$this->afkmsgid] = array(time() , $name , $msg);
+							$this->afkmsgid ++;
+							return ($value . " has been AFK for " . $this->afk_time($value) . " (" . $this->afk[$value][msg] . ").");
 						}
 					}
 				}
@@ -200,14 +188,15 @@ Class AFK extends BaseActiveModule
 
 	function afk_time($name)
 	{
-		$timenow = "" . time() ."";
-		$timeafk = $this -> afk[$name]['time'];
+		$timenow = "" . time() . "";
+		$timeafk = $this->afk[$name]['time'];
 		$dif = $timenow - $timeafk;
-		if($dif < 60) Return $dif." Seconds";
-		elseif($dif < 3600)
+		if ($dif < 60)
+			Return $dif . " Seconds";
+		elseif ($dif < 3600)
 		{
 			$mins = floor($dif / 60);
-			Return $mins." Minutes";
+			Return $mins . " Minutes";
 		}
 		else
 		{
@@ -215,37 +204,37 @@ Class AFK extends BaseActiveModule
 			$hours = floor($mins / 60);
 			$minstorem = $hours * 60;
 			$minsrem = $mins - $minstorem;
-			Return $hours." Hours and ".$minsrem." Minutes";
+			Return $hours . " Hours and " . $minsrem . " Minutes";
 		}
 	}
 
-	function gone($name, $msg=false)
+	function gone($name, $msg = false)
 	{
-		if(empty($msg))
+		if (empty($msg))
 		{
 			$msg = "Away from keyboard";
 		}
-		$this -> afk[$name] = array ('time' => time(), 'msg' => $msg);
+		$this->afk[$name] = array('time' => time() , 'msg' => $msg);
 		// Add Aliases to AFK list
-		$main = $this -> bot -> core("alts") -> main($name);
-		$alts = $this -> bot -> core("alts") -> get_alts($main);
-		if(!empty($alts))
+		$main = $this->bot->core("alts")->main($name);
+		$alts = $this->bot->core("alts")->get_alts($main);
+		if (! empty($alts))
 		{
-			foreach($alts as $alt)
+			foreach ($alts as $alt)
 			{
-				$this -> afkalias[$alt] = $name;
+				$this->afkalias[$alt] = $name;
 			}
 		}
-		if ($this -> bot -> core("settings") -> get("Afk", "Alias"))
+		if ($this->bot->core("settings")->get("Afk", "Alias"))
 		{
-			$aliases = $this -> bot -> core("alias") -> alias;
-			if(!empty($aliases))
+			$aliases = $this->bot->core("alias")->alias;
+			if (! empty($aliases))
 			{
-				foreach($aliases as $alias => $nickname)
+				foreach ($aliases as $alias => $nickname)
 				{
-					if($main == $nickname)
+					if ($main == $nickname)
 					{
-						$this -> afkalias[$alias] = $name;
+						$this->afkalias[$alias] = $name;
 					}
 				}
 			}
@@ -254,14 +243,14 @@ Class AFK extends BaseActiveModule
 
 	function back($name)
 	{
-		if($this -> afk[$name])
+		if ($this->afk[$name])
 		{
-			unset($this -> afk[$name]);
-			foreach($this -> afkalias as $key => $value)
+			unset($this->afk[$name]);
+			foreach ($this->afkalias as $key => $value)
 			{
 				if ($name == $value)
 				{
-					unset($this -> afkalias[$key]);
+					unset($this->afkalias[$key]);
 				}
 			}
 		}
@@ -269,7 +258,7 @@ Class AFK extends BaseActiveModule
 
 	function acheck($name)
 	{
-		if(isset($this -> afk[$name]))
+		if (isset($this->afk[$name]))
 		{
 			return true;
 		}
@@ -281,58 +270,54 @@ Class AFK extends BaseActiveModule
 
 	function buddy($name, $msg)
 	{
-		$access = $this -> bot -> core("security") -> get_access_level($name);
-
+		$access = $this->bot->core("security")->get_access_level($name);
 		if (($msg == 5) && ($access > 1))
 		{
-			if($this -> acheck($name))
+			if ($this->acheck($name))
 			{
-				$this -> back($name);
-				$msgs = $this -> msgs($name);
-				if($this -> bot -> game == "ao")
-					$this -> bot -> send_tell($name, "you have been set as back. ".$msgs."");
+				$this->back($name);
+				$msgs = $this->msgs($name);
+				if ($this->bot->game == "ao")
+					$this->bot->send_tell($name, "you have been set as back. " . $msgs . "");
 			}
 		}
 		else if (($msg == 3) && ($access > 1))
 		{
-			if(!$this -> acheck($name))
+			if (! $this->acheck($name))
 			{
-				$this -> gone($name);
-				$msgs = $this -> msgs($name);
-				if($this -> bot -> game == "ao")
-					$this -> bot -> send_tell($name, "you have been set as AFK. ".$msgs."");
+				$this->gone($name);
+				$msgs = $this->msgs($name);
+				if ($this->bot->game == "ao")
+					$this->bot->send_tell($name, "you have been set as AFK. " . $msgs . "");
 			}
 		}
 		elseif ($msg == 0)
 		{
-			if($this -> acheck($name))
+			if ($this->acheck($name))
 			{
-				$this -> back($name);
-				$msgs = $this -> msgs($name);
-				$this -> bot -> send_tell($name, "you have been set as back. (Logoff) ".$msgs."");
+				$this->back($name);
+				$msgs = $this->msgs($name);
+				$this->bot->send_tell($name, "you have been set as back. (Logoff) " . $msgs . "");
 			}
 		}
 	}
 
 	function msgs($name)
 	{
-		if (!empty($this -> afkmsgs[$name]))
+		if (! empty($this->afkmsgs[$name]))
 		{
 			$inside = "##blob_title##..:: AFK Messages ::..##end##\n\n";
-			foreach ($this -> afkmsgs[$name] as $key => $value)
+			foreach ($this->afkmsgs[$name] as $key => $value)
 			{
-				$inside .= "##green##".gmdate($this -> bot -> core("settings") -> get("Time", "FormatString"), $value[0])."##end##  ##orange##".$value[1]."##end##\n        ##blob_text##".$value[2]."##end##\n\n";
-				$count++;
+				$inside .= "##green##" . gmdate($this->bot->core("settings")->get("Time", "FormatString"), $value[0]) . "##end##  ##orange##" . $value[1] . "##end##\n        ##blob_text##" . $value[2] . "##end##\n\n";
+				$count ++;
 			}
-			$msgs = "##highlight##".$count."##end## Messages :: " . $this -> bot -> core("tools") -> make_blob("click to view", $inside);
-			unset ($this -> afkmsgs[$name]);
+			$msgs = "##highlight##" . $count . "##end## Messages :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
+			unset($this->afkmsgs[$name]);
 			Return ($msgs);
 		}
-		unset ($this -> afkmsgs[$name]);
+		unset($this->afkmsgs[$name]);
 		Return FALSE;
-
 	}
-
-
 }
 ?>

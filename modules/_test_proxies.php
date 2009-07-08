@@ -6,7 +6,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -32,21 +32,16 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2007-07-25 11:54:01 -0700 (Wed, 25 Jul 2007) $
-* Revision: $Id:_test_proxies.php 817 2007-07-25 18:54:01Z shadowmaster $
 */
 $testproxy = new testproxy($bot);
-
 class testproxy extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_command('tell', 'testproxy', 'SUPERADMIN');
-
-		$this -> help['description'] = 'This plugin runs through all the proxies that have been setup and tests each of them.';
+		$this->register_command('tell', 'testproxy', 'SUPERADMIN');
+		$this->help['description'] = 'This plugin runs through all the proxies that have been setup and tests each of them.';
 	}
 
 	function command_handler($name, $msg, $origin)
@@ -55,21 +50,16 @@ class testproxy extends BaseActiveModule
 		$server_timeout = 25;
 		$read_timeout = 30;
 		$url = "http://people.anarchy-online.com/character/bio/d/2/name/ebagmp/bio.xml";
-
-		foreach ($this -> bot -> proxy_server_address as $proxy)
+		foreach ($this->bot->proxy_server_address as $proxy)
 		{
-			$result = $this -> bot -> core("tools") -> get_site_data($url,$strip_headers,$server_timeout,$read_timeout,$proxy);
-
+			$result = $this->bot->core("tools")->get_site_data($url, $strip_headers, $server_timeout, $read_timeout, $proxy);
 			if ($result["error"] == true || $result["error"] == 1)
-				$status = "Failed\n".$result["errordesc"];
+				$status = "Failed\n" . $result["errordesc"];
 			else
 				$status = "Good";
-
-
 			$blob .= $proxy . " - " . $status . "\n\n";
 		}
-		return "Results for Proxies :: " . $this -> bot -> core("tools") -> make_blob("click to view", $blob);
+		return "Results for Proxies :: " . $this->bot->core("tools")->make_blob("click to view", $blob);
 	}
-
 }
 ?>

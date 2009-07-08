@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,39 +30,33 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
-* Revision: $Id: TimerRelay.php 1944 2009-01-01 02:15:37Z temar $
 */
-
 $timerrelay = new TimerRelay($bot);
-
 /*
 The Class itself...
 */
 class TimerRelay extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_command("tell", "relaytimer", "SUPERADMIN");
-		$this -> register_command("extpgmsg", "relaytimer", "MEMBER");
+		$this->register_command("tell", "relaytimer", "SUPERADMIN");
+		$this->register_command("extpgmsg", "relaytimer", "MEMBER");
 	}
 
 	function extpgmsg($pgroup, $name, $msg)
 	{
-		$this -> command_handler($pgroup, $msg, "extpgmsg");
+		$this->command_handler($pgroup, $msg, "extpgmsg");
 	}
 
 	function command_handler($name, $msg, $origin)
 	{
-		if ($this -> bot -> core("settings") -> get('Relay', 'Status') &&
-		strtolower($this -> bot -> core("settings") -> get('Relay', 'Relay')) == strtolower($name))
+		if ($this->bot->core("settings")->get('Relay', 'Status') && strtolower($this->bot->core("settings")->get('Relay', 'Relay')) == strtolower($name))
 		{
 			if (preg_match("/^relaytimer class:(.*) endtime:(.*) owner:(.*) repeat:(.*) channel:(.*) name:(.*)/$i", $msg, $info))
 			{
-				$this -> add_timer($info[3], $info[2], $info[6], $info[1], $info[4], $info[5]);
+				$this->add_timer($info[3], $info[2], $info[6], $info[1], $info[4], $info[5]);
 			}
 		}
 		return false;
@@ -70,7 +64,7 @@ class TimerRelay extends BaseActiveModule
 
 	function add_timer($owner, $endtime, $name, $class, $repeat, $channel)
 	{
-		$this -> bot -> core("timer") -> add_timer(true, $owner, $endtime - time(), $name, $channel, $repeat, $class);
+		$this->bot->core("timer")->add_timer(true, $owner, $endtime - time(), $name, $channel, $repeat, $class);
 	}
 }
 ?>

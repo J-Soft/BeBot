@@ -6,7 +6,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -32,12 +32,8 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-12-06 22:54:37 +0100 (lø, 06 des 2008) $
-* Revision: $Id: Items.php 1898 2008-12-06 21:54:37Z blueeagle $
 */
 $VhItems = new VhItems($bot);
-
 class VhItems extends BaseActiveModule
 {
 	var $icons = 'true';
@@ -50,64 +46,66 @@ class VhItems extends BaseActiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-		
-		$this -> register_command('all', 'items', 'GUEST');
-
-		$this -> help['description'] = 'Searches the central database for information about an item.';
-		$this -> help['command']['items [ql] <item>']="Searches and displays information about an <item> of the optional [ql]";
-		$this -> help['notes']="This module uses the Central Items Database v1.1, By Vhab.";
+		$this->register_command('all', 'items', 'GUEST');
+		$this->help['description'] = 'Searches the central database for information about an item.';
+		$this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";
+		$this->help['notes'] = "This module uses the Central Items Database v1.1, By Vhab.";
 	}
 
 	function command_handler($name, $msg, $origin)
 	{
-		if (preg_match('/^items/i', $msg, $info)) {
+		if (preg_match('/^items/i', $msg, $info))
+		{
 			$words = trim(substr($msg, strlen('items')));
-			if (!empty($words)) {
+			if (! empty($words))
+			{
 				$parts = explode(' ', $words);
-				if (count($parts) > 1 && is_numeric($parts[0])) {
+				if (count($parts) > 1 && is_numeric($parts[0]))
+				{
 					$ql = $parts[0];
 					unset($parts[0]);
 					$search = implode(' ', $parts);
-				} else {
+				}
+				else
+				{
 					$ql = 0;
 					$search = $words;
 				}
-				$url  = $this->server;
+				$url = $this->server;
 				$url .= '?bot=BeBot';
 				$url .= '&output=aoml';
-				$url .= '&max='.$this->max;
-				$url .= '&search='.urlencode($search);
-				$url .= '&ql='.$ql;
-				$url .= '&icons='.$this->icons;
+				$url .= '&max=' . $this->max;
+				$url .= '&search=' . urlencode($search);
+				$url .= '&ql=' . $ql;
+				$url .= '&icons=' . $this->icons;
 				if ($this->color_header)
 				{
-					$url .= '&color_header='.$this->color_header;
+					$url .= '&color_header=' . $this->color_header;
 				}
 				if ($this->color_highlight)
 				{
-					$url .= '&color_highlight='.$this->color_highlight;
+					$url .= '&color_highlight=' . $this->color_highlight;
 				}
 				if ($this->color_normal)
 				{
-					$url .= '&color_normal='.$this->color_normal;
+					$url .= '&color_normal=' . $this->color_normal;
 				}
-
-				$result = $this -> bot -> core("tools") -> get_site($url, 1);
+				$result = $this->bot->core("tools")->get_site($url, 1);
 				//Again I do not see why we're looking for mysql_real_escape_string
-				if(strstr($result, 'mysql_real_escape_string')!==false)
+				if (strstr($result, 'mysql_real_escape_string') !== false)
 				{
-					return("Recieved garbled reply from vhabot!");
+					return ("Recieved garbled reply from vhabot!");
 				}
 				return $result;
-			} 
-				else
+			}
+			else
 			{
 				return "Usage: items [quality] [item]";
 			}
-		} 
-		else 
+		}
+		else
 		{
-			$this -> bot -> send_help($name);
+			$this->bot->send_help($name);
 		}
 	}
 }

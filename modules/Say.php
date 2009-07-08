@@ -6,7 +6,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -32,13 +32,8 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (sÃ¸, 30 nov 2008) $
-* Revision: $Id: Say.php 1833 2008-11-30 22:09:06Z alreadythere $
 */
-
 $say = new Say($bot);
-
 /*
 The Class itself...
 */
@@ -49,67 +44,59 @@ class Say extends BaseActiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> whosaidthat = array();
-
+		$this->whosaidthat = array();
 		// Setup Access Control
-		$this -> register_command("all", "say", "ADMIN");
-		$this -> register_command("all", "whosaidthat", "MEMBER");
-
-		$this -> bot -> core("settings") -> create("Say", "OutputChannel", "both", "Into which channel should the output of say be sent? Either gc, pgmsg, both or original channel.", "gc;pgmsg;both;origin");
-
-		$this -> help['description'] = 'Makes the bot say things.';
-		$this -> help['command']['say something'] = "Makes that bot say 'something'";
-		$this -> help['command']['whosaidthat'] = "Find out who made the bot say that.";
+		$this->register_command("all", "say", "ADMIN");
+		$this->register_command("all", "whosaidthat", "MEMBER");
+		$this->bot->core("settings")->create("Say", "OutputChannel", "both", "Into which channel should the output of say be sent? Either gc, pgmsg, both or original channel.", "gc;pgmsg;both;origin");
+		$this->help['description'] = 'Makes the bot say things.';
+		$this->help['command']['say something'] = "Makes that bot say 'something'";
+		$this->help['command']['whosaidthat'] = "Find out who made the bot say that.";
 	}
 
 	function command_handler($name, $msg, $source)
 	{ // Start function handler()
-		$args = $this -> parse_com($msg, array("com","args"));
-
+		$args = $this->parse_com($msg, array("com" , "args"));
 		switch ($args['com'])
 		{
 			case "say":
-				if (strtolower($this -> bot -> core("settings") -> get("Say", "OutputChannel")) == "origin")
+				if (strtolower($this->bot->core("settings")->get("Say", "OutputChannel")) == "origin")
 				{
-					return $this -> saythis($name, $args['args']);
+					return $this->saythis($name, $args['args']);
 				}
 				else
 				{
-					$this -> bot -> send_output($name, $this -> saythis($name, $args['args']),
-					$this -> bot -> core("settings") -> get("Say", "OutputChannel"));
+					$this->bot->send_output($name, $this->saythis($name, $args['args']), $this->bot->core("settings")->get("Say", "OutputChannel"));
 				}
 				return false;
 			case "whosaidthat":
-				return $this -> whosaidthat();
+				return $this->whosaidthat();
 		}
-
-		$this -> bot -> send_help($name);
+		$this->bot->send_help($name);
 		return false;
 	} // End function handler()
 
 	function saythis($name, $message)
 	{
-		$this -> whosaidthat['time'] = time();
-		$this -> whosaidthat['name'] = $name;
-		$this -> whosaidthat['what'] = $message;
-
+		$this->whosaidthat['time'] = time();
+		$this->whosaidthat['name'] = $name;
+		$this->whosaidthat['what'] = $message;
 		return $message;
 	}
 
 	function whosaidthat()
 	{
-		if (empty($this -> whosaidthat))
+		if (empty($this->whosaidthat))
 		{
 			$output = "Nobody has used the say command since I logged in.";
 		}
 		else
 		{
-			$output = $this -> whosaidthat['name'];
+			$output = $this->whosaidthat['name'];
 			$output .= ' made me say "';
-			$output .= $this -> whosaidthat['what'];
+			$output .= $this->whosaidthat['what'];
 			$output .= '" ';
-			$output .= time()-$this -> whosaidthat['time'];
+			$output .= time() - $this->whosaidthat['time'];
 			$output .= ' seconds ago.';
 		}
 		return $output;

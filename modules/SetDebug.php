@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stens? ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,30 +30,24 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2009-01-04 18:47:30 +0000 (Sun, 04 Jan 2009) $
-* Revision: $Id: SetDebug.php 92 2009-01-04 18:47:30Z temar $
 */
-
-
 $setdebug = new SetDebug($bot);
-
 /*
 The Class itself...
 */
 class SetDebug extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_command('tell', 'setdebug', 'OWNER');
+		$this->register_command('tell', 'setdebug', 'OWNER');
 	}
 
 	function command_handler($name, $msg, $origin)
 	{
-		$this -> bot -> debug = !$this -> bot -> debug;
-		if ($this -> bot -> debug)
+		$this->bot->debug = ! $this->bot->debug;
+		if ($this->bot->debug)
 		{
 			return "Debugging output enabled!";
 		}

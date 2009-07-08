@@ -5,7 +5,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -31,29 +31,23 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-12-06 22:22:52 +0100 (lÃ¸, 06 des 2008) $
-* Revision: $Id: StringFilterUI.php 1894 2008-12-06 21:22:52Z blueeagle $
 */
-
 $stringfilter_interface = new StringFilter_Interface($bot);
-
 /*
 The Class itself...
 */
 class StringFilter_Interface extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_command('all', 'filter', 'ADMIN');
-
-		$this -> help['description'] = 'Add and remove strings to the bot\'s filter.';
-		$this -> help['command']['filter']="- Display the current string filter list.";
-		$this -> help['command']['filter add <string>'] = "- Replace <strong> with default replacment text.";
-		$this -> help['command']['filter add <string1> replace: <string2>'] = "- Replace <string1> with <string2>.";
-		$this -> help['command']['filter rem <string>'] = "Remove <string> from the list.";
+		$this->register_command('all', 'filter', 'ADMIN');
+		$this->help['description'] = 'Add and remove strings to the bot\'s filter.';
+		$this->help['command']['filter'] = "- Display the current string filter list.";
+		$this->help['command']['filter add <string>'] = "- Replace <strong> with default replacment text.";
+		$this->help['command']['filter add <string1> replace: <string2>'] = "- Replace <string1> with <string2>.";
+		$this->help['command']['filter rem <string>'] = "Remove <string> from the list.";
 	}
 
 	function command_handler($name, $msg, $type)
@@ -61,42 +55,42 @@ class StringFilter_Interface extends BaseActiveModule
 		// preg_match just works better than explode for string based input that may have spaces.
 		if (preg_match("/^filter add (.+?) replace: (.+)$/i", $msg, $info))
 		{
-			return $this -> add($info[1], $info[2]);
+			return $this->add($info[1], $info[2]);
 		}
 		else if (preg_match("/^filter add (.+?)$/i", $msg, $info))
 		{
-			return $this -> add($info[1]);
+			return $this->add($info[1]);
 		}
 		else if (preg_match("/^filter rem (.+)$/i", $msg, $info))
 		{
-			return $this -> rem($info[1]);
+			return $this->rem($info[1]);
 		}
 		else
 		{
-			return $this -> show($name);
+			return $this->show($name);
 		}
 	}
 
-	function add($string, $new=NULL)
+	function add($string, $new = NULL)
 	{
-		return $this -> bot -> core("stringfilter") -> add_string($string, $new);
+		return $this->bot->core("stringfilter")->add_string($string, $new);
 	}
 
 	function rem($string)
 	{
-		return $this -> bot -> core("stringfilter") -> rem_string($string);
+		return $this->bot->core("stringfilter")->rem_string($string);
 	}
 
 	function show($source)
 	{
-		$return = $this -> bot -> core("stringfilter") -> get_strings();
+		$return = $this->bot->core("stringfilter")->get_strings();
 		$inside = "Filtered String List:\n\n";
 		foreach ($return as $string => $replace)
 		{
-			$inside .= "Search for: \"".$string."\" Replace with: \"".$replace."\" ".$this -> bot -> core("tools") -> chatcmd("filter rem ".$string, "[REMOVE]");
+			$inside .= "Search for: \"" . $string . "\" Replace with: \"" . $replace . "\" " . $this->bot->core("tools")->chatcmd("filter rem " . $string, "[REMOVE]");
 			$inside .= "\n";
 		}
-		return $this -> bot -> core("tools") -> make_blob("Filtered String List", $inside);
+		return $this->bot->core("tools")->make_blob("Filtered String List", $inside);
 	}
 }
 ?>

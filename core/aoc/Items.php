@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -13,10 +13,8 @@
 * - Glarawyn (RK1)
 * - Khalem (RK1)
 * - Naturalistic (RK1)
-* - Noer
 * - Temar (RK1)
-* - Vrykolas
-* *
+*
 * See Credits file for all aknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -32,13 +30,8 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-10-29 23:33:21 +0100 (Mi, 29 Okt 2008) $
-* Revision: $Id: StartBot.php 1794 2008-10-29 22:33:21Z temar $
 */
-
 $items_core = new Items_Core($bot);
-
 class Items_Core extends BasePassiveModule
 {
 	var $server = 'http://aocdb.lunevo.net/';
@@ -47,8 +40,7 @@ class Items_Core extends BasePassiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_module("items");
+		$this->register_module("items");
 	}
 
 	/*
@@ -58,18 +50,16 @@ class Items_Core extends BasePassiveModule
 	function parse_items($itemText)
 	{
 		$items = array();
-
-		$count = preg_match_all('/'.$this->itemPattern.'/i', $itemText, $matches, PREG_SET_ORDER);
-
-		foreach($matches as $match)
+		$count = preg_match_all('/' . $this->itemPattern . '/i', $itemText, $matches, PREG_SET_ORDER);
+		foreach ($matches as $match)
 		{
-			$item['lowid']   = $match[2];
-			$item['highid']  = $match[3];
-			$item['ql']      = $match[4];
-			$item['lowcrc']  = $match[5];
+			$item['lowid'] = $match[2];
+			$item['highid'] = $match[3];
+			$item['ql'] = $match[4];
+			$item['lowcrc'] = $match[5];
 			$item['highcrc'] = $match[6];
-			$item['colour']  = $match[7];
-			$item['name']    = $match[8];
+			$item['colour'] = $match[7];
+			$item['name'] = $match[8];
 			$items[] = $item;
 		}
 		return $items;
@@ -80,68 +70,63 @@ class Items_Core extends BasePassiveModule
 	*/
 	function make_item($item, $alternate = false)
 	{
-		if(empty($item))
+		if (empty($item))
 			return '';
-
-		if($alternate)
-			return '<a style="text-decoration:none" href="itemref://'.$item['lowid'].'/'.$item['highid'].'/'.$item['ql'].'/'.$item['lowcrc'].'/'.$item['highcrc'].'"><font color=#'.$item['colour'].'>['.$item['name'].']</font></a>';
+		if ($alternate)
+			return '<a style="text-decoration:none" href="itemref://' . $item['lowid'] . '/' . $item['highid'] . '/' . $item['ql'] . '/' . $item['lowcrc'] . '/' . $item['highcrc'] . '"><font color=#' . $item['colour'] . '>[' . $item['name'] . ']</font></a>';
 		else
-			return "<a style='text-decoration:none' href='itemref://".$item['lowid']."/".$item['highid']."/".$item['ql']."/".$item['lowcrc']."/".$item['highcrc']."'><font color=#".$item['colour'].">[".$item['name']."]</font></a>";
+			return "<a style='text-decoration:none' href='itemref://" . $item['lowid'] . "/" . $item['highid'] . "/" . $item['ql'] . "/" . $item['lowcrc'] . "/" . $item['highcrc'] . "'><font color=#" . $item['colour'] . ">[" . $item['name'] . "]</font></a>";
 	}
 
 	//Returns true if $item is an itemref, false otherwise.
 	function is_item($item)
 	{
-		if(1 > preg_match('/'.$this->itemPattern.'/i', $item))
+		if (1 > preg_match('/' . $this->itemPattern . '/i', $item))
 			return false;
-
 		return true;
 	}
 
 	function submit_item($item, $name)
 	{
-		if(empty($item))
-			return -1;
-
-		$checksum = md5('aocitems' + $item['lowid'] + $item['highid'] + $item['ql'] + $item['lowcrc'] + $item['highcrc'] + $item['colour'] + $item['itemname'] + $this -> bot -> dimension + $this -> bot -> guild + $name);
-
-		$url  = $this->server."botsubmit/v3/";
-		$url .= '?lowid='.urlencode($item['lowid']);
-		$url .= '&highid='.urlencode($item['highid']);
-		$url .= '&ql='.urlencode($item['ql']);
-		$url .= '&lowcrc='.urlencode($item['lowcrc']);
-		$url .= '&highcrc='.urlencode($item['highcrc']);
-		$url .= '&color='.urlencode($item['colour']);
-		$url .= '&name='.urlencode($item['name']);
-		$url .= '&server='.urlencode($this -> bot -> dimension);
-		$url .= '&guildname='.urlencode($this -> bot -> guild);
-		$url .= '&username='.urlencode($name);
-		$url .= '&checksum='.urlencode($checksum);
-
-		return $this -> bot -> core("tools") -> get_site($url, 1);
+		if (empty($item))
+			return - 1;
+		$checksum = md5('aocitems' + $item['lowid'] + $item['highid'] + $item['ql'] + $item['lowcrc'] + $item['highcrc'] + $item['colour'] + $item['itemname'] + $this->bot->dimension + $this->bot->guild + $name);
+		$url = $this->server . "botsubmit/v3/";
+		$url .= '?lowid=' . urlencode($item['lowid']);
+		$url .= '&highid=' . urlencode($item['highid']);
+		$url .= '&ql=' . urlencode($item['ql']);
+		$url .= '&lowcrc=' . urlencode($item['lowcrc']);
+		$url .= '&highcrc=' . urlencode($item['highcrc']);
+		$url .= '&color=' . urlencode($item['colour']);
+		$url .= '&name=' . urlencode($item['name']);
+		$url .= '&server=' . urlencode($this->bot->dimension);
+		$url .= '&guildname=' . urlencode($this->bot->guild);
+		$url .= '&username=' . urlencode($name);
+		$url .= '&checksum=' . urlencode($checksum);
+		return $this->bot->core("tools")->get_site($url, 1);
 	}
 
 	function search_item_db_details($words)
 	{
-		$url  = $this->server."botsearch/";
+		$url = $this->server . "botsearch/";
 		$url .= '?single=1';
-		$url .= '&id='.$words;
-		$result = $this -> bot -> core("tools") -> get_site($url, 1);
+		$url .= '&id=' . $words;
+		$result = $this->bot->core("tools")->get_site($url, 1);
 		//A comment explaining the logic of this check would be appreciated! Why are we looking for mysql_real_escape_string here?
-		if(strstr($result, 'mysql_real_escape_string')!==false)
+		if (strstr($result, 'mysql_real_escape_string') !== false)
 		{
-			return("Error in query to database");
+			return ("Error in query to database");
 		}
 		return $result;
 	}
 
 	function search_item_db($words)
 	{
-		$url  = $this->server."botsearch/";
-		$url .= '?search='.urlencode($words);
-		$url .= '&botname='.$this->bot->botname;
-		$url .= '&pre='.urlencode($this -> bot -> commpre);
-		return $this -> bot -> core("tools") -> get_site($url, 1);
+		$url = $this->server . "botsearch/";
+		$url .= '?search=' . urlencode($words);
+		$url .= '&botname=' . $this->bot->botname;
+		$url .= '&pre=' . urlencode($this->bot->commpre);
+		return $this->bot->core("tools")->get_site($url, 1);
 	}
 }
 ?>

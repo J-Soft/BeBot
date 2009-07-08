@@ -7,7 +7,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -33,151 +33,131 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
-* Revision: $Id: BanManagerUI.php 1 2008-11-04 06:00:45Z temar $
 */
-
 $banmanager = new BanManager($bot);
-
 /*
 The Class itself...
 */
 class BanManager extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_command("all", "ban", "GUEST", array("add" => "ADMIN", "del" => "ADMIN"));
-
-		$this -> help['description'] = "Handling the bans for <botname>.";
-		$this -> help['command']['banlist'] = "Shows the list of all currently banned characters.";
-		$this -> help['command']['ban'] = $this -> help['command']['banlist'];
-		$this -> help['command']['ban list'] = $this -> help['command']['banlist'];
-		$this -> help['command']['ban add <name> <reason>'] = "Bans <name> for <reason> from the bot forever - or until manually unbanned.";
-		$this -> help['command']['ban add <name> <time> <reason>'] = "Bans <name> for <reason> from the bot for <time>. <time> has a base unit of days. Using 'm' for minutes, 'h' for hours and 'd' for days directly behind the number you can change the time unit. '6h' as time would ban the character for 6h, after which the ban will be automatically deleted. The bot checks every minute for bans that have run out.";
-		$this -> help['command']['ban del <name>'] = "Unbans <name>.";
-		$this -> help['command']['ban rem <name>'] = "Unbans <name>.";
-		
-		$this -> bot -> core("command_alias") -> register("ban list", "banlist");
-		$this -> bot -> core("command_alias") -> register("ban", "blacklist");
-
-		$this -> register_event("cron", "5min");
-
-		$this -> bot -> core("settings") -> create("Ban", "ReqReason", FALSE, "is a Reason Required?");
+		$this->register_command("all", "ban", "GUEST", array("add" => "ADMIN" , "del" => "ADMIN"));
+		$this->help['description'] = "Handling the bans for <botname>.";
+		$this->help['command']['banlist'] = "Shows the list of all currently banned characters.";
+		$this->help['command']['ban'] = $this->help['command']['banlist'];
+		$this->help['command']['ban list'] = $this->help['command']['banlist'];
+		$this->help['command']['ban add <name> <reason>'] = "Bans <name> for <reason> from the bot forever - or until manually unbanned.";
+		$this->help['command']['ban add <name> <time> <reason>'] = "Bans <name> for <reason> from the bot for <time>. <time> has a base unit of days. Using 'm' for minutes, 'h' for hours and 'd' for days directly behind the number you can change the time unit. '6h' as time would ban the character for 6h, after which the ban will be automatically deleted. The bot checks every minute for bans that have run out.";
+		$this->help['command']['ban del <name>'] = "Unbans <name>.";
+		$this->help['command']['ban rem <name>'] = "Unbans <name>.";
+		$this->bot->core("command_alias")->register("ban list", "banlist");
+		$this->bot->core("command_alias")->register("ban", "blacklist");
+		$this->register_event("cron", "5min");
+		$this->bot->core("settings")->create("Ban", "ReqReason", FALSE, "is a Reason Required?");
 	}
 
 	function cron()
 	{
-		$unbans = $this -> bot -> db -> select("SELECT nickname FROM #___users WHERE user_level = -1 AND banned_until > 0 AND banned_until <= " . time());
-		if (!empty($unbans))
+		$unbans = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level = -1 AND banned_until > 0 AND banned_until <= " . time());
+		if (! empty($unbans))
 		{
 			foreach ($unbans as $unban)
 			{
-				$this -> bot -> core("security") -> rem_ban("Cron", $unban[0], "Temporary ban ran out,");
+				$this->bot->core("security")->rem_ban("Cron", $unban[0], "Temporary ban ran out,");
 			}
 		}
 	}
 
 	function command_handler($name, $msg, $origin)
 	{
-		if (preg_match("/^ban$/i", $msg)
-		|| preg_match("/^ban list$/i", $msg))
-			return $this -> show_ban_list();
+		if (preg_match("/^ban$/i", $msg) || preg_match("/^ban list$/i", $msg))
+			return $this->show_ban_list();
 		elseif (preg_match("/^ban add ([a-z0-9]+) ([0-9]+[mhd]?)$/i", $msg, $info))
-			return $this -> add_ban($name, $info[1], $info[2], "");
+			return $this->add_ban($name, $info[1], $info[2], "");
 		elseif (preg_match("/^ban add ([a-z0-9]+)$/i", $msg, $info))
-			return $this -> add_ban($name, $info[1], "0", "");
+			return $this->add_ban($name, $info[1], "0", "");
 		elseif (preg_match("/^ban add ([a-z0-9]+) ([0-9]+[mhd]?) (.+)$/i", $msg, $info))
-			return $this -> add_ban($name, $info[1], $info[2], $info[3]);
+			return $this->add_ban($name, $info[1], $info[2], $info[3]);
 		elseif (preg_match("/^ban add ([a-z0-9]+) (.+)$/i", $msg, $info))
-			return $this -> add_ban($name, $info[1], "0", $info[2]);
+			return $this->add_ban($name, $info[1], "0", $info[2]);
 		elseif (preg_match("/^ban del ([a-z0-9]+)$/i", $msg, $info))
-			return $this -> del_ban($name, $info[1]);
+			return $this->del_ban($name, $info[1]);
 		elseif (preg_match("/^ban rem ([a-z0-9]+)$/i", $msg, $info))
-			return $this -> del_ban($name, $info[1]);
-
-		return $this -> bot -> send_help($name, "ban");
+			return $this->del_ban($name, $info[1]);
+		return $this->bot->send_help($name, "ban");
 	}
 
 	function show_ban_list()
 	{
-		$banned = $this -> bot -> db -> select("SELECT nickname, banned_by, banned_at, banned_for, banned_until FROM #___users WHERE user_level = -1 ORDER BY nickname");
+		$banned = $this->bot->db->select("SELECT nickname, banned_by, banned_at, banned_for, banned_until FROM #___users WHERE user_level = -1 ORDER BY nickname");
 		if (empty($banned))
 		{
 			return "Nobody is banned!";
 		}
-
 		$total = 0;
-
-		$banlist = "##blob_title## ::: All banned characters for " . $this -> bot -> botname . " :::##end##\n";
+		$banlist = "##blob_title## ::: All banned characters for " . $this->bot->botname . " :::##end##\n";
 		foreach ($banned as $ban)
 		{
-			$blob = "\n" . $ban[0] . " ".$this -> bot -> core("tools") -> chatcmd("whois " . $ban[0], "[WHOIS]");
-			$blob .= " ".$this -> bot -> core("tools") -> chatcmd("ban del " . $ban[0], "[UNBAN]")."\n";
-			$blob .= $this -> bot -> core("colors") -> colorize("blob_text", "Banned by: ") . stripslashes($ban[1]) . "\n";
-			$blob .= $this -> bot -> core("colors") -> colorize("blob_text", "Banned at: ") . gmdate($this -> bot -> core("settings") -> get("Time", "FormatString"), $ban[2]) . "\n";
-			$blob .= $this -> bot -> core("colors") -> colorize("blob_text", "Reason: ") . stripslashes($ban[3]) . "\n";
+			$blob = "\n" . $ban[0] . " " . $this->bot->core("tools")->chatcmd("whois " . $ban[0], "[WHOIS]");
+			$blob .= " " . $this->bot->core("tools")->chatcmd("ban del " . $ban[0], "[UNBAN]") . "\n";
+			$blob .= $this->bot->core("colors")->colorize("blob_text", "Banned by: ") . stripslashes($ban[1]) . "\n";
+			$blob .= $this->bot->core("colors")->colorize("blob_text", "Banned at: ") . gmdate($this->bot->core("settings")->get("Time", "FormatString"), $ban[2]) . "\n";
+			$blob .= $this->bot->core("colors")->colorize("blob_text", "Reason: ") . stripslashes($ban[3]) . "\n";
 			if ($ban[4] > 0)
 			{
-				$blob .= $this -> bot -> core("colors") -> colorize("blob_text", "Temporary ban until " .  gmdate($this -> bot -> core("settings") -> get("Time", "FormatString"), $ban[4]) . ".\n");
+				$blob .= $this->bot->core("colors")->colorize("blob_text", "Temporary ban until " . gmdate($this->bot->core("settings")->get("Time", "FormatString"), $ban[4]) . ".\n");
 			}
 			else
 			{
-				$blob .= $this -> bot -> core("colors") -> colorize("blob_text", "Permanent ban.\n");
+				$blob .= $this->bot->core("colors")->colorize("blob_text", "Permanent ban.\n");
 			}
 			$banlist .= $blob;
-			$total++;
+			$total ++;
 		}
-
-
-		return ("##highlight##".$total."##end## Characters Banned ::: ".$this -> bot -> core("tools") -> make_blob("click to view", $banlist));
+		return ("##highlight##" . $total . "##end## Characters Banned ::: " . $this->bot->core("tools")->make_blob("click to view", $banlist));
 	}
 
 	function add_ban($source, $user, $duration, $reason)
 	{
-		$id = $this -> bot -> core("chat") -> get_uid($user);
+		$id = $this->bot->core("chat")->get_uid($user);
 		$user = ucfirst(strtolower($user));
 		if ($id == 0)
 		{
 			return "##highlight##" . $user . " ##end##is no valid character name!";
 		}
-
 		if ($reason == "")
 		{
-			if($this -> bot -> core("settings") -> get("Ban", "ReqReason"))
+			if ($this->bot->core("settings")->get("Ban", "ReqReason"))
 			{
-				Return("Reason Required for adding Bans");
+				Return ("Reason Required for adding Bans");
 			}
 			$reason = "None given.";
 		}
-
 		if ($duration == "0")
 		{
 			$endtime = 0;
 		}
 		else
 		{
-			$timesize = 60*60*24;
+			$timesize = 60 * 60 * 24;
 			if (stristr($duration, 'm'))
 				$timesize = 60;
 			elseif (stristr($duration, 'h'))
-				$timesize = 60*60;
+				$timesize = 60 * 60;
 			elseif (stristr($duration, 'd'))
-				$timesize = 60*60*24;
-
+				$timesize = 60 * 60 * 24;
 			settype($duration, "integer");
-
-			$endtime = time() +  $duration * $timesize;
+			$endtime = time() + $duration * $timesize;
 		}
-
-		$ban = $this -> bot -> core("security") -> set_ban($source, $user, $source, $reason, $endtime);
-		if (!($ban instanceof BotError))
+		$ban = $this->bot->core("security")->set_ban($source, $user, $source, $reason, $endtime);
+		if (! ($ban instanceof BotError))
 		{
-		if($this -> bot -> core("online") -> in_chat($user))
+			if ($this->bot->core("online")->in_chat($user))
 			{
-			$this -> bot -> core("chat") -> pgroup_kick($user);
+				$this->bot->core("chat")->pgroup_kick($user);
 			}
 		}
 		return $ban;
@@ -185,14 +165,13 @@ class BanManager extends BaseActiveModule
 
 	function del_ban($source, $user)
 	{
-		$id = $this -> bot -> core("chat") -> get_uid($user);
+		$id = $this->bot->core("chat")->get_uid($user);
 		$user = ucfirst(strtolower($user));
 		if ($id == 0)
 		{
 			return "##highlight##" . $user . " ##end##is no valid character name!";
 		}
-
-		$ban = $this -> bot -> core("security") -> rem_ban($source, $user, $source);
+		$ban = $this->bot->core("security")->rem_ban($source, $user, $source);
 		return $ban;
 	}
 }

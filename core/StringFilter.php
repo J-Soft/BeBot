@@ -1,12 +1,11 @@
 <?php
 /*
-*
 * StringFilter.php - Performs some common text filtering.
 * Can be used as a word censor. This functionality is not enabled by default.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -32,19 +31,15 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-12-05 13:02:28 +0100 (fr, 05 des 2008) $
-* Revision: $Id: StringFilter.php 1882 2008-12-05 12:02:28Z blueeagle $
 */
-
 $stringfilter_core = new stringfilter_core($bot);
-
 /*
 The Class itself...
 */
 class stringfilter_core extends BasePassiveModule
 { // Start Class
 	var $stringlist;
+
 	/*
 	Constructor:
 	Hands over a referance to the "Bot" class.
@@ -52,19 +47,16 @@ class stringfilter_core extends BasePassiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
 		// Create Table
-		$this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS ".$this -> bot -> db -> define_tablename("string_filter", "true")."
+		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("string_filter", "true") . "
 			(search varchar(255) NOT NULL,
 				new VARCHAR(255) NOT NULL DEFAULT '**bleep**',
 				PRIMARY KEY (search))");
-
-		$this -> register_module("stringfilter");
-		$this -> register_event("connect");
-
-		$this -> stringlist = array();
-		$this -> bot -> core("settings") -> create ("Filter", "Enabled", FALSE, "Enable bot output text filter.", "On;Off", FALSE, 1);
-		$this -> bot -> core("settings") -> create ("Filter", "Funmode", "off", "Select a fun bot output filter. (See documentation)", "off;chef;eleet;fudd;pirate;nofont;", FALSE, 10);
+		$this->register_module("stringfilter");
+		$this->register_event("connect");
+		$this->stringlist = array();
+		$this->bot->core("settings")->create("Filter", "Enabled", FALSE, "Enable bot output text filter.", "On;Off", FALSE, 1);
+		$this->bot->core("settings")->create("Filter", "Funmode", "off", "Select a fun bot output filter. (See documentation)", "off;chef;eleet;fudd;pirate;nofont;", FALSE, 10);
 	}
 
 	/*
@@ -72,20 +64,20 @@ class stringfilter_core extends BasePassiveModule
 	*/
 	function connect()
 	{ // Start function connect()
-		$this -> get_strings(TRUE);
+		$this->get_strings(TRUE);
 	} // End function connect()
 
 	function output_filter($text)
 	{ // Start function output_filter()
-		foreach ($this -> stringlist as $search => $new)
+		foreach ($this->stringlist as $search => $new)
 		{
-			$text = preg_replace("/".$search."/i", $new, $text);
+			$text = preg_replace("/" . $search . "/i", $new, $text);
 			// $text = str_ireplace($search, $new, $text); // str_ireplace is php5+
 		}
-		if ($this -> bot -> core("settings") -> get("Filter", "Funmode") <> "off")
+		if ($this->bot->core("settings")->get("Filter", "Funmode") != "off")
 		{
 			echo "\nCaling funmode()!\n";
-			$text = $this -> funmode($text, $this -> bot -> core("settings") -> get("Filter", "Funmode"));
+			$text = $this->funmode($text, $this->bot->core("settings")->get("Filter", "Funmode"));
 		}
 		return $text;
 	} // End function output_filter()
@@ -96,9 +88,9 @@ class stringfilter_core extends BasePassiveModule
 	*/
 	function input_filter($text)
 	{ // Start function input_filter()
-		foreach ($this -> stringlist as $search => $new)
+		foreach ($this->stringlist as $search => $new)
 		{
-			$text = preg_replace("/".stripslashes($search)."/i", stripslashes($new), $text);
+			$text = preg_replace("/" . stripslashes($search) . "/i", stripslashes($new), $text);
 			// $text = str_ireplace($search, $new, $text); // str_ireplace is php5+
 		}
 		return $text;
@@ -108,12 +100,12 @@ class stringfilter_core extends BasePassiveModule
 	Gets the filterd string list from the database.
 	If update is true, the array is refreshed from the database.
 	*/
-	function get_strings($update=FALSE)
+	function get_strings($update = FALSE)
 	{ // Start function get_strings()
 		if ($update)
 		{
 			$sql = "SELECT * FROM #___string_filter";
-			$result = $this -> bot -> db -> select($sql, MYSQL_ASSOC);
+			$result = $this->bot->db->select($sql, MYSQL_ASSOC);
 			if (empty($result))
 			{
 				return FALSE;
@@ -122,53 +114,53 @@ class stringfilter_core extends BasePassiveModule
 			{
 				foreach ($result as $info)
 				{
-					$this -> stringlist[$info["search"]] = $info["new"];
+					$this->stringlist[$info["search"]] = $info["new"];
 				}
-				unset ($result);
+				unset($result);
 			}
 		}
-		return $this -> stringlist;
+		return $this->stringlist;
 	} // End function get_strings()
 
 	/*
 	Adds a string to the filtered string list.
 	*/
-	function add_string($search, $new=NULL)
+	function add_string($search, $new = NULL)
 	{ // Start function add_string()
 		$search = mysql_real_escape_string(strtolower($search));
-		if (isset($this -> stringlist[$search]))
+		if (isset($this->stringlist[$search]))
 		{
-			$this->error->set("The string '".$search."' is already on the filtered word list.");
+			$this->error->set("The string '" . $search . "' is already on the filtered word list.");
 			return $this->error;
 		}
-		if (!is_null($new))
+		if (! is_null($new))
 		{
 			$new = mysql_real_escape_string(strtolower($new));
-			$sql = "INSERT INTO #___string_filter (search, new) VALUES ('".$search."', '".$new."')";
+			$sql = "INSERT INTO #___string_filter (search, new) VALUES ('" . $search . "', '" . $new . "')";
 		}
 		else
 		{
-			$sql = "INSERT INTO #___string_filter (search) VALUES ('".$search."')";
+			$sql = "INSERT INTO #___string_filter (search) VALUES ('" . $search . "')";
 			$new = "**bleep**";
 		}
-		$this -> bot -> db -> query($sql);
-		$this -> stringlist[$search] = $new;
-		return "Added '".$search."' to the filterd string list. It will be replaced with '".$new."'";
+		$this->bot->db->query($sql);
+		$this->stringlist[$search] = $new;
+		return "Added '" . $search . "' to the filterd string list. It will be replaced with '" . $new . "'";
 	} // End function add_string()
 
 	function rem_string($search)
 	{ // Start function rem_string()
 		$search = mysql_real_escape_string(strtolower($search));
-		if (isset($this -> stringlist[$search]))
+		if (isset($this->stringlist[$search]))
 		{
-			unset($this -> stringlist[$search]);
-			$sql = "DELETE FROM #___string_filter WHERE search = '".$search."'";
-			$this -> bot -> db -> query($sql);
-			return "Removed ".$search." from the filtered string list.";
+			unset($this->stringlist[$search]);
+			$sql = "DELETE FROM #___string_filter WHERE search = '" . $search . "'";
+			$this->bot->db->query($sql);
+			return "Removed " . $search . " from the filtered string list.";
 		}
 		else
 		{
-			$this->error->set($search." is not on the filtered string list.");
+			$this->error->set($search . " is not on the filtered string list.");
 			return $this->error;
 		}
 	} // End function rem_string()
@@ -182,29 +174,28 @@ class stringfilter_core extends BasePassiveModule
 		switch ($filter)
 		{
 			case "rot13":
-				return $this -> bot -> core("funfilters") -> rot13($text);
-			break;
+				return $this->bot->core("funfilters")->rot13($text);
+				break;
 			case "chef":
-				return $this -> bot -> core("funfilters") -> chef($text);
-			break;
+				return $this->bot->core("funfilters")->chef($text);
+				break;
 			case "eleet":
-				return $this -> bot -> core("funfilters") -> eleet($text);
-			break;
+				return $this->bot->core("funfilters")->eleet($text);
+				break;
 			case "fudd":
-				return $this -> bot -> core("funfilters") -> fudd($text);
-			break;
+				return $this->bot->core("funfilters")->fudd($text);
+				break;
 			case "pirate":
-				return $this -> bot -> core("funfilters") -> pirate($text);
-			break;
+				return $this->bot->core("funfilters")->pirate($text);
+				break;
 			case "nofont":
-				return $this -> bot -> core("funfilters") -> nofont($text);
-			break;
+				return $this->bot->core("funfilters")->nofont($text);
+				break;
 			default:
-				$this -> bot -> log("FILTER", "ERROR", $filter." is not a valid fun mode.");
+				$this->bot->log("FILTER", "ERROR", $filter . " is not a valid fun mode.");
 				return $text;
-			break;
+				break;
 		}
 	} // End function funmode()
-
 } // End of Class
 ?>

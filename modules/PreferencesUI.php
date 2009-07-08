@@ -2,7 +2,7 @@
 /*
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -28,72 +28,66 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-12-02 03:08:55 +0000 (Tue, 02 Dec 2008) $
-* Revision: $Id: PreferencesUI.php 39 2008-12-02 03:08:55Z temar $
 */
-
 $preferences = new Preferences_GUI(&$bot);
-
 /*
 The Class itself...
 */
 class Preferences_GUI extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
 		//Create access settings for this module
-		$this -> register_command("all", "preferences", "MEMBER", array('default'=>'SUPERADMIN'));
-		$this -> register_alias("preferences", "prefs");
-
-		$this -> help['description'] = 'Player Preferences';
-		$this -> help['command']['preferences'] = "Shows the preferences interface.";
-		$this -> help['notes'] = 'When a default is changed all users who have not customised ';
-		$this -> help['notes'].= 'that setting will also have their preferences changed.<br>';
-		$this -> help['notes'].= 'When a default is changed from option A to option B and back again ';
-		$this -> help['notes'].= 'users who had customised their preference to option B will be reset ';
-		$this -> help['notes'].= 'and have option A as default again.';
+		$this->register_command("all", "preferences", "MEMBER", array('default' => 'SUPERADMIN'));
+		$this->register_alias("preferences", "prefs");
+		$this->help['description'] = 'Player Preferences';
+		$this->help['command']['preferences'] = "Shows the preferences interface.";
+		$this->help['notes'] = 'When a default is changed all users who have not customised ';
+		$this->help['notes'] .= 'that setting will also have their preferences changed.<br>';
+		$this->help['notes'] .= 'When a default is changed from option A to option B and back again ';
+		$this->help['notes'] .= 'users who had customised their preference to option B will be reset ';
+		$this->help['notes'] .= 'and have option A as default again.';
 	}
 
 	function command_handler($name, $msg, $origin)
 	{
-		$com = $this->parse_com($msg, array('com', 'sub', 'module', 'preference', 'value'));
-		switch($com['sub'])
+		$com = $this->parse_com($msg, array('com' , 'sub' , 'module' , 'preference' , 'value'));
+		switch ($com['sub'])
 		{
 			case '':
 				//No arguments
-				return($this -> bot -> core("prefs") -> show_modules($name));
+				return ($this->bot->core("prefs")->show_modules($name));
 				break;
 			case 'show':
 				//Show a spesific preference
-				switch($com['module'])
+				switch ($com['module'])
 				{
 					case '':
 						//Show all modules
-						return($this -> bot -> core('prefs') -> show_modules($name));
+						return ($this->bot->core('prefs')->show_modules($name));
 						break;
 					default:
 						//Show module spesific preferences
-						return($this -> bot -> core('prefs') -> show_prefs($name, $com['module']));
+						return ($this->bot->core('prefs')->show_prefs($name, $com['module']));
 						break;
 				}
 				break;
 			case 'set':
 				//Set a given value
-				return($this -> bot -> core("prefs") -> change($name, $com['module'], $com['preference'], $com['value']));
+				return ($this->bot->core("prefs")->change($name, $com['module'], $com['preference'], $com['value']));
 				break;
 			case 'default':
 				//Set a default value
-				return ($this -> bot -> core("prefs") -> change_default($name, $com['module'], $com['preference'], $com['value']));
+				return ($this->bot->core("prefs")->change_default($name, $com['module'], $com['preference'], $com['value']));
 				break;
 			case 'reset':
-				return($this -> bot -> core("prefs") -> reset($name, $com['module']));
+				return ($this->bot->core("prefs")->reset($name, $com['module']));
 				break;
 			default:
 				$this->error->set("Unknown command ##highlight##'{$com['sub']}'##end##");
-				return($this->error);
+				return ($this->error);
 		}
 	}
 }

@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,40 +30,31 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (sÃ¸, 30 nov 2008) $
-* Revision: $Id: Countdown.php 1833 2008-11-30 22:09:06Z alreadythere $
 */
-
-
 $countdown = new Countdown($bot);
-
 /*
 The Class itself...
 */
 class Countdown extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_command('all', 'countdown', 'MEMBER');
-		$this -> register_alias("countdown", "cd");
-		$this -> register_event("timer", "countdown");
-		
-		$classid = $this -> bot -> core("timer") -> create_timer_class("Countdown", "Notify class used for countdowns, only last 5secs are shown.");
-		$nextid = $this -> bot -> core("timer") -> create_timer_class_entry($classid, -2, 0, "", "[##lightgreen##--&gt; GO GO GO &lt;--##end##]");
-		$nextid = $this -> bot -> core("timer") -> create_timer_class_entry($classid, $nextid, 1, "", "[##orange##--------&gt; 1 &lt;-------##end##]");
-		$nextid = $this -> bot -> core("timer") -> create_timer_class_entry($classid, $nextid, 2, "", "[##orange##--------&gt; 2 &lt;-------##end##]");
-		$nextid = $this -> bot -> core("timer") -> create_timer_class_entry($classid, $nextid, 3, "", "[##orange##--------&gt; 3 &lt;-------##end##]");
-		$nextid = $this -> bot -> core("timer") -> create_timer_class_entry($classid, $nextid, 4, "", "[##red##--------&gt; 4 &lt;-------##end##]");
-		$nextid = $this -> bot -> core("timer") -> create_timer_class_entry($classid, $nextid, 5, "", "[##red##--------&gt; 5 &lt;-------##end##]");
-
-		$this -> bot -> core("settings") -> create("Countdown", "Channel", "both", "In which channel should a countdown be shown? In the channel of origin, or in both gc and pgmsg?", "both;gc;pgmsg;origin");
-
-		$this -> help['description'] = "A simple countdown plugin.";
-		$this -> help['command']['countdown'] = "Counts down to zero.";
-		$this -> help['notes'] = "<pre>cd is a synonym for <pre>countdown.";
+		$this->register_command('all', 'countdown', 'MEMBER');
+		$this->register_alias("countdown", "cd");
+		$this->register_event("timer", "countdown");
+		$classid = $this->bot->core("timer")->create_timer_class("Countdown", "Notify class used for countdowns, only last 5secs are shown.");
+		$nextid = $this->bot->core("timer")->create_timer_class_entry($classid, - 2, 0, "", "[##lightgreen##--&gt; GO GO GO &lt;--##end##]");
+		$nextid = $this->bot->core("timer")->create_timer_class_entry($classid, $nextid, 1, "", "[##orange##--------&gt; 1 &lt;-------##end##]");
+		$nextid = $this->bot->core("timer")->create_timer_class_entry($classid, $nextid, 2, "", "[##orange##--------&gt; 2 &lt;-------##end##]");
+		$nextid = $this->bot->core("timer")->create_timer_class_entry($classid, $nextid, 3, "", "[##orange##--------&gt; 3 &lt;-------##end##]");
+		$nextid = $this->bot->core("timer")->create_timer_class_entry($classid, $nextid, 4, "", "[##red##--------&gt; 4 &lt;-------##end##]");
+		$nextid = $this->bot->core("timer")->create_timer_class_entry($classid, $nextid, 5, "", "[##red##--------&gt; 5 &lt;-------##end##]");
+		$this->bot->core("settings")->create("Countdown", "Channel", "both", "In which channel should a countdown be shown? In the channel of origin, or in both gc and pgmsg?", "both;gc;pgmsg;origin");
+		$this->help['description'] = "A simple countdown plugin.";
+		$this->help['command']['countdown'] = "Counts down to zero.";
+		$this->help['notes'] = "<pre>cd is a synonym for <pre>countdown.";
 	}
 
 	function timer($name, $prefix, $suffix, $delay)
@@ -71,14 +62,14 @@ class Countdown extends BaseActiveModule
 		$parts = explode(" ", $name);
 		$user = $parts[0];
 		$origin = $parts[1];
-		$out = $this -> bot -> core("settings") -> get("Countdown", "Channel");
+		$out = $this->bot->core("settings")->get("Countdown", "Channel");
 		if (strtolower($out) == 'origin')
 		{
-			$this -> bot -> send_output($user, $prefix . $suffix, $origin);
+			$this->bot->send_output($user, $prefix . $suffix, $origin);
 		}
 		else
 		{
-			$this -> bot -> send_output($user, $prefix . $suffix, $out);
+			$this->bot->send_output($user, $prefix . $suffix, $out);
 		}
 	}
 
@@ -87,7 +78,7 @@ class Countdown extends BaseActiveModule
 	*/
 	function command_handler($name, $msg, $origin)
 	{
-		$ret = $this -> bot -> core("timer") -> add_timer(false, "countdown", 6, $name . " " . $origin, "internal", 0, "Countdown");
+		$ret = $this->bot->core("timer")->add_timer(false, "countdown", 6, $name . " " . $origin, "internal", 0, "Countdown");
 		return "Countdown started!";
 	}
 }

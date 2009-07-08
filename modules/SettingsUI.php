@@ -6,7 +6,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -32,28 +32,22 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-12-18 05:06:42 +0100 (to, 18 des 2008) $
-* Revision: $Id: SettingsUI.php 1926 2008-12-18 04:06:42Z temar $
 */
-
 $setconf = new SetConf($bot);
-
 /*
 The Class itself...
 */
 class SetConf extends BaseActiveModule
 { // Start Class
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-	
-		$this -> help['description'] = "Setting management interface.";
-		$this -> help['command']['settings'] = "Shows the settings interface";
-		$this -> help['command']['set <module> <setting> <value>'] = "Sets the setting <setting> for module <module> to <value>.";
-
-		$this -> register_command("all", "settings", "SUPERADMIN");
-		$this -> register_alias("settings", "set");
+		$this->help['description'] = "Setting management interface.";
+		$this->help['command']['settings'] = "Shows the settings interface";
+		$this->help['command']['set <module> <setting> <value>'] = "Sets the setting <setting> for module <module> to <value>.";
+		$this->register_command("all", "settings", "SUPERADMIN");
+		$this->register_alias("settings", "set");
 	}
 
 	/*
@@ -64,16 +58,16 @@ class SetConf extends BaseActiveModule
 	function command_handler($name, $msg, $source)
 	{ // Start function process_command()
 		$msg = explode(" ", $msg, 4);
-		Switch(count($msg))
+		Switch (count($msg))
 		{
 			case 4:
-				return $this -> change_setting($name, $msg[1], $msg[2], $msg[3]);
+				return $this->change_setting($name, $msg[1], $msg[2], $msg[3]);
 			case 3:
-				return $this -> change_setting($msg[1], $msg[2], "");
+				return $this->change_setting($msg[1], $msg[2], "");
 			case 2:
-				return $this -> show_module($msg[1]);
+				return $this->show_module($msg[1]);
 			Default:
-				return $this -> show_all_modules();
+				return $this->show_all_modules();
 		}
 	} // End function process_command()
 
@@ -83,21 +77,20 @@ class SetConf extends BaseActiveModule
 	function show_all_modules()
 	{ // Start function show_all_modules()
 		$sql = "SELECT DISTINCT module FROM #___settings WHERE hidden = FALSE ORDER BY module";
-		$result = $this -> bot -> db -> select($sql);
+		$result = $this->bot->db->select($sql);
 		if (empty($result))
 		{
 			return "No settings defined.";
 		}
-
 		$output = "##ao_infoheader##Setting groups for <botname>:##end##\n\n";
 		foreach ($result as $module)
 		{
-			if ($module[0] <> "")
+			if ($module[0] != "")
 			{
-				$output .= $this -> bot -> core("tools") -> chatcmd("settings ".$module[0], $module[0])."\n";
+				$output .= $this->bot->core("tools")->chatcmd("settings " . $module[0], $module[0]) . "\n";
 			}
 		}
-		return $this -> bot -> core("tools") -> make_blob("Settings groups for <botname>", $output);
+		return $this->bot->core("tools")->make_blob("Settings groups for <botname>", $output);
 	} // End function show_all_modules()
 
 	/*
@@ -105,16 +98,16 @@ class SetConf extends BaseActiveModule
 	*/
 	function show_module($module)
 	{ // Start function show_module()
-		$module = str_replace (" ", "_", $module); // FIXME: Do regexp right and shouldn't need this?
+		$module = str_replace(" ", "_", $module); // FIXME: Do regexp right and shouldn't need this?
 		$sql = "SELECT setting, value, datatype, longdesc, defaultoptions FROM #___settings ";
-		$sql .= "WHERE module = '".$module."' AND hidden = FALSE ";
+		$sql .= "WHERE module = '" . $module . "' AND hidden = FALSE ";
 		$sql .= "ORDER BY disporder, setting";
-		$result = $this -> bot -> db -> select($sql);
+		$result = $this->bot->db->select($sql);
 		if (empty($result))
 		{
-			return "No settings for module ".$module;
+			return "No settings for module " . $module;
 		}
-		$inside = "##ao_infoheader##Settings for ".$module."##end##\n\n";
+		$inside = "##ao_infoheader##Settings for " . $module . "##end##\n\n";
 		foreach ($result as $setting)
 		{ // 0 = setting, 1 = value, 2 = datatype, 3 = longdesc, 4 = defaultoptions
 			// Provide generic description if none exists.
@@ -141,18 +134,15 @@ class SetConf extends BaseActiveModule
 			{
 				$longdesc = stripslashes($setting[3]);
 			}
-
 			// Make configuration links if options are provided.
 			$options = explode(";", $setting[4]);
-
 			$optionlinks = "  ##ao_infotextbold##Change to: [";
 			foreach ($options as $option)
 			{
-				$optionlinks .= " ".$this -> bot -> core("tools") -> chatcmd("set ".$module." ".$setting[0]." ".$option, $option)." |";
+				$optionlinks .= " " . $this->bot->core("tools")->chatcmd("set " . $module . " " . $setting[0] . " " . $option, $option) . " |";
 			}
 			$optionlinks = rtrim($optionlinks, "|");
 			$optionlinks .= "]##end##";
-
 			// Setting: Value
 			// Description: longdesc
 			// Change To: optionlinks
@@ -165,43 +155,40 @@ class SetConf extends BaseActiveModule
 			{
 				$setting[1] = "Off";
 			}
-
 			if (strtolower($setting[0]) == "password") // Mask passwords
 			{
-				$inside .= "##ao_infoheadline##".$setting[0].":##end##  ##ao_infotextbold##************##end##\n";
+				$inside .= "##ao_infoheadline##" . $setting[0] . ":##end##  ##ao_infotextbold##************##end##\n";
 			}
 			elseif (preg_match("/^#[0-9a-f]{6}$/i", $setting[1])) // Show HTML Color Codes in Color
 			{
-				$inside .= "##ao_infoheadline##".$setting[0].":##end##  <font color=".$setting[1].">".$setting[1]."</font>\n";
+				$inside .= "##ao_infoheadline##" . $setting[0] . ":##end##  <font color=" . $setting[1] . ">" . $setting[1] . "</font>\n";
 			}
 			else // Normal Setting Display.
 			{
-				$inside .= "##ao_infoheadline##".$setting[0].":##end##  ##ao_infotextbold##".$setting[1]."##end##\n";
+				$inside .= "##ao_infoheadline##" . $setting[0] . ":##end##  ##ao_infotextbold##" . $setting[1] . "##end##\n";
 			}
-
-			$inside .= "  ##ao_infotextbold##Description:##end## ##ao_infotext##".$longdesc."##end##\n";
+			$inside .= "  ##ao_infotextbold##Description:##end## ##ao_infotext##" . $longdesc . "##end##\n";
 			if (count($options) > 1)
 			{
-				$inside .= $optionlinks."\n\n";
+				$inside .= $optionlinks . "\n\n";
 			}
 			else
 			{
-				$inside .= "/tell <botname> <pre>set ".$module." ".$setting[0]." &lt;new value&gt;\n\n";
+				$inside .= "/tell <botname> <pre>set " . $module . " " . $setting[0] . " &lt;new value&gt;\n\n";
 			}
 		}
-		return $this -> bot -> core("tools") -> make_blob("Settings for ".$module, $inside);
+		return $this->bot->core("tools")->make_blob("Settings for " . $module, $inside);
 	} // End fucnction show_module()
 
 	function change_setting($user, $module, $setting, $value)
 	{ // Start function change_setting()
-		$module = $this -> bot -> core("settings") -> remove_space($module);
-		$setting = $this -> bot -> core("settings") -> remove_space($setting);
-		if (!($this -> bot -> core("settings") -> exists($module, $setting)))
+		$module = $this->bot->core("settings")->remove_space($module);
+		$setting = $this->bot->core("settings")->remove_space($setting);
+		if (! ($this->bot->core("settings")->exists($module, $setting)))
 		{
-			return "Setting ".$setting." for module ".$module." does not exist.";
+			return "Setting " . $setting . " for module " . $module . " does not exist.";
 		}
-
-		$datatype = $this -> bot -> core("settings") -> get_data_type($this -> bot -> core("settings") -> get($module, $setting));
+		$datatype = $this->bot->core("settings")->get_data_type($this->bot->core("settings")->get($module, $setting));
 		// Deal with possibly bad input from the user before continuing.
 		switch ($datatype)
 		{
@@ -217,9 +204,9 @@ class SetConf extends BaseActiveModule
 				}
 				else
 				{
-					return "Unrecgonized value for setting ".$setting." for module ".$module.". No change made.";
+					return "Unrecgonized value for setting " . $setting . " for module " . $module . ". No change made.";
 				}
-			break;
+				break;
 			case "null":
 				// If the string is null, change it to a null value.
 				// Otherwise, $value will be saved as a string. (No modification needed)
@@ -229,15 +216,15 @@ class SetConf extends BaseActiveModule
 				}
 				break;
 			case "array": // Changing arrays are not supported! :D
-				return "Modifying array values is not supported in this interface. See the help for ".$module;
+				return "Modifying array values is not supported in this interface. See the help for " . $module;
 				break;
 			default:
-				$value = $this -> bot -> core("settings") -> set_data_type($value, $datatype);
+				$value = $this->bot->core("settings")->set_data_type($value, $datatype);
 				break;
 		}
-		$this -> bot -> core("settings") -> set_change_user($user);
-		$result = $this -> bot -> core("settings") -> save($module, $setting, $value);
-		$this -> bot -> core("settings") -> set_change_user("");
+		$this->bot->core("settings")->set_change_user($user);
+		$result = $this->bot->core("settings")->save($module, $setting, $value);
+		$this->bot->core("settings")->set_change_user("");
 		if ($result instanceof BotError)
 		{
 			return $result;
@@ -246,13 +233,17 @@ class SetConf extends BaseActiveModule
 		{
 			if ($datatype == "bool")
 			{
-				if ($value) {$value = "On";}
-				else {$value = "Off";}
+				if ($value)
+				{
+					$value = "On";
+				}
+				else
+				{
+					$value = "Off";
+				}
 			}
-			return "Changed setting ".$setting." for module ".$module." to ".strval($value)." [".$this -> show_module($module)."]";
+			return "Changed setting " . $setting . " for module " . $module . " to " . strval($value) . " [" . $this->show_module($module) . "]";
 		}
-
 	} // End function change_setting()
-
 } // End of Class
 ?>

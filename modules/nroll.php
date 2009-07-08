@@ -2,7 +2,7 @@
 /*
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -28,11 +28,7 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-12-02 03:08:55 +0000 (Tue, 02 Dec 2008) $
-* Revision: $Id: nroll.php 39 2008-12-02 03:08:55Z temar $
 */
-
 ///////////////////////////////////
 // nroll.php 1.1 for BeBot
 ///////////////////////////////////
@@ -40,38 +36,33 @@
 // All Rights Reserved
 // Licensed for distribution under the GPL (Gnu General Public License) version 2.0 or later
 ///////////////////////////////////
-
 $nroll = new Nroll($bot);
-
 //////////////////////////////////////////////////////////////////////
 // The Class itself...
-class Nroll Extends BaseActiveModule
+class Nroll extends BaseActiveModule
 {
 	var $bot;
 	var $help;
 	var $verifyresult;
 	var $verifytime;
 	var $verifyname;
-	
+
 	// Constructor
-	function __construct (&$bot)
+	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> output = "group";
-		$this -> result = "";
-
-		$this -> verifyresult = array();
-		$this -> verifytime = array();
-		$this -> verifyname = array();
-
-		$this -> register_command("all", "nroll", "GUEST");
-		$this -> register_command("all", "nverify", "GUEST");
-		$this -> help['description'] = 'Randomly choose one of several options.';
-		$this -> help['command']['nroll keywords']="Randomly choose one of several keywords, seperated by commas or if no commas are present, by spaces.";
-		$this -> help['command']['nverify #']="Verify a previous nroll.";
+		$this->output = "group";
+		$this->result = "";
+		$this->verifyresult = array();
+		$this->verifytime = array();
+		$this->verifyname = array();
+		$this->register_command("all", "nroll", "GUEST");
+		$this->register_command("all", "nverify", "GUEST");
+		$this->help['description'] = 'Randomly choose one of several options.';
+		$this->help['command']['nroll keywords'] = "Randomly choose one of several keywords, seperated by commas or if no commas are present, by spaces.";
+		$this->help['command']['nverify #'] = "Verify a previous nroll.";
 	}
-	
+
 	function command_handler($name, $msg, $origin)
 	{
 		$output = "";
@@ -88,16 +79,14 @@ class Nroll Extends BaseActiveModule
 			$this->verifytime[] = time();
 			$this->verifyname[] = $name;
 			end($this->verifyresult);
-			$output = "I choose <font color=yellow>$result</font>.  To verify, /tell <botname> <pre>nverify ".key($this->verifyresult);
+			$output = "I choose <font color=yellow>$result</font>.  To verify, /tell <botname> <pre>nverify " . key($this->verifyresult);
 			//$this -> bot -> send_output($name, $output, $origin);
 		}
 		elseif (preg_match("/^nverify (.+)$/i", $msg, $info))
 		{
 			if (isset($this->verifyresult[$info[1]]))
 			{
-				$output = "I chose <font color=yellow>".($this->verifyresult[$info[1]])
-				."</font> for <font color=green>".$this->verifyname[$info[1]]
-				."</font> <font color=red>".(time()-$this->verifytime[$info[1]])."</font> seconds ago.";
+				$output = "I chose <font color=yellow>" . ($this->verifyresult[$info[1]]) . "</font> for <font color=green>" . $this->verifyname[$info[1]] . "</font> <font color=red>" . (time() - $this->verifytime[$info[1]]) . "</font> seconds ago.";
 			}
 			else
 			{
@@ -107,6 +96,5 @@ class Nroll Extends BaseActiveModule
 		}
 		return $output;
 	}
-
 }
 ?>

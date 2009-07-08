@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stens?s, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,61 +30,52 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate$
-* Revision: $Id$
 */
-
 $botstatisticsui = new BotStatisticsUI($bot);
-
 class BotStatisticsUI extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-		
-		$this -> register_command("all", "bots", "MEMBER");
+		$this->register_command("all", "bots", "MEMBER");
 	}
-	
+
 	function command_handler($name, $msg, $origin)
 	{
 		$var = explode(" ", $msg, 2);
-
 		$command = $var[0];
-
-		switch($var[0])
+		switch ($var[0])
 		{
 			case 'bots':
-				$reply = $this -> check_bots($name, $origin, $var[1]);
+				$reply = $this->check_bots($name, $origin, $var[1]);
 				if ($reply !== FALSE)
 					Return ($reply);
 			default:
-				Return ("##error##Error : Broken plugin, recieved unhandled command: ##highlight##".$var[0]."##end## in Bots.php##end##");
+				Return ("##error##Error : Broken plugin, recieved unhandled command: ##highlight##" . $var[0] . "##end## in Bots.php##end##");
 		}
 	}
-	
-	
+
 	function check_bots($name, $origin, $msg)
 	{
-		if(!$this -> bot -> accessallbots)
-			$msg = $this -> bot -> botname." ".$this -> bot -> dimension;
-		if(!empty($msg))
+		if (! $this->bot->accessallbots)
+			$msg = $this->bot->botname . " " . $this->bot->dimension;
+		if (! empty($msg))
 		{
 			$msg = explode(" ", $msg, 2);
-			if(!empty($msg[1]))
+			if (! empty($msg[1]))
 			{
-				Return $this -> bot -> core("bot_statistics") -> check_bots($name, $origin, $msg[0], $msg[1]);
+				Return $this->bot->core("bot_statistics")->check_bots($name, $origin, $msg[0], $msg[1]);
 			}
 			else
 			{
-				Return $this -> bot -> core("bot_statistics") -> check_bots($name, $origin, $msg[0]);
+				Return $this->bot->core("bot_statistics")->check_bots($name, $origin, $msg[0]);
 			}
 		}
 		else
 		{
-			Return $this -> bot -> core("bot_statistics") -> check_bots($name, $origin);
+			Return $this->bot->core("bot_statistics")->check_bots($name, $origin);
 		}
 	}
-
 }
 ?>

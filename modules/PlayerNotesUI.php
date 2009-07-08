@@ -5,7 +5,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stens?s, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -31,24 +31,19 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (sø, 30 nov 2008) $
-* Revision: $Id: PlayerNotesUI.php 1833 2008-11-30 22:09:06Z alreadythere $
 */
-
 $playernotes_ui = new PlayerNotes_UI($bot);
-
 /*
 The Class itself...
 */
 class PlayerNotes_UI extends BaseActiveModule
 { // Start Class
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_command("all", "notes", "MEMBER", array('add' => 'MEMBER', 'rem'=>'ADMIN'));
-		$this -> register_alias("notes", "note");
+		$this->register_command("all", "notes", "MEMBER", array('add' => 'MEMBER' , 'rem' => 'ADMIN'));
+		$this->register_alias("notes", "note");
 	}
 
 	/*
@@ -58,80 +53,79 @@ class PlayerNotes_UI extends BaseActiveModule
 	*/
 	function command_handler($name, $msg, $source)
 	{ // Start function handler()
-		$com = $this -> parse_com($msg);
-		Switch($com['sub'])
+		$com = $this->parse_com($msg);
+		Switch ($com['sub'])
 		{
-			case'add':
-				return $this -> add_note($name, $com['args']);
+			case 'add':
+				return $this->add_note($name, $com['args']);
 				break;
-			case'add':
-			case'admin':
+			case 'add':
+			case 'admin':
 				$admin = explode(" ", $msg[2], 2);
-				if(strtolower($admin[0]) == "add" || strtolower($admin[0]) == "admin")
-					return $this -> add_note($name, $admin[1], TRUE);
+				if (strtolower($admin[0]) == "add" || strtolower($admin[0]) == "admin")
+					return $this->add_note($name, $admin[1], TRUE);
 				else
-					return $this -> add_note($name, $msg[2], FALSE);
-			case'rem':
-			case'del':
-				return $this -> rem_note($com['args']);
-			case'':
-				return $this -> show_all_notes($name, $source);
+					return $this->add_note($name, $msg[2], FALSE);
+			case 'rem':
+			case 'del':
+				return $this->rem_note($com['args']);
+			case '':
+				return $this->show_all_notes($name, $source);
 			Default:
-				return $this -> show_notes($name, $com['sub']);
+				return $this->show_notes($name, $com['sub']);
 		}
 		return false;
 	} // End function handler()
 
-	function add_note($author, $msg, $admin=FALSE)
+	function add_note($author, $msg, $admin = FALSE)
 	{ // Start function add_note()
-		$args = $this -> parse_com($msg, array('target', 'reason'));
+		$args = $this->parse_com($msg, array('target' , 'reason'));
 		$author = ucfirst(strtoupper($author));
 		$player = ucfirst(strtoupper($args['target']));
 		$note = $args['reason'];
-
 		if ($admin)
 		{
-			if ($this -> bot -> core("security") -> check_access($author, "ADMIN"))
+			if ($this->bot->core("security")->check_access($author, "ADMIN"))
 			{
-				return($this -> bot -> core("player_notes") -> add($player, $author, $note, "admin"));
+				return ($this->bot->core("player_notes")->add($player, $author, $note, "admin"));
 			}
 			else
 			{
-				$this -> error -> set("Your access level must be ADMIN or higher to add admin notes.");
-				return($this -> error);
+				$this->error->set("Your access level must be ADMIN or higher to add admin notes.");
+				return ($this->error);
 			}
 		}
 		else
 		{
-			return($this -> bot -> core("player_notes") -> add($player, $author, $note, "default"));
+			return ($this->bot->core("player_notes")->add($player, $author, $note, "default"));
 		}
 	} // End function add_note()
 
 	function rem_note($pnid)
 	{ // Start function rem_note()
-		return ($this -> bot -> core("player_notes") -> del($pnid));
+		return ($this->bot->core("player_notes")->del($pnid));
 	} // End function rem_note()
 
 	/*
 	Show notes for a player
 	*/
-	function show_notes ($source, $player)
+	function show_notes($source, $player)
 	{ // Start function show_notes()
 		$source = ucfirst(strtolower($source));
 		$player = ucfirst(strtolower($player));
-		if (!$this -> bot -> core("chat") -> get_uid($player))
+		if (! $this->bot->core("chat")->get_uid($player))
 		{
 			$this->error->set("Player '$player' is not a valid character");
-			return($this->error);
+			return ($this->error);
 		}
-		$result = $this -> bot -> core("player_notes") -> get_notes($source, $player, "all", "DESC");
+		$result = $this->bot->core("player_notes")->get_notes($source, $player, "all", "DESC");
 		if ($result instanceof BotError) // Some error occured
 		{
 			return $result;
 		}
 		else
 		{
-			$inside = "Notes for ".$player.":\n\n";
+			$inside = "Notes for " . $player . ":\n\n";
 			foreach ($result as $note)
 			{
 				if ($note['class'] == 1)
@@ -146,11 +140,11 @@ class PlayerNotes_UI extends BaseActiveModule
 				{
 					$inside .= "Note #";
 				}
-				$inside .= $note['pnid']." added by ".$note['author']." on ".gmdate($this -> bot -> core("settings") -> get("Time", "FormatString"), $note['timestamp']).":\n";
+				$inside .= $note['pnid'] . " added by " . $note['author'] . " on " . gmdate($this->bot->core("settings")->get("Time", "FormatString"), $note['timestamp']) . ":\n";
 				$inside .= $note['note'];
 				$inside .= "\n\n";
 			}
-			return ("Notes for ".$this -> bot -> core("tools") -> make_blob($player, $inside));
+			return ("Notes for " . $this->bot->core("tools")->make_blob($player, $inside));
 		}
 	} // End function show_notes()
 
@@ -160,7 +154,7 @@ class PlayerNotes_UI extends BaseActiveModule
 	function show_all_notes($source, $origin)
 	{
 		$source = ucfirst(strtolower($source));
-		$result = $this -> bot -> core("player_notes") -> get_notes($source, "all", "all", "DESC");
+		$result = $this->bot->core("player_notes")->get_notes($source, "all", "all", "DESC");
 		if ($result instanceof BotError) // Some error occured
 		{
 			return $return;
@@ -170,19 +164,18 @@ class PlayerNotes_UI extends BaseActiveModule
 			$inside = "  :: All Players with Notes ::\n\n";
 			foreach ($result as $note)
 			{
-				$count[$note["player"]][$note['class']]++;
+				$count[$note["player"]][$note['class']] ++;
 			}
-			foreach($count as $player => $data)
+			foreach ($count as $player => $data)
 			{
-				foreach(array(0, 1, 2) as $n)
-					if($data[$n] < 1)
+				foreach (array(0 , 1 , 2) as $n)
+					if ($data[$n] < 1)
 						$data[$n] = 0;
-				$inside .= $this -> bot -> core("tools") -> chatcmd("notes ".$player, $player, $origin)." ".$data[2]." Admin Notes, ".$data[1]." Ban Notes, ".$data[0]." Normal Notes\n";
+				$inside .= $this->bot->core("tools")->chatcmd("notes " . $player, $player, $origin) . " " . $data[2] . " Admin Notes, " . $data[1] . " Ban Notes, " . $data[0] . " Normal Notes\n";
 			}
-			$return = "All Players with Notes :: ".$this -> bot -> core("tools") -> make_blob("Click to view", $inside);
+			$return = "All Players with Notes :: " . $this->bot->core("tools")->make_blob("Click to view", $inside);
 		}
 		Return $return;
 	}
-
 } // End of Class
 ?>

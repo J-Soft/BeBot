@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,37 +30,28 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-12-06 22:54:37 +0100 (lø, 06 des 2008) $
-* Revision: $Id: Server.php 1898 2008-12-06 21:54:37Z blueeagle $
 */
-
 /*
 Add a "_" at the beginning of the file (_ClassName.php) if you do not want it to be loaded.
 */
-
 $server = new Server($bot);
-
 /*
 The Class itself...
 */
 class Server extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_command('all', 'server', 'MEMBER');
-
-		$this -> help['description'] = 'Shows the server load.';
-		$this -> help['command']['server']="Shows the load on the server.";
+		$this->register_command('all', 'server', 'MEMBER');
+		$this->help['description'] = 'Shows the server load.';
+		$this->help['command']['server'] = "Shows the load on the server.";
 	}
-
-
 
 	function command_handler($name, $msg, $origin)
 	{
-		return $this -> server_load();
+		return $this->server_load();
 	}
 
 	/*
@@ -68,19 +59,18 @@ class Server extends BaseActiveModule
 	*/
 	function server_load()
 	{
-		$server = $this -> bot -> core("tools") -> get_site("http://probes.funcom.com/ao.xml");
-		$server = explode("name=\"" . $this -> select_dimension() . "\"", $server);
+		$server = $this->bot->core("tools")->get_site("http://probes.funcom.com/ao.xml");
+		$server = explode("name=\"" . $this->select_dimension() . "\"", $server);
 		$server = explode("</dimension>", $server[1]);
 		preg_match("/display-name=\"(.+)\"/U", $server[0], $info);
 		$dim_name = $info[1];
 		$pfs = explode("<playfield", $server[0]);
 		$playfields = array();
-		for($i = 1; $i < count($pfs); $i++)
+		for ($i = 1; $i < count($pfs); $i ++)
 		{
 			if (preg_match("/name=\"(.+)\" status=\"([0-9])\" load=\"([0-9])\" players=\"(.+)%\"/i", $pfs[$i], $info))
 			{
 				//$playfields[$info[1]] = $info[4];
-
 				if ($info[3] == 0)
 					$info[3] = "Low";
 				else if ($info[3] == 1)
@@ -89,18 +79,14 @@ class Server extends BaseActiveModule
 					$info[3] = "High";
 				else
 					$info[3] = "Unknown";
-
 				$playfields[$info[1]]['status'] = $info[2];
 				$playfields[$info[1]]['load'] = $info[3];
 				$playfields[$info[1]]['players'] = $info[4];
 			}
 		}
-
 		$inside = "##ao_ccheader##:::: " . $dim_name . " Server Status ::::##end####lightyellow##\n\n";
 		$inside .= "##lightyellow##Player distribution in % of total players online.##end##\n\n";
-
 		$inside .= "<font color=CCInfoHeader>Servers (Playfield: Load - Players)##end##\n";
-
 		foreach ($playfields as $key => $val)
 		{
 			if ($playfields[$key]['status'] == 1)
@@ -109,14 +95,11 @@ class Server extends BaseActiveModule
 				$inside .= " ##yellow##" . $key . "##end##: ##highlight##" . $playfields[$key]['load'] . " - " . $playfields[$key]['players'] . "%##end##\n";
 			else
 				$inside .= " ##red##" . $key . "##end##: ##highlight##" . $playfields[$key]['load'] . " - " . $playfields[$key]['players'] . "%##end##\n";
-
 		}
-
-
 		if (count($playfields) < 10)
 			return "Could not access server information";
 		else
-			return "Status of servers on " . $dim_name . ": " . $this -> bot -> core("tools") -> make_blob("click to view", $inside);
+			return "Status of servers on " . $dim_name . ": " . $this->bot->core("tools")->make_blob("click to view", $inside);
 	}
 
 	/*
@@ -124,7 +107,7 @@ class Server extends BaseActiveModule
 	*/
 	function select_dimension()
 	{
-		switch($this -> bot -> dimension)
+		switch ($this->bot->dimension)
 		{
 			case '0':
 				$return = "dt";

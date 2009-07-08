@@ -7,7 +7,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -33,41 +33,34 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
-* Revision: $Id: CommandAliasUI.php 1944 2009-01-01 02:15:37Z temar $
 */
-
 $commandaliasinterface = new CommandAliasInterface($bot);
-
 class CommandAliasInterface extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_command('all', 'comalias', 'SUPERADMIN');
-
-		$this -> help['description'] = 'Handles Command Aliases.';
-		$this -> help['command']['comalias add <alias> <command>'] = "Sets <alias> as an alias of <command>.";
-		$this -> help['command']['comalias del <alias>'] = "Deletes <alias>.";
-		$this -> help['command']['comalias rem <alias>'] = $this -> help['command']['comalias del <alias>']; 
-		$this -> help['command']['comalias'] = "Show All Aliases.";
+		$this->register_command('all', 'comalias', 'SUPERADMIN');
+		$this->help['description'] = 'Handles Command Aliases.';
+		$this->help['command']['comalias add <alias> <command>'] = "Sets <alias> as an alias of <command>.";
+		$this->help['command']['comalias del <alias>'] = "Deletes <alias>.";
+		$this->help['command']['comalias rem <alias>'] = $this->help['command']['comalias del <alias>'];
+		$this->help['command']['comalias'] = "Show All Aliases.";
 	}
 
 	function command_handler($name, $msg, $origin)
 	{
-		$var = explode (" ", $msg, 3);
-		
-		switch($var[1])
+		$var = explode(" ", $msg, 3);
+		switch ($var[1])
 		{
 			case 'add':
-				Return ($this -> bot -> core("command_alias") -> add($var[2]));
+				Return ($this->bot->core("command_alias")->add($var[2]));
 			case 'del':
 			case 'rem':
-				Return ($this -> bot -> core("command_alias") -> del($var[2]));
+				Return ($this->bot->core("command_alias")->del($var[2]));
 			default:
-				Return ($this -> bot -> core("command_alias") -> get_list());
+				Return ($this->bot->core("command_alias")->get_list());
 		}
 	}
 }

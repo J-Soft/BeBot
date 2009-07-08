@@ -6,7 +6,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stens?s, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -32,109 +32,94 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-12-29 23:42:14 +0100 (ma, 29 des 2008) $
-* Revision: $Id: 14_Tools.php 1939 2008-12-29 22:42:14Z temar $
 */
-
-
-
 $tools = new tools($bot);
-
 class tools extends BasePassiveModule
 {
 
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_module("tools");
-
-		if ($this -> bot -> core("settings") -> exists("tools", "get_site"))
+		$this->register_module("tools");
+		if ($this->bot->core("settings")->exists("tools", "get_site"))
 		{
-			$this -> bot -> core("settings") -> del("tools", "get_site");
+			$this->bot->core("settings")->del("tools", "get_site");
 		}
-		$this -> bot -> core("settings") -> create("tools", "force_sockets", FALSE, "Should we force the usage of Sockets in get_site() even if Curl is available?");
-
-		$this -> register_event("settings", array("module" => "tools", "setting" => "get_site"));
-		
-		$this -> useragent = BOT_VERSION_NAME . "/" . BOT_VERSION . " (Originating bot: " . $this -> bot -> botname . "; Dimension: " . $this -> bot -> dimension . ";)";
+		$this->bot->core("settings")->create("tools", "force_sockets", FALSE, "Should we force the usage of Sockets in get_site() even if Curl is available?");
+		$this->register_event("settings", array("module" => "tools" , "setting" => "get_site"));
+		$this->useragent = BOT_VERSION_NAME . "/" . BOT_VERSION . " (Originating bot: " . $this->bot->botname . "; Dimension: " . $this->bot->dimension . ";)";
 	}
 
 	function chatcmd($link, $title, $origin = FALSE, $strip = FALSE)
 	{
 		$origin = strtolower($origin);
 		$msgstrip = "";
-		switch($origin)
+		switch ($origin)
 		{
-			case'gc':
-			case'o':
-			case'gu':
+			case 'gc':
+			case 'o':
+			case 'gu':
 			case '3':
-				if($this -> bot -> game == "aoc")
+				if ($this->bot->game == "aoc")
 					$chatcmd = "gu <pre>";
 				else
 					$chatcmd = "o <pre>";
 				Break;
-			case'pgmsg':
-			case'pg':
+			case 'pgmsg':
+			case 'pg':
 			case '2':
-				$chatcmd = "group ".$this -> bot -> botname." <pre>";
+				$chatcmd = "group " . $this->bot->botname . " <pre>";
 				Break;
 			case 'start':
 				$chatcmd = "start ";
 				Break;
-			case'tell':
+			case 'tell':
 			case '0':
 			case '1':
 			case FALSE:
-				$chatcmd = "tell ".$this -> bot -> botname." <pre>";
+				$chatcmd = "tell " . $this->bot->botname . " <pre>";
 				Break;
 			case '/':
 				$chatcmd = "";
 				Break;
 			Default:
-				$chatcmd = $origin." ";
+				$chatcmd = $origin . " ";
 		}
 		if ($strip)
 		{
 			$msgstrip = "style=text-decoration:none ";
 		}
-		
-		Return ('<a ' . $msgstrip .'href=\'chatcmd:///'.$chatcmd.$link . '\'>' . $title . '</a>');
+		Return ('<a ' . $msgstrip . 'href=\'chatcmd:///' . $chatcmd . $link . '\'>' . $title . '</a>');
 	}
 
 	function get_site($url, $strip_headers = 0, $server_timeout = 25, $read_timeout = 30)
 	{
-		if(!function_exists('curl_init') || ($this -> bot -> core("settings") -> get("tools", "force_sockets") == TRUE))
+		if (! function_exists('curl_init') || ($this->bot->core("settings")->get("tools", "force_sockets") == TRUE))
 		{
-			$this -> bot -> core("settings") -> save($module, $setting, "Sockets");
-			$this -> bot -> send_tell($this -> bot -> core("security") -> owner, "Setting get_site for Module tools Changed to Sockets as cURL is not installed");
-			Return $this -> get_site_sock($url, $strip_headers, $server_timeout, $read_timeout);
+			$this->bot->core("settings")->save($module, $setting, "Sockets");
+			$this->bot->send_tell($this->bot->core("security")->owner, "Setting get_site for Module tools Changed to Sockets as cURL is not installed");
+			Return $this->get_site_sock($url, $strip_headers, $server_timeout, $read_timeout);
 		}
 		else
 		{
-			Return $this -> get_site_curl($url, $strip_headers);
+			Return $this->get_site_curl($url, $strip_headers);
 		}
 	}
 
 	function get_site_sock($url, $strip_headers = 0, $server_timeout = 5, $read_timeout = 10)
 	{
-		$return = $this -> get_site_data($url,$strip_headers,$server_timeout,$read_timeout);
-
-		if (($return instanceof BotError) && $this -> use_proxy_server && !empty($this -> proxy_server_address))
+		$return = $this->get_site_data($url, $strip_headers, $server_timeout, $read_timeout);
+		if (($return instanceof BotError) && $this->use_proxy_server && ! empty($this->proxy_server_address))
 		{
 			echo "We're using a proxy\n";
-			foreach ($this -> proxy_server_address as $proxy)
+			foreach ($this->proxy_server_address as $proxy)
 			{
-				echo "Trying proxy: ".$proxy."\n";
-				$return = $this -> get_site_data($url,$strip_headers,$server_timeout,$read_timeout,$proxy);
-
-				if (!($return instanceof BotError))
+				echo "Trying proxy: " . $proxy . "\n";
+				$return = $this->get_site_data($url, $strip_headers, $server_timeout, $read_timeout, $proxy);
+				if (! ($return instanceof BotError))
 					break;
 			}
 		}
-
 		return $return;
 	}
 
@@ -144,9 +129,8 @@ class tools extends BasePassiveModule
 	function get_site_data($url, $strip_headers = 0, $server_timeout = 5, $read_timeout = 10, $proxy = '')
 	{
 		$get_url = parse_url($url);
-
 		// Check to see if we're using a proxy, and get the IP address for the target host.
-		if (!empty($proxy))
+		if (! empty($proxy))
 		{
 			$proxy_address = explode(":", $proxy);
 			$address = gethostbyname($proxy_address[0]);
@@ -155,99 +139,79 @@ class tools extends BasePassiveModule
 		else
 		{
 			$address = gethostbyname($get_url['host']);
-
 			/* Get the port for the WWW service. */
 			$service_port = getservbyname('www', 'tcp');
-
 		}
-
 		/* Create a TCP/IP socket. */
 		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-
 		// Check to see if the socket failed to create.
-		if ($socket === false) {
- 			$this->error->set("Failed to create socket. Error was: ".socket_strerror(socket_last_error()));
- 			return $this->error;
+		if ($socket === false)
+		{
+			$this->error->set("Failed to create socket. Error was: " . socket_strerror(socket_last_error()));
+			return $this->error;
 		}
-
 		$connect_result = socket_connect($socket, $address, $service_port);
-
 		// Make sure we have a connection
 		if ($connect_result === false)
 		{
- 			$this->error->set("Failed to connect to server. Error was: ".socket_strerror(socket_last_error()));
- 			return $this->error;
+			$this->error->set("Failed to connect to server. Error was: " . socket_strerror(socket_last_error()));
+			return $this->error;
 		}
-
-		$bot_version = $this -> bot -> botversion;
-
+		$bot_version = $this->bot->botversion;
 		// Rebuild the full query after parse_url
 		$url = $get_url["path"];
-		if (!empty($get_url["query"]))
+		if (! empty($get_url["query"]))
 		{
 			$url .= '?' . $get_url["query"];
 		}
-
 		$in = "GET $url HTTP/1.0\r\n";
 		$in .= "Host: " . $get_url['host'] . "\r\n";
 		$in .= "Connection: Close\r\n";
-		$in .= "User-Agent:" . $this -> useragent . "\r\n\r\n";
-
+		$in .= "User-Agent:" . $this->useragent . "\r\n\r\n";
 		$write_result = socket_write($socket, $in, strlen($in));
-
 		// Make sure we wrote to the server okay.
 		if ($write_result === false)
 		{
- 			$this->error->set("Failed to write to server: ". socket_strerror(socket_last_error()));
- 			return $this->error;
+			$this->error->set("Failed to write to server: " . socket_strerror(socket_last_error()));
+			return $this->error;
 		}
-
 		$return["content"] = "";
 		$read_result = socket_read($socket, 2048);
 		while ($read_result != "" && $read_result !== false)
 		{
- 			$return .= $read_result;
+			$return .= $read_result;
 			$read_result = socket_read($socket, 2048);
 		}
-
 		// Make sure we got a response back from the server.
 		if ($read_result === false)
 		{
-			$this->error->set("Failed to read response: ".socket_strerror(socket_last_error()));
- 			return $this->error;
+			$this->error->set("Failed to read response: " . socket_strerror(socket_last_error()));
+			return $this->error;
 		}
-
 		$close_result = socket_close($socket);
-
 		// Make sure we closed our socket properly.  Open sockets are bad!
 		if ($close_result === false)
 		{
- 			$this->error->set("Failed to close socket: ".socket_strerror(socket_last_error()));
- 			return $this->error;
+			$this->error->set("Failed to close socket: " . socket_strerror(socket_last_error()));
+			return $this->error;
 		}
-
 		// Did the calling function want http headers stripped?
 		if ($strip_headers)
 		{
- 			$split = split("\r\n\r\n",$return);
- 			$return = $split[1];
+			$split = split("\r\n\r\n", $return);
+			$return = $split[1];
 		}
-
 		return $return;
-
 	}
 
 	function get_site_curl($url, $strip_headers, $timeout = 10)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
-
-		curl_setopt($ch, CURLOPT_USERAGENT, $this -> useragent);
-		
+		curl_setopt($ch, CURLOPT_USERAGENT, $this->useragent);
 		// Set your login and password for authentication
 		//curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
 		//curl_setopt($ch, CURLOPT_USERPWD, $user.':'.$pw);
-
 		// You can use CURLAUTH_BASIC, CURLAUTH_DIGEST, CURLAUTH_GSSNEGOTIATE,
 		// CURLAUTH_NTLM, CURLAUTH_ANY, and CURLAUTH_ANYSAFE
 		//
@@ -261,31 +225,24 @@ class tools extends BasePassiveModule
 		// CURLAUTH_NTLM
 		//
 		// Personally I prefer CURLAUTH_ANY as it covers all bases
-
 		// This is occassionally required to stop CURL from verifying the peer's certificate.
 		// CURLOPT_SSL_VERIFYHOST may also need to be TRUE or FALSE if
 		// CURLOPT_SSL_VERIFYPEER is disabled (it defaults to 2 - check the existence of a
 		// common name and also verify that it matches the hostname provided)
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
 		// Optional: Return the result instead of printing it
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		
 		// Specify a timeout
-		curl_setopt ( $ch , CURLOPT_TIMEOUT, $timeout);
-
+		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 		// The usual - get the data and close the session
 		$return = curl_exec($ch);
 		curl_close($ch);
-
 		// Did the calling function want http headers stripped?
 		//if ($strip_headers)// already stripped?
 		//{
 		//	$split = split("\r\n\r\n",$return);
 		//	$return = $split[1];
 		//}
-		
-	
 		Return $return;
 	}
 
@@ -302,19 +259,16 @@ class tools extends BasePassiveModule
 	function make_blob($title, $content, $header = TRUE)
 	{
 		$inside = "";
-
 		if ($header)
 		{
 			// Generic header for all info windows, shamelessly borrowed from VhaBot
 			$inside .= "##blob_title##:::::::::::##end## ##blob_text##BeBot Client Terminal##end## ##blob_title##::::::::::::##end##\n";
-			$inside .= $this -> chatcmd('about', '##blob_title##«##end## ##blob_text##About##end## ##blob_title##»##end##', FALSE, TRUE) . "     ";
-			$inside .= $this -> chatcmd('help', '##blob_title##«##end## ##blob_text##Help##end## ##blob_title##»##end##', FALSE, TRUE) . "     ";	
-			$inside .= $this -> chatcmd('close InfoView', '##blob_title##«##end## ##blob_text##Close Terminal##end## ##blob_title##»##end##', '/', TRUE);	
+			$inside .= $this->chatcmd('about', '##blob_title##«##end## ##blob_text##About##end## ##blob_title##»##end##', FALSE, TRUE) . "     ";
+			$inside .= $this->chatcmd('help', '##blob_title##«##end## ##blob_text##Help##end## ##blob_title##»##end##', FALSE, TRUE) . "     ";
+			$inside .= $this->chatcmd('close InfoView', '##blob_title##«##end## ##blob_text##Close Terminal##end## ##blob_title##»##end##', '/', TRUE);
 			$inside .= "\n##blob_title##¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯##end##\n";
 		}
-		
 		$inside .= str_replace("\"", "&quot;", $content);
-
 		return "<a href=\"text://" . $inside . "\">" . $title . "</a>";
 	}
 
@@ -324,13 +278,11 @@ class tools extends BasePassiveModule
 	function make_item($lowid, $highid, $ql, $name, $alternate = FALSE, $strip = FALSE)
 	{
 		$msgstrip = "";
-
 		if ($strip)
 		{
 			$msgstrip = "style=text-decoration:none ";
 		}
-	
-		if($alternate)
+		if ($alternate)
 			return "<a " . $msgstrip . "href='itemref://" . $lowid . "/" . $highid . "/" . $ql . "'>" . $name . "</a>";
 		else
 			return "<a " . $msgstrip . "href=\"itemref://" . $lowid . "/" . $highid . "/" . $ql . "\">" . $name . "</a>";
@@ -342,26 +294,26 @@ class tools extends BasePassiveModule
 	*/
 	function parse_item($item)
 	{
-		$pattern='|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
+		$pattern = '|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
 		preg_match($pattern, $item, $parts);
-		if(empty($parts))
+		if (empty($parts))
 		{
 			$this->error->set("Unable to parse item: '$item'");
-			return($this->error);
+			return ($this->error);
 		}
 		$parsed['lowid'] = $parts[1];
 		$parsed['highid'] = $parts[2];
-		$parsed['ql']=$parts[3];
-		$parsed['name']=$parts[4];
-		return($parsed);
+		$parsed['ql'] = $parts[3];
+		$parsed['name'] = $parts[4];
+		return ($parsed);
 	}
-	
+
 	//Returns true if $item is an itemref, false otherwise.
 	function is_item($item)
 	{
-		$pattern='|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
+		$pattern = '|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
 		preg_match($pattern, $item, $parts);
-		if(empty($parts))
+		if (empty($parts))
 		{
 			return false;
 		}
@@ -374,11 +326,11 @@ class tools extends BasePassiveModule
 	*/
 	function int_to_string($int)
 	{
-		if ($int <= -1)
+		if ($int <= - 1)
 		{
-			$int += (float)"4294967296";
+			$int += (float) "4294967296";
 		}
-		return (string)$int;
+		return (string) $int;
 	}
 
 	/*
@@ -387,51 +339,51 @@ class tools extends BasePassiveModule
 	*/
 	function string_to_int($string)
 	{
-		$int = (float)$string;
-		if ($int > (float)2147483647)
+		$int = (float) $string;
+		if ($int > (float) 2147483647)
 		{
-			$int -= (float)"4294967296";
+			$int -= (float) "4294967296";
 		}
-		return (int)$int;
+		return (int) $int;
 	}
-	
+
 	/*
 	Checks if a player name is valid and if the player exists.
 	Returns BotError on failure
 	Returns ucfirst(strtolower($name)) if the player exists.
 	*/
-	function validate_player($name, $check_exists=true)
+	function validate_player($name, $check_exists = true)
 	{
-		$name=trim(ucfirst(strtolower($name)));
-		if(strlen($name)<3 || strlen($name)>14)
+		$name = trim(ucfirst(strtolower($name)));
+		if (strlen($name) < 3 || strlen($name) > 14)
 		{
 			$this->error->set("Player name has to be between 4 and 13 characters long (inclusive)");
-			return($this->error);
+			return ($this->error);
 		}
-		if(preg_match("|([a-z]+[0-9]*[^a-z]*)|", $name)==0)
+		if (preg_match("|([a-z]+[0-9]*[^a-z]*)|", $name) == 0)
 		{
 			$this->error->set("Player name has to be alphabetical followed by 0 or more digits not followed by alphabetical characters.");
-			return($this->error);
+			return ($this->error);
 		}
-		if($check_exists)
+		if ($check_exists)
 		{
-			if(!$this->bot->core('chat')->get_uid($name))
+			if (! $this->bot->core('chat')->get_uid($name))
 			{
 				$this->error->set("Player '$name' does not exist.");
-				return($this->error);
+				return ($this->error);
 			}
 		}
-		return($name);
+		return ($name);
 	}
 
 	function settings($user, $module, $setting, $new, $old)
 	{
-		if($new == "curl" && !function_exists('curl_init'))
+		if ($new == "curl" && ! function_exists('curl_init'))
 		{
-			$this -> bot -> core("settings") -> save($module, $setting, "Sockets");
+			$this->bot->core("settings")->save($module, $setting, "Sockets");
 			if ($user != "")
 			{
-				$this -> bot -> send_tell($user, "Setting get_site for Module tools Changed to Sockets as cURL is not installed");
+				$this->bot->send_tell($user, "Setting get_site for Module tools Changed to Sockets as cURL is not installed");
 			}
 		}
 	}

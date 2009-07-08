@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stens?s, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,19 +30,14 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2007-07-25 11:54:01 -0700 (Wed, 25 Jul 2007) $
-* Revision: $Id: 15_AOChatWrapper.php 1910 2008-12-07 21:05:00Z blueeagle $
 */
-
-
 $aochat_wrapper_core = new AOChatWrapper_Core($bot);
-
 /*
 The Class itself...
 */
 class AOChatWrapper_Core extends BasePassiveModule
 {
+
 	/*
 	Constructor:
 	Hands over a referance to the "Bot" class.
@@ -50,8 +45,7 @@ class AOChatWrapper_Core extends BasePassiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_module("chat");
+		$this->register_module("chat");
 	}
 
 	/*
@@ -82,32 +76,27 @@ class AOChatWrapper_Core extends BasePassiveModule
 	function buddy_add($user, $que = TRUE)
 	{
 		$add = true;
-		if(is_numeric($user))
+		if (is_numeric($user))
 			$uid = $user;
 		else
-			$uid = $this -> bot -> core('player') -> id($user);
-			
+			$uid = $this->bot->core('player')->id($user);
 		if ($uid instanceof BotError)
 		{
 			return $uid;
 		}
 		else
 		{
-			if (
-			!($this -> bot -> aoc -> buddy_exists($uid)) && 
-			$uid != $this -> bot->core('player')->id($this -> bot -> botname) && 
-			!($this -> bot -> core('player') -> name($uid) instanceof BotError)
-			)
+			if (! ($this->bot->aoc->buddy_exists($uid)) && $uid != $this->bot->core('player')->id($this->bot->botname) && ! ($this->bot->core('player')->name($uid) instanceof BotError))
 			{
-				if (!$que || $this -> bot -> core("buddy_queue") -> check_queue())
+				if (! $que || $this->bot->core("buddy_queue")->check_queue())
 				{
-					$this -> bot -> aoc -> buddy_add($uid);
-					$this -> bot -> log("BUDDY", "BUDDY-ADD", $this -> bot -> core('player') -> name($uid));
+					$this->bot->aoc->buddy_add($uid);
+					$this->bot->log("BUDDY", "BUDDY-ADD", $this->bot->core('player')->name($uid));
 					return true;
 				}
 				else
 				{
-					$return = $this -> bot -> core("buddy_queue") -> into_queue($uid, $add);
+					$return = $this->bot->core("buddy_queue")->into_queue($uid, $add);
 					return $return;
 				}
 			}
@@ -119,23 +108,23 @@ class AOChatWrapper_Core extends BasePassiveModule
 	function buddy_remove($user)
 	{
 		$add = false;
-		if (empty($user) || ($uid = $this -> bot->core('player')->id($user)) === false)
+		if (empty($user) || ($uid = $this->bot->core('player')->id($user)) === false)
 		{
 			return false;
 		}
 		else
 		{
-			if (($this -> bot -> aoc -> buddy_exists($uid)))
+			if (($this->bot->aoc->buddy_exists($uid)))
 			{
-				if ($this -> bot -> core("buddy_queue") -> check_queue())
+				if ($this->bot->core("buddy_queue")->check_queue())
 				{
-					$this -> bot -> aoc -> buddy_remove($uid);
-					$this -> bot -> log("BUDDY", "BUDDY-DEL", $this -> get_uname($uid));
+					$this->bot->aoc->buddy_remove($uid);
+					$this->bot->log("BUDDY", "BUDDY-DEL", $this->get_uname($uid));
 					return true;
 				}
 				else
 				{
-					$return = $this -> bot -> core("buddy_queue") -> into_queue($uid, $add);
+					$return = $this->bot->core("buddy_queue")->into_queue($uid, $add);
 					return $return;
 				}
 			}
@@ -146,12 +135,12 @@ class AOChatWrapper_Core extends BasePassiveModule
 
 	function buddy_exists($who)
 	{
-		return $this -> bot -> aoc -> buddy_exists($who);
+		return $this->bot->aoc->buddy_exists($who);
 	}
 
 	function buddy_online($who)
 	{
-		return $this -> bot -> aoc -> buddy_online($who);
+		return $this->bot->aoc->buddy_online($who);
 	}
 
 	/*
@@ -161,9 +150,8 @@ class AOChatWrapper_Core extends BasePassiveModule
 	{
 		if ($group == NULL)
 			return false;
-
-		$this -> bot -> log("PGRP", "ACCEPT", "Accepting Invite for Private Group [" . $group . "]");
-		return $this -> bot -> aoc -> privategroup_join($group);
+		$this->bot->log("PGRP", "ACCEPT", "Accepting Invite for Private Group [" . $group . "]");
+		return $this->bot->aoc->privategroup_join($group);
 	}
 
 	/*
@@ -173,9 +161,8 @@ class AOChatWrapper_Core extends BasePassiveModule
 	{
 		if ($group == NULL)
 			return false;
-
-		$this -> bot -> log("PGRP", "LEAVE", "Leaving Private Group [" . $group . "]");
-		return $this -> bot -> aoc -> privategroup_leave($group);
+		$this->bot->log("PGRP", "LEAVE", "Leaving Private Group [" . $group . "]");
+		return $this->bot->aoc->privategroup_leave($group);
 	}
 
 	/*
@@ -183,7 +170,7 @@ class AOChatWrapper_Core extends BasePassiveModule
 	*/
 	function pgroup_decline($group)
 	{
-		return $this -> send_pgroup_leave($group);
+		return $this->send_pgroup_leave($group);
 	}
 
 	/*
@@ -193,36 +180,36 @@ class AOChatWrapper_Core extends BasePassiveModule
 	function pgroup_status($group)
 	{
 		if ($group == NULL)
-			$group = $this -> bot -> botname;
-		return $this -> bot -> aoc -> group_status($group);
+			$group = $this->bot->botname;
+		return $this->bot->aoc->group_status($group);
 	}
 
 	function pgroup_invite($user)
 	{
-		$this -> bot -> log("PGRP", "INVITE", "Invited " . $user . " to private group");
-		return $this -> bot -> aoc -> privategroup_invite($user);
+		$this->bot->log("PGRP", "INVITE", "Invited " . $user . " to private group");
+		return $this->bot->aoc->privategroup_invite($user);
 	}
 
 	function pgroup_kick($user)
 	{
-		$this -> bot -> log("PGRP", "KICK", "Kicking " . $user . " from private group");
-		return $this -> bot -> aoc -> privategroup_kick($user);
+		$this->bot->log("PGRP", "KICK", "Kicking " . $user . " from private group");
+		return $this->bot->aoc->privategroup_kick($user);
 	}
 
 	function pgroup_kick_all()
 	{
-		$this -> bot -> log("PGRP", "KICKALL", "Kicking all user from private group");
-		return $this -> bot -> aoc -> privategroup_kick_all();
+		$this->bot->log("PGRP", "KICKALL", "Kicking all user from private group");
+		return $this->bot->aoc->privategroup_kick_all();
 	}
 
-	function lookup_group($arg, $type=0)
+	function lookup_group($arg, $type = 0)
 	{
-		return $this -> bot -> aoc -> lookup_group($arg, $type);
+		return $this->bot->aoc->lookup_group($arg, $type);
 	}
 
 	function get_gname($g)
 	{
-		return $this -> bot -> aoc -> get_gname($g);
+		return $this->bot->aoc->get_gname($g);
 	}
 }
 ?>

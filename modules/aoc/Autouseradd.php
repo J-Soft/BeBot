@@ -2,7 +2,7 @@
 /*
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -28,11 +28,7 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-12-02 03:08:55 +0000 (Tue, 02 Dec 2008) $
-* Revision: $Id: Autouseradd.php 39 2008-12-02 03:08:55Z temar $
 */
-
 /*
 * Autouseradd v1.0, By Noer
 * Improved by Temar
@@ -41,7 +37,6 @@
 *
 */
 $AutoUserAdd = new AutoUserAdd($bot);
-
 class AutoUserAdd extends BasePassiveModule
 {
 	private $checked;
@@ -49,70 +44,62 @@ class AutoUserAdd extends BasePassiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-		
-		$this -> register_event("gmsg", "org");
-
-		$this -> register_module("autouseradd");
-
-		$this -> bot -> core("settings") -> create("Autouseradd", "Enabled", TRUE, "Should users be added to the Bot?");
-		$this -> bot -> core("settings") -> create("Autouseradd", "Notify", TRUE, "Should the User be Notified that he was added to the Bot?");
-
+		$this->register_event("gmsg", "org");
+		$this->register_module("autouseradd");
+		$this->bot->core("settings")->create("Autouseradd", "Enabled", TRUE, "Should users be added to the Bot?");
+		$this->bot->core("settings")->create("Autouseradd", "Notify", TRUE, "Should the User be Notified that he was added to the Bot?");
 		// Fill checked array with current members, we won't need to readd them:
-		$this -> checked = array();
-		$mems = $this -> bot -> db -> select("SELECT nickname FROM #___users WHERE user_level = 2", MYSQL_ASSOC);
-		if (!empty($mems))
+		$this->checked = array();
+		$mems = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level = 2", MYSQL_ASSOC);
+		if (! empty($mems))
 		{
 			foreach ($mems as $mem)
 			{
-				$this -> checked[$mem['nickname']] = TRUE;
+				$this->checked[$mem['nickname']] = TRUE;
 			}
 		}
 	}
 
 	function register(&$module)
 	{
-		$this -> hooks[] = &$module;
+		$this->hooks[] = &$module;
 	}
 
 	function gmsg($name, $group, $msg)
 	{
-		if(!$this -> bot -> core("settings") -> get("Autouseradd", "Enabled"))
+		if (! $this->bot->core("settings")->get("Autouseradd", "Enabled"))
 			Return;
-
-		// Add all characters when they are noticed in chat the first time:
-		if (!isset($this -> checked[$name]))
+			// Add all characters when they are noticed in chat the first time:
+		if (! isset($this->checked[$name]))
 		{
-			$this -> checked[$name] = TRUE;
-			
-			$result = $this -> bot -> db -> select("SELECT user_level FROM #___users WHERE nickname = '".$name."'");
-			if (!empty($result))
+			$this->checked[$name] = TRUE;
+			$result = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '" . $name . "'");
+			if (! empty($result))
 			{
 				if ($result[0][0] != 2)
 				{
-					$this -> add_user($name);
+					$this->add_user($name);
 				}
 			}
 			else
 			{
-				$this -> add_user($name);
+				$this->add_user($name);
 			}
 		}
 	}
 
 	function add_user($name)
 	{
-		if($this -> bot -> core("settings") -> get("Autouseradd", "Notify"))
+		if ($this->bot->core("settings")->get("Autouseradd", "Notify"))
 			$silent = 0;
 		else
 			$silent = 1;
-
-		$this -> bot -> core("user") -> add($this -> bot -> botname, $name, 0, MEMBER, $silent);
-
-		if(!empty($this -> hooks))
+		$this->bot->core("user")->add($this->bot->botname, $name, 0, MEMBER, $silent);
+		if (! empty($this->hooks))
 		{
-			foreach($this -> hooks as $hook)
+			foreach ($this->hooks as $hook)
 			{
-				$hook -> new_user($name);
+				$hook->new_user($name);
 			}
 		}
 	}

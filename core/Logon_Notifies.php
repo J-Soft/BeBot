@@ -7,7 +7,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -33,11 +33,7 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (Sun, 30 Nov 2008) $
-* Revision: $Id: Logon_Notifies.php 1833 2008-11-30 22:09:06Z alreadythere $
 */
-
 /*
  * Global storing for delaying notifies of modules on logon.
  * This module offers the storing backend as well as the buddy tracking.
@@ -51,9 +47,7 @@
  * of some things on bot restarts, useful for modules that only should do something if a
  * character logs in for real, instead of the possibly false logons on bot startup.
  */
-
 $logon_notifies_core = new Logon_Notifies_Core($bot);
-
 class Logon_Notifies_Core extends BasePassiveModule
 {
 	var $bot;
@@ -62,82 +56,71 @@ class Logon_Notifies_Core extends BasePassiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_module("logon_notifies");
-
-		$this -> register_event("buddy");
-		$this -> register_event("connect");
-		$this -> register_event("cron", "2sec");
-
-		$this -> modules = array();
-		$this -> cron_running = 0;
-		$this -> notifies = array();
-		
-		$this -> waiting = FALSE;
-
-		$this -> bot -> core("settings") -> create("Logon_Notifies", "Notify_Delay", 5, "How many seconds should be waited after logon of a buddy till any notifies are sent to him?", "0;1;2;3;4;5;10;15;30");
-		$this -> bot -> core("settings") -> create("Logon_Notifies", "Enabled", TRUE, "Are notifies on logon enabled or disabled?");
-
+		$this->register_module("logon_notifies");
+		$this->register_event("buddy");
+		$this->register_event("connect");
+		$this->register_event("cron", "2sec");
+		$this->modules = array();
+		$this->cron_running = 0;
+		$this->notifies = array();
+		$this->waiting = FALSE;
+		$this->bot->core("settings")->create("Logon_Notifies", "Notify_Delay", 5, "How many seconds should be waited after logon of a buddy till any notifies are sent to him?", "0;1;2;3;4;5;10;15;30");
+		$this->bot->core("settings")->create("Logon_Notifies", "Enabled", TRUE, "Are notifies on logon enabled or disabled?");
 		// Set startup high enough that it cannot be reached before connection is done successfully:
-		$this -> startup = time() + 3600;
+		$this->startup = time() + 3600;
 	}
 
 	// registers a new module
 	function register(&$module)
 	{
-		$this -> modules[get_class($module)] = &$module;
+		$this->modules[get_class($module)] = &$module;
 	}
 
 	function unregister(&$module)
 	{
-		if (isset($this -> modules[get_class($module)]))
+		if (isset($this->modules[get_class($module)]))
 		{
-			$this -> modules[get_class($module)] = NULL;
-			unset($this -> modules[get_class($module)]);
+			$this->modules[get_class($module)] = NULL;
+			unset($this->modules[get_class($module)]);
 		}
 	}
 
 	function buddy($name, $msg)
 	{
-		if ($msg == 1 && $this -> bot -> core("settings") -> get("Logon_notifies", "Enabled")
-		&& $this -> bot -> core("security") -> check_access($name, "GUEST") && $this -> bot -> core("notify") -> check($name))
+		if ($msg == 1 && $this->bot->core("settings")->get("Logon_notifies", "Enabled") && $this->bot->core("security")->check_access($name, "GUEST") && $this->bot->core("notify")->check($name))
 		{
-			$this -> notifies[$name] = time() + $this -> bot -> core("settings") -> get("Logon_notifies", "Notify_delay");
-			$this -> waiting = TRUE;
+			$this->notifies[$name] = time() + $this->bot->core("settings")->get("Logon_notifies", "Notify_delay");
+			$this->waiting = TRUE;
 		}
 	}
 
 	function connect()
 	{
-		$this -> startup = time() + 120 + $this -> bot -> core("settings") -> get("Logon_notifies", "Notify_delay");
+		$this->startup = time() + 120 + $this->bot->core("settings")->get("Logon_notifies", "Notify_delay");
 	}
 
 	function cron()
 	{
-		if (!($this -> waiting) || empty($this -> modules))
+		if (! ($this->waiting) || empty($this->modules))
 		{
 			return;
 		}
-
-		if (empty($this -> notifies))
+		if (empty($this->notifies))
 		{
-			$this -> waiting = FALSE;
-			$this -> cron_running = 0;
+			$this->waiting = FALSE;
+			$this->cron_running = 0;
 			return;
 		}
-		
-		if ($this -> cron_running == 0)
+		if ($this->cron_running == 0)
 		{
-			$this -> cron_running = 1;
+			$this->cron_running = 1;
 		}
 		else
 		{
 			return;
 		}
-		
 		$thistime = time();
-
-		if ($thistime >= $this -> startup)
+		if ($thistime >= $this->startup)
 		{
 			$starting = false;
 		}
@@ -145,22 +128,21 @@ class Logon_Notifies_Core extends BasePassiveModule
 		{
 			$starting = true;
 		}
-
-		foreach ($this -> notifies AS $user => $time)
+		foreach ($this->notifies as $user => $time)
 		{
 			if ($time <= $thistime)
 			{
-				foreach ($this -> modules AS $module)
+				foreach ($this->modules as $module)
 				{
 					if ($module != NULL)
 					{
-						$module -> notify($user, $starting);
+						$module->notify($user, $starting);
 					}
 				}
-				unset($this -> notifies[$user]);
+				unset($this->notifies[$user]);
 			}
 		}
-		$this -> cron_running = 0;
+		$this->cron_running = 0;
 		return;
 	}
 }

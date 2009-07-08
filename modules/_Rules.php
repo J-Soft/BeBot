@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,38 +30,27 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (sÃ¸, 30 nov 2008) $
-* Revision: $Id: _Rules.php 1833 2008-11-30 22:09:06Z alreadythere $
 */
-
 $rules = new Rules($bot);
-
-
-
 /*
 The Class itself...
 */
 class Rules extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> register_command('all', 'rules', 'GUEST');
+		$this->register_command('all', 'rules', 'GUEST');
 	}
-
-
 
 	/*
 	This gets called on a tell with the command
 	*/
 	function command_handler($name, $msg, $origin)
 	{
-		return $this -> make_rules();
+		return $this->make_rules();
 	}
-
-
 
 	/*
 	Make the rules
@@ -69,12 +58,11 @@ class Rules extends BaseActiveModule
 	function make_rules()
 	{
 		$content = "<font color=CCInfoHeadline> :::: RULES ::::</font>\n\n";
-		if(file_exists("./txt/".$this -> bot -> botname."_rules.txt"))
-			$content .= implode("", file("./txt/".$this -> bot -> botname."_rules.txt"));
-		elseif(file_exists("./txt/rules.txt"))
+		if (file_exists("./txt/" . $this->bot->botname . "_rules.txt"))
+			$content .= implode("", file("./txt/" . $this->bot->botname . "_rules.txt"));
+		elseif (file_exists("./txt/rules.txt"))
 			$content .= implode("", file("./txt/rules.txt"));
-
-		return "<botname>'s Rules :: " . $this -> bot -> core("tools") -> make_blob("click to view", $content);
+		return "<botname>'s Rules :: " . $this->bot->core("tools")->make_blob("click to view", $content);
 	}
 }
 ?>

@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,16 +30,8 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-30 23:09:06 +0100 (sø, 30 nov 2008) $
-* Revision: $Id: Callers.php 1833 2008-11-30 22:09:06Z alreadythere $
 */
-
-
 $callers = new Callers($bot);
-
-
-
 /*
 The Class itself...
 */
@@ -49,42 +41,35 @@ class Callers extends BaseActiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> callers = array();
-
-		$this -> register_command('all', 'caller', 'GUEST', array("clear" => "LEADER", "add" => "LEADER", "del" => "LEADER"));
-		$this -> register_alias("caller", "callers");
-		
-		$this -> help['description'] = "Designate and list 'callers' for raids and events";
-		$this -> help['command']['caller'] = "Lists the set callers";
-		$this -> help['command']['caller clear'] = "Clears the list of callers";
-		$this -> help['command']['caller add <name>'] = "Adds player <name> as a caller on the list.";
-		$this -> help['command']['caller del <name>'] = "Removes player <name> as a caller from the list.";
+		$this->callers = array();
+		$this->register_command('all', 'caller', 'GUEST', array("clear" => "LEADER" , "add" => "LEADER" , "del" => "LEADER"));
+		$this->register_alias("caller", "callers");
+		$this->help['description'] = "Designate and list 'callers' for raids and events";
+		$this->help['command']['caller'] = "Lists the set callers";
+		$this->help['command']['caller clear'] = "Clears the list of callers";
+		$this->help['command']['caller add <name>'] = "Adds player <name> as a caller on the list.";
+		$this->help['command']['caller del <name>'] = "Removes player <name> as a caller from the list.";
 	}
-
-
 
 	function command_handler($name, $msg, $origin)
 	{
-		if (preg_match("/^caller clear/i", $msg))		
+		if (preg_match("/^caller clear/i", $msg))
 		{
-			return $this -> clear_callers($name);			
+			return $this->clear_callers($name);
 		}
 		else if (preg_match("/^caller add (.+)/i", $msg, $info))
 		{
-			return $this -> caller_add($info[1]);
+			return $this->caller_add($info[1]);
 		}
 		else if (preg_match("/^caller del (.+)/i", $msg, $info))
 		{
-			return $this -> caller_del($info[1]);
+			return $this->caller_del($info[1]);
 		}
 		else if (preg_match("/^caller/i", $msg))
 		{
-			return $this -> show_callers();
-		}		
+			return $this->show_callers();
+		}
 	}
-
-
 
 	/*
 	Add a caller
@@ -92,18 +77,14 @@ class Callers extends BaseActiveModule
 	function caller_add($name)
 	{
 		$name = ucfirst(strtolower($name));
-
-		if ($this -> bot -> core("chat") -> get_uid($name))
+		if ($this->bot->core("chat")->get_uid($name))
 		{
-			$this -> callers[$name] = 1;
-			return "##YELLOW##" . $name . "##END## has been added to caller list. " . $this -> show_callers();
+			$this->callers[$name] = 1;
+			return "##YELLOW##" . $name . "##END## has been added to caller list. " . $this->show_callers();
 		}
 		else
-		return "Player ##YELLOW##" . $name . "##END## does not exist.";
-
+			return "Player ##YELLOW##" . $name . "##END## does not exist.";
 	}
-
-
 
 	/*
 	Remove a caller
@@ -111,42 +92,40 @@ class Callers extends BaseActiveModule
 	function caller_del($name)
 	{
 		$name = ucfirst(strtolower($name));
-
 		if ($name == "All")
 		{
-			$this -> callers = array();
+			$this->callers = array();
 			return "List of callers has been cleared.";
 		}
-		else if ($this -> bot -> core("chat") -> get_uid($name) != -1)
+		else if ($this->bot->core("chat")->get_uid($name) != - 1)
 		{
-			if (isset($this -> callers[$name]))
+			if (isset($this->callers[$name]))
 			{
-				unset($this -> callers[$name]);
-				return "##YELLOW##" . $name . "##END## has been removed from caller list. " . $this -> show_callers();
+				unset($this->callers[$name]);
+				return "##YELLOW##" . $name . "##END## has been removed from caller list. " . $this->show_callers();
 			}
 			else
-			return "##YELLOW##" . $name . "##END## is not on list of callers. " . $this -> show_callers();
+				return "##YELLOW##" . $name . "##END## is not on list of callers. " . $this->show_callers();
 		}
 		else
-		return "Player ##YELLOW##" . $name . "##END## does not exist.";
+			return "Player ##YELLOW##" . $name . "##END## does not exist.";
 	}
 
 	function clear_callers($name)
 	{
 		$name = ucfirst(strtolower($name));
-		$this -> callers = array();
+		$this->callers = array();
 		return "Caller list cleared by ##YELLOW##" . $name . "##END##.";
 	}
-
 
 	/*
 	Return the list of callers
 	*/
 	function show_callers()
 	{
-		$call = array_keys($this -> callers);
+		$call = array_keys($this->callers);
 		if (empty($call))
-		return "No callers on list.";
+			return "No callers on list.";
 		else
 		{
 			$batch = "";
@@ -154,16 +133,16 @@ class Callers extends BaseActiveModule
 			$list = "##AO_INFOHEADLINE##::: List of callers :::##END##\n\n";
 			foreach ($call as $player)
 			{
-				if ($count>=1)
+				if ($count >= 1)
 					$batch .= " \\n ";
-				$count++;
+				$count ++;
 				$list .= " - $player: [<a href='chatcmd:///macro $player /assist $player'>Create Macro</a>] [<a href='chatcmd:///assist $player'>Assist</a>]\n";
-				$batch .= "/assist ".$player;
+				$batch .= "/assist " . $player;
 			}
 			$list .= "\n";
 			$list .= "All Callers: [<a href='chatcmd://$batch'>Assist</a>]";
 			$list .= "\n\nAll Callers Macro:\n/macro <botname> $batch";
-			return $this -> bot -> core("tools") -> make_blob("List of Callers", $list);
+			return $this->bot->core("tools")->make_blob("List of Callers", $list);
 		}
 	}
 }

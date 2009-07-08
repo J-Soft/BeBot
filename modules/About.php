@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,18 +30,14 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-12-23 02:49:51 +0100 (Tue, 23 Dec 2008) $
-* Revision: $Id: About.php 1936 2008-12-23 01:49:51Z temar $
 */
-
 $about = new About($bot);
-
 /*
 The Class itself...
 */
 class About extends BaseActiveModule
 {
+
 	/*
 	Constructor:
 	Hands over a referance to the "Bot" class.
@@ -49,14 +45,11 @@ class About extends BaseActiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
 		//Sed default access control levels
-		$this -> register_command('all', 'about', 'GUEST');
-		$this -> register_alias('about', 'version');
-
-		$this -> help['description'] = "Shows information about the bot.";
-		$this -> help['command']['about'] = "See description";
-
+		$this->register_command('all', 'about', 'GUEST');
+		$this->register_alias('about', 'version');
+		$this->help['description'] = "Shows information about the bot.";
+		$this->help['command']['about'] = "See description";
 	}
 
 	/*
@@ -65,35 +58,29 @@ class About extends BaseActiveModule
 	function command_handler($name, $msg, $origin)
 	{
 		$return = false;
-
 		/*
 		This should really be moved to the bot core.. but until i get the time to modify every single module... :\
 		*/
 		$vars = explode(' ', strtolower($msg));
-
 		$command = $vars[0];
-
-		switch($command)
+		switch ($command)
 		{
 			case 'about':
-				return $this -> about_blob();
+				return $this->about_blob();
 				break;
 			default:
 				return "Broken plugin, recieved unhandled command: $command";
 		}
 	}
 
-
 	/*
 	Makes the about-blob
 	*/
 	function about_blob()
 	{
-		$version =  BOT_VERSION_NAME . " v." . BOT_VERSION;
-
+		$version = BOT_VERSION_NAME . " v." . BOT_VERSION;
 		$inside .= "##blob_text##Bot Client:##end##\n";
 		$inside .= "$version\n\n";
-
 		$inside .= "##blob_text##Developers:##end##\n";
 		$inside .= "Alreadythere (RK2)\n";
 		$inside .= "Blondengy (RK1)\n";
@@ -102,7 +89,6 @@ class About extends BaseActiveModule
 		$inside .= "Khalem (RK1)\n";
 		$inside .= "Naturalistic (RK1)\n";
 		$inside .= "Temar (RK1 / Doomsayer)\n\n";
-
 		$inside .= "##blob_text##Special thanks to:##end##\n";
 		$inside .= "Akarah (RK1)\n";
 		$inside .= "Bigburtha (RK2) aka Craized\n";
@@ -117,13 +103,10 @@ class About extends BaseActiveModule
 		$inside .= "Zarkingu (RK2)\n";
 		$inside .= "Auno for writing and maintaining the PHP AOChat library\n";
 		$inside .= "And last but not least, the greatest MMORPG community in existence.\n\n";
-		
 		$inside .= "##blob_text##Links:##end##\n";
-		$inside .= $this -> bot -> core("tools") -> chatcmd("http://bebot.shadow-realm.org", "BeBot website and support forums", "start")."\n";
-		$inside .= $this -> bot -> core("tools") -> chatcmd("http://bugs.launchpad.net/bebot", "BeBot bugtracker", "start")."\n";
-
-		$return = "$version ::: " . $this -> bot -> core("tools") -> make_blob('More details', $inside);
-
+		$inside .= $this->bot->core("tools")->chatcmd("http://bebot.shadow-realm.org", "BeBot website and support forums", "start") . "\n";
+		$inside .= $this->bot->core("tools")->chatcmd("http://bugs.launchpad.net/bebot", "BeBot bugtracker", "start") . "\n";
+		$return = "$version ::: " . $this->bot->core("tools")->make_blob('More details', $inside);
 		return $return;
 	}
 }

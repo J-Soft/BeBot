@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,11 +30,7 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2009-03-09 01:58:35 +0000 (Mon, 09 Mar 2009) $
-* Revision: $Id: StartBot.php 3 2009-03-09 01:58:35Z temar $
 */
-
 /*
 Take a decent stab at what OS we run on and try using some sane defaults
 */
@@ -43,7 +39,6 @@ if (empty($os))
 {
 	$os = getenv("OS");
 }
-
 if (preg_match("/^windows/i", $os))
 {
 	/*
@@ -51,8 +46,7 @@ if (preg_match("/^windows/i", $os))
 	*/
 	$php_bin = "php.exe";
 	$php_args = " -c ./ ";
-	$main_php = "Main.php";	
-	
+	$main_php = "Main.php";
 	/*
 	If the above fails you can try specifying full paths, example:
 	$php_bin = "C:\php\php.exe";
@@ -71,43 +65,39 @@ else
 }
 $confc = TRUE;
 require_once "./Sources/Conf.php";
-if($argv[1] != $conf -> argv)
+if ($argv[1] != $conf->argv)
 {
-	echo "Use \"StartBot.php ".$conf -> argv."\" to start bot next time\n";
-	$argv[1] = $conf -> argv;
-	$conf -> ask("Press Enter to load Bot");
-	if(!$argv[1] || $argv[1] == "")
+	echo "Use \"StartBot.php " . $conf->argv . "\" to start bot next time\n";
+	$argv[1] = $conf->argv;
+	$conf->ask("Press Enter to load Bot");
+	if (! $argv[1] || $argv[1] == "")
 		$argc = 1;
 	else
 		$argc = 2;
 }
-if(!empty($conf -> pw))
+if (! empty($conf->pw))
 {
-	$pw = $conf -> pw;
-	$conf -> pw = NULL;
+	$pw = $conf->pw;
+	$conf->pw = NULL;
 }
-
 // Create the command to execute in the system() call of the main loop:
 $systemcommand = $php_bin . $php_args . " " . $main_php;
 if ($argc > 1)
 {
 	$systemcommand .= " " . $argv[1];
 }
-
 while (true)
 {
-	if($pw)
+	if ($pw)
 	{
 		$fp = fopen('./conf/pw', 'w');
 		fwrite($fp, $pw);
 		fclose($fp);
 	}
 	$last_line = system($systemcommand);
-
 	if (preg_match("/^The bot has been shutdown/i", $last_line))
-	die();
+		die();
 	else
-	sleep(1);
+		sleep(1);
 }
-
 ?>

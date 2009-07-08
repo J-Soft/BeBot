@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,22 +30,15 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
-*
-* File last changed at $LastChangedDate: 2008-11-04 06:00:45 +0000 (Tue, 04 Nov 2008) $
-* Revision: $Id: LandControlZones.php 1944 2009-01-01 02:15:37Z temar $
 */
-
 $landcontrol = new LandControlZones($bot);
-
-
-
 class LandControlZones extends BaseActiveModule
 {
+
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-
-		$this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS " . $this -> bot -> db -> define_tablename("land_control_zones", "false") . " (
+		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("land_control_zones", "false") . " (
 			`id` int(11) default NULL,
 			`lrange` int(10) default NULL,
 			`hrange` int(10) default NULL,
@@ -60,119 +53,123 @@ class LandControlZones extends BaseActiveModule
 			INDEX (hrange),
 			INDEX (area)
 			)");
-
-		$this -> help['description'] = 'Land Control Areas';
-		$this -> help['command']['lc [name]']="Shows all towersites in [name]";
-		$this -> help['command']['lc 50']="Shows all towersites in the 50 range";
-		$this -> help['command']['lc 100 200'] = "Shows all towersites in the 100-200 range";
-		$this -> help['command']['lc 100 200 [name]'] = "Shows all towersites in the 100-200 range in [name]";
-		$this -> help['command']['lc'] = "Shows all Land Control Areas with a link to each area.";
-
-		if($this -> bot -> core("settings") -> exists("LandControl", "SchemaVersion"))
+		$this->help['description'] = 'Land Control Areas';
+		$this->help['command']['lc [name]'] = "Shows all towersites in [name]";
+		$this->help['command']['lc 50'] = "Shows all towersites in the 50 range";
+		$this->help['command']['lc 100 200'] = "Shows all towersites in the 100-200 range";
+		$this->help['command']['lc 100 200 [name]'] = "Shows all towersites in the 100-200 range in [name]";
+		$this->help['command']['lc'] = "Shows all Land Control Areas with a link to each area.";
+		if ($this->bot->core("settings")->exists("LandControl", "SchemaVersion"))
 		{
-			$this -> bot -> db -> set_version("land_control_zones",
-			$this -> bot -> core("settings") -> get("LandControl", "SchemaVersion"));
-			$this -> bot -> core("settings") -> del("LandControl", "SchemaVersion");
+			$this->bot->db->set_version("land_control_zones", $this->bot->core("settings")->get("LandControl", "SchemaVersion"));
+			$this->bot->core("settings")->del("LandControl", "SchemaVersion");
 		}
-
-		switch ($this -> bot -> db -> get_version("land_control_zones"))
+		switch ($this->bot->db->get_version("land_control_zones"))
 		{
 			case 1:
-				$this -> bot -> db -> query("UPDATE #___land_control_zones SET hrange = 150 "
-				. "WHERE area = 'Broken Shores' AND name = 'Surrounding Evil'");
+				$this->bot->db->query("UPDATE #___land_control_zones SET hrange = 150 " . "WHERE area = 'Broken Shores' AND name = 'Surrounding Evil'");
 			case 2:
-				$this -> bot -> db -> query("UPDATE #___land_control_zones SET hrange = 90 "
-				. "WHERE area = 'Wailing Wastes' AND name = 'Styx Magma'");
+				$this->bot->db->query("UPDATE #___land_control_zones SET hrange = 90 " . "WHERE area = 'Wailing Wastes' AND name = 'Styx Magma'");
 			case 3:
-				$this -> bot -> db -> query("UPDATE #___land_control_zones SET hrange = 90, lrange = 60 "
-				. "WHERE area = 'Avalon' AND name = 'Griffon Frontier'");
+				$this->bot->db->query("UPDATE #___land_control_zones SET hrange = 90, lrange = 60 " . "WHERE area = 'Avalon' AND name = 'Griffon Frontier'");
 			case 4:
 				$filename = "./extra/table_data/lc_zones.sql";
 				$handle = fopen($filename, "r");
 				$query = fread($handle, filesize($filename));
 				fclose($handle);
-				if(!empty($query))
-					$this -> bot -> db -> query($query);
+				if (! empty($query))
+					$this->bot->db->query($query);
 			default:
 		}
-
-		$this -> bot -> db -> set_version("land_control_zones", 5);
-
-		$this -> register_command("all", "lc", "MEMBER");
+		$this->bot->db->set_version("land_control_zones", 5);
+		$this->register_command("all", "lc", "MEMBER");
 	}
 
 	function command_handler($name, $msg, $channel)
 	{
 		if (preg_match("/^lc  (.+)$/i", $msg, $info))
-			return $this -> show_lc($info[1]);
+			return $this->show_lc($info[1]);
 		elseif (preg_match("/^lc (\d+) (\d+) (.+)$/i", $msg, $info))
-			return $this -> show_lc($info[3],$info[1],$info[2]);
+			return $this->show_lc($info[3], $info[1], $info[2]);
 		elseif (preg_match("/^lc (\d+) ([^\d]+)$/i", $msg, $info))
-			return $this -> show_lc($info[2],$info[1],$info[1]);
+			return $this->show_lc($info[2], $info[1], $info[1]);
 		elseif (preg_match("/^lc (\d+) (\d+)$/i", $msg, $info))
-			return $this -> show_lc(NULL,$info[1],$info[2]);
+			return $this->show_lc(NULL, $info[1], $info[2]);
 		elseif (preg_match("/^lc (\d+)$/i", $msg, $info))
-			return $this -> show_lc(NULL,$info[1],$info[1]);
+			return $this->show_lc(NULL, $info[1], $info[1]);
 		elseif (preg_match("/^lc ([^\d]+)$/i", $msg, $info))
-			return $this -> show_lc($info[1]);
+			return $this->show_lc($info[1]);
 		elseif (preg_match("/^lc$/i", $msg, $info))
-			return $this -> show_lc("--all--");
+			return $this->show_lc("--all--");
 		return false;
 	}
 
-	function show_lc($iarea=NULL,$lrange=0,$hrange=300) {
-		if ($iarea == "--all--") {
+	function show_lc($iarea = NULL, $lrange = 0, $hrange = 300)
+	{
+		if ($iarea == "--all--")
+		{
 			$areas = $this->bot->db->select("select distinct(area),count(area) from #___land_control_zones group by area");
-			if (!empty($areas)) {
-				$return.="<div align=center><u><font color=#10a5e5>Land Control Areas</font></u></div>";
+			if (! empty($areas))
+			{
+				$return .= "<div align=center><u><font color=#10a5e5>Land Control Areas</font></u></div>";
 				foreach ($areas as $area)
-					$return .= $this -> bot -> core("tools") -> chatcmd("lc  ".$area[0], $area[0])." (".$area[1].")<br>";
-				return $this -> bot -> core("tools") -> make_blob("Land Control Areas",$return);
-			} else
+					$return .= $this->bot->core("tools")->chatcmd("lc  " . $area[0], $area[0]) . " (" . $area[1] . ")<br>";
+				return $this->bot->core("tools")->make_blob("Land Control Areas", $return);
+			}
+			else
 				return "No matches";
 		}
-		else {
-			if (!$iarea)
+		else
+		{
+			if (! $iarea)
 				$areas = $this->bot->db->select("select distinct(area),count(area) from #___land_control_zones group by area");
 			else
-				$areas = $this->bot->db->select("select distinct(area),count(area) from #___land_control_zones where area like '%".$iarea."%' group by area");
-			if (!empty($areas)) {
-				foreach ($areas as $area) {
+				$areas = $this->bot->db->select("select distinct(area),count(area) from #___land_control_zones where area like '%" . $iarea . "%' group by area");
+			if (! empty($areas))
+			{
+				foreach ($areas as $area)
+				{
 					unset($temp);
 					if (isset($return))
-						$temp="<br><br>";
-					$temp.="<div align=center><u><font color=#10a5e5>".$area[0]." (".$area[1].")</font></u></div>";
+						$temp = "<br><br>";
+					$temp .= "<div align=center><u><font color=#10a5e5>" . $area[0] . " (" . $area[1] . ")</font></u></div>";
 					if ($lrange == $hrange)
-						$lcs = $this->bot->db->select("select * from #___land_control_zones where area='".$area[0]."' AND lrange<=".$lrange." AND hrange>=".$hrange." order by huge");
+						$lcs = $this->bot->db->select("select * from #___land_control_zones where area='" . $area[0] . "' AND lrange<=" . $lrange . " AND hrange>=" . $hrange . " order by huge");
 					else
-						$lcs = $this->bot->db->select("select * from #___land_control_zones where area='".$area[0]."' AND lrange>=".$lrange." AND hrange<=".$hrange." order by huge");
-					if (!empty($lcs)) {
-						foreach ($lcs as $lc) {
-							$temp.=" Area: ".$lc[7]."<br> Range: ".$this->conv($lc[1])."-".$this->conv($lc[2])."<br> Coords: ".$this->coords($lc[5])."x".$this->coords($lc[6])."<br> Hugemap: ".$lc[4]."<br><br>";
-
+						$lcs = $this->bot->db->select("select * from #___land_control_zones where area='" . $area[0] . "' AND lrange>=" . $lrange . " AND hrange<=" . $hrange . " order by huge");
+					if (! empty($lcs))
+					{
+						foreach ($lcs as $lc)
+						{
+							$temp .= " Area: " . $lc[7] . "<br> Range: " . $this->conv($lc[1]) . "-" . $this->conv($lc[2]) . "<br> Coords: " . $this->coords($lc[5]) . "x" . $this->coords($lc[6]) . "<br> Hugemap: " . $lc[4] . "<br><br>";
 						}
-						$return.=$temp;
+						$return .= $temp;
 					}
 				}
-				return $this -> bot -> core("tools") -> make_blob("Land Control Areas",$return);
-			} else
+				return $this->bot->core("tools")->make_blob("Land Control Areas", $return);
+			}
+			else
 				return "No matches";
 		}
 	}
-	function conv($num) {
-		if (strlen($num)<2)
+
+	function conv($num)
+	{
+		if (strlen($num) < 2)
 			return $num;
-		elseif (strlen($num)<3)
+		elseif (strlen($num) < 3)
 			return $num;
 		else
 			return $num;
 	}
-	function coords($num) {
-		if (strlen($num)<2)
+
+	function coords($num)
+	{
+		if (strlen($num) < 2)
 			return $num;
-		elseif (strlen($num)<3)
+		elseif (strlen($num) < 3)
 			return $num;
-		elseif (strlen($num)<4)
+		elseif (strlen($num) < 4)
 			return $num;
 		else
 			return $num;
