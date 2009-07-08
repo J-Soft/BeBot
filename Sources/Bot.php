@@ -244,15 +244,31 @@ class Bot
 			sleep($this -> reconnecttime);
 			die("The bot is restarting.\n");
 		}
+		
+		// AoC authentication is a bit different
+		if ( $this -> game == "aoc" )
+		{
+			$this -> log("LOGIN", "STATUS", "Authenticating");
+			if ( $this -> aoc -> authenticateConan($this -> username,$this -> password, $this -> botname) == false )
+			{
+				$this -> cron_activated = false;
+				$this -> disconnect();
+				$this -> log("CONN", "ERROR", "Failed authenticating to server. Retrying in " . $this -> reconnecttime . " seconds.");
+				sleep($this -> reconnecttime);
+				die("The bot is restarting.\n");		
+			}
+		}
+		else
+		{
+			// Authenticate
+			$this -> log("LOGIN", "STATUS", "Authenticating");
+			$this -> aoc -> authenticate($this -> username, $this -> password);
 
-		// Authenticate
-		$this -> log("LOGIN", "STATUS", "Authenticating");
-		$this -> aoc -> authenticate($this -> username, $this -> password);
-
-		// Login the bot character
-		$this -> log("LOGIN", "STATUS", "Logging in");
-		$this -> aoc -> login(ucfirst(strtolower($this -> botname)));
-
+			// Login the bot character
+			$this -> log("LOGIN", "STATUS", "Logging in");
+			$this -> aoc -> login(ucfirst(strtolower($this -> botname)));
+		}
+		
 		/*
 		We're logged in. Make sure we no longer keep username and password in memory.
 		*/
@@ -505,14 +521,16 @@ class Bot
 	*/
 	function send_pgroup($msg, $group = NULL, $checksize = TRUE, $parsecolors=TRUE)
 	{
+		// Never send any privategroup message in AoC, because this would disconnect the bot
+		if ($this -> game == "aoc")
+			return FALSE;
+
 		if ($group == NULL)
 			$group = $this -> botname;
 
 		if ($group == $this -> botname && $this -> core("settings") -> get("Core", "DisablePGMSG"))
-		{
 			return FALSE;
-		}
-
+		
 		// parse all color tags:
 		if($parsecolors)
 			$msg = $this -> core("colors") -> parse($msg);
@@ -828,6 +846,7 @@ class Bot
 		{
 			if ($group == $this -> guildname || ($this -> game == "aoc" && $group == "~Guild"))
 			{
+			echo "guildmessage..";
 				$group = "org";
 			}
 			$registered = $this -> commands[$channel][$group];
