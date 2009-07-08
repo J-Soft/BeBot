@@ -45,6 +45,7 @@ Version 0.6.4
 - Corrected some color codes and time zone for "last online" in !whois (AoC only)
 - Changed help for !aliasadmin (which didn't exist) to !alias admin
 - Bot doesn't tell people that there are "No news." upon login any more. Only if they ask for "!news".
+- Added more spam protection (e.g. when double clicking tell links) to message queue.
 
 -------------
 Version 0.6.3
