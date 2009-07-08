@@ -134,7 +134,7 @@ class Chat_Queue_Core extends BasePassiveModule
 
 
 	/*
-	Sets messages left...
+	Sents messages left...
 	*/
 	function set_msgs()
 	{
@@ -142,7 +142,7 @@ class Chat_Queue_Core extends BasePassiveModule
 		$this -> msgs_left += ($time - $this -> last_call) / ($this -> bot -> telldelay / 1000);
 		$this -> last_call = $time;
 		if ($this -> msgs_left > 4)
-			$this -> msgs_left = 4;
+		$this -> msgs_left = 4;
 	}
 
 
@@ -169,22 +169,9 @@ class Chat_Queue_Core extends BasePassiveModule
 	function into_queue($to, $msg, $type, $priority)
 	{
 		if ($priority == 0)
-		{
-			// Filter duplicate messages. The exact same message twice in a queue
-			// results most likely from double clicking a link or spamming the bot
-			// (like if 100 people are klicking on a guild info link multiple times).
-			// There is no point in sending the same answer back twice in a row.
-			foreach ($this->queue as $item)
-				if ($item[0]==$to && $item[1]==$msg && $item[2]==$type)
-					return;
-			$this -> queue[] = array($to, $msg, $type);
-		} else {
-			// Filter duplicate messages.
-			foreach ($this->queue_low as $item)
-				if ($item[0]==$to && $item[1]==$msg && $item[2]==$type)
-					return;
-			$this -> queue_low[] = array($to, $msg, $type);
-		}
+		$this -> queue[] = array($to, $msg, $type);
+		else
+		$this -> queue_low[] = array($to, $msg, $type);
 	}
 }
 ?>

@@ -80,7 +80,7 @@ class craftclasses Extends BaseActiveModule
 		$this -> register_command("all", "setcraft", "MEMBER");
 		$this -> register_command("all", "craft", "MEMBER");
 		$this -> help['description'] = 'Used to set the crafting classes on a user.';
-		$this -> help['command']['setcraft <class1> <class2>']="Sets the two crafting classes for you. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None";
+		$this -> help['command']['setcraft [class1] [class2]']="Sets the two crafting classes for you. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None";
 		$this -> help['command']['craft']="Shows the classes you currently have assigned to you.";
 
 		$this -> bot -> core("settings") -> create("Craftclasses", "Remind", TRUE, "Should users level 40+ be reminded to set their craft classes?");
