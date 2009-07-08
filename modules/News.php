@@ -100,11 +100,13 @@ class News extends BaseActiveModule
 				case 'Last_headline':
 					$spam .= $this -> get_last_headline();
 					$spam .= $this -> get_news($name);
-					$this -> bot -> send_output($name, $spam, 'tell');
+					if ($spam != "No news.")
+						$this -> bot -> send_output($name, $spam, 'tell');
 					break;
 				case 'Link':
 					$spam .= $this -> get_news($name);
-					$this -> bot -> send_output($name, $spam, 'tell');
+					if ($spam != "No news.")
+						$this -> bot -> send_output($name, $spam, 'tell');
 		 	}
 		}
 	}
@@ -116,11 +118,13 @@ class News extends BaseActiveModule
 			case 'Last_headline':
 				$spam .= $this -> get_last_headline();
 				$spam .= $this -> get_news($name);
-				$this -> bot -> send_output($name, $spam, 'tell');
+				if ($spam != "No news.")
+					$this -> bot -> send_output($name, $spam, 'tell');
 				break;
 			case 'Link':
 				$spam .= $this -> get_news($name);
-				$this -> bot -> send_output($name, $spam, 'tell');
+				if ($spam != "No news.")
+					$this -> bot -> send_output($name, $spam, 'tell');
 		}
 	}
 
