@@ -2098,7 +2098,7 @@ $GLOBALS["aochat-rpcpacketmap"] = array(
 "out" => array(
 	(string)RPC_UNIVERSE_INIT				=> array("name"=>"Login Init",					"args"=>"SSI"),
 	(string)RPC_UNIVERSE_ANSWERCHALLENGE	=> array("name"=>"Login Answer Challenge",		"args"=>"S"),
-	(string)RPC_UNIVERSE_ACCOUNT			=> array("name"=>"Login Player Account",		"args"=>"II"),
+//	(string)RPC_UNIVERSE_ACCOUNT			=> array("name"=>"Login Player Account",		"args"=>"II"),
 	(string)RPC_TERRITORY_INIT				=> array("name"=>"Player Init",					"args"=>"II"),
 	(string)RPC_TERRITORY_STARTUP			=> array("name"=>"Player Startup",				"args"=>""),
 	(string)RPC_TERRITORY_LOGINCHARACTER	=> array("name"=>"Login Character",				"args"=>"ISS"))
