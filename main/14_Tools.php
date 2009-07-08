@@ -50,9 +50,15 @@ class tools extends BasePassiveModule
 
 		$this -> register_module("tools");
 
-		$this -> bot -> core("settings") -> create("tools", "get_site", "Sockets", "Should get_site use Sockets or Curl", "Sockets;Curl");
+		if ($this -> bot -> core("settings") -> exists("tools", "get_site"))
+		{
+			$this -> bot -> core("settings") -> del("tools", "get_site");
+		}
+		$this -> bot -> core("settings") -> create("tools", "force_sockets", FALSE, "Should we force the usage of Sockets in get_site() even if Curl is available?");
 
 		$this -> register_event("settings", array("module" => "tools", "setting" => "get_site"));
+		
+		$this -> useragent = BOT_VERSION_NAME . "/" . BOT_VERSION . " (Originating bot: " . $this -> bot -> botname . "; Dimension: " . $this -> bot -> dimension . ";)";
 	}
 
 	function chatcmd($link, $title, $origin = FALSE, $strip = FALSE)
@@ -84,6 +90,9 @@ class tools extends BasePassiveModule
 			case FALSE:
 				$chatcmd = "tell ".$this -> bot -> botname." <pre>";
 				Break;
+			case '/':
+				$chatcmd = "";
+				Break;
 			Default:
 				$chatcmd = $origin." ";
 		}
@@ -97,22 +106,15 @@ class tools extends BasePassiveModule
 
 	function get_site($url, $strip_headers = 0, $server_timeout = 25, $read_timeout = 30)
 	{
-		if(strtolower($this -> bot -> core("settings") -> get("tools", "get_site")) == "curl")
+		if(!function_exists('curl_init') || ($this -> bot -> core("settings") -> get("tools", "force_sockets") == TRUE))
 		{
-			if(!function_exists('curl_init'))
-			{
-				$this -> bot -> core("settings") -> save($module, $setting, "Sockets");
-				$this -> bot -> send_tell($this -> bot -> core("security") -> owner, "Setting get_site for Module tools Changed to Sockets as cURL is not installed");
-				Return $this -> get_site_sock($url, $strip_headers, $server_timeout, $read_timeout);
-			}
-			else
-			{
-				Return $this -> get_site_curl($url, $strip_headers);
-		}
+			$this -> bot -> core("settings") -> save($module, $setting, "Sockets");
+			$this -> bot -> send_tell($this -> bot -> core("security") -> owner, "Setting get_site for Module tools Changed to Sockets as cURL is not installed");
+			Return $this -> get_site_sock($url, $strip_headers, $server_timeout, $read_timeout);
 		}
 		else
 		{
-			Return $this -> get_site_sock($url, $strip_headers, $server_timeout, $read_timeout);
+			Return $this -> get_site_curl($url, $strip_headers);
 		}
 	}
 
@@ -189,7 +191,7 @@ class tools extends BasePassiveModule
 		$in = "GET $url HTTP/1.0\r\n";
 		$in .= "Host: " . $get_url['host'] . "\r\n";
 		$in .= "Connection: Close\r\n";
-		$in .= "User-Agent: BeBot/$bot_version\r\n\r\n";
+		$in .= "User-Agent:" . $this -> useragent . "\r\n\r\n";
 
 		$write_result = socket_write($socket, $in, strlen($in));
 
@@ -240,6 +242,8 @@ class tools extends BasePassiveModule
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 
+		curl_setopt($ch, CURLOPT_USERAGENT, $this -> useragent);
+		
 		// Set your login and password for authentication
 		//curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
 		//curl_setopt($ch, CURLOPT_USERPWD, $user.':'.$pw);
@@ -305,7 +309,7 @@ class tools extends BasePassiveModule
 			$inside .= "##blob_title##:::::::::::##end## ##blob_text##BeBot Client Terminal##end## ##blob_title##::::::::::::##end##\n";
 			$inside .= $this -> chatcmd('about', '##blob_title##«##end## ##blob_text##About##end## ##blob_title##»##end##', FALSE, TRUE) . "     ";
 			$inside .= $this -> chatcmd('help', '##blob_title##«##end## ##blob_text##Help##end## ##blob_title##»##end##', FALSE, TRUE) . "     ";	
-			$inside .= $this -> chatcmd('close InfoView', '##blob_title##«##end## ##blob_text##Close Terminal##end## ##blob_title##»##end##', FALSE, TRUE);	
+			$inside .= $this -> chatcmd('close InfoView', '##blob_title##«##end## ##blob_text##Close Terminal##end## ##blob_title##»##end##', '/', TRUE);	
 			$inside .= "\n##blob_title##¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯##end##\n";
 		}
 		

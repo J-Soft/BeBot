@@ -393,7 +393,7 @@ class Whois_Core extends BasePassiveModule
 		*/
 		else
 		{
-			$this->error->set("Character lookup could not be completed. people.anarchy-online.com and www.auno.org lookups have failed and no cached data is available.");
+			$this->error->set("Character lookup could not be completed. people.anarchy-online.com and www.auno.org lookups have failed and no cached data is available for $name.");
 			return $this->error;
 		}
 	}
@@ -407,31 +407,34 @@ class Whois_Core extends BasePassiveModule
 	{ // Start function get_playerxml()
 		$name = strtolower($name);
 
+		$fcurl = "http://people.anarchy-online.com/character/bio/d/" . $this -> bot -> dimension . "/name/" . strtolower($name) . "/bio.xml";
+		$aunourl = "http://auno.org/ao/char.php?output=xml&dimension=" . $this -> bot -> dimension . "&name=" . strtolower($name);
+		
 		if ($this -> bot -> core("settings") -> get("Whois", "LookupOrder") == "funcom_auno")
 		{
 			$site1NAME = "Anarchy-Online";
-			$site1URL = "http://people.anarchy-online.com/character/bio/d/" . $this -> bot -> dimension . "/name/" . strtolower($name) . "/bio.xml";
+			$site1URL = $fcurl;
 			$site2NAME = "Auno";
-			$site2URL = "http://auno.org/ao/char.php?output=xml&dimension=" . $this -> bot -> dimension . "&name=" . strtolower($name);
+			$site2URL = $aunourl;
 		}
 		elseif ($this -> bot -> core("settings") -> get("Whois", "LookupOrder") == "funcom_only")
 		{
 			$site1NAME = "Anarchy-Online";
-			$site1URL = "http://people.anarchy-online.com/character/bio/d/" . $this -> bot -> dimension . "/name/" . strtolower($name) . "/bio.xml";
+			$site1URL = $fcurl;
 			$site2NAME = FALSE;
 		}
 		elseif ($this -> bot -> core("settings") -> get("Whois", "LookupOrder") == "auno_only")
 		{
 			$site1NAME = "Auno";
-			$site1URL = "http://auno.org/ao/char.php?output=xml&dimension=" . $this -> bot -> dimension . "&name=" . strtolower($name);
+			$site2URL = $aunourl;
 			$site2NAME = FALSE;
 		}
 		else
 		{
 			$site1NAME = "Auno";
-			$site1URL = "http://auno.org/ao/char.php?output=xml&dimension=" . $this -> bot -> dimension . "&name=" . strtolower($name);
+			$site2URL = $aunourl;
 			$site2NAME = "Anarchy-Online";
-			$site2URL = "http://people.anarchy-online.com/character/bio/d/" . $this -> bot -> dimension . "/name/" . strtolower($name) . "/bio.xml";
+			$site1URL = $fcurl;
 		}
 
 		$xml = $this -> bot -> core("tools") -> get_site($site1URL);
@@ -471,7 +474,7 @@ class Whois_Core extends BasePassiveModule
 			return $xml; // The XML is bad to start with, no more checking needed.
 		}
 
-		if (strpos($xml, '404 Not Found') !== 0)
+		if (strpos($xml, '404 Not Found') !== FALSE)
 		{
 			$this->error->set("404 Not Found error encountered");
 			return $this->error;

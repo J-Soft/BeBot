@@ -15,6 +15,9 @@ Version 0.7.0
 - Added third optional parameter $header (bol TRUE/FALSE) to make_blob displaying VhaBot like terminal header. Shamelessly borrowed from VhaBot. Defaults to TRUE
 - Added fourth optional parameter $strip (bol TRUE/FALSE) to chatcmd to allow stripping of all formatting for the actual link. This allows custom formatting of links. Defaults to FALSE.
 - Added sixth optional parameter $strip (bol TRUE/FALSE) to make_item to allow stripping of all formatting for the actual link. This allows custom formatting of links. Defaults to FALSE.
+- Bot now automatically uses curl() for fetching URL's if curl is detected. You can still force it to use Sockets using !settings tools force sockets on.
+- Bot now includes bot name and dimension in user agent on HTTP requests.
+- chatcmd() now allows / as $origin parameter and will not prefix the chatcmd in any way.
 
 +Possible BREAKAGE! - Peliminary testing shows modules appear to be working as expected.
 +- AoC is still broken until someone fixes the AoC spesific modules. (I ain't got no account)
