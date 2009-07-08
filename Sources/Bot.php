@@ -521,14 +521,16 @@ class Bot
 	*/
 	function send_pgroup($msg, $group = NULL, $checksize = TRUE, $parsecolors=TRUE)
 	{
+		// Never send any privategroup message in AoC, because this would disconnect the bot
+		if ($this -> game == "aoc")
+			return FALSE;
+
 		if ($group == NULL)
 			$group = $this -> botname;
 
 		if ($group == $this -> botname && $this -> core("settings") -> get("Core", "DisablePGMSG"))
-		{
 			return FALSE;
-		}
-
+		
 		// parse all color tags:
 		if($parsecolors)
 			$msg = $this -> core("colors") -> parse($msg);
