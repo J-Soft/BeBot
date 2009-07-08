@@ -60,6 +60,8 @@ class AOChatWrapper_Core extends BasePassiveModule
 	function get_uid($user)
 	{
 		$user = ucfirst(strtolower($user));
+		echo "Depreciated AOChatWarapper::get_uid() called for $user. Backtrace:\n";
+		debug_print_backtrace();
 		$this->debug_output("Deprecated call to core('chat')->get_uid(). Use bot->core('player')->id($user)\n");
 		return $this->bot->core('player')->id($user);
 	}
@@ -71,6 +73,8 @@ class AOChatWrapper_Core extends BasePassiveModule
 	{
 		$user = ucfirst(strtolower($user));
 		$this->debug_output("Deprecated call to core('chat')->get_uname(). Use bot->core('player')->name($user)\n");
+		echo "Depreciated AOChatWarapper::get_uname() called for $user. Backtrace:\n";
+		debug_print_backtrace();
 		return $this->bot->core('player')->name($user);
 	}
 

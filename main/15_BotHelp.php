@@ -93,19 +93,24 @@ class BotHelp_Core extends BaseActiveModule
 	{
 		$vars = explode(' ', $msg);
 		unset($vars[0]);
-		switch($vars[1])
+		
+		if (!isset($vars[1]))
 		{
-			case '':
-				return($this -> show_help_menu($name));
-				break;
-			case 'tell':
-			case 'gc':
-			case 'pgmsg':
-				return($this -> show_help_menu($name, $vars[1]));
-				break;
-			default:
-				return($this -> show_help($name, $vars[1]));
-				break;
+			return($this -> show_help_menu($name));
+		}
+		else
+		{
+			switch($vars[1])
+			{
+				case 'tell':
+				case 'gc':
+				case 'pgmsg':
+					return($this -> show_help_menu($name, $vars[1]));
+					break;
+				default:
+					return($this -> show_help($name, $vars[1]));
+					break;
+			}
 		}
 	}
 

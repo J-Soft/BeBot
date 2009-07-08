@@ -11,6 +11,10 @@ Version 0.7.0
 - Moved the server list into it's own file and changed the way game and server is detected. Dimension 0-3 are no longer valid and are replaced by Testlive, Atlantean, Rimor and Die neue welt. No backwards compatibility implimented
 - Added level command to IRC (coded by nyt), Prefix no longer Required for /msg botname in IRC, /msg botname now Output error if unknown command.
 - Created a commodities directory for class files that do not instantiate themselves
+- Fixed countless php warnings and notices meaning it should now be possible to run the bot with php E_ALL logging turned on to help ease debugging.
+- Added third optional parameter $header (bol TRUE/FALSE) to make_blob displaying VhaBot like terminal header. Shamelessly borrowed from VhaBot. Defaults to TRUE
+- Added fourth optional parameter $strip (bol TRUE/FALSE) to chatcmd to allow stripping of all formatting for the actual link. This allows custom formatting of links. Defaults to FALSE.
+- Added sixth optional parameter $strip (bol TRUE/FALSE) to make_item to allow stripping of all formatting for the actual link. This allows custom formatting of links. Defaults to FALSE.
 
 +Possible BREAKAGE! - Peliminary testing shows modules appear to be working as expected.
 +- AoC is still broken until someone fixes the AoC spesific modules. (I ain't got no account)

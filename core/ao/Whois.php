@@ -452,7 +452,7 @@ class Whois_Core extends BasePassiveModule
 		{
 			// If we get here, both Auno and FunCom XML lookups have failed.
 			// Rewrite the error message to reflect this before returning.
-			$xml->set_description("people.anarchy-online.com and www.auno.org lookups have failed.");
+			$xml->set_description("people.anarchy-online.com and www.auno.org lookups have failed for $name.");
 
 			if ($this -> bot -> core("settings") -> get("Statistics", "Enabled"))
 				$this -> bot -> core("statistics") -> capture_statistic("Whois","Lookup","BadName");

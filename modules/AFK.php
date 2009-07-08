@@ -73,9 +73,9 @@ Class AFK extends BaseActiveModule
 
 	function command_handler($name, $msg, $origin)
 	{
-		$this->error->reset();
-		$com=$this->parse_com($msg, array('com', 'args'));
-		$this->gone($name, $com['args']);
+		$this -> error->reset();
+		$com = $this->parse_com($msg, array('com', 'args'));
+		$this -> gone($name, $com['args']);
 		return("##highlight##$name##end## is now AFK.");
 	}
 
@@ -201,7 +201,7 @@ Class AFK extends BaseActiveModule
 	function afk_time($name)
 	{
 		$timenow = "" . time() ."";
-		$timeafk = $this -> afk[$name][time];
+		$timeafk = $this -> afk[$name]['time'];
 		$dif = $timenow - $timeafk;
 		if($dif < 60) Return $dif." Seconds";
 		elseif($dif < 3600)
@@ -269,7 +269,7 @@ Class AFK extends BaseActiveModule
 
 	function acheck($name)
 	{
-		if($this -> afk[$name])
+		if(isset($this -> afk[$name]))
 		{
 			return true;
 		}

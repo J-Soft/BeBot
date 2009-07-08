@@ -221,6 +221,7 @@ class OnlineDisplay extends BaseActiveModule
 	*/
 	function online_list($channel, $like, $lvl = FALSE)
 	{
+		$andlvl = "";
 		if($this -> bot -> game == "ao")
 		{
 			$ex1 = "defender_rank_id DESC, ";
@@ -313,6 +314,8 @@ class OnlineDisplay extends BaseActiveModule
 				}
 
 				$admin = "";
+				$raid = "";
+				
 				$online_num++;
 				$main = $this -> bot -> core("alts") -> main($player[0]);
 				$alts = $this -> bot -> core("alts") -> get_alts($main);
@@ -347,7 +350,7 @@ class OnlineDisplay extends BaseActiveModule
 				{
 					$alts = "";
 				}
-				else if ($main == $this -> bot -> core("chat") -> get_uname($player[0]))
+				else if ($main == $player[0])
 				{
 					$alts = ":: ".$this -> bot -> core("tools") -> chatcmd($altcmd." " . $player[0], "Details")." ::";
 				}
@@ -389,7 +392,7 @@ class OnlineDisplay extends BaseActiveModule
 				if($this -> bot -> game == "ao")
 					$online_list .= "/" . $player[5];
 				$online_list .= $this -> bot -> core("colors") -> colorize("online_characters", " " . $player[0] . " " . $charinfo . $raid . $admin . $alts);
-				if($this -> bot -> commands["tell"]["afk"] -> afk[$player[0]])
+				if(isset($this -> bot -> commands["tell"]["afk"] -> afk[$player[0]]))
 				{
 					$online_list .= ":: " . $this -> bot -> core("colors") -> colorize("online_afk", "( AFK )") . "\n";
 				}

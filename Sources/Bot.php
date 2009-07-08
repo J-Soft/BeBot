@@ -1711,11 +1711,13 @@ class Bot
 		foreach($content as $line)
 		{
 			if ((strlen($result[$page]) + strlen($line) + 12) < $this -> maxsize)
-			$result[$page] .= $line . "\n";
+			{
+				$result[$page] .= $line . "\n";
+			}
 			else
 			{
 				$page++;
-				$result[$page] .= $line . "\n";
+				$result[$page] = $line . "\n";
 			}
 		}
 

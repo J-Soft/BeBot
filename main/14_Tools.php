@@ -55,9 +55,10 @@ class tools extends BasePassiveModule
 		$this -> register_event("settings", array("module" => "tools", "setting" => "get_site"));
 	}
 
-	function chatcmd($link, $title, $origin = FALSE)
+	function chatcmd($link, $title, $origin = FALSE, $strip = FALSE)
 	{
 		$origin = strtolower($origin);
+		$msgstrip = "";
 		switch($origin)
 		{
 			case'gc':
@@ -86,7 +87,12 @@ class tools extends BasePassiveModule
 			Default:
 				$chatcmd = $origin." ";
 		}
-		Return ('<a href=\'chatcmd:///'.$chatcmd.$link . '\'>' . $title . '</a>');
+		if ($strip)
+		{
+			$msgstrip = "style=text-decoration:none ";
+		}
+		
+		Return ('<a ' . $msgstrip .'href=\'chatcmd:///'.$chatcmd.$link . '\'>' . $title . '</a>');
 	}
 
 	function get_site($url, $strip_headers = 0, $server_timeout = 25, $read_timeout = 30)
@@ -289,22 +295,41 @@ class tools extends BasePassiveModule
 		return $tmp[0];
 	}
 
-	function make_blob($title, $content)
+	function make_blob($title, $content, $header = TRUE)
 	{
-		$content = str_replace("\"", "&quot;", $content);
+		$inside = "";
 
-		return "<a href=\"text://" . $content . "\">" . $title . "</a>";
+		if ($header)
+		{
+			// Generic header for all info windows, shamelessly borrowed from VhaBot
+			$inside .= "##blob_title##:::::::::::##end## ##blob_text##BeBot Client Terminal##end## ##blob_title##::::::::::::##end##\n";
+			$inside .= $this -> chatcmd('about', '##blob_title##«##end## ##blob_text##About##end## ##blob_title##»##end##', FALSE, TRUE) . "     ";
+			$inside .= $this -> chatcmd('help', '##blob_title##«##end## ##blob_text##Help##end## ##blob_title##»##end##', FALSE, TRUE) . "     ";	
+			$inside .= $this -> chatcmd('close InfoView', '##blob_title##«##end## ##blob_text##Close Terminal##end## ##blob_title##»##end##', FALSE, TRUE);	
+			$inside .= "\n##blob_title##¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯##end##\n";
+		}
+		
+		$inside .= str_replace("\"", "&quot;", $content);
+
+		return "<a href=\"text://" . $inside . "\">" . $title . "</a>";
 	}
 
 	/*
 	Creates a text blob.  Alternate uses ' instead of ".
 	*/
-	function make_item($lowid, $highid, $ql, $name, $alternate = false)
+	function make_item($lowid, $highid, $ql, $name, $alternate = FALSE, $strip = FALSE)
 	{
+		$msgstrip = "";
+
+		if ($strip)
+		{
+			$msgstrip = "style=text-decoration:none ";
+		}
+	
 		if($alternate)
-			return "<a href='itemref://" . $lowid . "/" . $highid . "/" . $ql . "'>" . $name . "</a>";
+			return "<a " . $msgstrip . "href='itemref://" . $lowid . "/" . $highid . "/" . $ql . "'>" . $name . "</a>";
 		else
-			return "<a href=\"itemref://" . $lowid . "/" . $highid . "/" . $ql . "\">" . $name . "</a>";
+			return "<a " . $msgstrip . "href=\"itemref://" . $lowid . "/" . $highid . "/" . $ql . "\">" . $name . "</a>";
 	}
 
 	/*

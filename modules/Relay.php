@@ -106,6 +106,7 @@ class Relay extends BaseActiveModule
 
 		$this -> db_relay = FALSE;
 		$this -> lastsent = 0;
+		$this -> monbuds = FALSE;
 	}
 
 	function update()
@@ -885,6 +886,7 @@ class Relay extends BaseActiveModule
 	*/
 	function get_namestring($name)
 	{
+		$mainstr = "";
 		if ($this -> bot -> core("settings") -> get('Relay', 'ShowMain') != "")
 		{
 			$main = $this -> bot -> core("alts") -> main($name);

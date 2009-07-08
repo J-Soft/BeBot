@@ -52,6 +52,7 @@ class About extends BaseActiveModule
 
 		//Sed default access control levels
 		$this -> register_command('all', 'about', 'GUEST');
+		$this -> register_alias('about', 'version');
 
 		$this -> help['description'] = "Shows information about the bot.";
 		$this -> help['command']['about'] = "See description";
@@ -88,13 +89,10 @@ class About extends BaseActiveModule
 	*/
 	function about_blob()
 	{
-		$inside = "##blob_title##::: About :::##end##\n\n";
+		$version =  BOT_VERSION_NAME . " v." . BOT_VERSION;
 
 		$inside .= "##blob_text##Bot Client:##end##\n";
-		$inside .= $this -> bot -> botversionname . " v" . $this -> bot -> botversion . "\n\n";
-
-		$inside .= "##blob_text##Download URL:##end##\n";
-		$inside .= $this -> bot -> core("tools") -> chatcmd("http://bebot.shadow-realm.org", "http://bebot.shadow-realm.org", "start")."\n\n";
+		$inside .= "$version\n\n";
 
 		$inside .= "##blob_text##Developers:##end##\n";
 		$inside .= "Alreadythere (RK2)\n";
@@ -119,8 +117,14 @@ class About extends BaseActiveModule
 		$inside .= "Zarkingu (RK2)\n";
 		$inside .= "Auno for writing and maintaining the PHP AOChat library\n";
 		$inside .= "And last but not least, the greatest MMORPG community in existence.\n\n";
+		
+		$inside .= "##blob_text##Links:##end##\n";
+		$inside .= $this -> bot -> core("tools") -> chatcmd("http://bebot.shadow-realm.org", "BeBot website and support forums", "start")."\n";
+		$inside .= $this -> bot -> core("tools") -> chatcmd("http://bugs.launchpad.net/bebot", "BeBot bugtracker", "start")."\n";
 
-		return $this -> bot -> core("tools") -> make_blob("About", $inside);
+		$return = "$version ::: " . $this -> bot -> core("tools") -> make_blob('More details', $inside);
+
+		return $return;
 	}
 }
 ?>

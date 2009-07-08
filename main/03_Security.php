@@ -1403,7 +1403,7 @@ class Security_Core extends BaseActiveModule
 			}
 		}
 
-		$uid = $this -> bot -> core("chat") -> get_uid($player);
+		$uid = $this -> bot -> core("player") -> id($player);
 		// If user does not exist return ANONYMOUS access right away
 		if (!$uid)
 		{

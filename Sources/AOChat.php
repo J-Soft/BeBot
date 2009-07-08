@@ -821,7 +821,7 @@ class AOChat
 		else
 			$gid = $group;
 			
-		if($uid instanceof BotError)
+		if($gid instanceof BotError)
 		{
 			return false;
 		}
@@ -933,6 +933,11 @@ class AOChat
 		if($uid instanceof BotError)
 		{
 			return false;
+		}
+		
+		if (!isset($this->buddies[$uid]))
+		{
+			$this->buddies[$uid] = 0;
 		}
 		
 		$return = (int)$this->buddies[$uid];

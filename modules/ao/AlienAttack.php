@@ -101,6 +101,7 @@ class AlienAttack extends BaseActiveModule
 		$this -> bot -> core("settings") -> create("AlienAttack", "PublicTimer", false, "Should a public timer in addition to the periodic spam be created on cloak up and down?");
 		$this -> bot -> core("settings") -> create("AlienAttack", "CloakReminder", TRUE, "Should the bot send a reminder every 15mins if the cloak is still disabled?");
 		
+		$this -> spam = FALSE;
 		$setting = $this -> bot -> core("settings") -> get('AlienAttack', 'Spam');
 		if($setting == "tell" || $setting == "both")
 		{
