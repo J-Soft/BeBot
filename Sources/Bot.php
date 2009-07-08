@@ -249,21 +249,24 @@ class Bot
 		if ( $this -> game == "aoc" )
 		{
 			$this -> log("LOGIN", "STATUS", "Authenticating");
-			$this -> aoc -> authenticateConan($this -> username,$this -> password);
-
-			// Login the bot character
-			$this -> log("LOGIN", "STATUS", "Logging in");
-			$this -> aoc -> loginConan(ucfirst(strtolower($this -> botname)));
+			if ( $this -> aoc -> authenticateConan($this -> username,$this -> password, $this -> botname) == false )
+			{
+				$this -> cron_activated = false;
+				$this -> disconnect();
+				$this -> log("CONN", "ERROR", "Failed authenticating to server. Retrying in " . $this -> reconnecttime . " seconds.");
+				sleep($this -> reconnecttime);
+				die("The bot is restarting.\n");		
+			}
 		}
 		else
 		{
 			// Authenticate
 			$this -> log("LOGIN", "STATUS", "Authenticating");
-			$this -> aoc -> authenticateAO($this -> username, $this -> password);
+			$this -> aoc -> authenticate($this -> username, $this -> password);
 
 			// Login the bot character
 			$this -> log("LOGIN", "STATUS", "Logging in");
-			$this -> aoc -> loginAO(ucfirst(strtolower($this -> botname)));
+			$this -> aoc -> login(ucfirst(strtolower($this -> botname)));
 		}
 		
 		/*
@@ -841,6 +844,7 @@ class Bot
 		{
 			if ($group == $this -> guildname || ($this -> game == "aoc" && $group == "~Guild"))
 			{
+			echo "guildmessage..";
 				$group = "org";
 			}
 			$registered = $this -> commands[$channel][$group];
