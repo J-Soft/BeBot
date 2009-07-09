@@ -699,7 +699,7 @@ class Bot
 		}
 	}
 
-	function send_output($source, $msg, $type)
+	function send_output($source, $msg, $type, $low=0)
 	{
 		// Parse color tags now to be sure they don't get changed by output filters
 		$msg = $this->core("colors")->parse($msg);
@@ -720,7 +720,7 @@ class Bot
 			case '0':
 			case '1':
 			case 'tell':
-				$this->send_tell($source, $msg);
+				$this->send_tell($source, $msg, $low);
 				break;
 			case '2':
 			case 'pgroup':
@@ -729,11 +729,11 @@ class Bot
 				break;
 			case '3':
 			case 'gc':
-				$this->send_gc($msg);
+				$this->send_gc($msg, $low);
 				break;
 			case '4':
 			case 'both':
-				$this->send_gc($msg);
+				$this->send_gc($msg, $low);
 				$this->send_pgroup($msg);
 				break;
 			default:
@@ -1082,7 +1082,7 @@ class Bot
 			$who["nickname"] = $user;
 			$who["online"] = $args[1];
 			$who["level"] = $args[2];
-			$who["location"] = $args[3];
+			$who["location"] = $args[3]; // For offline users 'location' contains the last online time in milliseconds since 1970!
 			$class_name = $this->core("Whois")->class_name[$args[4]];
 			$who["class"] = $class_name;
 			$lookup = $this->db->select("SELECT * FROM #___craftingclass WHERE name = '" . $user . "'", MYSQL_ASSOC);

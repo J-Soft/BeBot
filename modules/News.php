@@ -89,12 +89,14 @@ class News extends BaseActiveModule
 				case 'Last_headline':
 					$spam .= $this->get_last_headline();
 					$spam .= $this->get_news($name);
-					$this->bot->send_output($name, $spam, 'tell');
+					if ($spam != "No news.")
+						$this->bot->send_output($name, $spam, 'tell');
 					break;
 				case 'Link':
 					$spam .= $this->get_news($name);
-					$this->bot->send_output($name, $spam, 'tell');
-			}
+					if ($spam != "No news.")
+						$this->bot->send_output($name, $spam, 'tell');
+		 	}
 		}
 	}
 
@@ -105,11 +107,13 @@ class News extends BaseActiveModule
 			case 'Last_headline':
 				$spam .= $this->get_last_headline();
 				$spam .= $this->get_news($name);
-				$this->bot->send_output($name, $spam, 'tell');
+				if ($spam != "No news.")
+					$this->bot->send_output($name, $spam, 'tell');
 				break;
 			case 'Link':
 				$spam .= $this->get_news($name);
-				$this->bot->send_output($name, $spam, 'tell');
+				if ($spam != "No news.")
+					$this->bot->send_output($name, $spam, 'tell');
 		}
 	}
 
@@ -119,17 +123,17 @@ class News extends BaseActiveModule
 		switch ($com['com'])
 		{
 			case 'news':
-				return ($this->sub_handler($name, $com, 1));
+				return $this->sub_handler($name, $com, 1);
 				break;
 			case 'headline':
-				return ($this->sub_handler($name, $com, 2));
+				return $this->sub_handler($name, $com, 2);
 				break;
 			case 'raids':
-				return ($this->sub_handler($name, $com, 3));
+				return $this->sub_handler($name, $com, 3);
 				break;
 			default:
 				$this->error->set("News recieved unknown command '{$com['com']}'.");
-				return ($this->error);
+				return $this->error;
 				break;
 		}
 	}
@@ -141,21 +145,21 @@ class News extends BaseActiveModule
 			case '':
 			case 'read':
 				if (($type == 1) || ($type == 2))
-					return ($this->get_news($name));
+					return $this->get_news($name);
 				else
-					return ($this->get_raids($name));
+					return $this->get_raids($name);
 				break;
 			case 'add':
-				return ($this->set_news($name, $com['args'], $type));
+				return $this->set_news($name, $com['args'], $type);
 				break;
 			case 'del':
 			case 'rem':
-				return ($this->del_news($name, $com['args']));
+				return $this->del_news($name, $com['args']);
 				break;
 			default:
 				//No keywords recognized. Assume that person in attempting to add news and forgot the "add" keyword
 				$news = "{$com['sub']} {$com['args']}";
-				return ($this->set_news($name, $news, $type));
+				return $this->set_news($name, $news, $type);
 				break;
 		}
 	}

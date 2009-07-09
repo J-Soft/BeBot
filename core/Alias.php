@@ -42,20 +42,21 @@ class Alias extends BaseActiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct(&$bot, get_class($this));
-		$this->register_command('all', 'alias', 'GUEST', array("admin" => "ADMIN"));
-		$this->register_module("alias");
-		$this->register_event("connect");
-		$this->help['description'] = "Add Alias's like what you are comanly called to be used in other modules.";
-		$this->help['command']['alias add <Alias>'] = "Add Alias.";
-		$this->help['command']['alias del <Alias>'] = "Delete Alias.";
-		$this->help['command']['alias rem <Alias>'] = "Delete Alias.";
-		$this->help['command']['alias admin add <nickname> <Alias>'] = "Add Alias to Nickname.";
-		$this->help['command']['alias admin del <Alias>'] = "Delete Alias.";
-		$this->help['command']['alias admin rem <Alias>'] = "Delete Alias.";
-		$this->help['command']['alias <name>'] = "Show Alias's Asosiated with <name> and Alts.";
-		$this->help['command']['alias'] = "Show Alias's Asosiated with you and your Alts.";
-		$this->help['command']['alias list'] = "Show all Alias's.";
-		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("alias", "false") . " (
+
+		$this -> register_command('all', 'alias', 'GUEST', array("admin" => "ADMIN"));
+		$this -> register_module("alias");
+		$this -> register_event("connect");
+		$this -> help['description'] = "Add Alias's like what you are commonly called to be used in other modules.";
+		$this -> help['command']['alias add <Alias>']="Add Alias.";
+		$this -> help['command']['alias del <Alias>']="Delete Alias.";
+		$this -> help['command']['alias rem <Alias>']="Delete Alias.";
+		$this -> help['command']['alias admin add <nickname> <Alias>']="Add Alias to Nickname.";
+		$this -> help['command']['alias admin del <Alias>']="Delete Alias.";
+		$this -> help['command']['alias admin rem <Alias>']="Delete Alias.";
+		$this -> help['command']['alias <name>']="Show Alias's associated with <name> and Alts.";
+		$this -> help['command']['alias']="Show Alias's associated with you and your Alts.";
+		$this -> help['command']['alias list']="Show all Alias's.";
+		$this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS " . $this -> bot -> db -> define_tablename("alias", "false") . " (
 										alias VARCHAR(30) PRIMARY KEY, 
 										nickname VARCHAR(30),
 										main INT(1) Default '0'
@@ -95,12 +96,12 @@ class Alias extends BaseActiveModule
 				switch ($vars[1])
 				{
 					case 'add':
-						return ($this->add_alias($name, $vars[2]));
+						return $this->add_alias($name, $vars[2]);
 					case 'del':
 					case 'rem':
-						return ($this->del_alias($name, $vars[2]));
+						return $this->del_alias($name, $vars[2]);
 					case 'main':
-						Return ($this->set_main($name, $vars[2]));
+						return $this->set_main($name, $vars[2]);
 					case '':
 						return $this->get_alias($name);
 					case 'admin':
@@ -108,28 +109,28 @@ class Alias extends BaseActiveModule
 						{
 							case 'add':
 								$vars[3] = ucfirst(strtolower($vars[3]));
-								return ($this->add_alias($vars[3], $vars[4]));
+								return $this->add_alias($vars[3], $vars[4]);
 							case 'rem':
 							case 'del':
-								return ($this->del_alias_admin($vars[3]));
+								return $this->del_alias_admin($vars[3]);
 							default:
-								Return ("Unknown Subcommand of alias admin: " . $vars[1]);
+								return "Unknown Subcommand of alias admin: " . $vars[1];
 						}
 					default:
 						return $this->get_alias($vars[1]);
 				}
 				break;
 			default:
-				Return ("Broken plugin, received unhandled command: " . $vars[0]);
+				return "Broken plugin, received unhandled command: " . $vars[0];
 		}
 	}
 
 	function add_alias($name, $alias)
 	{
 		if (! $this->bot->core("chat")->get_uid($name))
-			Return "##error##Character ##highlight##" . $name . "##end## does not exist.##end##";
+			return "##error##Character ##highlight##" . $name . "##end## does not exist.##end##";
 		if (strlen($alias) < 3)
-			Return "##error##Alias ##highlight##" . $alias . "##end## is too Short. (min 3)##end##";
+			return "##error##Alias ##highlight##" . $alias . "##end## is too Short. (min 3)##end##";
 		$name = $this->bot->core("alts")->main($name);
 		$result = $this->bot->db->select("SELECT nickname FROM #___alias WHERE alias = '$alias'");
 		if (empty($result))
@@ -236,21 +237,21 @@ class Alias extends BaseActiveModule
 		if (isset($this->main[$main]))
 		{
 			if (strtolower($this->main[$main]) == $alias)
-				Return ("##highlight##" . $alias . "##end## is Already you main alias");
+				return "##highlight##" . $alias . "##end## is Already you main alias";
 			$amain = $this->bot->core("alts")->main($this->alias[$alias]);
 			if ($main != $amain)
-				Return ("##highlight##" . $alias . "##end## is not your Alias so cannot be set as main");
+				return "##highlight##" . $alias . "##end## is not your Alias so cannot be set as main";
 				//set all alias's for $name and alts to not main
 			$this->bot->db->query("UPDATE #___alias SET main = 0 WHERE nickname = '" . $main . "'");
 			$this->bot->db->query("UPDATE #___alias SET main = 1 WHERE alias = '" . $alias . "'");
 			$this->create_caches();
-			Return ("Alias Main set");
+			return "Alias Main set";
 		}
 		elseif (isset($this->alias[$alias]))
 		{
 			$amain = $this->bot->core("alts")->main($this->alias[$alias]);
 			if ($main != $amain)
-				Return ("##highlight##" . $alias . "##end## is not your Alias so cannot be set as main");
+				return "##highlight##" . $alias . "##end## is not your Alias so cannot be set as main";
 				//set all alias's for $name and alts to not main
 			$sql .= "UPDATE #___alias SET main = 0 WHERE nickname = '" . $main . "'";
 			$alts = $this->bot->core("alts")->get_alts($main);
@@ -264,19 +265,19 @@ class Alias extends BaseActiveModule
 			$this->bot->db->query($sql);
 			$this->bot->db->query("UPDATE #___alias SET main = 1 WHERE alias = '" . $alias . "'");
 			$this->create_caches();
-			Return ("Alias Main set");
+			return "Alias Main set";
 		}
 		else
-			Return ("Alias not Found");
+			return "Alias not Found";
 	}
 
 	function get_main($name)
 	{
 		$main = $this->bot->core("alts")->main($name);
 		if (isset($this->main[$main]))
-			Return ($this->main[$main]);
+			return $this->main[$main];
 		else
-			Return FALSE;
+			return FALSE;
 	}
 }
 ?>
