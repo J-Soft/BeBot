@@ -139,6 +139,7 @@ define('RPC_TERRITORY_CHARACTERLIST', 0xC414C5EF);
 define('RPC_TERRITORY_LOGINCHARACTER', 0xEF616EB6);
 define('RPC_TERRITORY_GETCHATSERVER', 0x23A632FA);
 define('RPC_TERRITORY_ERROR', 0xD4063CA0);
+
 class AOChat
 {
 	var $state, $debug, $gid, $chars, $char, $grp, $buddies;
@@ -570,7 +571,7 @@ class AOChat
 		if ($this->char["id"] != 0 && $this->serverseed != 0)
 		{
 			$this->login_num ++;
-			$loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(0 , $this->char["id"] , $this->serverseed));
+			$loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(0 , $this->char["id"] , $this->serverseed), $this->game);
 			$this->send_packet($loginCharacterPacket);
 			$this->state = "connected";
 			return true;
@@ -981,7 +982,7 @@ class AOChat
 					}
 					//echo "Resending auth to chatserver [Character:" . $this->char["name"] . ", id:" . $this->char["id"] . "]\n";
 					$this->state = "connected";
-					$loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(0 , $this->char["id"] , $this->serverseed));
+					$loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(0 , $this->char["id"] , $this->serverseed), $this->game);
 					$this->send_packet($loginCharacterPacket);
 				}
 				break;
@@ -1037,7 +1038,7 @@ class AOChat
 						$packet->args[] = $em;
 					}
 				}
-					// Event is a group message (guildchat, towers etc)
+				// Event is a group message (guildchat, towers etc)
 				// Check if it is a command
 				//If it is not post it to all observers of the GROUP_MESSAGE of the originating group
 				//Deprecated call. Should listen to the signal already sendt.
@@ -1046,7 +1047,13 @@ class AOChat
 			// Events currently being debugged for possible inclusion
 			case AOCP_MSG_VICINITYA:
 				$bot->log("MAIN", "DEBUG", "Vicinity announcement");
-				print_r($packet->args);
+				if (is_resource($this->debug))
+				{
+					fwrite($this->debug, "<<<<<\n");
+					fwrite($this->debug, print_r($packet->args, TRUE));
+					fwrite($this->debug, "\n=====\n");
+				}
+				break;
 			// Events we ignore
 			// Character list upon login
 			case AOCP_LOGIN_CHARLIST:
@@ -1055,7 +1062,12 @@ class AOChat
 				break;
 			default:
 				$bot->log("MAIN", "TYPE", "Uhandeled packet of type $type:");
-				print_r($packet->args);
+				if (is_resource($this->debug))
+				{
+					fwrite($this->debug, "<<<<<\n");
+					fwrite($this->debug, print_r($packet->args, TRUE));
+					fwrite($this->debug, "\n=====\n");
+				}
 				break;
 		}
 		$this->last_packet = time();

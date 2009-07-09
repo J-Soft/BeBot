@@ -1094,6 +1094,7 @@ class Bot
 			$this->core("Whois")->update($who);
 			if ($old_who instanceof BotError)
 			{
+				$old_who = array();
 				$old_who["level"] = 0;
 				$old_who["location"] = 0;
 			}
