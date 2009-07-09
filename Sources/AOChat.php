@@ -2117,7 +2117,7 @@ class RPCPacket
                $this->args             = array();
                $this->type             = $type;
                $this->dir              = $dir;
-               $pmap = $GLOBALS["aochat-rpcpacketmap"][$dir][$type];
+               $pmap = $GLOBALS["aochat-rpcpacketmap"][$dir][(string)$type];
 
                if(!$pmap)
                {
