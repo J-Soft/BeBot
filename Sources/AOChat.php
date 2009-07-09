@@ -244,154 +244,128 @@ class AOChat
 	function get_rpcpacket()
 	{
 		$head = $this->read_data(8);
-		if(strlen($head) != 8)
+		if (strlen($head) != 8)
 		{
 			die("Error while reading rpc header. ($head)\n");
 			return "disconnected";
 		}
-
 		// First header contains of the packetsize and checksum
-		list(,$packetsize,$crc) = unpack("N2", $head);		
-		$data = $this->read_data($packetsize-4);
-		if ( strlen($data) != $packetsize - 4 )
+		list (, $packetsize, $crc) = unpack("N2", $head);
+		$data = $this->read_data($packetsize - 4);
+		if (strlen($data) != $packetsize - 4)
 		{
-			die("Error while reading rpc packet." . strlen($data) . ":" .$packetsize);
+			die("Error while reading rpc packet." . strlen($data) . ":" . $packetsize);
 		}
-
 		// Skip the caller id
-		$temparray 	= unpack("n",$data);
-		$len 		= array_pop($temparray);
-		$data		= substr($data, 2 + $len + 8);
-
+		$temparray = unpack("n", $data);
+		$len = array_pop($temparray);
+		$data = substr($data, 2 + $len + 8);
 		// Skip the endpoint id
-		$temparray 	= unpack("n",$data);
-		$len 		= array_pop($temparray);
-		$data		= substr($data, 2 + $len + 8);
-
+		$temparray = unpack("n", $data);
+		$len = array_pop($temparray);
+		$data = substr($data, 2 + $len + 8);
 		// Read RPC id ( same as type for normal packeets )
-		$temparray 	= unpack("N", $data);
-		$type  		= array_pop($temparray);
-		$data 		= substr($data, 4);
-
+		$temparray = unpack("N", $data);
+		$type = array_pop($temparray);
+		$data = substr($data, 4);
 		// Unpack willl give a signed int32 back, so make sure we make type unsigned
-		if ($type <0)
+		if ($type < 0)
 		{
-	      $type += 4294967296;
+			$type += 4294967296;
 		}
-			
-		if(is_resource($this->debug))
+		if (is_resource($this->debug))
 		{
 			fwrite($this->debug, "<<<<<\n");
 			fwrite($this->debug, $head);
 			fwrite($this->debug, $data);
 			fwrite($this->debug, "\n=====\n");
 		}
-	
 		$packet = new RPCPacket("in", $type, $data);
-		switch($type)
+		switch ($type)
 		{
-			case RPC_UNIVERSE_CHALLENGE :
+			case RPC_UNIVERSE_CHALLENGE:
 				$this->serverseed = $packet->args[0];
 				break;
-				
 			case RPC_UNIVERSE_AUTHENTICATED:
-				$this->accountid				= $packet->args[2];
-				$this->serverseed 				= $packet->args[4];
-
+				$this->accountid = $packet->args[2];
+				$this->serverseed = $packet->args[4];
 				// Split the server address up from address:port
-				$serverAddressString 			= $packet->args[3];
-				if ( strlen( $serverAddressString ) != 0 )
+				$serverAddressString = $packet->args[3];
+				if (strlen($serverAddressString) != 0)
 				{
-					list($server,$port) = split( ":", $serverAddressString );
-					if ( strlen( $server ) != 0 && $port != 0 )
+					list ($server, $port) = split(":", $serverAddressString);
+					if (strlen($server) != 0 && $port != 0)
 					{
-						$this->ServerAddress	= $server;
-						$this->ServerPort 		= $port;
+						$this->ServerAddress = $server;
+						$this->ServerPort = $port;
 					}
 				}
 				break;
-		
-			case RPC_TERRITORY_GETCHATSERVER:			
-				$serverip 				= $packet->args[0];
-				$this->ServerAddress 	= long2ip ( $serverip );
-				$this->ServerPort		= $packet->args[1];
+			case RPC_TERRITORY_GETCHATSERVER:
+				$serverip = $packet->args[0];
+				$this->ServerAddress = long2ip($serverip);
+				$this->ServerPort = $packet->args[1];
 				break;
-		
 			case RPC_TERRITORY_CHARACTERLIST:
-			
-				$temparray 	= unpack("N", $data);
-				$playerid	= array_pop($temparray);
-				$data 		= substr($data, 4);
-
-				$temparray 	= unpack("N", $data);
-				$characters	= array_pop($temparray);
-				$data 		= substr($data, 4);
-
+				$temparray = unpack("N", $data);
+				$playerid = array_pop($temparray);
+				$data = substr($data, 4);
+				$temparray = unpack("N", $data);
+				$characters = array_pop($temparray);
+				$data = substr($data, 4);
 				$characters = (($characters / 1009) - 1);
-			
 				// Prepare an array of all characters returned
-				for($i=0;$i<$characters;$i++)
+				for ($i = 0; $i < $characters; $i ++)
 				{
 					// CharacterID again ?
-					$data		= substr($data, 4);
-					
+					$data = substr($data, 4);
 					// PlayerID
-					$temparray 	= unpack("N",$data);
-					$playerid	= array_pop($temparray);
-					$data		= substr($data, 4);
-
+					$temparray = unpack("N", $data);
+					$playerid = array_pop($temparray);
+					$data = substr($data, 4);
 					// CharacterID
-					$temparray 	= unpack("N",$data);
-					$characterid= array_pop($temparray);
-					$data		= substr($data, 4);
-
+					$temparray = unpack("N", $data);
+					$characterid = array_pop($temparray);
+					$data = substr($data, 4);
 					// CharacterName
-					$temparray 	= unpack("n",$data);
-					$namelen	= array_pop($temparray);
-					$name		= substr($data, 2, $namelen);
-					$data		= substr($data, 2 + $namelen);
-
+					$temparray = unpack("n", $data);
+					$namelen = array_pop($temparray);
+					$name = substr($data, 2, $namelen);
+					$data = substr($data, 2 + $namelen);
 					// DimensionID
-					$temparray 	= unpack("N",$data);
-					$dimensionid= array_pop($temparray);
-					$data		= substr($data, 4);
-
+					$temparray = unpack("N", $data);
+					$dimensionid = array_pop($temparray);
+					$data = substr($data, 4);
 					// Loginstate
-					$temparray 	= unpack("N",$data);
-					$loginstate	= array_pop($temparray);
-					$data		= substr($data, 4);
-
+					$temparray = unpack("N", $data);
+					$loginstate = array_pop($temparray);
+					$data = substr($data, 4);
 					// Logindate
-					$temparray 	= unpack("n",$data);
-					$datelen	= array_pop($temparray);
-					$date		= substr($data, 2, $datelen);
-					$data		= substr($data, 2 + $datelen);
-
+					$temparray = unpack("n", $data);
+					$datelen = array_pop($temparray);
+					$date = substr($data, 2, $datelen);
+					$data = substr($data, 2 + $datelen);
 					// 9 uint32 blocks with
 					// playtime, playfieldid, level, class, ?, ?, Gender, Race
-					list(,$playtime,$locationid,$level,) = unpack("N9", $data);
-					$data		= substr($data, 36);
-
+					list (, $playtime, $locationid, $level, ) = unpack("N9", $data);
+					$data = substr($data, 36);
 					// Languagesetting
-					$temparray 	= unpack("n",$data);
-					$langlen	= array_pop($temparray);
-					$lang		= substr($data, 2, $langlen);
-					$data		= substr($data, 2 + $langlen);
-
+					$temparray = unpack("n", $data);
+					$langlen = array_pop($temparray);
+					$lang = substr($data, 2, $langlen);
+					$data = substr($data, 2 + $langlen);
 					// Blocked status
-					$temparray 	= unpack("N",$data);
-					$blocked	= array_pop($temparray);
-					$data		= substr($data, 4);
-					
+					$temparray = unpack("N", $data);
+					$blocked = array_pop($temparray);
+					$data = substr($data, 4);
 					$this->chars[] = array(
-					"id"     	=> $characterid,
-					"name"   	=> $name,
-					"level"  	=> $level,
-					"online" 	=> $loginstate,
-					"language"	=> $lang );				
+					"id" => $characterid ,
+					"name" => $name ,
+					"level" => $level ,
+					"online" => $loginstate ,
+					"language" => $lang);
 				}
 		}
-	
 		return $packet;
 	}
 
