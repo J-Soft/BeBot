@@ -231,10 +231,6 @@ class TowerAttack extends BaseActiveModule
 		}
 		if ($attack)
 		{
-			if (! isset($this->suppress[$infos["def_guild"]]))
-			{
-				$this->suppress[$infos["def_guild"]] = 0;
-			}
 			$infos["time"] = time();
 			$player = $this->bot->core("whois")->lookup($infos["off_player"]);
 			if ($player instanceof BotError)
@@ -255,6 +251,10 @@ class TowerAttack extends BaseActiveModule
 				{
 					$infos["off_side"] = $player["faction"];
 				}
+			}
+			if (! isset($this->suppress[$infos["def_guild"]]))
+			{
+				$this->suppress[$infos["def_guild"]] = 0;
 			}
 			$infos["off_level"] = $player["level"];
 			$infos["off_profession"] = $player["profession"];

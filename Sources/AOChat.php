@@ -1637,8 +1637,7 @@ class AOChatPacket
 				$this->args[] = $res;
 			}
 		}
-		elseelse
-		
+		else
 		{
 			if (! is_array($data))
 			{

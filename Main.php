@@ -31,15 +31,12 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-
 define('BOT_VERSION', "0.7.0.bzr(snapshot)");
 define('BOT_VERSION_NAME', "BeBot");
 $bot_version = BOT_VERSION;
 $php_version = phpversion();
-
 // Set the time zone to UTC
 date_default_timezone_set('UTC');
-
 /*
 OS detection, borrowed from Angelsbot.
 */
@@ -48,7 +45,6 @@ if (empty($os))
 {
 	$os = getenv("OS");
 }
-
 if (preg_match("/^windows/i", $os))
 {
 	$os_windows = true;
@@ -108,7 +104,7 @@ $bot->load_files('Main', 'main');
 $bot->load_files('Core', 'core');
 $bot->load_files('Core', "core/{$bot->game}");
 $bot->load_files('Core', 'custom/core');
-if(!empty($bot->core_directories))
+if (! empty($bot->core_directories))
 {
 	$core_dirs = explode(",", $bot->core_directories);
 	foreach ($core_dirs as $core_dir)
@@ -119,23 +115,23 @@ if(!empty($bot->core_directories))
 $bot->load_files('Modules', 'modules');
 $bot->load_files('Modules', "modules/{$bot->game}");
 $bot->load_files('Modules', 'custom/modules');
-if(!empty($bot->module_directories))
+if (! empty($bot->module_directories))
 {
 	$module_dirs = explode(",", $bot->module_directories);
 	foreach ($module_dirs as $module_dir)
- 	{
+	{
 		$bot->load_files('Modules', trim($module_dir));
- 	}
+	}
 }
-
 // Start up the bot.
-$bot -> connect();
+$bot->connect();
 
-while(true)
+while (true)
 {
-	if ($bot -> aoc -> wait_for_packet() == "disconnected")
-	$bot -> reconnect();
-
-	$bot -> cron();
+	if ($bot->aoc->wait_for_packet() == "disconnected")
+	{
+		$bot->reconnect();
+	}
+	$bot->cron();
 }
 ?>
