@@ -1915,6 +1915,10 @@ class Security_Core extends BaseActiveModule
 		{
 			$this -> set_government(); // Won't work until the org governing form is identified.
 		}
+		if ($this -> bot -> core("settings") -> get('Security', 'Orggov') instanceof BotError)
+		{
+			return false; // If the setting is still missing, we can't do anything about it.
+		}		
 		if ($this -> bot -> core("settings") -> get('Security', 'Orggov') == "Unknown")
 		{
 			$this -> set_government(); // Won't work until the org governing form is identified.
