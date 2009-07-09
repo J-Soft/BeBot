@@ -161,7 +161,7 @@ class Settings_Core extends BasePassiveModule
 		}
 		else
 		{
-			$this->error->set("SETTINGS", "ERROR", "The setting named " . $setting . " for setting group " . $module . " does not exisit.");
+			$this->error->set("The setting named " . $setting . " for setting group " . $module . " does not exisit.");
 			return $this->error;
 		}
 	} // End function get()
