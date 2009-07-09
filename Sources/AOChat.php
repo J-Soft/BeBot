@@ -911,6 +911,8 @@ class AOChat
 			case AOCP_CLIENT_NAME:
 			case AOCP_CLIENT_LOOKUP:
 				//Cross-game compatibility
+				echo "Debug: AOCP_CLIENT_LOOKUP:\n";
+				print_r ($packet);
 				if ($this->game == "aoc")
 				{
 					list ($id, $unknown, $name) = $packet->args;

@@ -167,6 +167,7 @@ class PlayerList extends BasePassiveModule
 			if (isset($this->uidcache[$uid]))
 			{
 				$return = $this->uidcache[$uid]['name'];
+				echo "Debug: name() returning $return from cache after lookup\n";
 				return $return;
 			}
 			else
@@ -185,6 +186,7 @@ class PlayerList extends BasePassiveModule
 						$this->bot->log("PLAYERLIST", "WARN", "Username lookup for $uid failed, but using whois info that is $age hours old.");
 						//cache in memory for future reference.
 						$this->add($uid, $result[0]['NICKNAME']);
+						echo "Debug: name() returning ". $result[0]['NICKNAME'] . "from database whois cache and adding to internal cache\n";
 						return $result[0]['NICKNAME'];
 					}
 				}
@@ -192,6 +194,7 @@ class PlayerList extends BasePassiveModule
 		}
 		else if (isset($this->uidcache[$uid]))
 		{
+			echo "Debug: name() returning $return from cache without lookup\n";
 			$return = $this->uidcache[$uid]['name'];
 			return $return;
 		}
