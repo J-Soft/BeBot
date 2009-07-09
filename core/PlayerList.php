@@ -47,7 +47,7 @@ class PlayerList extends BasePassiveModule
 	{
 		$data = $signal->getNotificationObject();
 		list ($uid, $uname) = $data->message;
-		if ($uid != 0 and $uid != - 1)
+		if ($uid != 0 and $uid != - 1 and $uname != 0)
 		{
 			$this->add($uid, $uname);
 		}

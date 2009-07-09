@@ -915,7 +915,7 @@ class AOChat
 				{
 					list ($id, $unknown, $name) = $packet->args;
 				}
-				
+				else
 				{
 					list ($id, $name) = $packet->args;
 				}
