@@ -911,8 +911,6 @@ class AOChat
 			case AOCP_CLIENT_NAME:
 			case AOCP_CLIENT_LOOKUP:
 				//Cross-game compatibility
-				echo "Debug: AOCP_CLIENT_LOOKUP:\n";
-				print_r ($packet);
 				if ($this->game == "aoc")
 				{
 					list ($id, $unknown, $name) = $packet->args;
@@ -925,9 +923,6 @@ class AOChat
 				$signal = new signal_message('aochat', 'bot', array($id , $name));
 				$dispatcher->post($signal, 'onPlayerName');
 				unset($signal);
-					// TO DO: Remove uid->uname cache from AOChat.php and handle that in core/PlayerList.php
-				/*$this->id[$id]   = $name;
-				$this->id[$name] = $id;*/
 				break;
 			case AOCP_BUDDY_LOGONOFF:
 				// Event is a buddy logging on/off

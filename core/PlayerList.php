@@ -49,12 +49,7 @@ class PlayerList extends BasePassiveModule
 		list ($uid, $uname) = $data->message;
 		if ($uid != 0 and $uid != - 1 and !empty($uname))
 		{
-			echo "Debug: Adding $uid ($uname)\n";
 			$this->add($uid, $uname);
-		}
-		else
-		{
-			echo "Debug: Not adding $uid ($uname)\n";
 		}
 	}
 
@@ -140,6 +135,10 @@ class PlayerList extends BasePassiveModule
 		}
 	}
 
+	/*
+	* name() will send a lookup request to the chatserver to return the userid of someone.
+	* 
+	*/
 	public function name($uid)
 	{
 		//echo "Looking up uname for $uid!\n";
@@ -160,14 +159,12 @@ class PlayerList extends BasePassiveModule
 		//Check if we need to ask the server about the user
 		if (! isset($this->uidcache[$uid]))
 		{
-			echo "Debug: name() calling lookup_user for $uid\n";
 			$this->bot->aoc->lookup_user($uid);
 
 			//The user should now definitively be in the cache if it exists.
 			if (isset($this->uidcache[$uid]))
 			{
 				$return = $this->uidcache[$uid]['name'];
-				echo "Debug: name() returning $return from cache after lookup\n";
 				return $return;
 			}
 			else
@@ -186,7 +183,6 @@ class PlayerList extends BasePassiveModule
 						$this->bot->log("PLAYERLIST", "WARN", "Username lookup for $uid failed, but using whois info that is $age hours old.");
 						//cache in memory for future reference.
 						$this->add($uid, $result[0]['NICKNAME']);
-						echo "Debug: name() returning ". $result[0]['NICKNAME'] . "from database whois cache and adding to internal cache\n";
 						return $result[0]['NICKNAME'];
 					}
 				}
@@ -194,7 +190,6 @@ class PlayerList extends BasePassiveModule
 		}
 		else if (isset($this->uidcache[$uid]))
 		{
-			echo "Debug: name() returning $return from cache without lookup\n";
 			$return = $this->uidcache[$uid]['name'];
 			return $return;
 		}
