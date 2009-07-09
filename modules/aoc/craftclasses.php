@@ -132,7 +132,7 @@ class craftclasses extends BaseActiveModule
 	{
 		if ($this->bot->core("settings")->get("Craftclasses", "Remind") && ! $startup)
 		{
-			$id = $this->bot->core("chat")->get_uid($name);
+			$id = $this->bot->core("player")->id($name);
 			$result = $this->bot->core("whois")->lookup($name);
 			if (! ($result instanceof BotError))
 			{

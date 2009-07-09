@@ -79,10 +79,10 @@ class User_Core extends BasePassiveModule
 		// If we didn't get an id, look it up
 		if ($id == 0)
 		{
-			$id = $this->bot->core("chat")->get_uid($name);
+			$id = $this->bot->core("player")->id($name);
 		}
 		// Make sure the character exsists.
-		if (! $id)
+		if (!$id || ($id instanceof BotError))
 		{
 			$this->error->set("Player ##highlight##" . $name . " ##end##does not exist");
 			return $this->error;

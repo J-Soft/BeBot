@@ -76,7 +76,8 @@ class Whois extends BaseActiveModule
 	function command_handler($name, $msg, $type)
 	{
 		preg_match("/^whois (.+)$/i", $msg, $info);
-		if ($this->bot->core("player")->id($info[1]))
+		$id = $this->bot->core("player")->id($info[1]);
+		if ($id && !($id instanceof BotError))
 		{
 			return $this->whois_player($name, $info[1], $type);
 		}

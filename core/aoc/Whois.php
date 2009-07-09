@@ -222,7 +222,7 @@ class Whois_Core extends BasePassiveModule
 		/*
 		Make sure we havent been passed a bogus name.
 		*/
-		if (! $uid)
+		if (!$uid || ($uid instanceof BotError))
 		{
 			$this->error->set("$name appears to be a non exsistant character.");
 			return $this->error;
@@ -290,7 +290,7 @@ class Whois_Core extends BasePassiveModule
 		}
 		$id = $this->bot->core("player")->id($name);
 		// Make sure the character exsists.
-		if (! $id)
+		if (!$id || ($id instanceof BotError))
 		{
 			$this->error->set("Player ##highlight##" . $name . " ##end##does not exist");
 			return $this->error;

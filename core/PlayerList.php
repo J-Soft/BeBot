@@ -65,13 +65,14 @@ class PlayerList extends BasePassiveModule
 		if ($uname instanceof BotError)
 		{
 			echo 'FIXME: core/PlayerList.php function id recieving BotError as $uname\nError is ' . $uname->get . '\n';
+			debug_print_backtrace();
 			return ($uname);
 		}
 		
 		if (empty($uname))
 		{
-			$this->error->set("id() called with empty string");
-			debug_print_backtrace();
+			// This is normal and can happen, if the user yust types "!whois" etc.
+			$this->error->set("Tried to get user id for an empty user name.");
 			return ($this->error);
 		}
 		
@@ -79,7 +80,6 @@ class PlayerList extends BasePassiveModule
 		if (is_numeric($uname))
 		{
 			$this->debug_output("Attempting to look up an id for an id ($uname)");
-			debug_print_backtrace();
 			return $uname;
 		}
 		
