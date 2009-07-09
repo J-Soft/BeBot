@@ -252,7 +252,7 @@ class tools extends BasePassiveModule
 	function xmlparse($xml, $tag)
 	{
 		$tmp = explode("<" . $tag . ">", $xml);
-		if (isset($tmp[1]))
+		if (! isset($tmp[1]))
 		{
 			$tmp[1] = "";
 			echo "Debug: xml: $xml tag: $tag\n";
