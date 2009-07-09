@@ -109,7 +109,7 @@ class Logon extends BaseActiveModule
 						$spam = TRUE;
 					if ($spam)
 					{
-						$id = $this->bot->core("chat")->get_uid($name);
+						$id = $this->bot->core("player")->id($name);
 						if (! isset($this->last_log["on"][$name]))
 						{
 							$this->last_log["on"][$name] = 0;

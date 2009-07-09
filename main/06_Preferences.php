@@ -139,7 +139,7 @@ class Preferences_core extends BasePassiveModule
 		}
 		else
 		{
-			$uid = $this->bot->core('chat')->get_uid($name);
+			$uid = $this->bot->core('player')->id($name);
 		}
 		if ($module == false && $setting == false)
 		{
