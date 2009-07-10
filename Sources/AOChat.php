@@ -1043,7 +1043,7 @@ class AOChat
 				break;
 			// Events currently being debugged for possible inclusion
 			case AOCP_MSG_VICINITYA:
-				$bot->log("MAIN", "DEBUG", "Vicinity announcement");
+				$bot->log("MAIN", "INC", "Vicinity announcement");
 				if (is_resource($this->debug))
 				{
 					fwrite($this->debug, "<<<<<\n");
