@@ -87,7 +87,6 @@ class PlayerList extends BasePassiveModule
 		if (! isset($this->namecache[$uname]))
 		{
 			// Lookup user from Funcom server first
-			echo "Debug: id() calling lookup_user for $uname\n";
 			$this->bot->aoc->lookup_user($uname);
 			// We should have the user in cache if we got a response from FC server
 			if (isset($this->namecache[$uname]))
