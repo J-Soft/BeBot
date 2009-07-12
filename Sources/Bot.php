@@ -1076,7 +1076,7 @@ class Bot
 		else
 		{
 			// Get the users current state
-			$old_who = $this->core("Whois")->lookup($user);
+			$old_who = $this->core("Whois")->lookup($user, true); // $noupdate MUST be true to avoid adding buddy recursively
 			if (array_key_exists($user, $this->buddy_status))
 				$old_buddy_status = $this->buddy_status[$user];
 			else

@@ -807,6 +807,107 @@ class AOChat
 		return $this->get_packet();
 	}
 
+	/**
+	 * Function waits for maximal $time seconds (can be float) for a packet of type $type
+	 * that corresponds to the given arguments given in $arg.
+	 * 
+	 * The function returns when the time is up, when an error occured (disconnect), or
+	 * when the awaited packed was received, whatever comes first. All packets, including
+	 * the one we are waiting for, are processed normally, except that this function
+	 * MUST NO be called recursively.
+	 * 
+	 * The concept used here becomes probably deprecated, once the dispatcher concept
+	 * is fully used.
+	 *
+	 * @param $type the type of packet, we are waiting for, e.g. AOCP_CLIENT_LOOKUP
+	 * @param $args array of packet arguments to match. Order is important. NULL values are skipped.
+	 * @param $time maximum time in seconds to wait for the packet, can be float including micro seconds
+	 * @return the packet we are waiting for, or FALSE if the packet didn't arrive,
+	 *         or "disconnected" if connection was disconnected
+	 */
+	function wait_for_certain_packet($type, $args = array(), $time = 5)
+	{
+		// Prevent this function from being called recursively
+		static $already_running = false;
+		if ($already_running) {
+			$this->bot->log("NETWORK", "ERROR", "AOChat::wait_for_certain_packet() called recursively! Don't do that!");
+			debug_print_backtrace();
+			return false;
+		}
+		$already_running = true;
+		
+		// Save start time
+		$time_left = $time;
+    	list($usec, $sec) = explode(" ", microtime());
+		$start_time = (float)$usec + (float)$sec; 
+		echo "DEBUG: time left = $time_left\n";	
+		while ($time_left > 0)
+		{
+			// Call the cron job to let timed things happen on time
+			$this->bot->cron();
+			
+			// Wait for a packed max. 1 second
+			echo "Waiting $time_left seconds for certain packets...\n";
+			$packet = $this->wait_for_packet(($time_left>1 ? 1 : $time_left));
+			echo "     DEBUG: Received packet type " . $packet->type . ": " . serialize($packet->args) . "\n";
+			
+			// Check if connection was lost --> return
+			if ($packet == "disconnected")
+			{
+				echo "DEBUG: disconnected received!\n";
+				$already_running = false;
+				return "disconnected";
+			}
+			
+			// Check if this packet is the one we are looking for --> return
+			if (($packet instanceof AOChatPacket) && ($packet->type == $type))
+			{
+				$args_match = true;
+				for ($i = 0; $i < count($packet->args); $i++)
+				{
+					if ($args[$i] !== NULL && $packet->args[$i] != $args[$i])
+						$args_match = false;
+				}
+				if ($args_match)
+				{
+					echo "DEBUG: certain packet received!\n";
+					$already_running = false;
+					return $packet;
+				}
+			}
+			
+			// Calculate time left for next cycle				
+    		list($usec, $sec) = explode(" ", microtime());
+			$current_time = (float)$usec + (float)$sec;
+			$time_left = (float)$time - ($current_time - $start_time);
+			echo "DEBUG: time left = $time_left\n";	
+		}
+		$already_running = false;
+		return false;
+	}
+	
+	/**
+	 * Process packets and cron timers until a buddy add was confirmend by the server.
+	 * @param $uid uder id of the user that just got added
+	 */
+	function wait_for_buddy_add($uid)
+	{
+		if ($uid === $this->char['id'])
+			return; // Bot can't add itself to buddy list, so waiting would be useless.
+		$args = array($uid);
+		$this->wait_for_certain_packet(AOCP_BUDDY_LOGONOFF, $args);
+	}
+	
+	/**
+	 * Process packets and cron timers until a lookup answer for a specific user name was returned.
+	 * @param $uname user name of the user, for which we just asked the server to lookup
+	 */
+	function wait_for_lookup_user($uname)
+	{
+		$args = array(NULL, $uname);
+		return $this->wait_for_certain_packet(AOCP_CLIENT_LOOKUP, $args);
+	}
+	
 	function read_data($len)
 	{
 		$data = "";
@@ -883,9 +984,6 @@ class AOChat
 			case AOCP_LOGIN_OK:
 				$bot->log("LOGIN", "RESULT", "OK");
 				break;
-			case AOCP_LOGIN_ERROR:
-				$bot->log("LOGIN", "RESULT", "Error");
-				break;
 			case AOCP_GROUP_ANNOUNCE:
 				list ($gid, $name, $status) = $packet->args;
 				$signal = new signal_message('aochat', $gid, $name);
@@ -898,13 +996,13 @@ class AOChat
 				// Deprecated call: Should listen to the signal already sendt.
 				$bot->inc_gannounce($packet->args);
 				break;
-				// invites
+			// invites
 			case AOCP_PRIVGRP_INVITE:
 				// Event is a privgroup invite
 				list ($gid) = $packet->args;
 				$signal = new signal_message('aochat', $gid, 'invite');
 				$dispatcher->post($signal, 'onGroupInvite');
-					// Deprecated call: Should listen to the signal already sendt.
+				// Deprecated call: Should listen to the signal already sendt.
 				$bot->inc_pginvite($packet->args);
 				break;
 			// buddy/player
@@ -968,12 +1066,12 @@ class AOChat
 				if ($this->game == "aoc" && $this->login_num >= 1 && $this->login_num < 3)
 				{
 					// Up this
-					echo "Retrying login.\n";
+					$this->bot->log("LOGIN", "ERROR", "Received login error. Retrying ...");
 					$this->login_num ++;
 					// Disconnect from the territoryserver
 					if (is_resource($this->socket))
 						socket_close($this->socket);
-						// Connect to the chat server
+					// Connect to the chat server
 					$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 					if (! is_resource($this->socket)) /* this is fatal */
 						die("Could not create socket.\n");
@@ -1058,6 +1156,8 @@ class AOChat
 				}
 				break;
 			// Events we ignore
+			// some notice, e.g. after buddy add
+			case AOCP_CHAT_NOTICE:
 			// Character list upon login
 			case AOCP_LOGIN_CHARLIST:
 			// AO server pings
@@ -1105,6 +1205,9 @@ class AOChat
 		// This is really ugly, and we really need to detect if we recieve a Client Lookup packet as the lookup could be negative or null.
 		// In those cases this loop would run 200 times or for 15 seconds even if we have gotten a reply.
 		// We now detect when we recieve the AOCP_CLIENT_LOOKUP package so we don't loop uneccecary. Maybe add some error catching in the event we do complete 200 loops?
+		/*** FIXME no. 2 ***/
+		// Maybe the new function $this->wait_for_buddy_add(...) could be used.
+		// But its still untested and forbidden recursive calls are likely!
 		for ($i = 0; ($i < 200) && (!$this->bot->core('player')->exists($stack[0]['user'])) && ($stack[0]['timeout'] > time()) && (!$p); $i ++)
 		{
 			$pr = $this->get_packet();

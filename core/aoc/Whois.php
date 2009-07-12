@@ -277,9 +277,7 @@ class Whois_Core extends BasePassiveModule
 		{
 			if (empty($lookup))
 			{
-				// No old data exists, return error:
-				$this->error->set("No chached character data was found for $name, but no web lookup mode was requested!");
-				return $this->error;
+				return false;
 			}
 			else
 			{
@@ -289,9 +287,10 @@ class Whois_Core extends BasePassiveModule
 		}
 		// We have no info about the user yet. The only possible way to get the info
 		// is to add the user as a buddy (gets removed by roster update sometime)
-		// and retrieve the info whyn the buddy() function gets called.
+		// and retrieve the info when the buddy() function gets called.
 		$this->bot->core("chat")->buddy_add($uid);
-		return false;
+		$this->bot->aoc->wait_for_buddy_add($uid);
+		return $this->lookup($name, true);
 	}
 
 	/*
