@@ -311,7 +311,7 @@ class Whois_Core extends BasePassiveModule
 				// FIXME: Why caching it here? If we got a db result and it was up-to-date,
 				//        we already chached and returned it. If it wasn't up-to-date there
 				//        is no point in chaching it. However we might wanna return the
-				//        outdated info, because updating the caller didn't want to update it.
+				//        outdated info, because the caller didn't want to update it.
 				$this->add_to_cache($who);
 				return $who;
 			}
