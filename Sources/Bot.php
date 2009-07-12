@@ -591,7 +591,11 @@ class Bot
 			}
 			if ($this->core("chat_queue")->check_queue())
 			{
-				$this->log("TELL", "OUT", "-> " . $to . $msg);
+				if (is_numeric($to))
+					$to_name = $this->core('player')->name($to);
+				else
+					$to_name = $to;
+				$this->log("TELL", "OUT", "-> " . $to_name . ": " . $msg);
 				$msg = utf8_encode($msg);
 				$this->aoc->send_tell($to, $msg);
 			}
