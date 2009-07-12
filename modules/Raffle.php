@@ -96,17 +96,28 @@ class Raffle extends BaseActiveModule
 	{
 		if (! empty($this->item) && ! empty($this->users) && (($this->admin == $name) || $this->bot->core("security")->check_access($name, "admin")))
 		{
-			$users = array_keys($this->users);
-			$usr_num = count($users);
-			$max = 10000 - $usr_num;
-			for ($i = 0; $i < $max; $i ++)
+			$users = array_keys($this -> users);
+			for ($i = 0; $i < 5; $i++)
 			{
-				$this->users[$users[rand(0, ($usr_num - 1))]] += 1;
+				shuffle(&$users);
 			}
+
+			$usr_num = count($users);
+			$max = 1000 * $usr_num - $usr_num;
+			if ($max > 29000)
+			{
+				$max = 30000 - $usr_num;
+			}
+
+			for ($i = 0; $i < $max; $i++)
+			{
+				$this -> users[$users[$this->bot->core("tools")->my_rand(0, ($usr_num - 1))]] += 1;
+			}
+			
 			natsort($this->users);
 			$results = "##ao_ccheader##::::: Raffle Results :::::##end####lightyellow##\n\n";
 			$results .= "##highlight##" . $this->admin . "##end## raffled ##highlight##" . $this->item_blank;
-			$results .= "##end##. I rolled 10000 times. The results where:\n\n";
+			$results .= "##end##. I rolled $i times using " . $this->bot->core("tools")->randomsource . " for random numbers. The results where:\n\n";
 			$winner = "";
 			$res = "";
 			$count = count($this->users);

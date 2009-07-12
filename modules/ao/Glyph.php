@@ -136,7 +136,7 @@ class Glyph extends BaseActiveModule
 					if (! empty($this->users["aban"]))
 					{
 						$users = array_keys($this->users["aban"]);
-						$num = ((int) mt_rand(0, 10000000)) % count($users);
+						$num = ((int) $this->bot->core("tools")->my_rand(0, 10000000)) % count($users);
 						$aban .= $users[$num] . " ";
 						unset($this->users["aban"][$users[$num]]);
 						$this->bot->db->query("UPDATE raid_points SET points = points - 20 WHERE id = " . $this->bot->core("chat")->get_uid($users[$num]));
@@ -148,7 +148,7 @@ class Glyph extends BaseActiveModule
 					if (! empty($this->users["enel"]))
 					{
 						$users = array_keys($this->users["enel"]);
-						$num = ((int) mt_rand(0, 10000000)) % count($users);
+						$num = ((int) $this->bot->core("tools")->my_rand(0, 10000000)) % count($users);
 						$enel .= $users[$num] . " ";
 						unset($this->users["enel"][$users[$num]]);
 						$this->bot->db->query("UPDATE raid_points SET points = points - 20 WHERE id = " . $this->bot->core("chat")->get_uid($users[$num]));
@@ -160,7 +160,7 @@ class Glyph extends BaseActiveModule
 					if (! empty($this->users["ocra"]))
 					{
 						$users = array_keys($this->users["ocra"]);
-						$num = ((int) mt_rand(0, 10000000)) % count($users);
+						$num = ((int) $this->bot->core("tools")->my_rand(0, 10000000)) % count($users);
 						$ocra .= $users[$num] . " ";
 						unset($this->users["ocra"][$users[$num]]);
 						$this->bot->db->query("UPDATE raid_points SET points = points - 20 WHERE id = " . $this->bot->core("chat")->get_uid($users[$num]));

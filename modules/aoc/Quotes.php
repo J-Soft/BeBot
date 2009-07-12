@@ -128,7 +128,7 @@ class Quotes extends BaseActiveModule
 				$found = false;
 				while ($found == false)
 				{
-					$row = rand(0, $num[0][0]);
+					$row = $this->bot->core("tools")->my_rand(0, $num[0][0]);
 					if (! empty($result[$row][0]))
 					{
 						$strquote = "#" . $result[$row][0] . " - " . $result[$row][1] . " [Contributed by: " . $result[$row][2] . "]";
@@ -167,7 +167,7 @@ class Quotes extends BaseActiveModule
 			$found = false;
 			while ($found == false)
 			{
-				$row = rand(0, $num[0][0]);
+				$row = $this->bot->core("tools")->my_rand(0, $num[0][0]);
 				if (! empty($result[$row][0]))
 				{
 					$strquote = "#" . $result[$row][0] . " - " . $result[$row][1] . " [Contributed by: " . $result[$row][2] . "]";

@@ -1369,7 +1369,7 @@ class AOChat
 	{
 		$str = "";
 		do
-			$str .= sprintf('%02x', mt_rand(0, 0xff));
+			$str .= sprintf('%02x', $this->bot->core("tools")->my_rand(0, 0xff));
 		while (($bits -= 8) > 0);
 		return $str;
 	}

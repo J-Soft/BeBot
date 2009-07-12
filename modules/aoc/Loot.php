@@ -209,7 +209,7 @@ class Rolls extends BaseActiveModule
 				$users = array_keys($list);
 				$count = count($list) - 1;
 				for ($i = 1; $i <= 10000; $i ++)
-					$list[$users[rand(0, $count)]] += 1;
+					$list[$users[$this->bot->core("tools")->my_rand(0, $count)]] += 1;
 				natsort($list);
 				foreach ($list as $name => $points)
 					$winner = $name;

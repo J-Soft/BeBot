@@ -18,6 +18,9 @@ Version 0.7.0
 - Bot now automatically uses curl() for fetching URL's if curl is detected. You can still force it to use Sockets using !settings tools force sockets on.
 - Bot now includes bot name and dimension in user agent on HTTP requests.
 - chatcmd() now allows / as $origin parameter and will not prefix the chatcmd in any way.
+- Added this->bot->core("tools")->my_rand($min=false, $max=false) wrapper to call random number generator.
+- !roll should work properly now.
+- Improved !raffle logic slightly. Will now determine the number of times to do a roll depending on the number of people in the raffle.
 
 +Possible BREAKAGE! - Peliminary testing shows modules appear to be working as expected.
 +- AoC is still broken until someone fixes the AoC spesific modules. (I ain't got no account)

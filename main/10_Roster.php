@@ -496,15 +496,15 @@ class Roster_Core extends BasePassiveModule
 			$msg = "";
 			if ($this->added > 0)
 			{
-				$msg .= "::: Added $this -> added members ";
+				$msg .= "::: Added " . $this -> added ." members ";
 			}
 			if ($this->removed > 0)
 			{
-				$msg .= "::: Removed $this -> removed members ";
+				$msg .= "::: Removed " . $this->removed. " members ";
 			}
 			if ($this->rerolled > 0)
 			{
-				$msg .= "::: $this -> removed members was found to have rerolled ";
+				$msg .= "::: " . $this->removed . " members was found to have rerolled ";
 			}
 			$this->bot->core("settings")->save("members", "LastRosterUpdate", time());
 			$this->bot->log("ROSTER", "UPDATE", "Roster update complete. $msg", true);

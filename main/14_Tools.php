@@ -48,6 +48,7 @@ class tools extends BasePassiveModule
 		$this->bot->core("settings")->create("tools", "force_sockets", FALSE, "Should we force the usage of Sockets in get_site() even if Curl is available?");
 		$this->register_event("settings", array("module" => "tools" , "setting" => "get_site"));
 		$this->useragent = BOT_VERSION_NAME . "/" . BOT_VERSION . " (Originating bot: " . $this->bot->botname . "; Dimension: " . $this->bot->dimension . ";)";
+		$this->randomsource = "";
 	}
 
 	function chatcmd($link, $title, $origin = FALSE, $strip = FALSE)
@@ -391,6 +392,21 @@ class tools extends BasePassiveModule
 				$this->bot->send_tell($user, "Setting get_site for Module tools Changed to Sockets as cURL is not installed");
 			}
 		}
+	}
+	
+	function my_rand ($min = FALSE, $max = FALSE)
+	{
+		// For now we only support Mersienne Twister, but this can be changed.
+ 		$this->randomsource = "Mersenne Twister";
+		if (isset($min))
+		{
+			return mt_rand($min, $max);
+		}
+		else
+		{
+			return mt_rand();
+		}
+
 	}
 }
 ?>
