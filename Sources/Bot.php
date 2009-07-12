@@ -1840,7 +1840,7 @@ class Bot
 			}
 			elseif ($event == 'timer')
 			{
-				return $this->core("timer")->unregister_callback($target, $module);
+				return $this->core("timer")->unregister_callback($target);
 			}
 			elseif ($event == 'logon_notify')
 			{
