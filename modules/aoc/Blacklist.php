@@ -36,9 +36,7 @@
 *  USA
 */
 $blacklist = new Blacklist($bot);
-/*
-The Class itself...
-*/
+
 class Blacklist extends BaseActiveModule
 {
 	private $table_version;
@@ -73,7 +71,7 @@ class Blacklist extends BaseActiveModule
 	sutible for output via send_tell, send_pgroup, and send_gc.
 	*/
 	function command_handler($name, $msg, $source)
-	{ // Start function handler()
+	{
 		if (preg_match("/^blacklist add (.+?) (.+)$/i", $msg, $info))
 		{
 			return $this->set_blacklist($name, $info[1], $info[2]);
@@ -86,13 +84,13 @@ class Blacklist extends BaseActiveModule
 		{
 			return $this->get_blacklist($name);
 		}
-	} // End function handler()
+	}
 
 	/*
 	Get Blacklist
 	*/
 	function get_blacklist($name)
-	{ // Start function get_blacklist()
+	{
 		if ($this->bot->guildbot)
 		{
 			$title = "Guild";
@@ -128,13 +126,13 @@ class Blacklist extends BaseActiveModule
 			return "Blacklist is empty.";
 		}
 		return $title . " Blacklist :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
-	} // End function get_blacklist()
+	}
 
 	/*
 	Sets new name on blacklist
 	*/
 	function set_blacklist($source, $target, $reason, $expire = 0)
-	{ // Start function set_blacklist()
+	{
 		$source = ucfirst(strtolower($source));
 		$target = ucfirst(strtolower($target));
 		$source = mysql_real_escape_string($source);
@@ -169,7 +167,7 @@ class Blacklist extends BaseActiveModule
 		{
 			return "There isn't any person named " . $target . " registered on this server!";
 		}
-	} // End function set_blacklist()
+	}
 
 	/*
 	Removes name from blacklist
@@ -215,13 +213,13 @@ class Blacklist extends BaseActiveModule
 			$this->bot->db->query($sql);
 			$this->bot->core("security")->rem_ban($this->bot->botname, $ban['name']);
 		}
-	} // End function clean_blacklist()
+	}
 
 	/*
 	Table Update.
 	*/
 	function table_update()
-	{ // Start function table_update()
+	{
 		$this->bot->core("settings")->create("Blacklist", "table_version", 0, "Table version for Blacklist database table", NULL, TRUE, 99);
 		switch ($this->bot->core("settings")->get('Blacklist', 'Table_version'))
 		{
@@ -231,14 +229,12 @@ class Blacklist extends BaseActiveModule
 				$this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 1.");
 				$this->bot->core("settings")->save("Blacklist", "table_version", 1);
 			case 1:
-				$this->bot->db->update_table("blacklist", "expire", "add", "ALTER IGNORE TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0");
+				// db->update_table does not work for indexes, so let's do it manually
+				$this->bot->db->query("ALTER IGNORE TABLE #___blacklist ADD INDEX expire (expire)");
 				$this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 2.");
 				$this->bot->core("settings")->save("Blacklist", "table_version", 2);
-			case 2: // Current version of this module.
-			default:
+				$this->bot->log("BLACKLIST", "UPDATE", "Blacklist table update complete.");
 		}
-		$this->bot->core("settings")->save("Blacklist", "table_version", $this->table_version);
-		$this->bot->log("BLACKLIST", "UPDATE", "Blacklist table update complete.");
-	} // End function table_udpate()
+	}
 }
 ?>
