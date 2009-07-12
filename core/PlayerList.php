@@ -127,6 +127,9 @@ class PlayerList extends BasePassiveModule
 		else
 		{
 			// FIXME: This bloack should never be reached!
+			// Actually, it is perfectly possible to reach this block as there is no guarantee we get a valid
+			// responce from the server. This has been a long standing problem in Anarchy Online that randomly
+			// the server will return invalid or no response. - Thomas
 			echo "!!!!!!!!!!!!!!!!!! This block should never be reached !!!!!!!!!!!!!!!!!!!!!!!!\n";
 			echo "uname = $uname\n";
 			echo "namecache = ";
