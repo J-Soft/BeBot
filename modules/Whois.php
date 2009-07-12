@@ -32,9 +32,7 @@
 *  USA
 */
 $whois = new Whois($bot);
-/*
-The Class itself...
-*/
+
 class Whois extends BaseActiveModule
 {
 	var $name;
@@ -117,121 +115,112 @@ class Whois extends BaseActiveModule
 			$this->origin[$name] = $origin;
 		}
 		$who = $this->bot->core("whois")->lookup($name);
-		if ($this->bot->game == "aoc" && $who)
+		if (!$who || ($who instanceof BotError))
+			return $who; // returns false or a BotError object
+		if ($this->bot->game == "aoc")
 		{
 			unset($this->name[$name]);
 			unset($this->origin[$name]);
 		}
-		if (! $who)
+		$result = "##whois_name##" . $who["nickname"] . "##end## is a level ";
+		$result .= "##whois_level##" . $who["level"] . "##end##";
+		if ($this->bot->game == "ao")
+			$result .= "/##whois_alienlevel##" . $who["at_id"] . "##end## " . $who["breed"];
+		$result .= " ##whois_profession##";
+		if ($this->bot->core("settings")->get("Online", "Useshortcuts"))
 		{
-			Return;
-		}
-		elseif (! ($who instanceof BotError))
-		{
-			$result = "##whois_name##" . $who["nickname"] . "##end## is a level ";
-			$result .= "##whois_level##" . $who["level"] . "##end##";
-			if ($this->bot->game == "ao")
-				$result .= "/##whois_alienlevel##" . $who["at_id"] . "##end## " . $who["breed"];
-			$result .= " ##whois_profession##";
-			if ($this->bot->core("settings")->get("Online", "Useshortcuts"))
-			{
-				$result .= $this->bot->core("shortcuts")->get_short($who["profession"]);
-			}
-			else
-			{
-				$result .= $who["profession"];
-			}
-			if ($this->bot->game == "ao")
-				$result .= "##end##, ";
-			if (! empty($who["rank"]))
-			{
-				$result .= "##whois_orginfo##";
-				if ($this->bot->core("settings")->get("Online", "Useshortcuts"))
-				{
-					$result .= $this->bot->core("shortcuts")->get_short($who["rank"]);
-				}
-				else
-				{
-					$result .= $who["rank"];
-				}
-				$result .= " of ";
-				if ($this->bot->core("settings")->get("Online", "Useshortcuts"))
-				{
-					$result .= $this->bot->core("shortcuts")->get_short($who["org"]);
-				}
-				else
-				{
-					$result .= $who["org"];
-				}
-				$result .= "##end##, ";
-			}
-			if ($this->bot->game == "ao")
-				$result .= "##" . $who["faction"] . "##" . $who["faction"] . "##end##";
-			if ($this->bot->core("settings")->get("whois", "banned"))
-			{
-				$banned = $this->bot->core("security")->get_access_level_player($name);
-				if ($banned == - 1)
-					$result .= ":: ##red## Banned!##end##";
-			}
-			if ($this->bot->core("settings")->get("Whois", "Online") == TRUE)
-			{
-				$online = $this->bot->core("online")->get_online_state($name);
-				if ($online['status'] != - 1)
-				{
-					$result .= " :: " . $online;
-				}
-			}
-			if ($this->bot->core("settings")->get("Whois", "Notes") == TRUE)
-			{
-				$notes = $this->bot->core("player_notes")->get_notes($source, $name, "all", "DESC");
-				if (! ($notes instanceof BotError))
-				{
-					$notesin = "Notes for " . $name . ":\n\n";
-					foreach ($notes as $note)
-					{
-						if ($note['class'] == 1)
-						{
-							$notesin .= "Ban Reason #";
-						}
-						elseif ($note['class'] == 2)
-						{
-							$notesin .= "Admin Note #";
-						}
-						else
-						{
-							$notesin .= "Note #";
-						}
-						$notesin .= $note['pnid'] . " added by " . $note['author'] . " on " . gmdate($this->bot->core("settings")->get("Time", "FormatString"), $note['timestamp']) . ":\n";
-						$notesin .= $note['note'];
-						$notesin .= "\n\n";
-					}
-					$result .= " :: " . $this->bot->core("tools")->make_blob("Notes", $notesin);
-				}
-			}
-			if ($this->bot->core("settings")->get("Whois", "Details") == TRUE)
-			{
-				if ($this->bot->core("settings")->get("Whois", "ShowMain") == TRUE)
-				{
-					$main = $this->bot->core("alts")->main($name);
-					if (strcasecmp($main, $name) != 0)
-					{
-						$result .= " :: Alt of $main";
-					}
-				}
-				$result .= " :: " . $this->bot->core("whois")->whois_details($source, $who);
-			}
-			elseif ($this->bot->core("settings")->get("Whois", "Alts"))
-			{
-				$alts = $this->bot->core("alts")->show_alt($name);
-				if ($alts['alts'])
-				{
-					$result .= " :: " . $alts['list'];
-				}
-			}
+			$result .= $this->bot->core("shortcuts")->get_short($who["profession"]);
 		}
 		else
 		{
-			$result = $who;
+			$result .= $who["profession"];
+		}
+		if ($this->bot->game == "ao")
+			$result .= "##end##, ";
+		if (!empty($who["rank"]))
+		{
+			$result .= "##whois_orginfo##";
+			if ($this->bot->core("settings")->get("Online", "Useshortcuts"))
+			{
+				$result .= $this->bot->core("shortcuts")->get_short($who["rank"]);
+			}
+			else
+			{
+				$result .= $who["rank"];
+			}
+			$result .= " of ";
+			if ($this->bot->core("settings")->get("Online", "Useshortcuts"))
+			{
+				$result .= $this->bot->core("shortcuts")->get_short($who["org"]);
+			}
+			else
+			{
+				$result .= $who["org"];
+			}
+			$result .= "##end##, ";
+		}
+		if ($this->bot->game == "ao")
+			$result .= "##" . $who["faction"] . "##" . $who["faction"] . "##end##";
+		if ($this->bot->core("settings")->get("whois", "banned"))
+		{
+			$banned = $this->bot->core("security")->get_access_level_player($name);
+			if ($banned == - 1)
+				$result .= ":: ##red## Banned!##end##";
+		}
+		if ($this->bot->core("settings")->get("Whois", "Online") == TRUE)
+		{
+			$online = $this->bot->core("online")->get_online_state($name);
+			if ($online['status'] != - 1)
+			{
+				$result .= " :: " . $online;
+			}
+		}
+		if ($this->bot->core("settings")->get("Whois", "Notes") == TRUE)
+		{
+			$notes = $this->bot->core("player_notes")->get_notes($source, $name, "all", "DESC");
+			if (!($notes instanceof BotError))
+			{
+				$notesin = "Notes for " . $name . ":\n\n";
+				foreach ($notes as $note)
+				{
+					if ($note['class'] == 1)
+					{
+						$notesin .= "Ban Reason #";
+					}
+					elseif ($note['class'] == 2)
+					{
+						$notesin .= "Admin Note #";
+					}
+					else
+					{
+						$notesin .= "Note #";
+					}
+					$notesin .= $note['pnid'] . " added by " . $note['author'] . " on " . gmdate($this->bot->core("settings")->get("Time", "FormatString"), $note['timestamp']) . ":\n";
+					$notesin .= $note['note'];
+					$notesin .= "\n\n";
+				}
+				$result .= " :: " . $this->bot->core("tools")->make_blob("Notes", $notesin);
+			}
+		}
+		if ($this->bot->core("settings")->get("Whois", "Details") == TRUE)
+		{
+			if ($this->bot->core("settings")->get("Whois", "ShowMain") == TRUE)
+			{
+				$main = $this->bot->core("alts")->main($name);
+				if (strcasecmp($main, $name) != 0)
+				{
+					$result .= " :: Alt of $main";
+				}
+			}
+			$result .= " :: " . $this->bot->core("whois")->whois_details($source, $who);
+		}
+		elseif ($this->bot->core("settings")->get("Whois", "Alts"))
+		{
+			$alts = $this->bot->core("alts")->show_alt($name);
+			if ($alts['alts'])
+			{
+				$result .= " :: " . $alts['list'];
+			}
 		}
 		return $result;
 	}
