@@ -226,15 +226,12 @@ class Blacklist extends BaseActiveModule
 		switch ($this->bot->core("settings")->get('Blacklist', 'Table_version'))
 		{
 			case 0: // Previous version of BeBot.
-				$sql = "ALTER TABLE #___blacklist ADD noteid INT NOT NULL";
-				$this->bot->db->query($sql);
-				$sql = "ALTER TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0";
-				$this->bot->db->query($sql);
+				$this->bot->db->update_table("blacklist", "noteid", "add", "ALTER IGNORE TABLE #___blacklist ADD noteid INT NOT NULL");
+				$this->bot->db->update_table("blacklist", "expire", "add", "ALTER IGNORE TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0");
 				$this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 1.");
 				$this->bot->core("settings")->save("Blacklist", "table_version", 1);
 			case 1:
-				$sql = "ALTER TABLE #___blacklist ADD INDEX expire (expire)";
-				$this->bot->db->query($sql);
+				$this->bot->db->update_table("blacklist", "expire", "add", "ALTER IGNORE TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0");
 				$this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 2.");
 				$this->bot->core("settings")->save("Blacklist", "table_version", 2);
 			case 2: // Current version of this module.
