@@ -29,7 +29,7 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$preferences_core = new Preferences_core(&$bot);
+$preferences_core = new Preferences_core($bot);
 class Preferences_core extends BasePassiveModule
 {
 	private $cache;
@@ -39,7 +39,7 @@ class Preferences_core extends BasePassiveModule
 	*/
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$query = 'CREATE TABLE IF NOT EXISTS ' . $this->bot->db->define_tablename('preferences_def', 'true');
 		$query .= '(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ';
 		$query .= 'module VARCHAR(30), ';

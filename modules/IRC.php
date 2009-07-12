@@ -54,7 +54,7 @@ class IRC extends BaseActiveModule
 	*/
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_module("irc");
 		$this->register_command("all", "irc", "SUPERADMIN");
 		$this->register_command("all", "irconline", "GUEST");
@@ -109,7 +109,7 @@ class IRC extends BaseActiveModule
 		$this->bot->core("colors")->define_scheme("Irc", "Group", "normal");
 		$this->irc = null;
 		$this->last_log["st"] = time();
-		$this->bot->core("timer")->register_callback("IRC", &$this);
+		$this->bot->core("timer")->register_callback("IRC", $this);
 		$this->spam[0] = array(0 , 0 , 0 , 0);
 		$this->bot->db->query("UPDATE #___online SET status_gc = 0 WHERE botname = '" . $this->bot->botname . " - IRC'");
 	}
@@ -1064,25 +1064,25 @@ class IRC extends BaseActiveModule
 				Break; //These should of been handled elsewere
 			case 'is':
 				$data->message = $this->bot->commpre . $data->message;
-				$this->irc_is(&$irc, &$data);
+				$this->irc_is($irc, $data);
 				Break;
 			case 'online':
 				$data->message = $this->bot->commpre . $data->message;
-				$this->irc_online(&$irc, &$data);
+				$this->irc_online($irc, $data);
 				Break;
 			case 'whois':
 				$data->message = $this->bot->commpre . $data->message;
-				$this->irc_whois(&$irc, &$data);
+				$this->irc_whois($irc, $data);
 				Break;
 			case 'uid':
 				$data->message = $this->bot->commpre . $data->message;
-				$this->irc_uid(&$irc, &$data);
+				$this->irc_uid($irc, $data);
 				Break;
 			case 'level':
 			case 'lvl':
 			case 'pvp':
 				$data->message = $this->bot->commpre . $data->message;
-				$this->irc_level(&$irc, &$data);
+				$this->irc_level($irc, $data);
 				Break;
 			Default:
 				if ($data->type == SMARTIRC_TYPE_QUERY)

@@ -38,7 +38,7 @@ class Notify_Core extends BasePassiveModule
 
 	function Notify_Core(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_module("notify");
 		$this->update_cache();
 	}

@@ -42,7 +42,7 @@ class AFK extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->afk = array();
 		$this->afkalias = array();
 		$this->register_command("all", "afk", 'MEMBER');

@@ -38,7 +38,7 @@ class ColorConfig extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command('all', 'color', 'SUPERADMIN');
 		$this->register_command('all', 'theme', 'SUPERADMIN');
 		$this->help['description'] = "Configures the colors used by the bot.";

@@ -40,7 +40,7 @@ class CommandAliasInterface extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command('all', 'comalias', 'SUPERADMIN');
 		$this->help['description'] = 'Handles Command Aliases.';
 		$this->help['command']['comalias add <alias> <command>'] = "Sets <alias> as an alias of <command>.";

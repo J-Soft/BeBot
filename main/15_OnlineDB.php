@@ -62,7 +62,7 @@ class OnlineDB_Core extends BasePassiveModule
 	*/
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		// Create Table
 		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("online", "false") . "
 		            (nickname varchar(25) NOT NULL,

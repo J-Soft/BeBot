@@ -40,7 +40,7 @@ class Calc extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command('all', 'calc', 'GUEST');
 		$this->bot->core("settings")->create("Calc", "ShowEquation", TRUE, "Should the equation be shown when doing calculations?");
 		$this->help['description'] = "Performs simple calculations";

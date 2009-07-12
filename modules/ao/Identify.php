@@ -40,7 +40,7 @@ class Identify extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command('all', 'identify', 'GUEST');
 		$this->register_alias("identify", "bio");
 		$this->help['description'] = "Identify the end result of a given item. Useful for biomaterial, galactic gems, and other misc items.";

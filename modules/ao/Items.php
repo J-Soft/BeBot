@@ -45,7 +45,7 @@ class VhItems extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command('all', 'items', 'GUEST');
 		$this->help['description'] = 'Searches the central database for information about an item.';
 		$this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";

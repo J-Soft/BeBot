@@ -52,7 +52,7 @@ class craftclasses extends BaseActiveModule
 	// Constructor
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("craftingclass", "false") . " (
 			id int(11) NOT NULL auto_increment,
 			name varchar(32) NOT NULL,

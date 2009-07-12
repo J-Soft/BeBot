@@ -40,7 +40,7 @@ class ModuleControlGUI extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command("tell", "modules", "OWNER");
 		$this->help['description'] = "Allows you to enable and disable modules.";
 		$this->help['command']['modules'] = "Shows the GUI to enable and disable modules.";

@@ -43,7 +43,7 @@ class Server extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command('all', 'server', 'MEMBER');
 		$this->help['description'] = 'Shows the server load.';
 		$this->help['command']['server'] = "Shows the load on the server.";

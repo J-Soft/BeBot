@@ -42,7 +42,7 @@ class SetConf extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->help['description'] = "Setting management interface.";
 		$this->help['command']['settings'] = "Shows the settings interface";
 		$this->help['command']['set <module> <setting> <value>'] = "Sets the setting <setting> for module <module> to <value>.";

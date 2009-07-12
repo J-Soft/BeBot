@@ -37,7 +37,7 @@ class LandControlZones extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("land_control_zones", "false") . " (
 			`id` int(11) default NULL,
 			`lrange` int(10) default NULL,

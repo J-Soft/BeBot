@@ -37,7 +37,7 @@ class OnlineCounting extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->bot->core("colors")->define_scheme("counting", "text", "normal");
 		$this->bot->core("colors")->define_scheme("counting", "number", "lightgray");
 		$this->bot->core("colors")->define_scheme("counting", "name", "forestgreen");

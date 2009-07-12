@@ -45,7 +45,7 @@ class PlayerNotes_Core extends BasePassiveModule
 	*/
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("player_notes", "false") . "
 			(pnid INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				player VARCHAR(30) NOT NULL,

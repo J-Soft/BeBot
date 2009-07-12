@@ -29,7 +29,7 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$preferences = new Preferences_GUI(&$bot);
+$preferences = new Preferences_GUI($bot);
 /*
 The Class itself...
 */
@@ -38,7 +38,7 @@ class Preferences_GUI extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		//Create access settings for this module
 		$this->register_command("all", "preferences", "MEMBER", array('default' => 'SUPERADMIN'));
 		$this->register_alias("preferences", "prefs");

@@ -50,7 +50,7 @@ class Nroll extends BaseActiveModule
 	// Constructor
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->output = "group";
 		$this->result = "";
 		$this->verifyresult = array();

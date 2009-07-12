@@ -42,7 +42,7 @@ class LeadEcho extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->bot->core("settings")->create("Leader", "Name", "", "The name of the character that took lead.", "", TRUE);
 		$this->bot->core("settings")->create("Leader", "Echo", FALSE, "Is the chat echo for the leader activated or nor?");
 		$this->bot->core("settings")->create("Leader", "LeaderAccess", TRUE, "Does being leader give you at least LEADER access in the bot?");

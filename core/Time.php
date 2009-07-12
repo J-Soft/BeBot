@@ -45,7 +45,7 @@ class Time_Core extends BaseActiveModule
 	*/
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_module("time");
 		$this->register_command("all", "time", "GUEST");
 		$this->help['description'] = "Shows the time.";

@@ -45,7 +45,7 @@ class Rolls extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->count = 0;
 		$this->register_command("gc", "loot", "ANONYMOUS", array("add" => "ANONYMOUS" , "rem" => "ANONYMOUS" , "list" => "ANONYMOUS" , "clear" => "ADMIN" , "result" => "ADMIN" , "reroll" => "ADMIN"));
 		$this->register_command("tell", "loot", "ANONYMOUS", array("add" => "ANONYMOUS" , "rem" => "ANONYMOUS" , "list" => "ANONYMOUS" , "clear" => "ADMIN" , "result" => "ADMIN" , "reroll" => "ADMIN"));

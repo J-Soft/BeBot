@@ -47,7 +47,7 @@ class BasePassiveModule
 
 	protected function register_event($event, $target = false)
 	{
-		$ret = $this->bot->register_event($event, $target, &$this);
+		$ret = $this->bot->register_event($event, $target, $this);
 		if ($ret)
 		{
 			$this->error->set($ret);
@@ -56,7 +56,7 @@ class BasePassiveModule
 
 	protected function unregister_event($event, $target = false)
 	{
-		$ret = $this->bot->unregister_event($event, $target, &$this);
+		$ret = $this->bot->unregister_event($event, $target, $this);
 		if ($ret)
 		{
 			$this->error->set($ret);
@@ -68,7 +68,7 @@ class BasePassiveModule
 		if ($this->link_name == NULL)
 		{
 			$this->link_name = strtolower($name);
-			$this->bot->register_module(&$this, strtolower($name));
+			$this->bot->register_module($this, strtolower($name));
 		}
 	}
 

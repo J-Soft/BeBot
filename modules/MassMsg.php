@@ -40,7 +40,7 @@ class MassMsg extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command('all', 'announce', 'LEADER');
 		$this->register_command('all', 'massinv', 'LEADER');
 		$this->help['description'] = 'Sends out mass messages and invites.';

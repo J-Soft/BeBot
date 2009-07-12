@@ -37,7 +37,7 @@ class ShortCutGUI extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command("all", "shortcuts", "SUPERADMIN");
 		$this->help['description'] = "Allows you view, add and delete entries in the shortcut database.";
 		$this->help['command']['shortcuts'] = "Shows currently existing shortcuts with corresponding long entries and allows deleting selected entries.";

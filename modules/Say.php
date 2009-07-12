@@ -43,7 +43,7 @@ class Say extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->whosaidthat = array();
 		// Setup Access Control
 		$this->register_command("all", "say", "ADMIN");

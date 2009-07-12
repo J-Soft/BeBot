@@ -57,7 +57,7 @@ class Chuck extends BaseActiveModule
     */
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command("all", "chuck", "MEMBER");
 		$this->help['description'] = 'Pwnzor.';
 		$this->help['command']['beer'] = "Pwnzors you!";

@@ -70,7 +70,7 @@
 *   A return of -1 signifies some error.
 * 
 * The timer module supports timed events using callback functions. A module that wants to use this has to register itself
-* first using the register_callback($name, &$module) function. The $name must be a unique string identifying the module,
+* first using the register_callback($name, $module) function. The $name must be a unique string identifying the module,
 * &$module is a reference to the object of the module. The module has to implement a timer($name, $prefix, $suffix, $delay)
 * function, where $name is the name given to the timer on creation, and $prefix and $suffix are the corresponding entries
 * of the current notification of the timer class used and $delay is the current notify delay.
@@ -89,7 +89,7 @@ class Timer_Core extends BasePassiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("timer", "true") . " (
 			id BIGINT(100) unsigned NOT NULL auto_increment,
 			name VARCHAR(200) NOT NULL default '',

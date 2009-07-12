@@ -38,7 +38,7 @@ class Level extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command('all', 'level', 'GUEST');
 		$this->register_command('all', 'mission', 'GUEST');
 		$this->help['description'] = 'Displayes teaming, pvp and mission levels.';

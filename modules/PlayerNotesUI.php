@@ -41,7 +41,7 @@ class PlayerNotes_UI extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command("all", "notes", "MEMBER", array('add' => 'MEMBER' , 'rem' => 'ADMIN'));
 		$this->register_alias("notes", "note");
 	}

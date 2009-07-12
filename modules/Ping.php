@@ -40,7 +40,7 @@ class ping extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->verify = array();
 		$this->register_command('all', 'ping', 'OWNER');
 		$this->register_command('all', 'tracert', 'OWNER');

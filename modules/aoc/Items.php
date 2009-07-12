@@ -41,7 +41,7 @@ class Items extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_event("gmsg", "org");
 		$this->register_event("gmsg", "Trade");
 		$this->register_event("gmsg", "RegionAquilonia");

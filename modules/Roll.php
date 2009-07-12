@@ -51,7 +51,7 @@ class Roll extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->verify = array();
 		$this->register_command('all', 'roll', 'GUEST');
 		$this->register_command('all', 'flip', 'GUEST');

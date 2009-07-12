@@ -55,7 +55,7 @@ class Logon_Notifies_Core extends BasePassiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_module("logon_notifies");
 		$this->register_event("buddy");
 		$this->register_event("connect");

@@ -37,7 +37,7 @@ class Whois_Core extends BasePassiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		/*
 		Create tables for our whois cache if it does not already exsist.
 		*/

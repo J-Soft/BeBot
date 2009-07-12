@@ -42,7 +42,7 @@ class Whois extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->help['description'] = 'Shows information about a player';
 		$this->help['command']['whois <name>'] = "Shows information about player <name>.";
 		$this->register_command("all", "whois", "GUEST");

@@ -40,7 +40,7 @@ class Callers extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->callers = array();
 		$this->register_command('all', 'caller', 'GUEST', array("clear" => "LEADER" , "add" => "LEADER" , "del" => "LEADER"));
 		$this->register_alias("caller", "callers");

@@ -41,7 +41,7 @@ class tokens extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command("all", "tokens", "GUEST");
 		$this->help['description'] = "Token calculator";
 		$this->help['command']['tokens'] = "Displays how many side tokens you get per token disk at various levels";

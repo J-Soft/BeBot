@@ -42,7 +42,7 @@ class Logon extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("logon", "true") . "
 				(id INT NOT NULL PRIMARY KEY,
 				message VARCHAR(255))");

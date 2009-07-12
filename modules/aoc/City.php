@@ -77,7 +77,7 @@ array(0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 120 , 60 , 0 , 249) , array(0 , 0 , 0 
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("city", "true") . "(
 				`key` VARCHAR(32) NOT NULL PRIMARY KEY,
 				`vark` VARCHAR(255))");

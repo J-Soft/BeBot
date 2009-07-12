@@ -45,7 +45,7 @@ class BotHelp_Core extends BaseActiveModule
 	*/
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_module("help");
 		$this->register_command("all", "help", "GUEST");
 		$this->help['description'] = "The bot help system.";

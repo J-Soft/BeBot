@@ -44,7 +44,7 @@ class Maintenance extends BaseActiveModule
 	*/
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_event("cron", "5sec");
 		$this->register_event("connect");
 		$this->register_module("maintenance");
@@ -96,7 +96,7 @@ class Maintenance extends BaseActiveModule
 		if($info != "")
 		{
 			$rostermod = $this -> bot -> core("roster_core");
-			$this -> bot -> unregister_event("cron", "24hour", &$rostermod);
+			$this -> bot -> unregister_event("cron", "24hour", $rostermod);
 		} */
 	}
 

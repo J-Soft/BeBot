@@ -49,7 +49,7 @@ class AccessControl_Core extends BasePassiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		/*
 		Create the table for access rights
 		*/

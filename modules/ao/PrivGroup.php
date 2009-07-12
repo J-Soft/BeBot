@@ -44,7 +44,7 @@ class PrivGroup extends BaseActiveModule
 	*/
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		// Create sane default levels for the commands
 		$this->register_command("all", "join", "GUEST");
 		$this->register_command("all", "invite", "LEADER", array("$" => "GUEST"));

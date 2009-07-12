@@ -44,7 +44,7 @@ class AutoInv extends BaseActiveModule
 	*/
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->bot->core("settings")->create("AutoInv", "Activated", FALSE, "Is the autoinvite activated?");
 		$this->bot->core("settings")->create("AutoInv", "ShowInfo", TRUE, "Should an informative message telling how to disable autoinvite be sent to all characters that are invited via autoinvite?");
 		$this->bot->core('prefs')->create('AutoInv', 'recieve_auto_invite', 'Automatic invites to private group should be?', 'Off', 'Off;On');

@@ -45,7 +45,7 @@ class Rolls extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->count = 0;
 		$this->register_command("pgmsg", "loot", "ANONYMOUS");
 		$this->register_command("pgmsg", "add", "ANONYMOUS");

@@ -41,7 +41,7 @@ class StringFilter_Interface extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command('all', 'filter', 'ADMIN');
 		$this->help['description'] = 'Add and remove strings to the bot\'s filter.';
 		$this->help['command']['filter'] = "- Display the current string filter list.";

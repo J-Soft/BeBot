@@ -40,7 +40,7 @@ class Oe extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->register_command("all", "oe", "GUEST");
 		$this->help['description'] = 'Module for calculating over-equipping';
 		$this->help['command']['oe <level>'] = "Shows the minimum skill level required to use an item with <level> requirement and ";

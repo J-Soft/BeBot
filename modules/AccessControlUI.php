@@ -43,7 +43,7 @@ class AccessControlGUI extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->access_levels = $this->bot->core("access_control")->get_access_levels();
 		$this->access_shorts = array('AN' => 'ANONYMOUS' , 'G' => 'GUEST' , 'M' => 'MEMBER' , 'L' => 'LEADER' , 'A' => 'ADMIN' , 'SA' => 'SUPERADMIN' , 'O' => 'OWNER' , 'D' => 'DISABLED');
 		$this->shortcuts = array();

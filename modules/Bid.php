@@ -52,7 +52,7 @@ class Bid extends BaseActiveModule
 	*/
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->bid = "";
 		$this->register_command('all', 'bid', 'MEMBER');
 		$this->help['description'] = "Handles auctions using raid points";

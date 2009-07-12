@@ -41,7 +41,7 @@ class Rally extends BaseActiveModule
 
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->rallyinfo = "No rally point has been set.";
 		$this->register_command('all', 'rally', 'MEMBER');
 		$this->help['description'] = 'Sets a rallying point for the raid.';

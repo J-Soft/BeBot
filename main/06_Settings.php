@@ -95,7 +95,7 @@ class Settings_Core extends BasePassiveModule
 	*/
 	function __construct(&$bot)
 	{
-		parent::__construct(&$bot, get_class($this));
+		parent::__construct($bot, get_class($this));
 		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("settings", "true") . "
 		              (module varchar(25) NOT NULL,
 		               setting varchar(50) NOT NULL,
