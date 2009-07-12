@@ -1666,7 +1666,8 @@ class Security_Core extends BaseActiveModule
 			return FALSE; // Raidbot.
 		//$guild = $this -> bot -> db -> select("SELECT org_name FROM #___whois WHERE nickname = '".$this -> bot -> botname."'");
         $whois = $this -> bot -> core("whois") -> lookup($this -> bot -> botname);
-        $guild = $whois['org'];
+        if ($whois && !($whois instanceof BotError))
+        	$guild = $whois['org'];
 		//if(!empty($guild) && $guild[0][0] != "")
         if(empty($guild) || $guild != "")
 			$guild = $this -> bot -> guildname;
