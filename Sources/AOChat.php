@@ -197,7 +197,7 @@ class AOChat
 		$this->buddies = array();
 	}
 
-		/* Network stuff */
+	/* Network stuff */
 	function connect($server = "default", $port = "default")
 	{
 		if ($this->game == "ao")
@@ -845,11 +845,11 @@ class AOChat
 
 	function get_packet()
 	{
-		//Get the bot instance
+		// Get the bot instance
 		$bot = Bot::get_instance($this->bothandle);
-		//Get the aochat dispatcher.
+		// Get the aochat dispatcher.
 		$dispatcher = Event_Dispatcher2::getInstance();
-		//Include a the signal_message (Should probably be included somewhere else)
+		// Include a the signal_message (Should probably be included somewhere else)
 		require_once ('Dispatcher/signal_message.php');
 		$head = $this->read_data(4);
 		if (strlen($head) != 4)
@@ -862,7 +862,7 @@ class AOChat
 		// So when you receive the first packet, you are logged in
 		if ($this->game == "aoc" && $this->state != "ok")
 		{
-			$bot->log("LOGIN", "RESULT", "Bot is now loggend in.");			
+			// $bot->log("LOGIN", "RESULT", "Bot is now loggend in.");	
 			$this->state = "ok";
 		}
 		if (is_resource($this->debug))
@@ -876,7 +876,7 @@ class AOChat
 		$bot->cron();
 		switch ($type)
 		{
-			//system
+			// system
 			case AOCP_LOGIN_SEED:
 				$this->serverseed = $packet->args[0];
 				break;
@@ -891,26 +891,25 @@ class AOChat
 				$signal = new signal_message('aochat', $gid, $name);
 				$dispatcher->post($signal, 'onGroupAnnounce');
 				unset($signal);
-				//TO DO: Group caching should most likely be done somewhere else.
+				// TODO: Group caching should most likely be done somewhere else.
 				$this->grp[$gid] = $status;
 				$this->gid[$gid] = $name;
 				$this->gid[strtolower($name)] = $gid;
-				//Deprecated call: Should listen to the signal already sendt.
+				// Deprecated call: Should listen to the signal already sendt.
 				$bot->inc_gannounce($packet->args);
 				break;
-				//invites
+				// invites
 			case AOCP_PRIVGRP_INVITE:
 				// Event is a privgroup invite
 				list ($gid) = $packet->args;
 				$signal = new signal_message('aochat', $gid, 'invite');
 				$dispatcher->post($signal, 'onGroupInvite');
-					//Deprecated call: Should listen to the signal already sendt.
+					// Deprecated call: Should listen to the signal already sendt.
 				$bot->inc_pginvite($packet->args);
 				break;
-			//buddy/player
+			// buddy/player
 			case AOCP_CLIENT_NAME:
-			case AOCP_CLIENT_LOOKUP:
-				//Cross-game compatibility
+				// Cross-game compatibility
 				if ($this->game == "aoc")
 				{
 					list ($id, $unknown, $name) = $packet->args;
@@ -919,6 +918,13 @@ class AOChat
 				{
 					list ($id, $name) = $packet->args;
 				}
+				$name = ucfirst(strtolower($name));
+				$signal = new signal_message('aochat', 'bot', array($id , $name));
+				$dispatcher->post($signal, 'onPlayerName');
+				unset($signal);
+				break;
+			case AOCP_CLIENT_LOOKUP:
+				list ($id, $name) = $packet->args;
 				$name = ucfirst(strtolower($name));
 				$signal = new signal_message('aochat', 'bot', array($id , $name));
 				$dispatcher->post($signal, 'onPlayerName');
@@ -947,14 +953,14 @@ class AOChat
 					list ($bid, $bonline, $btype) = $packet->args;
 					$this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | (ord($btype) ? AOC_BUDDY_KNOWN : 0);
 				}
-				//Deprecated call. Should listen to the signal already sendt.
+				// Deprecated call. Should listen to the signal already sendt.
 				$bot->inc_buddy($packet->args);
 				break;
 			case AOCP_BUDDY_REMOVE:
 				$signal = new signal_message('aochat', 'system', $id);
 				$dispatcher->post($signal, 'onBuddyRemove');
 				unset($signal);
-					//TO DO: This should probably be cached somewhere else.
+				// TODO: This should probably be cached somewhere else.
 				unset($this->buddies[$packet->args[0]]);
 				break;
 			case AOCP_LOGIN_ERROR:
@@ -977,7 +983,7 @@ class AOChat
 						$this->disconnect();
 						return false;
 					}
-					//echo "Resending auth to chatserver [Character:" . $this->char["name"] . ", id:" . $this->char["id"] . "]\n";
+					// echo "Resending auth to chatserver [Character:" . $this->char["name"] . ", id:" . $this->char["id"] . "]\n";
 					$this->state = "connected";
 					$loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(0 , $this->char["id"] , $this->serverseed), $this->game);
 					$this->send_packet($loginCharacterPacket);
@@ -985,12 +991,12 @@ class AOChat
 				break;
 			case AOCP_PRIVGRP_CLIJOIN:
 				// Event is someone joining the privgroup
-				//Deprecated call. Should listen to the signal already sendt.
+				// Deprecated call. Should listen to the signal already sendt.
 				list ($id, $name) = $packet->args;
 				$signal = new signal_message('aochat', $id, 'join');
 				$dispatcher->post($signal, 'onPgJoin');
 				unset($signal);
-				//Deprecated call, Should listen to the signal already sendt.
+				// Deprecated call, Should listen to the signal already sendt.
 				$bot->inc_pgjoin($packet->args);
 				break;
 			case AOCP_PRIVGRP_CLIPART:
@@ -999,10 +1005,10 @@ class AOChat
 				$signal = new signal_message('aochat', $id, 'leave');
 				$dispatcher->post($signal, 'onPgLeave');
 				unset($signal);
-				//Deprecated call. Should listen to the signal already sendt.
+				// Deprecated call. Should listen to the signal already sendt.
 				$bot->inc_pgleave($packet->args);
 				break;
-				//Messages
+				// Messages
 			case AOCP_MSG_PRIVATE:
 				// Event is a tell
 				// Tells should always be commands
@@ -1010,7 +1016,7 @@ class AOChat
 				$signal = new signal_message('aochat', $id, $message);
 				$dispatcher->post($signal, 'onTell');
 				unset($signal);
-				//Deprecated call. Should listen to the signal already sendt.
+				// Deprecated call. Should listen to the signal already sendt.
 				$bot->inc_tell($packet->args);
 				break;
 			case AOCP_PRIVGRP_MESSAGE:
@@ -1018,14 +1024,14 @@ class AOChat
 				list (, $id, $message) = $packet->args;
 				$signal = new signal_message('aochat', $id, $message);
 				$dispatcher->post($signal, 'onPgMessage');
-				//Check if this is a command
-				//If it is not post it to all observers of the PRIVGRP_MESSAGE channel.
-				//Deprecated call. Should listen to the signal already sendt.
+				// Check if this is a command
+				// If it is not post it to all observers of the PRIVGRP_MESSAGE channel.
+				// Deprecated call. Should listen to the signal already sendt.
 				$bot->inc_pgmsg($packet->args);
 				break;
 			case AOCP_GROUP_MESSAGE:
 				/* Hack to support extended messages */
-				//This should be re-hacked so that we can handle the extmsgs here.
+				// This should be re-hacked so that we can handle the extmsgs here.
 				if($packet->args[1] === 0 && substr($packet->args[2], 0, 2) == "~&")
 				{
 					$em = new AOExtMsg($packet->args[2]);
@@ -1037,8 +1043,8 @@ class AOChat
 				}
 				// Event is a group message (guildchat, towers etc)
 				// Check if it is a command
-				//If it is not post it to all observers of the GROUP_MESSAGE of the originating group
-				//Deprecated call. Should listen to the signal already sendt.
+				// If it is not post it to all observers of the GROUP_MESSAGE of the originating group
+				// Deprecated call. Should listen to the signal already sendt.
 				$bot->inc_gmsg($packet->args);
 				break;
 			// Events currently being debugged for possible inclusion
@@ -1058,7 +1064,7 @@ class AOChat
 			case AOCP_PING:
 				break;
 			default:
-				$bot->log("MAIN", "TYPE", "Uhandeled packet of type $type:");
+				$bot->log("MAIN", "TYPE", "Unhandeled packet of type $type. Args: " . serialize($packet->args));
 				if (is_resource($this->debug))
 				{
 					fwrite($this->debug, "<<<<<\n");
@@ -1084,23 +1090,22 @@ class AOChat
 		return true;
 	}
 
-		/* User and group lookup functions */
+	/* User and group lookup functions */
 	function lookup_user($u)
 	{
 		$stack = array();
 		$timeout = 15;
-		//put the user on the call stack.
+		// put the user on the call stack.
 		$u = ucfirst(strtolower($u));
 		$timelimit = time() + $timeout;
 		array_unshift($stack, array('user' => $u , 'timeout' => $timelimit));
-		// var_dump($stack);
 		$pq = new AOChatPacket("out", AOCP_CLIENT_LOOKUP, $u, $this->game);
 		$this->send_packet($pq);
 		/*** FIXME ***/
 		// This is really ugly, and we really need to detect if we recieve a Client Lookup packet as the lookup could be negative or null.
 		// In those cases this loop would run 200 times or for 15 seconds even if we have gotten a reply.
 		// We now detect when we recieve the AOCP_CLIENT_LOOKUP package so we don't loop uneccecary. Maybe add some error catching in the event we do complete 200 loops?
-		for ($i = 0; ($i < 200) && (! $this->bot->core('player')->exists($stack[0]['user'])) && ($stack[0]['timeout'] > time()) && (! isset($p)); $i ++)
+		for ($i = 0; ($i < 200) && (!$this->bot->core('player')->exists($stack[0]['user'])) && ($stack[0]['timeout'] > time()) && (!$p); $i ++)
 		{
 			$pr = $this->get_packet();
 			if ($pr->type == AOCP_CLIENT_LOOKUP)
@@ -1109,13 +1114,13 @@ class AOChat
 			}
 		}
 		array_shift($stack);
-		if (! $this->bot->core('player')->exists($u))
+		if (!$this->bot->core('player')->exists($u))
 		{
 			return false;
 		}
 	}
 
-		// 	function get_uid($user)
+	// 	function get_uid($user)
 	// 	{
 	// 		//This should probably be moved out of AOChat and into core/PlayerList.php
 	// 		if(!($uid = (int)$user))
@@ -1145,7 +1150,7 @@ class AOChat
 	function lookup_group($arg, $type = 0)
 	{
 		$is_gid = false;
-		//This should probably be moved out of AOChat and into core/PlayerList.php
+		// This should probably be moved out of AOChat and into core/PlayerList.php
 		if ($type && ($is_gid = (strlen($arg) === 5 && (ord($arg[0]) & ~ 0x80) < 0x10)))
 		{
 			return $arg;
@@ -1159,13 +1164,13 @@ class AOChat
 
 	function get_gid($g)
 	{
-		//This should probably be moved out of AOChat and into core/PlayerList.php
+		// This should probably be moved out of AOChat and into core/PlayerList.php
 		return $this->lookup_group($g, 1);
 	}
 
 	function get_gname($g)
 	{
-		//This should probably be moved out of AOChat and into core/GroupList.php
+		// This should probably be moved out of AOChat and into core/GroupList.php
 		if (($gid = $this->lookup_group($g, 1)) === false)
 		{
 			return false;
@@ -1173,7 +1178,7 @@ class AOChat
 		return $this->gid[$gid];
 	}
 
-		/* Sending various packets */
+	/* Sending various packets */
 	function send_ping()
 	{
 		$this->last_ping = time();
@@ -1197,7 +1202,7 @@ class AOChat
 		return $this->send_packet(new AOChatPacket("out", AOCP_MSG_PRIVATE, array($uid , $msg , $blob), $this->game));
 	}
 
-		/* General chat groups */
+	/* General chat groups */
 	function send_group($group, $msg, $blob = "\0")
 	{
 		if (($gid = $this->get_gid($group)) === false)
@@ -1234,7 +1239,7 @@ class AOChat
 		return $this->grp[$gid];
 	}
 
-		/* Private chat groups */
+	/* Private chat groups */
 	function send_privgroup($group, $msg, $blob = "\0")
 	{
 		if (! is_numeric($group))
@@ -1298,7 +1303,7 @@ class AOChat
 		return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_KICKALL, 0, $this->game));
 	}
 
-		/* Buddies */
+	/* Buddies */
 	function buddy_add($user, $type = "\1")
 	{
 		if (is_numeric($user))
@@ -1569,7 +1574,7 @@ class AOChat
 		return $return;
 	}
 
-		/*
+	/*
 	* Wrapper for bcadd for easy adding of other bignum library support
 	*/
 	function big_add($a, $b)
@@ -1648,7 +1653,8 @@ class AOChat
 
 class AOChatPacket
 {
-
+	var $args, $type, $dir, $data;
+	
 	function AOChatPacket($dir, $type, $data, $game)
 	{
 		//This is a hack that should be done better. I'm just not sure how.

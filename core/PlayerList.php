@@ -66,14 +66,14 @@ class PlayerList extends BasePassiveModule
 		{
 			echo 'FIXME: core/PlayerList.php function id recieving BotError as $uname\nError is ' . $uname->get . '\n';
 			debug_print_backtrace();
-			return ($uname);
+			return $uname;
 		}
 		
 		if (empty($uname))
 		{
-			// This is normal and can happen, if the user yust types "!whois" etc.
+			// This is normal and can happen, if the user just types "!whois" etc.
 			$this->error->set("Tried to get user id for an empty user name.");
-			return ($this->error);
+			return $this->error;
 		}
 		
 		$uname = ucfirst(strtolower($uname));
@@ -83,33 +83,30 @@ class PlayerList extends BasePassiveModule
 			return $uname;
 		}
 		
-		//Check if we have the player in cache.
-		if (! isset($this->namecache[$uname]))
+		// Check if we have the player in cache.
+		if (!isset($this->namecache[$uname]))
 		{
 			// Lookup user from Funcom server first
 			$this->bot->aoc->lookup_user($uname);
 			// We should have the user in cache if we got a response from FC server
 			if (isset($this->namecache[$uname]))
 			{
-				//$id = array_search($uname, $this->cache);//why are we putting it in $id then getting it again for return?
-				$return = $this->namecache[$uname]['id'];
-				return $return;
+				return $this->namecache[$uname]['id'];
 			}
 			else
 			{
-				// If we we didn't get a responce from funcom, it's possible it was just a fluke, so try to get userid from whois
+				// If we we didn't get a response from funcom, it's possible it was just a fluke, so try to get userid from whois
 				// table if the information there isn't stale.
 				$query = "SELECT ID,UPDATED FROM #___whois WHERE nickname = '$uname' LIMIT 1";
 				$result = $this->bot->db->select($query, MYSQL_ASSOC);
 				// If we have a whois result, and its under 48 hours old, 
-				if (! empty($result))
+				if (!empty($result))
 				{
 					if ($result[1] + 172800 >= time())
 					{
 						$age = time() - $result[1];
 						$age = $age / 60 / 60;
-						$this->bot->log("PLAYERLIST", "WARN", "Userid lookup for $uname failed, but using whois info that is $age hours old.");
-						//cache in memory for future reference.
+						// cache in memory for future reference.
 						$this->add($result[0]['ID'], $uname);
 						return $result[0]['ID'];
 					}
@@ -117,7 +114,7 @@ class PlayerList extends BasePassiveModule
 					{
 						// If we failed to get userid and we have no up to date whois information, the character most likely does NOT exist.
 						$this->error->set("Unable to find player '$uname' and whois information is unreliable. The player might have been deleted.");
-						return ($this->error);
+						return $this->error;
 					}
 				}
 			}
@@ -129,8 +126,14 @@ class PlayerList extends BasePassiveModule
 		}
 		else
 		{
+			// FIXME: This bloack should never be reached!
+			echo "!!!!!!!!!!!!!!!!!! This block should never be reached !!!!!!!!!!!!!!!!!!!!!!!!\n";
+			echo "uname = $uname\n";
+			echo "namecache = ";
+			var_dump($this->namecache[$uname]);
+			
 			$this->error->set("id() unable to find player '$uname'");
-			return ($this->error);
+			return $this->error;
 		}
 	}
 

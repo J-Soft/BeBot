@@ -102,7 +102,7 @@ class Whois_Core extends BasePassiveModule
 		$who = array();
 		$who["id"] = $user;
 		$who["nickname"] = $name;
-		if (! array_key_exists($name, $this->bot->buddy_status))
+		if (!array_key_exists($name, $this->bot->buddy_status))
 			$who["online"] = 0;
 		else
 		{
@@ -124,7 +124,7 @@ class Whois_Core extends BasePassiveModule
 		}
 		$who["class"] = $class_name;
 		$lookup = $this->bot->db->select("SELECT * FROM #___craftingclass WHERE name = '" . $name . "'", MYSQL_ASSOC);
-		if (! empty($lookup))
+		if (!empty($lookup))
 		{
 			$who["craft1"] = $lookup[0]['class1'];
 			$who["craft2"] = $lookup[0]['class2'];
@@ -227,6 +227,7 @@ class Whois_Core extends BasePassiveModule
 			$this->error->set("$name appears to be a non exsistant character.");
 			return $this->error;
 		}
+		
 		// Check cache for entry first.
 		if (isset($this->cache[$name]))
 		{
@@ -239,10 +240,9 @@ class Whois_Core extends BasePassiveModule
 			unset($this->cache[$name]);
 		}
 		$lookup = $this->bot->db->select("SELECT * FROM #___whois WHERE nickname = '" . $name . "'", MYSQL_ASSOC);
-		/*
-		If we have a result, we assume we might need to use it in case funcom XML is unresponsive.
-		*/
-		if (! empty($lookup))
+		
+		// If we have a result, we check it and return it, if it's still up-to-date.
+		if (!empty($lookup))
 		{
 			$who["id"] = $lookup[0]['ID'];
 			$who["nickname"] = $lookup[0]['nickname'];
@@ -283,19 +283,14 @@ class Whois_Core extends BasePassiveModule
 			}
 			else
 			{
-				// only cache valid entries
-				$this->add_to_cache($who);
+				// return outdated info because the caller didn't want us to update it
+				return $who;
 			}
-			return $who;
 		}
-		$id = $this->bot->core("player")->id($name);
-		// Make sure the character exsists.
-		if (!$id || ($id instanceof BotError))
-		{
-			$this->error->set("Player ##highlight##" . $name . " ##end##does not exist");
-			return $this->error;
-		}
-		$this->bot->core("chat")->buddy_add($id);
+		// We have no info about the user yet. The only possible way to get the info
+		// is to add the user as a buddy (gets removed by roster update sometime)
+		// and retrieve the info whyn the buddy() function gets called.
+		$this->bot->core("chat")->buddy_add($uid);
 		return false;
 	}
 
@@ -303,7 +298,7 @@ class Whois_Core extends BasePassiveModule
 	Performs a quick check to make sure XML data is parsable.
 	*/
 	function check_xml($xml)
-	{ // Start function check_xml()
+	{
 		if ($xml instanceof BotError)
 		{
 			$this->bot->log("WHOIS", "CHECK_XML", "For some reason I was passed a BotError. This shouldn't happen!");
@@ -321,25 +316,23 @@ class Whois_Core extends BasePassiveModule
 		}
 		else
 			return $xml; // If we get here, all should be well.
-	} // End function check_xml()
+	}
 
 	/*
 	Updates whois cache info with passed array.
 	*/
 	function update($who)
-	{ // Start function update()
-		//Adding in some validation and error handling due to an unknown bug (work around).
-		//If ID is stops being 0, then remove this code.
-		if ($who["id"] == 0 || $who["id"] === false)
+	{
+		// Adding in some validation and error handling due to an unknown bug (work around).
+		// If ID stops being 0, then remove this code.
+		if (!$who["id"])
 		{
 			$this->bot->log('Whois', 'Update', $who["nickname"] . " had an invalid user ID! UID: " . $who["id"]);
 			$who["id"] = $this->bot->core("player")->id($who["nickname"]);
 		}
-		if ($who["id"] != 0 || $who["id"] !== false)
+		if ($who["id"])
 		{
-			/*
-			Update our database cache
-			*/
+			// Update our database cache
 			$this->bot->db->query("INSERT INTO #___whois (id, nickname, level," . " class, craft1, craft2, location, online, updated)" . " VALUES ('" . $who["id"] . "', '" . $who["nickname"] . "', '" . $who["level"] . "', '" . $who["class"] . "', '" . $who["craft1"] . "', '" . $who["craft2"] . "', " . $who["location"] . ", " . $who["online"] . ", " . "'" . time() . "') ON DUPLICATE KEY UPDATE id = VALUES(id), " . "level = VALUES(level), class = VALUES(class), craft1 = VALUES(craft1), craft2 = VALUES(craft2), online = VALUES(online), location = VALUES(location), " . " updated = VALUES(updated) ");
 			// Clear from memory cache
 			$this->remove_from_cache($who["nickname"]);
@@ -347,7 +340,7 @@ class Whois_Core extends BasePassiveModule
 		}
 		else
 			return FALSE;
-	} // End function udpate()
+	}
 
 	function whois_details($source, $whois)
 	{

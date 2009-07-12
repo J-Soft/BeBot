@@ -44,7 +44,7 @@ class signal_message
 
 	public function get_array()
 	{
-		//Not required, but may be useful.
+		// Not required, but may be useful.
 		return array('channel' => $this->channel , 'sender' => $this->sender , 'message' => $this->$message);
 	}
 }
