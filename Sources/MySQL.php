@@ -133,6 +133,7 @@ class MySQL
 
 	function connect($initial = false)
 	{
+		$bot = Bot::get_instance($bothandle);
 		$conn = mysql_connect($this->SERVER, $this->USER, $this->PASS);
 		if (! $conn)
 		{
@@ -146,7 +147,7 @@ class MySQL
 		}
 		if ($initial == true)
 		{
-			echo "MySQL database connection test successfull\n";
+			$bot->log("MYSQL", "START", "MySQL database connection test successfull.");
 		}
 		$this->CONN = $conn;
 	}

@@ -167,7 +167,7 @@ class AOChat
 			$phpbit = "64 bit";
 			$this->sixtyfourbit = true;
 		}
-		echo "PHP install detected as being $phpbit\n";
+		$this->bot->log("MAIN", "START", "PHP install detected as being $phpbit");
 	}
 
 	public function get_instance($bothandle)
@@ -483,7 +483,7 @@ class AOChat
 		return 0;
 	}
 
-		/*
+	/*
 	Connecting to the universe function
 	*/
 	function authenticateConan($username, $password, $character)
@@ -509,7 +509,7 @@ class AOChat
 			// We received an errorcode we cannot continue with
 			if ($ret == - 1)
 			{
-				echo "disconnect\n";
+				trigger_error("Not connected to universe server (anymore)!", E_USER_WARNING);
 				return false;
 			}
 		}
@@ -576,11 +576,11 @@ class AOChat
 			$this->state = "connected";
 			return true;
 		}
-		trigger_error("Could not connect to the " . strtoupper($this->game) . " Chatserver (" . $this->ServerAddress . ":" . $this->ServerPort . ") Character array/id or serverseed was missing.\n");
+		trigger_error("Could not connect to the " . strtoupper($this->game) . " Chatserver (" . $this->ServerAddress . ":" . $this->ServerPort . ") Character array/id or serverseed was missing.\n", E_USER_WARNING);
 		return false;
 	}
 
-		// Resolve the characterid
+	// Resolve the characterid
 	function getLoginCharacter($char)
 	{
 		// Check if we have been given a character id or character name
@@ -862,7 +862,7 @@ class AOChat
 		// So when you receive the first packet, you are logged in
 		if ($this->game == "aoc" && $this->state != "ok")
 		{
-			echo "Bot is now logged in.\n";
+			$bot->log("LOGIN", "RESULT", "Bot is now loggend in.");			
 			$this->state = "ok";
 		}
 		if (is_resource($this->debug))
