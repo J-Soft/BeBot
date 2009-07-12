@@ -38,6 +38,7 @@ class MySQL
 	var $USER = "";
 	var $PASS = "";
 	var $SERVER = "";
+	var $bot;
 	public static $instance;
 
 	public function get_instance($bothandle)
@@ -46,14 +47,15 @@ class MySQL
 		if (! isset(self::$instance[$bothandle]))
 		{
 			$class = __CLASS__;
-			self::$instance[$bothandle] = new $class($bot->botname);
+			self::$instance[$bothandle] = new $class($bothandle);
 		}
 		return self::$instance[$bothandle];
 	}
 
-	private function __construct($botname)
+	private function __construct($bothandle)
 	{
-		$this->botname = $botname;
+		$this->bot = Bot::get_instance($bothandle);
+		$this->botname = $this->bot->botname;
 		$this->error_count = 0;
 		$this->last_error = 0;
 		$this->last_reconnect = 0;
@@ -133,7 +135,6 @@ class MySQL
 
 	function connect($initial = false)
 	{
-		$bot = Bot::get_instance($bothandle);
 		$conn = mysql_connect($this->SERVER, $this->USER, $this->PASS);
 		if (! $conn)
 		{
@@ -147,7 +148,7 @@ class MySQL
 		}
 		if ($initial == true)
 		{
-			$bot->log("MYSQL", "START", "MySQL database connection test successfull.");
+			$this->bot->log("MYSQL", "START", "MySQL database connection test successfull.");
 		}
 		$this->CONN = $conn;
 	}
@@ -165,8 +166,7 @@ class MySQL
 	{
 		$msg = mysql_error();
 		$this->error_count ++;
-		echo "MySQL ERROR (# " . $this->error_count . ") on query: $text\n$msg\n";
-		//$this->bot->log("MySQL", "ERROR", "(# " . $this->error_count . ") on query: $text\n$msg", TRUE);
+		$this->bot->log("MySQL", "ERROR", "(# " . $this->error_count . ") on query: $text\n$msg", TRUE);
 		// If this error is occuring while we are trying to first connect to the database when starting
 		// rthe bot its a fatal error.
 		if ($fatal == true)
