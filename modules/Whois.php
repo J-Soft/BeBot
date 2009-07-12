@@ -172,7 +172,7 @@ class Whois extends BaseActiveModule
 			$online = $this->bot->core("online")->get_online_state($name);
 			if ($online['status'] != - 1)
 			{
-				$result .= " :: " . $online;
+				$result .= " :: " . $online['content'];
 			}
 		}
 		if ($this->bot->core("settings")->get("Whois", "Notes") == TRUE)
