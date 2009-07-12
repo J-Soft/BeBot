@@ -99,7 +99,7 @@ class Raffle extends BaseActiveModule
 			$users = array_keys($this -> users);
 			for ($i = 0; $i < 5; $i++)
 			{
-				shuffle(&$users);
+				shuffle($users);
 			}
 
 			$usr_num = count($users);
