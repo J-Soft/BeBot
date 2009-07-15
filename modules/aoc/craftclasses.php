@@ -106,6 +106,7 @@ class craftclasses extends BaseActiveModule
 			{
 				$this->bot->db->query('INSERT INTO #___craftingclass (name,class1,class2) VALUES("' . $name . '","' . $options[0] . '","' . $options[1] . '") ON DUPLICATE KEY UPDATE class1=values(class1), class2=values(class2)');
 				$this->bot->db->query("UPDATE #___whois set craft1 = '" . $options[0] . "', craft2 = '" . $options[1] . "' WHERE nickname = '" . $name . "'");
+				$this->bot->core("whois")->remove_from_cache($name);
 				$output = "Thank you for updating your crafting information.";
 			}
 			else
