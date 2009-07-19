@@ -158,7 +158,6 @@ class tools extends BasePassiveModule
 			$this->error->set("Failed to connect to server. Error was: " . socket_strerror(socket_last_error()));
 			return $this->error;
 		}
-		$bot_version = $this->bot->botversion;
 		// Rebuild the full query after parse_url
 		$url = $get_url["path"];
 		if (! empty($get_url["query"]))

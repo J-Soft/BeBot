@@ -31,8 +31,16 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-define('BOT_VERSION', "0.7.0.bzr(snapshot)");
+define('BOT_VERSION', "0.7.0");
+define('BOT_VERSION_INFO', ".bzr(snapshot)");
 define('BOT_VERSION_NAME', "BeBot");
+
+// Is this a development snapshot from BZR?
+define('BOT_VERSION_SNAPSHOT', TRUE);
+
+// Is this a stable release or a development release?
+define('BOT_VERSION_STABLE', TRUE);
+
 $bot_version = BOT_VERSION;
 $php_version = phpversion();
 // Set the time zone to UTC
