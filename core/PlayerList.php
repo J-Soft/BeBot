@@ -83,7 +83,7 @@ class PlayerList extends BasePassiveModule
 			return $uname;
 		}
 		
-		// Check if we have the player in cache.
+		// Check if we have not the player in cache.
 		if (!isset($this->namecache[$uname]))
 		{
 			// Lookup user from Funcom server first
@@ -119,24 +119,9 @@ class PlayerList extends BasePassiveModule
 				}
 			}
 		}
-		else if (isset($this->namecache[$uname]))
+		else // so we HAVE the player in cache...
 		{
-			$return = $this->namecache[$uname]['id'];
-			return $return;
-		}
-		else
-		{
-			// FIXME: This bloack should never be reached!
-			// Actually, it is perfectly possible to reach this block as there is no guarantee we get a valid
-			// responce from the server. This has been a long standing problem in Anarchy Online that randomly
-			// the server will return invalid or no response. - Thomas
-			echo "!!!!!!!!!!!!!!!!!! This block should never be reached !!!!!!!!!!!!!!!!!!!!!!!!\n";
-			echo "uname = $uname\n";
-			echo "namecache = ";
-			var_dump($this->namecache[$uname]);
-			
-			$this->error->set("id() unable to find player '$uname'");
-			return $this->error;
+			return $this->namecache[$uname]['id'];
 		}
 	}
 

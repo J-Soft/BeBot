@@ -44,8 +44,6 @@ class Whois extends BaseActiveModule
 		$this->help['description'] = 'Shows information about a player';
 		$this->help['command']['whois <name>'] = "Shows information about player <name>.";
 		$this->register_command("all", "whois", "GUEST");
-		if ($this->bot->game == "aoc")
-			$this->register_event("buddy");
 		$this->bot->core("colors")->define_scheme("whois", "alienlevel", "lightgreen");
 		$this->bot->core("colors")->define_scheme("whois", "level", "lightbeige");
 		$this->bot->core("colors")->define_scheme("whois", "name", "yellow");
@@ -84,26 +82,6 @@ class Whois extends BaseActiveModule
 	}
 
 	/*
-	This gets called if a buddy logs on/off
-	*/
-	function buddy($name, $msg)
-	{
-		if ($this->bot->game == "aoc")
-		{
-			if (isset($this->name[$name]))
-			{
-				$user = $this->name[$name];
-				$origin = $this->origin[$name];
-				$msg = $this->whois_player($user, $name, $origin);
-				//$this -> irc -> message(SMARTIRC_TYPE_CHANNEL, $this -> whois[$name], $this -> whois[$name]);
-				$this->bot->send_output($user, $msg, $origin);
-				unset($this->name[$name]);
-				unset($this->origin[$name]);
-			}
-		}
-	}
-
-	/*
 	Returns info about the player
 	*/
 	function whois_player($source, $name, $origin)
@@ -116,7 +94,7 @@ class Whois extends BaseActiveModule
 		}
 		$who = $this->bot->core("whois")->lookup($name);
 		if (!$who || ($who instanceof BotError))
-			return $who; // returns false or a BotError object
+			return false;
 		if ($this->bot->game == "aoc")
 		{
 			unset($this->name[$name]);

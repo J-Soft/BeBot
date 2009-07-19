@@ -849,7 +849,6 @@ class AOChat
 			// Wait for a packed max. 1 second
 			echo "Waiting $time_left seconds for certain packets...\n";
 			$packet = $this->wait_for_packet(($time_left>1 ? 1 : $time_left));
-			echo "     DEBUG: Received packet type " . $packet->type . ": " . serialize($packet->args) . "\n";
 			
 			// Check if connection was lost --> return
 			if ($packet == "disconnected")
@@ -1206,7 +1205,7 @@ class AOChat
 		// In those cases this loop would run 200 times or for 15 seconds even if we have gotten a reply.
 		// We now detect when we recieve the AOCP_CLIENT_LOOKUP package so we don't loop uneccecary. Maybe add some error catching in the event we do complete 200 loops?
 		/*** FIXME no. 2 ***/
-		// Maybe the new function $this->wait_for_buddy_add(...) could be used.
+		// Maybe the new function $this->wait_for_lookup_user(...) could be used.
 		// But its still untested and forbidden recursive calls are likely!
 		for ($i = 0; ($i < 200) && (!$this->bot->core('player')->exists($stack[0]['user'])) && ($stack[0]['timeout'] > time()) && (!$p); $i ++)
 		{
