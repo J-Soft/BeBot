@@ -248,7 +248,7 @@ class Roster_Handler extends BaseActiveModule
 		}
 		foreach ($buddies as $id => $value)
 		{
-			$buddy[$id] = $this->bot->core("chat")->get_uname($id);
+			$buddy[$id] = $this->bot->core('player')->name($id);
 			$count ++;
 		}
 		asort($buddy);
