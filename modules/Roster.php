@@ -127,17 +127,16 @@ class Roster_Handler extends BaseActiveModule
 						return $this->guest_list();
 				}
 			case 'rosterupdate':
-				$force = true;
 				if ($this->bot->guildbot)
 				{
 					$this->output($source, "Starting roster update.");
-					$this->bot->core("roster_core")->update_guild($force);
+					$this->bot->core("roster_core")->update_guild(true);
 					return FALSE;
 				}
 				else
 				{
 					$this->output($source, "Starting roster update.");
-					$this->bot->core("roster_core")->update_raid($force);
+					$this->bot->core("roster_core")->update_raid(true);
 					return FALSE;
 				}
 				break;
@@ -277,9 +276,6 @@ class Roster_Handler extends BaseActiveModule
 	*/
 	function cron()
 	{
-		/*** FIXME ***/
-		// This does not make any sense to me, what does the uid/name cache has to do with the number of buddies on the bot?
-		//$buddies = $this -> bot -> core('player') -> get_cache();
 		$buddies = $this->bot->aoc->buddies;
 		$buddy_count = count($buddies);
 		$notify_db = $this->bot->db->select("SELECT count(notify) FROM #___users WHERE notify = 1");

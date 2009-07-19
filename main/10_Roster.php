@@ -216,12 +216,12 @@ class Roster_Core extends BasePassiveModule
 		if (($this->lastrun + (60 * 60 * 6)) >= time() && $force == false)
 		{
 			$this->bot->log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
-			Return;
+			return;
 		}
 		if ($this->running)
 		{
 			$this->bot->send_gc("Roster update is Already Running");
-			Return ("Roster update is Already Running");
+			return "Roster update is Already Running";
 		}
 		$this->running = TRUE;
 		$this->bot->log("ROSTER", "UPDATE", "Starting roster update for guild id: " . $this->bot->guildid . " on RK" . $this->bot->dimension);
