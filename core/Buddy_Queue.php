@@ -69,7 +69,7 @@ class Buddy_Queue_Core extends BasePassiveModule
 		}
 		else
 		{
-			$this->bot->log("BUDDY QUEUE", "BUDDY-ERROR", "Tried to add " . $this->bot->core("chat")->get_uname($uid) . " as a buddy when they already are one.");
+			$this->bot->log("BUDDY QUEUE", "BUDDY-ERROR", "Tried to add " . $this->bot->core("player")->name($uid) . " as a buddy when they already are one.");
 		}
 	}
 
@@ -80,12 +80,12 @@ class Buddy_Queue_Core extends BasePassiveModule
 			if (($this->bot->core("chat")->buddy_exists($uid)))
 			{
 				$this->bot->aoc->buddy_remove($uid);
-				$this->bot->core("online")->logoff($this->bot->core("chat")->get_uname($uid));
-				$this->bot->log("BUDDY QUEUE", "BUDDY-DEL", $this->bot->core("chat")->get_uname($uid));
+				$this->bot->core("online")->logoff($this->bot->core("player")->name($uid));
+				$this->bot->log("BUDDY QUEUE", "BUDDY-DEL", $this->bot->core("player")->name($uid));
 			}
 			else
 			{
-				$this->bot->log("BUDDY QUEUE", "BUDDY-ERROR", "Tried to remove " . $this->bot->core("chat")->get_uname($uid) . " as a buddy when they are not one.");
+				$this->bot->log("BUDDY QUEUE", "BUDDY-ERROR", "Tried to remove " . $this->bot->core("player")->name($uid) . " as a buddy when they are not one.");
 			}
 		}
 	}
