@@ -94,7 +94,7 @@ class MySQL
 			$table_prefix = str_ireplace("<botname>", strtolower($botname), $table_prefix);
 			$this->table_prefix = $table_prefix;
 		}
-		if (isset($nounderscore))
+		if ($nounderscore)
 		{
 			$this->underscore = "";
 		}
