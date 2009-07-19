@@ -418,7 +418,7 @@ class Roster_Core extends BasePassiveModule
 					/*
 					Make sure we have an entry in the whois cache for the character.
 					*/
-					$whois = $this->bot->core("whois")->lookup($member[1]);
+					$whois = $this->bot->core("whois")->lookup($member[1], false, true);
 					if ($this->bot->game == "ao")
 					{
 						/*
@@ -617,7 +617,7 @@ class Roster_Core extends BasePassiveModule
 						/*
 						Make sure we have an entry in the whois cache for the character.
 						*/
-						$this->bot->core("whois")->lookup($member[1]);
+						$this->bot->core("whois")->lookup($member[1], false, true);
 						if ($member[3] == 1)
 						{
 							/*

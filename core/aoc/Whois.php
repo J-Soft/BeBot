@@ -209,11 +209,17 @@ class Whois_Core extends BasePassiveModule
 		$this->cache[ucfirst(strtolower($who["nickname"]))] = $who;
 	}
 
-	/*
-	Internal whois function with caching.
-	Heavily modified to work with AoC
-	*/
-	function lookup($name, $noupdate = false)
+	/**
+	 * Internal whois function with caching. Heavily modified to work with AoC.
+	 * 
+	 * @param $name      User name of the player to lookup whois information
+	 * @param $noupdate  If no stale data is cached, get whois information by adding the user as a buddy temporarily.
+	 *                   You should set $noupdate to true, if you are sure the user is already a buddy. 
+	 * @param $nowait    If buddy added, wait until server sends whois information. Process other packets meanwhile.
+	 *                   You should set $nowait to true, if you are about to update whois information for many users.
+	 * @return The WHO array, or false, or BotError
+	 */
+	function lookup($name, $noupdate = false, $nowait = false)
 	{
 		if ($this->bot->core("settings")->get("Statistics", "Enabled"))
 			$this->bot->core("statistics")->capture_statistic("Whois", "Lookup");
@@ -289,8 +295,15 @@ class Whois_Core extends BasePassiveModule
 		// is to add the user as a buddy (gets removed by roster update sometime)
 		// and retrieve the info when the buddy() function gets called.
 		$this->bot->core("chat")->buddy_add($uid);
-		$this->bot->aoc->wait_for_buddy_add($uid);
-		return $this->lookup($name, true);
+		if ($nowait)
+		{
+			return false;
+		}
+		else
+		{
+			$this->bot->aoc->wait_for_buddy_add($uid);
+			return $this->lookup($name, true);
+		}
 	}
 
 	/*

@@ -883,20 +883,17 @@ class AOChat
 		$time_left = $time;
     	list($usec, $sec) = explode(" ", microtime());
 		$start_time = (float)$usec + (float)$sec; 
-		echo "DEBUG: time left = $time_left\n";	
 		while ($time_left > 0)
 		{
 			// Call the cron job to let timed things happen on time
 			$this->bot->cron();
 			
 			// Wait for a packed max. 1 second
-			echo "Waiting $time_left seconds for certain packets...\n";
 			$packet = $this->wait_for_packet(($time_left>1 ? 1 : $time_left));
 			
 			// Check if connection was lost --> return
 			if ($packet == "disconnected")
 			{
-				echo "DEBUG: disconnected received!\n";
 				$already_running = false;
 				return "disconnected";
 			}
@@ -912,7 +909,6 @@ class AOChat
 				}
 				if ($args_match)
 				{
-					echo "DEBUG: certain packet received!\n";
 					$already_running = false;
 					return $packet;
 				}
@@ -922,7 +918,6 @@ class AOChat
     		list($usec, $sec) = explode(" ", microtime());
 			$current_time = (float)$usec + (float)$sec;
 			$time_left = (float)$time - ($current_time - $start_time);
-			echo "DEBUG: time left = $time_left\n";	
 		}
 		$already_running = false;
 		return false;

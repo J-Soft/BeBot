@@ -225,11 +225,15 @@ class Whois_Core extends BasePassiveModule
 		$this->cache[ucfirst(strtolower($who["nickname"]))] = $who;
 	}
 
-	/*
-	Internal whois function with caching.
-	Code mainly by Alreadythere
-	*/
-	function lookup($name, $noupdate = false)
+	/**
+	 * Internal whois function with caching. Code mainly by Alreadythere.
+	 * 
+	 * @param $name      User name of the player to lookup whois information
+	 * @param $noupdate  If no stale data is cached, get whois information by retrieving funcoms xml player list via web.
+	 * @param $nowait    This has NO MEANING AT ALL! It only exists to be compatible with the AoC equivalent of this function.
+	 * @return The WHO array, or false, or BotError
+	 */
+	function lookup($name, $noupdate = false, $nowait = false)
 	{
 		if ($this->bot->core("settings")->get("Statistics", "Enabled"))
 			$this->bot->core("statistics")->capture_statistic("Whois", "Lookup");
