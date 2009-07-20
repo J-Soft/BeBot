@@ -49,7 +49,7 @@ Version 0.6.4
 - Bot doesn't tell people that there are "No news." upon login any more. Only if they ask for "!news".
 - Added more spam protection (e.g. when double clicking tell links) to message queue.
 - Added setting Members->QuietUpdate to let the bot do roster updates quietly (default off).
-- Added setting Shutdown->QuietShutdown to let the bot to restart and shutdown quietly (default off).
+- Added setting Shutdown->QuietShutdown to let the bot do restart and shutdown quietly (default off).
 
 -------------
 Version 0.6.3
