@@ -372,7 +372,8 @@ class tools extends BasePassiveModule
 		}
 		if ($check_exists)
 		{
-			if (! $this->bot->core('chat')->get_uid($name))
+			$uid = $this->bot->core('player')->id($name);
+			if (!$uid || ($uid instanceof BotError))
 			{
 				$this->error->set("Player '$name' does not exist.");
 				return ($this->error);
