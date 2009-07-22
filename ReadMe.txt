@@ -18,7 +18,7 @@ PREREQUISITES (WHAT DO YOU NEED?)
 To install and run BeBot you need the following: 
 
 * Anarchy Online (free or paid) or Age of Conan
-* PHP version >= 4.4
+* PHP version >= 5.2
 * MySQL database server version >= 4.1.1
 * The BeBot files
 
