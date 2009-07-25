@@ -44,7 +44,7 @@ class Logon extends BaseActiveModule
 	{
 		parent::__construct($bot, get_class($this));
 		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("logon", "true") . "
-				(id INT NOT NULL PRIMARY KEY,
+				(id BIGINT NOT NULL PRIMARY KEY,
 				message VARCHAR(255))");
 		$this->last_log = array();
 		$this->start = time() + 3600;
@@ -54,6 +54,7 @@ class Logon extends BaseActiveModule
 		$this->register_command("all", "logon", "MEMBER");
 		$this->register_event("buddy");
 		$this->register_event("connect");
+		$this->update_table();
 		$this->bot->core("colors")->define_scheme("logon", "logon_spam", "darkaqua");
 		$this->bot->core("colors")->define_scheme("logon", "level", "lightteal");
 		$this->bot->core("colors")->define_scheme("logon", "ailevel", "lightgreen");
@@ -69,6 +70,18 @@ class Logon extends BaseActiveModule
 		$this->bot->core("settings")->create("Relay", "Alias", TRUE, "Should a Users Main Alias be Shown with logon message?");
 	}
 
+	function update_table()
+	{
+		switch ($this->bot->db->get_version("logon"))
+		{
+			case 1:
+				$this->bot->db->update_table("logon", "id", "alter", "ALTER TABLE #___logon CHANGE `id` BIGINT NOT NULL");
+			case 2:
+			default:
+		}
+		$this->bot->db->set_version("logon", 2);
+	}
+	
 	function command_handler($name, $msg, $origin)
 	{
 		if (preg_match("/^logon (.+)/i", $msg, $info))
