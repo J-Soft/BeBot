@@ -49,6 +49,24 @@
 set_time_limit(0);
 ini_set("html_errors", 0);
 
+// Make sure we can handle BIGINT on 32bit systems
+if (PHP_INT_SIZE != 8)
+{
+	$precision = ini_get('precision');
+	echo "Debug: Precision is $precision\n";
+	if ($precision <= 16)
+	{
+			if (!ini_set('precision', 16))
+			{
+				die("On 32bit systems we need precision of 16 or greater and we where unable to raise the limit.\nPlease set precision in php.ini to 16.");
+			}
+	}
+
+	$precision = ini_get('precision');
+	echo "Debug: Precision is $precision\n";
+}
+
+
 /* Packet type definitions - so we won't have to use the number IDs
 * .. I did not distinct between server and client message types, as
 * they are mostly the same for same type packets, but maybe it should
@@ -1260,33 +1278,6 @@ class AOChat
 		}
 	}
 
-	// 	function get_uid($user)
-	// 	{
-	// 		//This should probably be moved out of AOChat and into core/PlayerList.php
-	// 		if(!($uid = (int)$user))
-	// 		{
-	// 			$uid = (int)$this->lookup_user($user);
-	// 		}
-	// 
-	// 		if($uid == -1 || $uid == 0)
-	// 		{
-	// 			$uid = false;
-	// 		}
-	// 		return $uid;
-	// 	}
-	// 
-	// 	function get_uname($user)
-	// 	{
-	// 		//This should probably be moved out of AOChat and into core/PlayerList.php
-	// 		if(!($uid = (int)$user))
-	// 		{
-	// 			return $user;
-	// 		}
-	// 		else
-	// 		{
-	// 			return $this->lookup_user($uid);
-	// 		}
-	// 	}
 	function lookup_group($arg, $type = 0)
 	{
 		$is_gid = false;
@@ -1500,7 +1491,7 @@ class AOChat
 		{
 			$this->buddies[$uid] = 0;
 		}
-		$return = (int) $this->buddies[$uid];
+		$return = $this->buddies[$uid];
 		return $return;
 	}
 
@@ -1876,6 +1867,17 @@ class AOChatPacket
 				{
 					case "I":
 						$temparray = unpack("N", $data);
+						// If we are not running 64bit php, we need to use float instead of int due to large numbers
+						// And due PHP not converting from int to float when unpack() is used, we have to force it.
+						if (PHP_INT_SIZE != 8)
+						{
+							// We mainly use this for userid's which never have negative values
+							// However some error returns use negative values so using -100 instead of -1 just as a precaution
+							if ($temparray[1] < -100)
+							{
+								$temparray[1] += 0x100000000;
+							}
+						}
 						$res = array_pop($temparray);
 						$data = substr($data, 4);
 						break;
