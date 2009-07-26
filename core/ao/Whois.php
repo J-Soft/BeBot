@@ -64,7 +64,7 @@ class Whois_Core extends BasePassiveModule
 		Create tables for our whois cache if it does not already exsist.
 		*/
 		$this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("whois", "false") . " (
-					ID int(15) NOT NULL default '0',
+					ID bigint NOT NULL default '0',
 					nickname varchar(15) NOT NULL default '',
 					firstname varchar(20) NOT NULL default '',
 					lastname varchar(20) NOT NULL default '',
@@ -114,7 +114,7 @@ class Whois_Core extends BasePassiveModule
 
 	function update_table()
 	{
-		if ($this->bot->db->get_version("whois") == 2)
+		if ($this->bot->db->get_version("whois") == 3)
 		{
 			return;
 		}
@@ -123,9 +123,11 @@ class Whois_Core extends BasePassiveModule
 			case 1: // Update Table version to prevent repeat update calls
 			//was an update for a setting
 			case 2:
+				$this->bot->db->update_table("whois", "id", "alter", "ALTER TABLE #___whois CHANGE `id` BIGINT NOT NULL");
+			case 3:
 			default:
 		}
-		$this->bot->db->set_version("whois", 2);
+		$this->bot->db->set_version("whois", 3);
 	}
 
 	function create_name_cache()

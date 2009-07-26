@@ -51,7 +51,7 @@ class Preferences_core extends BasePassiveModule
 		$query = 'CREATE TABLE IF NOT EXISTS ' . $this->bot->db->define_tablename('preferences', 'true');
 		$query .= '(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ';
 		$query .= 'pref_id INT NOT NULL, ';
-		$query .= 'owner INT, ';
+		$query .= 'owner BIGINT, ';
 		$query .= 'value VARCHAR(25))';
 		$this->bot->db->query($query);
 		$this->register_event('connect'); //Cache all defaults on connect.
@@ -62,12 +62,19 @@ class Preferences_core extends BasePassiveModule
 
 	function update_table()
 	{
+		if ($this->bot->db->get_version("preferences_def") == 3)
+		{
+			return;
+		}
+		
 		Switch ($this->bot->db->get_version("preferences_def"))
 		{
 			case 1:
 				$this->bot->db->update_table("preferences_def", "access", "drop", "ALTER TABLE #___preferences_def DROP access");
+			case 2:
+				$this->bot->db->update_table("preferences_def", "owner", "alter", "ALTER TABLE #___preferences_def CHANGE `owner` BIGINT NOT NULL");			
 		}
-		$this->bot->db->set_version("preferences_def", 2);
+		$this->bot->db->set_version("preferences_def", 3);
 	}
 
 	function connect()
