@@ -62,25 +62,32 @@ class Preferences_core extends BasePassiveModule
 
 	function update_table()
 	{
-		if ($this->bot->db->get_version("preferences_def") == 3)
+		if ($this->bot->db->get_version("preferences_def") == 2 and $this->bot->db->get_version("preferences") == 2)
 		{
 			return;
 		}
-		
-		Switch ($this->bot->db->get_version("preferences_def"))
+
+		Switch($this -> bot -> db -> get_version("preferences_def"))
 		{
 			case 1:
-				$this->bot->db->update_table("preferences_def", "access", "drop", "ALTER TABLE #___preferences_def DROP access");
+				$this -> bot -> db -> update_table("preferences_def", "access", "drop",	"ALTER TABLE #___preferences_def DROP access");
 				$this->bot->db->set_version("preferences_def", 2);
 				$this->update_table();
 				return;
-			case 2:
-				$this->bot->db->update_table("preferences_def", "owner", "alter", "ALTER TABLE #___preferences_def MODIFY owner BIGINT");
-				$this->bot->db->set_version("preferences_def", 3);
-				$this->update_table();
-				return;				
+			default:
+				break;
 		}
-
+		
+		Switch($this -> bot -> db -> get_version("preferences"))
+		{
+			case 1:
+				$this->bot->db->update_table("preferences_def", "owner", "alter", "ALTER TABLE #___preferences MODIFY owner BIGINT NOT NULL");
+				$this->bot->db->set_version("preferences", 2);
+				$this->update_table();
+				return;		
+			default:
+				break;
+		}
 	}
 
 	function connect()
