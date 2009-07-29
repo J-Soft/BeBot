@@ -81,7 +81,7 @@ class Preferences_core extends BasePassiveModule
 		Switch($this -> bot -> db -> get_version("preferences"))
 		{
 			case 1:
-				$this->bot->db->update_table("preferences_def", "owner", "alter", "ALTER TABLE #___preferences MODIFY owner BIGINT NOT NULL");
+				$this->bot->db->update_table("preferences", "owner", "alter", "ALTER TABLE #___preferences MODIFY owner BIGINT NOT NULL");
 				$this->bot->db->set_version("preferences", 2);
 				$this->update_table();
 				return;		
