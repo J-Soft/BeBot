@@ -284,7 +284,7 @@ class Identify extends BaseActiveModule
 		$return = "##highlight##QL " . $ql . "##end## :: ";
 		if (! empty($type))
 		{
-			$return .= $this->bot->core("tools")->make_item($lowid, $highid, $ql, $type, true) . "\n";
+			$return .= $this -> bot -> core("tools") -> make_item($lowid, $highid, $ql, $type) . "\n";
 		}
 		$return .= $purpose . "\n";
 		return $return;
