@@ -66,7 +66,6 @@ class Roster_Core extends BasePassiveModule
 			$this->register_event("gmsg", "Org Msg");
 		}
 		$this->register_event("cron", "24hour");
-		$this->register_event("connect");
 		$this->update_table();
 		$this->bot->core("settings")->create("Members", "LastRosterUpdate", 1, "Last time we completed a Roster update", NULL, TRUE, 2);
 		$this->bot->core("settings")->create('Members', 'Roster', 'XML', 'What should we use to look up organization information? (Fallback means that if XML fails the cache will be used)', 'XML;WhoisCache;Fallback');
