@@ -91,12 +91,18 @@ class Roster_Core extends BasePassiveModule
 			case 1:
 				$this->bot->db->update_table("users", array("banned_for" , "banned_until"), "add", "ALTER TABLE #___users ADD banned_for VARCHAR(100) AFTER banned_at, ADD banned_until INT(11) DEFAULT '0' AFTER banned_for");
 				$this->bot->db->set_version("users", 2);
+				$this->update_table();
+				return;
 			case 2:
 				$this->bot->db->update_table("users", array("user_level" , "banned_until" , "notify"), "alter", "ALTER TABLE #___users ADD INDEX (user_level), ADD INDEX (banned_until), ADD INDEX (notify)");
 				$this->bot->db->set_version("users", 3);
+				$this->update_table();
+				return;
 			case 3:
 				$this->bot->db->update_table('users', array('recieve_announce' , 'recieve_invite' , 'admin_level'), 'drop', "ALTER TABLE #___users DROP recieve_announce, DROP recieve_invite, DROP admin_level");
 				$this->bot->db->set_version("users", 4);
+				$this->update_table();
+				return;
 			case 4:
 				if ($this->bot->core('prefs')->exists('AutoInv', 'recieve_auto_invite'))
 				{
@@ -127,6 +133,9 @@ class Roster_Core extends BasePassiveModule
 					// We have to delay any further updates until we can correctly update the autoinvite fields!
 					return;
 				}
+				$this->bot->db->set_version("users", 5);
+				$this->update_table();
+				return;
 			case 5:
 				// update pref default and remove old settings, useing user scheme since it used to be in user table
 				if ($this->bot->core("settings")->exists("members", "Receiveannounce"))
@@ -147,11 +156,16 @@ class Roster_Core extends BasePassiveModule
 					$this->bot->core("prefs")->change_default("Roster Module", "MassMsg", "recieve_invite", $set);
 					$this->bot->core("settings")->del("members", "Receiveinvite");
 				}
+				$this->bot->db->set_version("users", 6);
+				$this->update_table();
+				return;
 			case 6:
-				$this->bot->db->update_table("users", "char_id", "alter", "ALTER TABLE #___users CHANGE `char_id` BIGINT NOT NULL");
+				$this->bot->db->update_table("users", "char_id", "alter", "ALTER TABLE #___users MODIFY char_id BIGINT NOT NULL");
+				$this->bot->db->set_version("users", 7);
+				$this->update_table();
+				return;
 			default:
 		}
-		$this->bot->db->set_version("users", 7);
 	}
 
 	function connect()
