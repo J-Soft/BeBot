@@ -381,7 +381,7 @@ class Whois_Core extends BasePassiveModule
 		if (0 == $whois['online'])
 		{
 			// For offline users 'location' contains the last online time in milliseconds since 1970!
-			$window .= " ##normal##Last Online: ##highlight##" . gmdate("Y-m-d h:i", $whois['location']) . "##end##\n";
+			$window .= " ##normal##Last Online: ##highlight##" . gmdate($this->bot->core("settings")->get("time", "formatstring"), $whois['location']) . "##end##\n";
 		}
 		if ($this->bot->core("settings")->get('Whois', 'Debug'))
 		{
