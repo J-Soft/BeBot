@@ -1489,10 +1489,9 @@ class AOChat
 		}
 		if (! isset($this->buddies[$uid]))
 		{
-			$this->buddies[$uid] = 0;
+			return 0;
 		}
-		$return = $this->buddies[$uid];
-		return $return;
+		return $this->buddies[$uid];
 	}
 
 	function buddy_online($who)
