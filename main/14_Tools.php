@@ -273,22 +273,32 @@ class tools extends BasePassiveModule
 			$inside .= $this->chatcmd('close InfoView', '##blob_title##«##end## ##blob_text##Close Terminal##end## ##blob_title##»##end##', '/', TRUE);
 			$inside .= "\n##blob_title##¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯##end##\n";
 		}
-		$inside .= str_replace("\"", "&quot;", $content);
+		// Using " inside a blob will end the blob.
+		// Convert opening and closing tags with " to '
+		// Convert any other " to HTML entities.
+		$inside .= str_replace("=\"", "='", $content);
+		$inside .= str_replace("\">", "'>", $content);
+		$inside .= str_replace("\"", "&quot;", $content);	
 		return "<a href=\"text://" . $inside . "\">" . $title . "</a>";
 	}
 
 	/*
 	Creates a text blob.
 	*/
-	function make_item($lowid, $highid, $ql, $name, $strip = FALSE)
+	function make_item($lowid, $highid, $ql, $name, $alt = FALSE, $strip = FALSE)
 	{
 		$msgstrip = "";
 		if ($strip)
 		{
 			$msgstrip = "style=text-decoration:none ";
 		}
+		$quote = '"';
+		if ($alt)
+		{
+			$quote = '\'';
+		}
 		$name = str_replace("'", "&#039;", $name);
-		return "<a {$msgstrip}href='itemref://$lowid/$highid/$ql'>$name</a>";
+		return "<a {$msgstrip}href=".$quote."itemref://$lowid/$highid/$ql".$quote.">$name</a>";
 	}
 
 	/*
