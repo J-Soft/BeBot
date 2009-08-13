@@ -369,10 +369,10 @@ class Bot
 		else
 		{
 			// Authenticate
-			$this->log("LOGIN", "STATUS", "Authenticating");
+			$this->log("LOGIN", "STATUS", "Authenticating $this->username");
 			$this->aoc->authenticate($this->username, $this->password);
 			// Login the bot character
-			$this->log("LOGIN", "STATUS", "Logging in");
+			$this->log("LOGIN", "STATUS", "Logging in $this->botname");
 			$this->aoc->login(ucfirst(strtolower($this->botname)));
 		}
 		/*
