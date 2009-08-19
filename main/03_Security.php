@@ -61,10 +61,9 @@ class Security_Core extends BaseActiveModule
 	*/
 	var $firstcron; // Cron Control Hack.
 	var $gocron; // Cron Crontrol Hack part 2. :)
-	// FIXME: If PHP5, make $super_admin, $owner, and $cahce private.
-	var $super_admin; // SuperAdmins from Bot.conf
-	var $owner; // Owner from Bot.conf
-	var $cache; // Security Cache.
+	var $_super_admin; // SuperAdmins from Bot.conf
+	var $_owner; // Owner from Bot.conf
+	var $_cache; // Security Cache.
 	var $last_alts_status; // Check status of setting UseAlts, if it changes clear main cache.
 	/*
 	Constructor:
