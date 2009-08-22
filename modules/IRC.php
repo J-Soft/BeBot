@@ -973,7 +973,7 @@ class IRC extends BaseActiveModule
 
 	function irc_nick(&$irc, &$data)
 	{
-		if (($data->nick != $this->bot->core("settings")->get("Irc", "Nick")))
+		if (($data->nick != $this->bot->core("settings")->get("Irc", "Nick")) && (strtolower($this->bot->core("settings")->get("Irc", "AnnounceTo")) != "none"))
 		{
 			unset($this->irconline[strtolower($data->nick)]);
 			$this->irconline[strtolower($data->message)] = strtolower($data->message);
