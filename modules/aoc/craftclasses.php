@@ -139,7 +139,7 @@ class craftclasses extends BaseActiveModule
 			{
 				if (empty($result["craft1"]) & $result["level"] > 40)
 				{
-					$msg = "You have no crafting information set and you are above level 40. Please use '/tell <botname> <pre>setcraft [class1] [class2]'. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None. If you havn't picked crafting classes yet this may be the time to do it.";
+					$msg = "You have no crafting information set and you are above level 40. Please use '/tell <botname> <pre>setcraft [class1] [class2]'. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None. If you haven't picked crafting classes yet this may be the time to do it.";
 					$this->bot->send_tell($name, $msg);
 				}
 			}
