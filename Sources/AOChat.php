@@ -1110,7 +1110,7 @@ class AOChat
 				$bot->inc_buddy($packet->args);
 				break;
 			case AOCP_BUDDY_REMOVE:
-				$signal = new signal_message('aochat', 'system', $id);
+				$signal = new signal_message('aochat', 'system', $packet->args[0]);
 				$dispatcher->post($signal, 'onBuddyRemove');
 				unset($signal);
 				// TODO: This should probably be cached somewhere else.
@@ -1250,6 +1250,7 @@ class AOChat
 	{
 		$stack = array();
 		$timeout = 15;
+		$p = FALSE;
 		// put the user on the call stack.
 		$u = ucfirst(strtolower($u));
 		$timelimit = time() + $timeout;

@@ -162,6 +162,9 @@ class Bot
 		}
 		//Read config_file
 		require_once ('conf/' . $config_file);
+		
+		echo "Loaded bot configuration from conf/" . $config_file . "\n";
+		
 		if (empty($ao_password) || $ao_password == "")
 		{
 			$fp = fopen('./conf/pw', 'r');
@@ -205,7 +208,7 @@ class Bot
 		//initialize bot.
 		self::$instance[$bothandle]->username = $ao_username;
 		self::$instance[$bothandle]->password = $ao_password;
-		self::$instance[$bothandle]->botname = $bot_name;
+		self::$instance[$bothandle]->botname = ucfirst(strtolower($bot_name));
 		self::$instance[$bothandle]->dimension = ucfirst(strtolower($dimension));
 		self::$instance[$bothandle]->botversion = 'BOT_VERSION';
 		self::$instance[$bothandle]->botversionname = 'BOT_VERSION_NAME';
@@ -276,7 +279,7 @@ class Bot
 	{
 		if (! is_dir($directory))
 		{
-			$this->log("LOAD", "ERROR", "The specified directory '$directory' is unaccessible!");
+			$this->log("LOAD", "ERROR", "The specified directory '$directory' is inaccessible!");
 			return;
 		}
 		$bot = $this;

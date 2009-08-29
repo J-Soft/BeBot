@@ -63,14 +63,16 @@ class MySQL
 		/*
 		Load up config
 		*/
-		$botname_mysql_conf = "conf/" . $botname . ".MySQL.conf";
+		$botname_mysql_conf = "conf/" . $this->botname . ".MySQL.conf";
 		if (file_exists($botname_mysql_conf))
 		{
 			include $botname_mysql_conf;
+			echo "Loaded MySQL configuration from " . $botname_mysql_conf . "\n";
 		}
 		else
 		{
 			include "conf/MySQL.conf";
+			echo "Loaded MySQL configuration from conf/MySQL.conf\n";
 		}
 		$this->USER = $user;
 		$this->PASS = $pass;
@@ -78,20 +80,20 @@ class MySQL
 		$this->DBASE = $dbase;
 		if (empty($master_tablename))
 		{
-			$this->master_tablename = strtolower($botname) . "_tablenames";
+			$this->master_tablename = strtolower($this->botname) . "_tablenames";
 		}
 		else
 		{
-			$master_tablename = str_ireplace("<botname>", strtolower($botname), $master_tablename);
+			$master_tablename = str_ireplace("<botname>", strtolower($this->botname), $master_tablename);
 			$this->master_tablename = $master_tablename;
 		}
 		if (! isset($table_prefix))
 		{
-			$this->table_prefix = strtolower($botname);
+			$this->table_prefix = strtolower($this->botname);
 		}
 		else
 		{
-			$table_prefix = str_ireplace("<botname>", strtolower($botname), $table_prefix);
+			$table_prefix = str_ireplace("<botname>", strtolower($this->botname), $table_prefix);
 			$this->table_prefix = $table_prefix;
 		}
 		if ($nounderscore)

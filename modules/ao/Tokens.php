@@ -227,4 +227,4 @@ class tokens extends BaseActiveModule
 		return $info;
 	}
 }
-?> 
+?>
