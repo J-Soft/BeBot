@@ -161,18 +161,31 @@ class Bot
 			$config_file = "Bot.conf";
 		}
 		//Read config_file
-		require_once ('conf/' . $config_file);
-		
-		echo "Loaded bot configuration from conf/" . $config_file . "\n";
+		if (file_exists("./conf/" . $config_file))
+		{
+			require_once "./conf/" . $config_file;
+			echo "Loaded bot configuration from conf/" . $config_file . "\n";
+		}
+		else
+		{
+			die("Could not read config file conf/" . $config_file);
+		}
 		
 		if (empty($ao_password) || $ao_password == "")
 		{
 			$fp = fopen('./conf/pw', 'r');
-			$ao_password = fread($fp, filesize('./conf/pw'));
-			fclose($fp);
-			$fp = fopen('./conf/pw', 'w');
-			fwrite($fp, "");
-			fclose($fp);
+			if ($fp)
+			{
+				$ao_password = fread($fp, filesize('./conf/pw'));
+				fclose($fp);
+				$fp = fopen('./conf/pw', 'w');
+				fwrite($fp, "");
+				fclose($fp);
+			}
+			else if(empty($ao_password) || $ao_password == "")
+			{
+				die("No password set in either ./conf/" . $config_file . " or in conf/pw");
+			}
 		}
 		//Determine which game we are playing
 		if (! empty($server_list['ao'][$dimension]))
