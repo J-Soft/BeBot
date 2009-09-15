@@ -14,6 +14,7 @@ Version 0.7.0
 - Bot now includes bot name and dimension in user agent on HTTP requests.
 - !roll should work properly now.
 - Improved !raffle logic slightly. Will now determine the number of times to do a roll depending on the number of people in the raffle.
+- Added waypoint support to rally
 
 API Changes:
 - Moved aochat event handling out of Main.php and in to AOChat.php
