@@ -37,12 +37,12 @@ The Class itself...
 */
 class MassMsg extends BaseActiveModule
 {
-
 	function __construct(&$bot)
 	{
 		parent::__construct($bot, get_class($this));
 		$this->register_command('all', 'announce', 'LEADER');
 		$this->register_command('all', 'massinv', 'LEADER');
+		$this -> bot -> core("queue") -> register($this, "invite", 0.2, 5);
 		$this->help['description'] = 'Sends out mass messages and invites.';
 		$this->help['command']['announce <message>'] = "Sends out announcement <message> as tells to all online members.";
 		$this->help['command']['massinv <message>'] = "Sends out announcement <message> as tells to all online members and invites them to the private group.";
@@ -59,7 +59,7 @@ class MassMsg extends BaseActiveModule
 
 	function command_handler($name, $msg, $origin)
 	{
-		$com = $this->parse_com($msg, array('com' , 'args'));
+		$com = $this->parse_com($msg, array('com', 'args'));
 		switch ($com['com'])
 		{
 			case 'announce':
@@ -157,7 +157,10 @@ class MassMsg extends BaseActiveModule
 							$this->bot->send_tell($recipient, $message, 0, FALSE, TRUE, FALSE);
 							$status[$recipient]['sent'] = true;
 						}
-						$this->bot->core('chat')->pgroup_invite($recipient);
+						if($this -> bot -> core("queue") -> check_queue("invite"))
+							$this->bot->core('chat')->pgroup_invite($recipient);
+						else
+							$this -> bot -> core("queue") -> into_queue("invite", $recipient);
 						$status[$recipient]['invited'] = true;
 					}
 				}

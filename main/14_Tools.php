@@ -414,7 +414,51 @@ class tools extends BasePassiveModule
 		{
 			return mt_rand();
 		}
+	}
 
+	function best_match($find, $in, $perc=0)
+	{
+		$use = array(0);
+		$percentage = 0;
+
+		if(!empty($in))
+		{
+			foreach($in as $compare)
+			{
+				similar_text($find, $compare, $percentage);
+				if ($percentage >= $perc
+				&& $percentage > $use[0])
+				{
+					$use = array($percentage, $compare);
+				}
+			}
+		}
+		return $use;
+	}
+
+	//return TRUE if the same, and FALSE if not
+	function compare($a, $b)
+	{
+		if(is_array($a) && is_array($b))
+		{
+			$dif = array_diff_assoc($a, $b);
+			if(!empty($dif))
+				Return(FALSE);
+			else
+			{
+				$check = TRUE;
+				foreach($a as $k => $v)
+				{
+					if(is_array($v) && $check)
+						$check = $this -> compare($v, $b[$k]);
+				}
+				Return($check);
+			}
+		}
+		if(is_array($a) || is_array($b))
+			Return(FALSE);
+		else
+			Return($a == $b);
 	}
 }
 ?>

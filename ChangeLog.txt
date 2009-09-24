@@ -15,6 +15,7 @@ Version 0.7.0
 - !roll should work properly now.
 - Improved !raffle logic slightly. Will now determine the number of times to do a roll depending on the number of people in the raffle.
 - Added waypoint support to rally
+- Added a General queue module Changed chatqueue buddy_queue and masmsg (invites) to use
 
 API Changes:
 - Moved aochat event handling out of Main.php and in to AOChat.php

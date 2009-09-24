@@ -37,9 +37,6 @@ The Class itself...
 */
 class Buddy_Queue_Core extends BasePassiveModule
 {
-	private $queue;
-	private $unused;
-	private $last_add;
 
 	/*
 	Constructor:
@@ -49,12 +46,18 @@ class Buddy_Queue_Core extends BasePassiveModule
 	{
 		parent::__construct($bot, get_class($this));
 		$this->register_module("buddy_queue");
-		$this->register_event("cron", "1sec");
-		$this->queue = array();
-		$this->unused = 0;
-		$this->last_add = time();
+
 		$this->bot->core("settings")->create("Buddy_Queue", "Enabled", TRUE, "Should buddies be queued or added as requested? (Queueing buddies may slow down the bot.)");
 		$this->bot->core("settings")->create("Buddy_Queue", "Rate", 1, "How many buddy add and removes should be done per second?", "1;2;3;4;5;6;7;8;9;10");
+		$this -> bot -> core("settings") -> register_callback("Buddy_Queue", "Rate", $this);
+		$this -> settings(FALSE, FALSE, FALSE, $this -> bot -> core("settings") -> get("Buddy_Queue", "Rate"), FALSE);
+	}
+
+	function settings($user, $module, $setting, $new, $old)
+	{
+		$rate = 1 / $new;
+		$max = $new * 2;
+		$this -> bot -> core("queue") -> register($this, "buddy", $rate, $max);
 	}
 
 	function do_add($uid)
@@ -93,41 +96,15 @@ class Buddy_Queue_Core extends BasePassiveModule
 	/*
 	This gets called on cron
 	*/
-	function cron()
+	function queue($module, $info)
 	{
-		// Make sure that there can't be bursts of delayed cron() calls:
-		if (time() <= $this->last_add)
+		if($info[1])
 		{
-			return;
-		}
-		$this->last_add = time();
-		if (! empty($this->queue))
-		{
-			$count = 0;
-			foreach ($this->queue as $uid => $action)
-			{
-				unset($this->queue[$uid]);
-				if ($action)
-				{
-					$this->do_add($uid);
-				}
-				else
-				{
-					$this->do_delete($uid);
-				}
-				$count ++;
-				if ($count >= $this->bot->core("settings")->get("Buddy_Queue", "Rate"))
-				{
-					return;
-				}
-			}
+			$this -> do_add($info[0]);
 		}
 		else
 		{
-			if ($this->unused > 0)
-			{
-				$this->unused --;
-			}
+			$this -> do_delete($info[0]);
 		}
 	}
 
@@ -136,13 +113,10 @@ class Buddy_Queue_Core extends BasePassiveModule
 	*/
 	function check_queue()
 	{
-		if ((empty($this->queue) && $this->unused == 0) || ! ($this->bot->core("settings")->get("Buddy_Queue", "Enabled")))
-		{
-			$this->unused = 2;
-			return true;
-		}
+		if(!$this -> bot -> core("settings") -> get("Buddy_Queue", "Enabled"))
+			Return TRUE;
 		else
-			return false;
+			return $this -> bot -> core("queue") -> check_queue("buddy");
 	}
 
 	/*
@@ -151,8 +125,8 @@ class Buddy_Queue_Core extends BasePassiveModule
 	*/
 	function into_queue($uid, $type)
 	{
-		$this->queue[$uid] = $type;
-		return true;
+		$info = array($uid, $type);
+		return $this -> bot -> core("queue") -> into_queue("buddy", $info);
 	}
 }
 ?>

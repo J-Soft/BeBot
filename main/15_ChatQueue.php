@@ -50,99 +50,38 @@ class Chat_Queue_Core extends BasePassiveModule
 	{
 		parent::__construct($bot, get_class($this));
 		$this->register_module("chat_queue");
-		$this->register_event("cron", "2sec");
-		$this->queue = array();
-		$this->queue_low = array();
+
+		$this -> bot -> core("queue") -> register($this, "chat", ($this -> bot -> telldelay / 1000), 4);
 	}
 
 	/*
 	This gets called on cron
 	*/
-	function cron()
+	function queue($name, $info)
 	{
-		if (! empty($this->queue))
+		$to = $info[0];
+		$msg = $info[1];
+		if ($info[2] == "tell")
 		{
-			$this->set_msgs();
-			foreach ($this->queue as $key => $value)
-			{
-				if ($this->msgs_left >= 1)
-				{
-					$to = $value[0];
-					if (isnumeric($to))
-					{
-						$to = $this->bot->core("player")->name($to);
-					}
-					$msg = $value[1];
-					if ($value[2] == "tell")
-					{
-						$this->bot->log("TELL", "OUT", "-> $to: " . $msg);
-						$msg = utf8_encode($msg);
-						$this->bot->aoc->send_tell($to, $msg);
-					}
-					else
-					{
-						$msg = utf8_encode($msg);
-						$this->bot->aoc->send_group($to, $msg);
-					}
-					unset($this->queue[$key]);
-					$this->msgs_left -= 1;
-				}
-			}
+			$this -> bot -> log("TELL", "OUT", "-> " . $this -> bot -> core("chat") -> get_uname($to) . ": " . $msg);
+			$msg = utf8_encode($msg);
+			$this -> bot -> aoc -> send_tell($to, $msg);
 		}
-		if (! empty($this->queue_low))
+		else
 		{
-			$this->set_msgs();
-			foreach ($this->queue_low as $key => $value)
-			{
-				if ($this->msgs_left >= 1)
-				{
-					$to = $value[0];
-					$msg = $value[1];
-					if ($value[2] == "tell")
-					{
-						$this->bot->log("TELL", "OUT", "-> " . $this->bot->core("chat")->get_uname($to) . ": " . $msg);
-						$msg = utf8_encode($msg);
-						$this->bot->aoc->send_tell($to, $msg);
-					}
-					else
-					{
-						$msg = utf8_encode($msg);
-						$this->bot->aoc->send_group($to, $msg);
-					}
-					unset($this->queue_low[$key]);
-					$this->msgs_left -= 1;
-				}
-				else
-					return false;
-			}
+			$msg = utf8_encode($msg);
+			$this -> bot -> aoc -> send_group($to, $msg);
 		}
-		return true;
 	}
 
-	/*
-	Sets messages left...
-	*/
-	function set_msgs()
-	{
-		$time = time();
-		$this->msgs_left += ($time - $this->last_call) / ($this->bot->telldelay / 1000);
-		$this->last_call = $time;
-		if ($this->msgs_left > 4)
-			$this->msgs_left = 4;
-	}
+
 
 	/*
 	Checks if tell can be sent. true if yes, false it has to be put to queue
 	*/
 	function check_queue()
 	{
-		$this->set_msgs();
-		if (($this->msgs_left >= 1) && empty($this->queue) && empty($this->queue_low))
-		{
-			$this->msgs_left -= 1;
-			return true;
-		}
-		return false;
+		return $this -> bot -> core("queue") -> check_queue("chat");
 	}
 
 	/*
@@ -150,23 +89,8 @@ class Chat_Queue_Core extends BasePassiveModule
 	*/
 	function into_queue($to, $msg, $type, $priority)
 	{
-		if ($priority == 0)
-		{
-			// Filter duplicate messages. The exact same message twice in a queue
-			// results most likely from double clicking a link or spamming the bot
-			// (like if 100 people are klicking on a guild info link multiple times).
-			// There is no point in sending the same answer back twice in a row.
-			foreach ($this->queue as $item)
-				if ($item[0]==$to && $item[1]==$msg && $item[2]==$type)
-					return;
-			$this->queue[] = array($to, $msg, $type);
-		} else {
-			// Filter duplicate messages.
-			foreach ($this->queue_low as $item)
-				if ($item[0]==$to && $item[1]==$msg && $item[2]==$type)
-					return;
-			$this->queue_low[] = array($to, $msg, $type);
-		}
+		$info = array($to, $msg, $type);
+		$this -> bot -> core("queue") -> into_queue("chat", $info, $priority);
 	}
 }
 ?>
