@@ -509,7 +509,7 @@ class AOChat
 				{
 					$lang = "en";
 				}
-				$outPacket = new RPCPacket("out", RPC_TERRITORY_LOGINCHARACTER, array($this->char["id"] , "" , $lang));
+				$outPacket = new RPCPacket("out", RPC_TERRITORY_LOGINCHARACTER, array($this->char["id"], "", $lang, 0, 0, 0) );
 				$this->send_rpcpacket($outPacket);
 				break;
 			
@@ -2224,7 +2224,7 @@ $GLOBALS["aochat-rpcpacketmap"] = array(
 //	(string)RPC_UNIVERSE_ACCOUNT			=> array("name"=>"Login Player Account",		"args"=>"II"),
 	(string)RPC_TERRITORY_INIT				=> array("name"=>"Player Init",					"args"=>"II"),
 	(string)RPC_TERRITORY_STARTUP			=> array("name"=>"Player Startup",				"args"=>""),
-	(string)RPC_TERRITORY_LOGINCHARACTER	=> array("name"=>"Login Character",				"args"=>"ISS"))
+	(string)RPC_TERRITORY_LOGINCHARACTER    => array("name"=>"Login Character",             "args"=>"ISSIII"))
 );
 /****************************************************
  *
