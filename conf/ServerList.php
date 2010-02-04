@@ -11,7 +11,7 @@
 	// AOC
 	$server_list['aoc']['EU']           = array('server'=>'aoc-eu-um.live.ageofconan.com', 'port'=>7000);
 	$server_list['aoc']['US']           = array('server'=>'aoc-us-um.live.ageofconan.com', 'port'=>7000);
-	$server_list['aoc']['Testlive']     = array('server'=>'testlive.ageofconan.com', 'port'=>7000);
+	$server_list['aoc']['Aoctestlive']  = array('server'=>'testlive.ageofconan.com', 'port'=>7000);
 
 	// all EU servers use the same login server
 	$server_list['aoc']['Bloodbrand'] 	= $server_list['aoc']['EU'];
