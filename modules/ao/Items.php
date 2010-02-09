@@ -1,12 +1,14 @@
 <?php
-/*
+/**
+* Items database changed to Xyphos.
+*
 * Central Items Database v1.1, By Vhab
 * Latest version can always be found at: http://bebot.shadow-realm.org/index.php/topic,380.0.html
 * Details about the database itself: http://aodevs.com/index.php/topic,84.0.html
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2009 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2010 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -40,7 +42,7 @@ class VhItems extends BaseActiveModule
 	var $color_header = 'DFDF00';
 	var $color_highlight = '97BE37';
 	var $color_normal = 'CCF0AD';
-	var $server = 'http://items.vhabot.net/';
+	var $server = 'http://cidb.xyphos.com/';
 	var $max = 50;
 
 	function __construct(&$bot)
@@ -49,7 +51,7 @@ class VhItems extends BaseActiveModule
 		$this->register_command('all', 'items', 'GUEST');
 		$this->help['description'] = 'Searches the central database for information about an item.';
 		$this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";
-		$this->help['notes'] = "This module uses the Central Items Database v1.1, By Vhab.";
+		$this -> help['notes']="This module uses the Xyphos Items Database .";
 	}
 
 	function command_handler($name, $msg, $origin)

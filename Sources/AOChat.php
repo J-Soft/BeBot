@@ -265,6 +265,7 @@ class AOChat
 		return $s;
 	}
 
+
 	function get_rpcpacket()
 	{
 		$head = $this->read_data(8);
@@ -1079,6 +1080,14 @@ class AOChat
 			case AOCP_CLIENT_LOOKUP:
 				list ($id, $name) = $packet->args;
 				$name = ucfirst(strtolower($name));
+				
+				// *** FIXME ***
+				// This is an ugly workaround for now to deal with overflowing 32bit int in Age of Conan
+				if ($id == 4294967295)
+				{
+					$id = -1;
+				}
+				
 				$signal = new signal_message('aochat', 'bot', array($id , $name));
 				$dispatcher->post($signal, 'onPlayerName');
 				unset($signal);

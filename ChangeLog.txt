@@ -28,6 +28,8 @@ Version 0.7.0
 - Some Bug Fixes and Spelling Corrections in Raid mod.
 - Make it so you goto be in PG to join Raid, can be disable in settings and only applies to AO game.
 - Roster Module now Supports use of dimension name for AO
+- Fixed an issue with invalid users on AOC causing crashes.
+- Xyphos items database now used by default for AO. Please report issues at http://www.xyphos.com/viewforum.php?f=7
 - Added waypoint support to rally
 - Added a General queue module Changed chatqueue buddy_queue and masmsg (invites) to use
 

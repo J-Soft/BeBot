@@ -86,6 +86,15 @@ class AOChatWrapper_Core extends BasePassiveModule
 		}
 		else
 		{
+			// FIXME
+			// Currently checking specifically for 4294967295 as userid to ensure we never ever send an add buddy
+			// packet to AoC as it will disconnect the player.
+			if ($uid == 4294967295)
+			{
+				$this -> bot -> log("BUDDY", "BUDDY-ADD", "Received add request for " . $this -> get_uname($uid) . "(" . $uid . ") This user is likely in the userlist and might need to be manually removed if this error persists.");
+				return FALSE;
+			}
+
 			if (! ($this->bot->aoc->buddy_exists($uid)) && $uid != $this->bot->core('player')->id($this->bot->botname) && ! ($this->bot->core('player')->name($uid) instanceof BotError))
 			{
 				if (! $que || $this->bot->core("buddy_queue")->check_queue())
