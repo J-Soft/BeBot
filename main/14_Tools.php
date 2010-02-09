@@ -39,14 +39,10 @@ class tools extends BasePassiveModule
 
 	function __construct(&$bot)
 	{
+
 		parent::__construct($bot, get_class($this));
 		$this->register_module("tools");
-		if ($this->bot->core("settings")->exists("tools", "get_site"))
-		{
-			$this->bot->core("settings")->del("tools", "get_site");
-		}
 		$this->bot->core("settings")->create("tools", "force_sockets", FALSE, "Should we force the usage of Sockets in get_site() even if Curl is available?");
-		$this->register_event("settings", array("module" => "tools" , "setting" => "get_site"));
 		$this->useragent = BOT_VERSION_NAME . "/" . BOT_VERSION . " (Originating bot: " . $this->bot->botname . "; Dimension: " . $this->bot->dimension . ";)";
 		$this->randomsource = "";
 	}
@@ -93,17 +89,15 @@ class tools extends BasePassiveModule
 		Return ('<a ' . $msgstrip . 'href=\'chatcmd:///' . $chatcmd . $link . '\'>' . $title . '</a>');
 	}
 
-	function get_site($url, $strip_headers = 0, $server_timeout = 25, $read_timeout = 30)
+	function get_site($url, $strip_headers = 0, $server_timeout = 5, $read_timeout = 10)
 	{
 		if (! function_exists('curl_init') || ($this->bot->core("settings")->get("tools", "force_sockets") == TRUE))
 		{
-			$this->bot->core("settings")->save($module, $setting, "Sockets");
-			$this->bot->send_tell($this->bot->core("security")->owner, "Setting get_site for Module tools Changed to Sockets as cURL is not installed");
 			Return $this->get_site_sock($url, $strip_headers, $server_timeout, $read_timeout);
 		}
 		else
 		{
-			Return $this->get_site_curl($url, $strip_headers);
+			Return $this->get_site_curl($url, $strip_headers, $read_timeout);
 		}
 	}
 
@@ -151,6 +145,10 @@ class tools extends BasePassiveModule
 			$this->error->set("Failed to create socket. Error was: " . socket_strerror(socket_last_error()));
 			return $this->error;
 		}
+		
+		// Set some sane read timeouts to prevent the bot from hanging forever.
+		socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array("sec" => $read_timeout, "usec" => 0));
+
 		$connect_result = socket_connect($socket, $address, $service_port);
 		// Make sure we have a connection
 		if ($connect_result === false)
@@ -204,7 +202,8 @@ class tools extends BasePassiveModule
 		return $return;
 	}
 
-	function get_site_curl($url, $strip_headers, $timeout = 10)
+
+function get_site_curl($url, $strip_headers = 0, $timeout = 10, $post = NULL, $login = NULL) // login should be username:password
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -390,18 +389,7 @@ class tools extends BasePassiveModule
 		return ($name);
 	}
 
-	function settings($user, $module, $setting, $new, $old)
-	{
-		if ($new == "curl" && ! function_exists('curl_init'))
-		{
-			$this->bot->core("settings")->save($module, $setting, "Sockets");
-			if ($user != "")
-			{
-				$this->bot->send_tell($user, "Setting get_site for Module tools Changed to Sockets as cURL is not installed");
-			}
-		}
-	}
-	
+
 	function my_rand ($min = FALSE, $max = FALSE)
 	{
 		// For now we only support Mersienne Twister, but this can be changed.

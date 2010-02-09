@@ -140,13 +140,52 @@ class Preferences_core extends BasePassiveModule
 		$module = ucfirst(strtolower($module));
 		$description = mysql_real_escape_string($description);
 		$default = ucfirst(strtolower($default));
-		$query = "SELECT * FROM #___preferences_def WHERE module = '$module' AND name = '$name' LIMIT 1";
+		$query = "SELECT ID, description, possible_values, default_value FROM #___preferences_def WHERE module = '$module' AND name = '$name' LIMIT 1";
 		$prefs = $this->bot->db->select($query);
 		if (empty($prefs))
 		{
 			$query = "INSERT INTO #___preferences_def VALUES (NULL, '$module', '$name', '$description', '$default', '$possible_values')";
 			$this->bot->db->query($query);
 			$this->bot->log('PREFS', 'CREATE', "Created preference '$name' for module '$module' with default value '$default'");
+		}
+		else
+		{
+			$prefs = $prefs[0];
+			if($prefs[1] != stripslashes($description) || $prefs[2] != $possible_values)
+			{
+				$this -> bot -> db -> query("UPDATE #___preferences_def SET description = '".$description."', possible_values = '".$possible_values."' WHERE module = '".$module."' AND name = '".$name."'");
+				$this -> bot -> log("PREFS", "UPDATED", "Updated values for ".stripslashes($name)." for module ".stripslashes($module));
+				if($prefs[2] != $possible_values)
+				{
+					$temps = explode(";", $possible_values);
+					foreach($temps as $temp)
+					{
+						$pv[strtolower(trim($temp))] = TRUE;
+					}
+					if(!isset($pv[strtolower($prefs[3])])) // current default invalid, reset
+					{
+						$this -> bot -> db -> query("UPDATE #___preferences_def SET default_value = '".$default."' WHERE module = '".$module."' AND name = '".$name."'");
+						$this -> bot -> log("PREFS", "UPDATED", "Reset default value as it was invalid for ".stripslashes($name)." for module ".stripslashes($module));
+					}
+					$query = "SELECT ID, value FROM #___preferences WHERE pref_id = ".$prefs[0];
+					$uprefs = $this -> bot -> db -> select($query);
+					if(!empty($uprefs))
+					{
+						$count = 0;
+						foreach($uprefs as $pref)
+						{
+							$pref[1] = strtolower(trim($pref[1]));
+							if(!isset($pv[$pref[1]]))
+							{
+								$this -> bot -> db -> query("DELETE FROM #___preferences WHERE ID = '".$pref[0]."'");
+								$count++;
+							}
+						}
+						if($count > 0)
+							$this -> bot -> log("PREFS", "UPDATED", "Reset $count user prefs as they were invalid for ".stripslashes($name)." for module ".stripslashes($module));
+					}
+				}
+			}
 		}
 	}
 

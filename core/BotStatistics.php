@@ -232,7 +232,7 @@ class BotStatistics_Core extends BasePassiveModule
 		}
 		else
 		{
-			$result = $this->bot->db->select("SELECT bot, dim, online, time FROM " . $this->DB . "#___bots");
+			$result = $this -> bot -> db -> select("SELECT bot, dim, online, time FROM ".$this -> DB."#___bots ORDER BY dim, online DESC");
 			if (! empty($result))
 			{
 				foreach ($result as $bot)

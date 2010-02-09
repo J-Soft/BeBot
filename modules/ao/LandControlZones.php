@@ -43,7 +43,9 @@ class LandControlZones extends BaseActiveModule
 			`lrange` int(10) default NULL,
 			`hrange` int(10) default NULL,
 			`area` varchar(50) default NULL,
+			`short` varchar(5) default NULL,
 			`huge` varchar(10) default NULL,
+			`zoneid` int(11) default NULL,
 			`x` varchar(10) default NULL,
 			`y` varchar(10) default NULL,
 			`name` varchar(250) default NULL,
@@ -67,12 +69,15 @@ class LandControlZones extends BaseActiveModule
 		switch ($this->bot->db->get_version("land_control_zones"))
 		{
 			case 1:
-				$this->bot->db->query("UPDATE #___land_control_zones SET hrange = 150 " . "WHERE area = 'Broken Shores' AND name = 'Surrounding Evil'");
 			case 2:
-				$this->bot->db->query("UPDATE #___land_control_zones SET hrange = 90 " . "WHERE area = 'Wailing Wastes' AND name = 'Styx Magma'");
 			case 3:
-				$this->bot->db->query("UPDATE #___land_control_zones SET hrange = 90, lrange = 60 " . "WHERE area = 'Avalon' AND name = 'Griffon Frontier'");
 			case 4:
+			case 5:
+				$this -> bot -> db -> update_table("land_control_zones", "short", "add",
+					"ALTER IGNORE TABLE #___land_control_zones ADD short VARCHAR(5) DEFAULT NULL");
+				$this -> bot -> db -> update_table("land_control_zones", "zoneid", "add",
+					"ALTER IGNORE TABLE #___land_control_zones ADD zoneid INT(11) DEFAULT NULL");
+				$this -> bot -> db -> query("truncate table #___land_control_zones");
 				$filename = "./extra/table_data/lc_zones.sql";
 				$handle = fopen($filename, "r");
 				$query = fread($handle, filesize($filename));
@@ -81,7 +86,7 @@ class LandControlZones extends BaseActiveModule
 					$this->bot->db->query($query);
 			default:
 		}
-		$this->bot->db->set_version("land_control_zones", 5);
+		$this -> bot -> db -> set_version("land_control_zones", 6);
 		$this->register_command("all", "lc", "MEMBER");
 	}
 
@@ -134,9 +139,9 @@ class LandControlZones extends BaseActiveModule
 						$temp = "<br><br>";
 					$temp .= "<div align=center><u><font color=#10a5e5>" . $area[0] . " (" . $area[1] . ")</font></u></div>";
 					if ($lrange == $hrange)
-						$lcs = $this->bot->db->select("select * from #___land_control_zones where area='" . $area[0] . "' AND lrange<=" . $lrange . " AND hrange>=" . $hrange . " order by huge");
+						$lcs = $this->bot->db->select("select id, lrange, hrange, area, huge, x, y, name from #___land_control_zones where area='".$area[0]."' AND lrange<=".$lrange." AND hrange>=".$hrange." order by huge");
 					else
-						$lcs = $this->bot->db->select("select * from #___land_control_zones where area='" . $area[0] . "' AND lrange>=" . $lrange . " AND hrange<=" . $hrange . " order by huge");
+						$lcs = $this->bot->db->select("select id, lrange, hrange, area, huge, x, y, name from #___land_control_zones where area='".$area[0]."' AND lrange>=".$lrange." AND hrange<=".$hrange." order by huge");
 					if (! empty($lcs))
 					{
 						foreach ($lcs as $lc)

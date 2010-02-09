@@ -53,6 +53,7 @@ class Alts extends BaseActiveModule
 		$this->help['command']['alts del <player>'] = "Removes <player> from your alt list.";
 		$this->help['command']['altadmin add <main> <alt>'] = "Adds <alt> as alt to <main>.";
 		$this->help['command']['altadmin del <main> <alt>'] = "Removes <alt> as alt from <main>.";
+		$this->help['command']['altadmin confirm <main> <alt>'] = "Confirms <alt> as alt of <main>.";
 		$this->bot->core("settings")->create("Alts", "Security", TRUE, "Should security restrictions be enabled to prevent users from gaining higher access levels by adding alts with higher access level when Usealts for the security module is enabled?");
 	}
 
@@ -175,13 +176,25 @@ class Alts extends BaseActiveModule
 		$main = $this->bot->core("alts")->main($name);
 		//Check that the alt is not already registered
 		$query = "SELECT main, confirmed FROM #___alts WHERE main='$alt' OR alt='$alt'";
-		$result = $this->bot->db->select($query, MYSQL_ASSOC);
+		$result = $this -> bot -> db -> select($query);
 		if (! empty($result))
 		{
-			if ($result[0]['confirmed'] == 1)
-				return ("##highlight##$alt##end## is already registered as an alt of ##highlight##{$result[0]['main']}##end##.");
+			if($result[0][1] == 1)
+				return("##highlight##$alt##end## is already registered as an alt of ##highlight##".$result[0][0]."##end##.");
 			else
-				return ("##highlight##$alt##end## is already an unconfirmed alt of ##highlight##{$result[0]['main']}##end##.");
+				return("##highlight##$alt##end## is already an unconfirmed alt of ##highlight##".$result[0][0]."##end##.");
+		}
+
+		//Check that the main is not already registered but unconfirmed, this is only needed is main is not different
+		if($name == $main)
+		{
+			$query = "SELECT main, confirmed FROM #___alts WHERE alt='$name'";
+			$result = $this -> bot -> db -> select($query);
+			if(!empty($result))
+			{
+				if($result[0][1] == 0)
+					return("##highlight##$name##end## is already an unconfirmed alt of ##highlight##".$result[0][0]."##end##.");
+			}
 		}
 		if ($security)
 		{
@@ -199,7 +212,7 @@ class Alts extends BaseActiveModule
 			$inside = "##blob_title##  :::  Alt Confirmation Request :::##end##\n\n";
 			$inside .= "##blob_text## $main has added you as an Alt\n\n " . $this->bot->core("tools")->chatcmd("alts confirm " . $main, "Click here") . " to Confirm.";
 			$this->bot->send_tell($alt, "Alt Confirmation :: " . $this->bot->core("tools")->make_blob("Click to view", $inside));
-			return "##highlight##$alt##end## has been registered but Now requires Confirmation.";
+			return "##highlight##$alt##end## has been registered but Now requires Confirmation, to confirm do ##highlight##<pre>alts confirm $main##end## on $alt";
 		}
 		$this->bot->db->query("INSERT INTO #___alts (alt, main) VALUES ('$alt', '$main')");
 		$this->bot->core("alts")->add_alt($main, $alt);
@@ -256,6 +269,8 @@ class Alts extends BaseActiveModule
 			{
 				$this->bot->db->query("UPDATE #___alts SET confirmed = 1 WHERE main = '$main' AND alt = '$alt'");
 				$this->bot->core("alts")->add_alt($main, $alt);
+				if($this -> bot -> exists_module("points"))
+					$this -> bot -> core("points") -> check_alts($main);
 				return "##highlight##$alt##end## has been confirmed as a new alt of ##highlight##$main##end##.";
 			}
 			else
