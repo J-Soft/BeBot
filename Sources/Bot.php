@@ -1484,7 +1484,7 @@ class Bot
 	*/
 	function cronjob($time, $duration)
 	{
-		if (($this->cron_job_timer[$duration] < $time) && ($this->cron_job_active[$duration] == false))
+		if (($this -> cron_job_timer[$duration] <= $time) && ($this -> cron_job_active[$duration] == false))
 		{
 			if (! empty($this->cron[$duration]))
 			{

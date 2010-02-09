@@ -115,6 +115,12 @@ class tools extends BasePassiveModule
 					break;
 			}
 		}
+
+		if ($return['error'])
+		{
+			$this -> bot -> log("ERROR", "tools", $return['errordesc'] . " Reason (" . $return['content'] . ")");
+		}
+
 		return $return;
 	}
 
@@ -149,11 +155,12 @@ class tools extends BasePassiveModule
 		// Set some sane read timeouts to prevent the bot from hanging forever.
 		socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array("sec" => $read_timeout, "usec" => 0));
 
-		$connect_result = socket_connect($socket, $address, $service_port);
+		$connect_result = @socket_connect($socket, $address, $service_port);
+
 		// Make sure we have a connection
 		if ($connect_result === false)
 		{
-			$this->error->set("Failed to connect to server. Error was: " . socket_strerror(socket_last_error()));
+			$this->error->set("Failed to connect to server " . $address . ":" . $service_port . " (" . $url . ") Error was: " . socket_strerror(socket_last_error()));
 			return $this->error;
 		}
 		// Rebuild the full query after parse_url
@@ -166,7 +173,7 @@ class tools extends BasePassiveModule
 		$in .= "Host: " . $get_url['host'] . "\r\n";
 		$in .= "Connection: Close\r\n";
 		$in .= "User-Agent:" . $this->useragent . "\r\n\r\n";
-		$write_result = socket_write($socket, $in, strlen($in));
+		$write_result = @socket_write($socket, $in, strlen($in));
 		// Make sure we wrote to the server okay.
 		if ($write_result === false)
 		{
@@ -174,11 +181,11 @@ class tools extends BasePassiveModule
 			return $this->error;
 		}
 		$return["content"] = "";
-		$read_result = socket_read($socket, 2048);
+		$read_result = @socket_read($socket, 2048);
 		while ($read_result != "" && $read_result !== false)
 		{
 			$return .= $read_result;
-			$read_result = socket_read($socket, 2048);
+			$read_result = @socket_read($socket, 2048);
 		}
 		// Make sure we got a response back from the server.
 		if ($read_result === false)
@@ -186,7 +193,7 @@ class tools extends BasePassiveModule
 			$this->error->set("Failed to read response: " . socket_strerror(socket_last_error()));
 			return $this->error;
 		}
-		$close_result = socket_close($socket);
+		$close_result = @socket_close($socket);
 		// Make sure we closed our socket properly.  Open sockets are bad!
 		if ($close_result === false)
 		{
