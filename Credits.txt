@@ -2,7 +2,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2010 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -36,7 +36,7 @@
 * If you redistribute BeBot or fork it, please include this file.
 */
 
-BeBot was created by Jonas Jax (Blondengy (RK1)) in 2004 with spiritual guidance by Thomas J. Stensås (Khalem (RK1)).
+BeBot was created by Jonas Jax (Blondengy (RK1)) in 2004 with spiritual guidance by Thomas Juberg (Khalem (RK1)).
 
 Currently maintained by a small group of dedicated community members with good help from the Anarchy Online community at large.
 
