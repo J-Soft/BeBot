@@ -76,7 +76,10 @@ class Raid extends BaseActiveModule
 		$this->bot->core("settings")->create("Raid", "raidinfo", "", "Raid info.", NULL, TRUE, 2);
 		$this->bot->core("settings")->create("Raid", "showlft", TRUE, "show LFT link next to raid join");
 		if($this -> bot -> game == "ao")
+		{
 			$this -> bot -> core("settings") -> create("Raid", "inPG", TRUE, "Do users have to be in the PG to join a Raid?");
+		}
+		$this -> bot -> core("settings") -> create("Raid", "AnnounceDelay", 120, "Specify the delay between raid announces.", 60;120;180;340;400;600;900);
 
 		$this->help['description'] = 'Module to manage and announce raids.';
 		$this->help['command']['raid start <description>'] = "Starts a raid with optional description.";
@@ -852,7 +855,8 @@ class Raid extends BaseActiveModule
 				$this->bot->db->query("UPDATE #___raid_points SET points = points + " . $points . " WHERE raiding = 1");
 			}
 		}
-		if ($this->announce && $this->announcel < (time() + 45))
+		
+		if ($this -> announce && $this -> announcel <= (time() + $this -> bot -> core("settings") -> get('Raid', 'AnnounceDelay')))
 		{
 			if ($this->move > time())
 			{
