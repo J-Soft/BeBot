@@ -43,6 +43,8 @@ class tools extends BasePassiveModule
 		parent::__construct($bot, get_class($this));
 		$this->register_module("tools");
 		$this->bot->core("settings")->create("tools", "force_sockets", FALSE, "Should we force the usage of Sockets in get_site() even if Curl is available?");
+		$this->bot->core("settings")->create("tools", "connect_timeout", 20, "How long in seconds should we wait for data to be returned from the webserver when making get_data calls?");
+		// Please do not change this string.
 		$this->useragent = BOT_VERSION_NAME . "/" . BOT_VERSION . " (Originating bot: " . $this->bot->botname . "; Dimension: " . $this->bot->dimension . ";)";
 		$this->randomsource = "";
 	}
@@ -89,11 +91,11 @@ class tools extends BasePassiveModule
 		Return ('<a ' . $msgstrip . 'href=\'chatcmd:///' . $chatcmd . $link . '\'>' . $title . '</a>');
 	}
 
-	function get_site($url, $strip_headers = 0, $server_timeout = 5, $read_timeout = 10)
+	function get_site($url, $strip_headers = FALSE, $read_timeout = FALSE)
 	{
 		if (! function_exists('curl_init') || ($this->bot->core("settings")->get("tools", "force_sockets") == TRUE))
 		{
-			Return $this->get_site_sock($url, $strip_headers, $server_timeout, $read_timeout);
+			Return $this->get_site_sock($url, $strip_headers, $read_timeout);
 		}
 		else
 		{
@@ -101,16 +103,16 @@ class tools extends BasePassiveModule
 		}
 	}
 
-	function get_site_sock($url, $strip_headers = 0, $server_timeout = 5, $read_timeout = 10)
+	function get_site_sock($url, $strip_headers = FALSE, $read_timeout = FALSE)
 	{
-		$return = $this->get_site_data($url, $strip_headers, $server_timeout, $read_timeout);
+		$return = $this->get_site_data($url, $strip_headers, $read_timeout);
 		if (($return instanceof BotError) && $this->use_proxy_server && ! empty($this->proxy_server_address))
 		{
 			echo "We're using a proxy\n";
 			foreach ($this->proxy_server_address as $proxy)
 			{
 				echo "Trying proxy: " . $proxy . "\n";
-				$return = $this->get_site_data($url, $strip_headers, $server_timeout, $read_timeout, $proxy);
+				$return = $this->get_site_data($url, $strip_headers, $read_timeout, $proxy);
 				if (! ($return instanceof BotError))
 					break;
 			}
@@ -127,7 +129,7 @@ class tools extends BasePassiveModule
 	/*
 	Gets the data from a URL
 	*/
-	function get_site_data($url, $strip_headers = 0, $server_timeout = 5, $read_timeout = 10, $proxy = '')
+	function get_site_data($url, $strip_headers = FALSE, $read_timeout = FALSE, $proxy = '')
 	{
 		$get_url = parse_url($url);
 		// Check to see if we're using a proxy, and get the IP address for the target host.
@@ -153,6 +155,11 @@ class tools extends BasePassiveModule
 		}
 		
 		// Set some sane read timeouts to prevent the bot from hanging forever.
+		if (!$read_timeout)
+		{
+			$read_timeout = $this->bot->core("settings")->get("tools", "connect_timeout");
+		}
+		
 		socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array("sec" => $read_timeout, "usec" => 0));
 
 		$connect_result = @socket_connect($socket, $address, $service_port);
@@ -210,7 +217,7 @@ class tools extends BasePassiveModule
 	}
 
 
-function get_site_curl($url, $strip_headers = 0, $timeout = 10, $post = NULL, $login = NULL) // login should be username:password
+function get_site_curl($url, $strip_headers = FALSE, $timeout = FALSE, $post = NULL, $login = NULL) // login should be username:password
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -239,6 +246,11 @@ function get_site_curl($url, $strip_headers = 0, $timeout = 10, $post = NULL, $l
 		// Optional: Return the result instead of printing it
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		// Specify a timeout
+		if (!$timeout)
+		{
+			$timeout = $this->bot->core("settings")->get("tools", "connect_timeout");
+		}
+		
 		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 		// The usual - get the data and close the session
 		$return = curl_exec($ch);
