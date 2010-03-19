@@ -205,7 +205,7 @@ class User_Core extends BasePassiveModule
 	{
 		$reroll = 0;
 		$name = ucfirst(strtolower($name));
-		if (! ctype_alnum($name))
+		if (empty($name))
 		{
 			$this->error->set("You have to give a character to be deleted.");
 			return $this->error;
@@ -295,7 +295,7 @@ class User_Core extends BasePassiveModule
 	{
 		$reroll = 0;
 		$deleted = 0;
-		if (! ctype_alnum($name))
+		if (empty($name))
 		{
 			$this->error->set("You have to give a character name to be erased.");
 			return $this->error;
