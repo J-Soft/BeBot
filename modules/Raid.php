@@ -79,7 +79,7 @@ class Raid extends BaseActiveModule
 		{
 			$this -> bot -> core("settings") -> create("Raid", "inPG", TRUE, "Do users have to be in the PG to join a Raid?");
 		}
-		$this -> bot -> core("settings") -> create("Raid", "AnnounceDelay", 120, "Specify the delay between raid announces.", 60;120;180;340;400;600;900);
+		$this -> bot -> core("settings") -> create("Raid", "AnnounceDelay", 120, "Specify the delay between raid announces.", '60;120;180;340;400;600;900');
 
 		$this->help['description'] = 'Module to manage and announce raids.';
 		$this->help['command']['raid start <description>'] = "Starts a raid with optional description.";
