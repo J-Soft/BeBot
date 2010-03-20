@@ -148,6 +148,7 @@ class Bot
 	public $bothandle; // == botname@dimension
 	public $debug = false;
 	public static $instance;
+	public $dispatcher;
 
 	public function factory($config_file = null)
 	{

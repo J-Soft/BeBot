@@ -89,7 +89,7 @@ require_once "./Sources/MySQL.php";
 require_once "./Sources/AOChat.php";
 require_once "./Sources/ConfigMagik.php";
 require_once "./Sources/Bot.php";
-require_once "./Sources/Dispatcher2.php";
+require_once "./Sources/sfEventDispatcher.php";
 
 /*
 Creating the bot.
@@ -104,6 +104,7 @@ else
 	$bothandle = Bot::factory();
 }
 $bot = Bot::get_instance($bothandle);
+$bot->dispatcher = new sfEventDispatcher();
   
 //Load modules.
 $bot->load_files('Commodities', 'commodities'); //Classes that do not instantiate themselves.

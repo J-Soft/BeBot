@@ -1004,10 +1004,8 @@ class AOChat
 	{
 		// Get the bot instance
 		$bot = Bot::get_instance($this->bothandle);
-		// Get the aochat dispatcher.
-		$dispatcher = Event_Dispatcher2::getInstance();
 		// Include a the signal_message (Should probably be included somewhere else)
-		require_once ('Dispatcher/signal_message.php');
+		//require_once ('Dispatcher/signal_message.php');
 		$head = $this->read_data(4);
 		if (strlen($head) != 4)
 		{
@@ -1042,22 +1040,29 @@ class AOChat
 				break;
 			case AOCP_GROUP_ANNOUNCE:
 				list ($gid, $name, $status) = $packet->args;
-				$signal = new signal_message('aochat', $gid, $name);
-				$dispatcher->post($signal, 'onGroupAnnounce');
-				unset($signal);
+				//$signal = new signal_message('aochat', $gid, $name);
+				//$dispatcher->post($signal, 'onGroupAnnounce');
+				//unset($signal);
+				$event = new sfEvent($this, 'core.on_group_announce', array('source' => $gid, 'message' => $name, 'status' => $status));
+				$this->bot->dispatcher->notify($event);
+				
 				// TODO: Group caching should most likely be done somewhere else.
 				$this->grp[$gid] = $status;
 				$this->gid[$gid] = $name;
 				$this->gid[strtolower($name)] = $gid;
-				// Deprecated call: Should listen to the signal already sendt.
+				// Deprecated call: Should listen to the event already sendt.
 				$bot->inc_gannounce($packet->args);
 				break;
 			// invites
 			case AOCP_PRIVGRP_INVITE:
 				// Event is a privgroup invite
 				list ($gid) = $packet->args;
-				$signal = new signal_message('aochat', $gid, 'invite');
-				$dispatcher->post($signal, 'onGroupInvite');
+				//$signal = new signal_message('aochat', $gid, 'invite');
+				//$dispatcher->post($signal, 'onGroupInvite');
+				
+				$event = new sfEvent($this, 'core.on_group_invite', array('source' => $gid, 'message' => 'invite'));
+				$this->bot->dispatcher->notify($event);
+				
 				// Deprecated call: Should listen to the signal already sendt.
 				$bot->inc_pginvite($packet->args);
 				break;
@@ -1073,9 +1078,14 @@ class AOChat
 					list ($id, $name) = $packet->args;
 				}
 				$name = ucfirst(strtolower($name));
-				$signal = new signal_message('aochat', 'bot', array($id , $name));
-				$dispatcher->post($signal, 'onPlayerName');
-				unset($signal);
+				
+				//$signal = new signal_message('aochat', 'bot', array($id , $name));
+				//$dispatcher->post($signal, 'onPlayerName');
+				//unset($signal);
+				
+				$event = new sfEvent($this, 'core.on_player_name', array('id' => $id, 'name' => $name));
+				$this->bot->dispatcher->notify($event);
+				
 				break;
 			case AOCP_CLIENT_LOOKUP:
 				list ($id, $name) = $packet->args;
@@ -1088,23 +1098,33 @@ class AOChat
 					$id = -1;
 				}
 				
-				$signal = new signal_message('aochat', 'bot', array($id , $name));
-				$dispatcher->post($signal, 'onPlayerName');
-				unset($signal);
+				//$signal = new signal_message('aochat', 'bot', array($id , $name));
+				//$dispatcher->post($signal, 'onPlayerName');
+				//unset($signal);
+				
+				$event = new sfEvent($this, 'core.bot', array('id' => $id, 'name' => $name));
+				$this->bot->dispatcher->notify($event);
+				
 				break;
 			case AOCP_BUDDY_LOGONOFF:
 				// Event is a buddy logging on/off
 				list ($id, $status) = $packet->args;
-				$signal = new signal_message('aochat', $id, $status);
-				if ($status)
-				{
-					$dispatcher->post($signal, 'onBuddyJoin');
-				}
-				else
-				{
-					$dispatcher->post($signal, 'onBuddyLeave');
-				}
-				unset($signal);
+			
+				//$signal = new signal_message('aochat', $id, $status);
+				//if ($status)
+				//{
+				//	$dispatcher->post($signal, 'onBuddyJoin');
+				//}
+				//else
+				//{
+				//	$dispatcher->post($signal, 'onBuddyLeave');
+				//}
+				//unset($signal);
+				
+				$event = new sfEvent($this, $status ? 'core.on_buddy_join' : 'on_buddy_leave', array('id' => $id, 'status' => $status));
+				$this->bot->dispatcher->notify($event);
+				
+				
 				if ($this->game == "aoc")
 				{
 					list ($bid, $bonline, $blevel, $blocation, $bclass) = $packet->args;
@@ -1119,9 +1139,13 @@ class AOChat
 				$bot->inc_buddy($packet->args);
 				break;
 			case AOCP_BUDDY_REMOVE:
-				$signal = new signal_message('aochat', 'system', $packet->args[0]);
-				$dispatcher->post($signal, 'onBuddyRemove');
-				unset($signal);
+//				$signal = new signal_message('aochat', 'system', $packet->args[0]);
+//				$dispatcher->post($signal, 'onBuddyRemove');
+//				unset($signal);
+				
+				$event = new sfEvent($this, 'core.on_buddy_remove', array('source' => 'system', 'message' => $pakcte->args[0]));
+				$this->bot->dispatcher->notify($event);				
+				
 				// TODO: This should probably be cached somewhere else.
 				unset($this->buddies[$packet->args[0]]);
 				break;
@@ -1155,18 +1179,29 @@ class AOChat
 				// Event is someone joining the privgroup
 				// Deprecated call. Should listen to the signal already sendt.
 				list ($id, $name) = $packet->args;
-				$signal = new signal_message('aochat', $id, 'join');
-				$dispatcher->post($signal, 'onPgJoin');
-				unset($signal);
+				
+				//$signal = new signal_message('aochat', $id, 'join');
+				//$dispatcher->post($signal, 'onPgJoin');
+				//unset($signal);
+				
+				$event = new sfEvent($this, 'core.on_privgroup_join', array('source' => $id, 'message' => 'join'));
+				$this->bot->dispatcher->notify($event);	
+				
+				
 				// Deprecated call, Should listen to the signal already sendt.
 				$bot->inc_pgjoin($packet->args);
 				break;
 			case AOCP_PRIVGRP_CLIPART:
 				// Event is someone leaveing the privgroup
 				list ($id, $name) = $packet->args;
-				$signal = new signal_message('aochat', $id, 'leave');
-				$dispatcher->post($signal, 'onPgLeave');
-				unset($signal);
+				
+				//$signal = new signal_message('aochat', $id, 'leave');
+				//$dispatcher->post($signal, 'onPgLeave');
+				//unset($signal);
+				
+				$event = new sfEvent($this, 'core.on_privgroup_leave', array('source' => $id, 'message' => 'leave'));
+				$this->bot->dispatcher->notify($event);	
+				
 				// Deprecated call. Should listen to the signal already sendt.
 				$bot->inc_pgleave($packet->args);
 				break;
@@ -1175,17 +1210,28 @@ class AOChat
 				// Event is a tell
 				// Tells should always be commands
 				list ($id, $message) = $packet->args;
-				$signal = new signal_message('aochat', $id, $message);
-				$dispatcher->post($signal, 'onTell');
-				unset($signal);
+				
+				//$signal = new signal_message('aochat', $id, $message);
+				//$dispatcher->post($signal, 'onTell');
+				//unset($signal);
+				
+				$event = new sfEvent($this, 'core.on_tell', array('source' => $id, 'message' => $message));
+				$this->bot->dispatcher->notify($event);	
+				
+				
 				// Deprecated call. Should listen to the signal already sendt.
 				$bot->inc_tell($packet->args);
 				break;
 			case AOCP_PRIVGRP_MESSAGE:
 				// Event is a privgroup message
 				list (, $id, $message) = $packet->args;
-				$signal = new signal_message('aochat', $id, $message);
-				$dispatcher->post($signal, 'onPgMessage');
+				//$signal = new signal_message('aochat', $id, $message);
+				//$dispatcher->post($signal, 'onPgMessage');
+				
+				$event = new sfEvent($this, 'core.on_privgroup_message', array('source' => $id, 'message' => $message));
+				$this->bot->dispatcher->notify($event);	
+				
+				
 				// Check if this is a command
 				// If it is not post it to all observers of the PRIVGRP_MESSAGE channel.
 				// Deprecated call. Should listen to the signal already sendt.

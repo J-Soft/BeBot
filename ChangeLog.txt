@@ -36,7 +36,6 @@ Version 0.7.0
 
 API Changes:
 - Moved aochat event handling out of Main.php and in to AOChat.php
-- Added signal events to AOChat events
 - Added third optional parameter $header (bol TRUE/FALSE) to make_blob displaying VhaBot like terminal header. Shamelessly borrowed from VhaBot. Defaults to TRUE
 - Added fourth optional parameter $strip (bol TRUE/FALSE) to chatcmd to allow stripping of all formatting for the actual link. This allows custom formatting of links. Defaults to FALSE.
 - Added sixth optional parameter $strip (bol TRUE/FALSE) to make_item to allow stripping of all formatting for the actual link. This allows custom formatting of links. Defaults to FALSE.
@@ -44,6 +43,7 @@ API Changes:
 - Added this->bot->core("tools")->my_rand($min=false, $max=false) wrapper to call random number generator.
 - Removed one optional parameter from get_site leaving the parameters now as: url, $strip_headers = FALSE, $read_timeout = FALSE.
   Only $url is a required parameter.
+- AOChat now utilizes the Symfony Event Dispatcher for it's events.
 
 New Modules:
 - Added AdminsUI Module to allow members to easily see the admin list, which also shows alts and status

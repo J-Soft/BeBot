@@ -39,18 +39,21 @@ class PlayerList extends BasePassiveModule
 	{
 		parent::__construct($bot, get_class($this));
 		$this->register_module('player');
-		$dispatcher = Event_Dispatcher2::getInstance();
-		$dispatcher->addObserver(array($this , 'signal_handle'), 'onPlayerName');
+		//$dispatcher = Event_Dispatcher2::getInstance();
+		//$dispatcher->addObserver(array($this , 'signal_handle'), 'onPlayerName');
+		$this->bot->dispatcher->connect('core.on_player_name', array($this, 'signal_handle'));
 	}
 
-	public function signal_handle($signal)
+	public function signal_handle($data)
 	{
-		$data = $signal->getNotificationObject();
-		list ($uid, $uname) = $data->message;
-		if ($uid != 0 and $uid != - 1 and !empty($uname))
+		//$data = $signal->getNotificationObject();
+		//list ($uid, $uname) = $data->message;
+		if ($data['id'] != 0 and $data['id'] != - 1 and !empty($data['name']))
 		{
-			$this->add($uid, $uname);
+			$this->add($data['id'], $data['name']);
 		}
+		
+		return true;
 	}
 
 	public function add($id, $name)
