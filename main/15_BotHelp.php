@@ -66,7 +66,7 @@ class BotHelp_Core extends BaseActiveModule
 		
 		if (!isset($vars[1]))
 		{
-			return($this -> show_help_menu($name));
+			return($this -> show_help_menu($name, 'source', $origin));
 		}
 		else
 		{
@@ -85,16 +85,22 @@ class BotHelp_Core extends BaseActiveModule
 	}
 
 
-	function show_help_menu($name, $section = 'all')
+	function show_help_menu($name, $section = 'source', $origin = FALSE)
 	{
 		switch($section)
 		{
-			case 'all':
-				$window = $this -> get_commands($name, 'tell');
-				$window .= "<br><br>" . $this -> get_commands($name, 'gc');
-				if($this -> bot -> game == "ao")
+			case 'source':
+				switch($origin)
 				{
-					$window .= "<br><br>" . $this -> get_commands($name, 'pgmsg');
+					case 'tell':
+						$window = $this -> get_commands($name, 'tell');
+						break;
+					case 'gc':
+						$window = $this -> get_commands($name, 'gc');
+						break;
+					case 'pgmsg':	
+						$window = $this -> get_commands($name, 'pgmsg');
+						break;
 				}
 				return($this -> bot -> core("tools") -> make_blob('Help', $window));
 				break;
