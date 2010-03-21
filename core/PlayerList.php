@@ -105,7 +105,7 @@ class PlayerList extends BasePassiveModule
 				// If we have a whois result, and its under 48 hours old, 
 				if (!empty($result))
 				{
-					if ($result[1] + 172800 >= time())
+					if ($result[0]['UPDATED'] + 172800 >= time())
 					{
 						$age = time() - $result[1];
 						$age = $age / 60 / 60;
