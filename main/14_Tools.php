@@ -294,9 +294,10 @@ function get_site_curl($url, $strip_headers = FALSE, $timeout = FALSE, $post = N
 		// Using " inside a blob will end the blob.
 		// Convert opening and closing tags with " to '
 		// Convert any other " to HTML entities.
-		$inside .= str_replace("=\"", "='", $content);
-		$inside .= str_replace("\">", "'>", $content);
-		$inside .= str_replace("\"", "&quot;", $content);	
+		$content = str_replace("=\"", "='", $content);
+		$content = str_replace("\">", "'>", $content);
+		$content = str_replace("\"", "&quot;", $content);	
+		$inside .= $content;
 		return "<a href=\"text://" . $inside . "\">" . $title . "</a>";
 	}
 

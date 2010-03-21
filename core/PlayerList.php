@@ -107,7 +107,7 @@ class PlayerList extends BasePassiveModule
 				{
 					if ($result[0]['UPDATED'] + 172800 >= time())
 					{
-						$age = time() - $result[1];
+						$age = time() - $result[0]['UPDATED'];
 						$age = $age / 60 / 60;
 						// cache in memory for future reference.
 						$this->add($result[0]['ID'], $uname);
