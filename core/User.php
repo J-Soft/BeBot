@@ -60,7 +60,7 @@ class User_Core extends BasePassiveModule
 	/*
 	Add a user to the bot.
 	*/
-	function add($source, $name, $id = 0, $user_level, $silent = 0)
+	function add($source, $name, $id = FALSE, $user_level, $silent = 0)
 	{
 		$change_level = false;
 		$name = ucfirst(strtolower($name));
@@ -77,7 +77,7 @@ class User_Core extends BasePassiveModule
 			return $this->error;
 		}
 		// If we didn't get an id, look it up
-		if ($id == 0)
+		if (!$id)
 		{
 			$id = $this->bot->core("player")->id($name);
 		}

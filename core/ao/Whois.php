@@ -251,9 +251,13 @@ class Whois_Core extends BasePassiveModule
 	function lookup($name, $noupdate = false, $nowait = false)
 	{
 		if ($this->bot->core("settings")->get("Statistics", "Enabled"))
+		{
 			$this->bot->core("statistics")->capture_statistic("Whois", "Lookup");
+		}
+		
 		$name = ucfirst(strtolower($name));
 		$uid = $this->bot->core("player")->id($name);
+
 		/*
 		Make sure we havent been passed a bogus name.
 		*/
@@ -471,6 +475,13 @@ class Whois_Core extends BasePassiveModule
 		*/
 		if ($nickname == '')
 		{
+			$error = $this->bot->core("tools")->xmlparse($xml, "error");
+			if ($error != '')
+			{
+				$this->error->set("Error encountered while parsing XML data: " . $this->bot->core("tools")->xmlparse($xml, "description"));
+				return $this->error;
+			}
+			
 			$this->error->set("Could not parse XML data.");
 			return $this->error;
 		}

@@ -1102,13 +1102,26 @@ class AOChat
 				//$dispatcher->post($signal, 'onPlayerName');
 				//unset($signal);
 				
-				$event = new sfEvent($this, 'core.bot', array('id' => $id, 'name' => $name));
+				$event = new sfEvent($this, 'core.on_client_id', array('id' => $id, 'name' => $name));
 				$this->bot->dispatcher->notify($event);
 				
 				break;
 			case AOCP_BUDDY_LOGONOFF:
 				// Event is a buddy logging on/off
 				list ($id, $status) = $packet->args;
+				
+				if ($this->game == "aoc")
+				{
+					list ($bid, $bonline, $blevel, $blocation, $bclass) = $packet->args;
+					$this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | AOC_BUDDY_KNOWN;
+					$event = new sfEvent($this, 'core.on_buddy_onoff', array('id' => $bid, 'online' => $bonline, 'level' => $blevel, 'location' => $blocation, 'class' => $bclass));
+				}
+				else
+				{
+					list ($bid, $bonline, $btype) = $packet->args;
+					$this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | (ord($btype) ? AOC_BUDDY_KNOWN : 0);
+					$event = new sfEvent($this, 'core.on_buddy_onoff', array('id' => $bid, 'online' => $bonline, 'type' => $btype));
+				}
 			
 				//$signal = new signal_message('aochat', $id, $status);
 				//if ($status)
@@ -1121,22 +1134,12 @@ class AOChat
 				//}
 				//unset($signal);
 				
-				$event = new sfEvent($this, $status ? 'core.on_buddy_join' : 'on_buddy_leave', array('id' => $id, 'status' => $status));
 				$this->bot->dispatcher->notify($event);
 				
 				
-				if ($this->game == "aoc")
-				{
-					list ($bid, $bonline, $blevel, $blocation, $bclass) = $packet->args;
-					$this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | AOC_BUDDY_KNOWN;
-				}
-				else
-				{
-					list ($bid, $bonline, $btype) = $packet->args;
-					$this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | (ord($btype) ? AOC_BUDDY_KNOWN : 0);
-				}
+
 				// Deprecated call. Should listen to the signal already sendt.
-				$bot->inc_buddy($packet->args);
+				//$bot->inc_buddy($packet->args);
 				break;
 			case AOCP_BUDDY_REMOVE:
 //				$signal = new signal_message('aochat', 'system', $packet->args[0]);
@@ -1303,15 +1306,25 @@ class AOChat
 	/* User and group lookup functions */
 	function lookup_user($u)
 	{
-		$stack = array();
+//		$stack = array();
 		$timeout = 15;
 		$p = FALSE;
 		// put the user on the call stack.
 		$u = ucfirst(strtolower($u));
-		$timelimit = time() + $timeout;
-		array_unshift($stack, array('user' => $u , 'timeout' => $timelimit));
+//		$timelimit = time() + $timeout;
+//		array_unshift($stack, array('user' => $u , 'timeout' => $timelimit));
 		$pq = new AOChatPacket("out", AOCP_CLIENT_LOOKUP, $u, $this->game);
 		$this->send_packet($pq);
+		
+		while ($p == FALSE)
+		{
+			$pr = $this->get_packet();
+			if ($pr->type == AOCP_CLIENT_LOOKUP)
+			{
+				$p = TRUE;
+			}
+		}
+		
 		/*** FIXME ***/
 		// This is really ugly, and we really need to detect if we recieve a Client Lookup packet as the lookup could be negative or null.
 		// In those cases this loop would run 200 times or for 15 seconds even if we have gotten a reply.
@@ -1319,6 +1332,8 @@ class AOChat
 		/*** FIXME no. 2 ***/
 		// Maybe the new function $this->wait_for_lookup_user(...) could be used.
 		// But its still untested and forbidden recursive calls are likely!
+		
+		/*
 		for ($i = 0; ($i < 200) && (!$this->bot->core('player')->exists($stack[0]['user'])) && ($stack[0]['timeout'] > time()) && (!$p); $i ++)
 		{
 			$pr = $this->get_packet();
@@ -1328,6 +1343,8 @@ class AOChat
 			}
 		}
 		array_shift($stack);
+		*/
+		
 		if (!$this->bot->core('player')->exists($u))
 		{
 			return false;
