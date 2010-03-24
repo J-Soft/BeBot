@@ -75,20 +75,20 @@ class BuddyList extends BasePassiveModule
 		}
 		else
 		{
-			$end = " (" . $this->core("security")->get_access_name($this->core("security")->get_access_level($user)) . ")";
+			$end = " (" . $this->bot->core("security")->get_access_name($this->bot->core("security")->get_access_level($user)) . ")";
 		}
-		$this->log("BUDDY", "LOG", $user . " logged [" . (($args['online'] == 1) ? "on" : "off") . "]" . $end);
+		$this->bot->log("BUDDY", "LOG", $user . " logged [" . (($args['online'] == 1) ? "on" : "off") . "]" . $end);
 
 		// **** FIXME ***
 		// This should be event driven
 		if (! empty($this->bot->commands["buddy"]))
 		{
-			$keys = array_keys($this->commands["buddy"]);
+			$keys = array_keys($this->bot->commands["buddy"]);
 			foreach ($keys as $key)
 			{
 				if ($this->bot->commands["buddy"][$key] != NULL)
 				{
-					$this->bot->commands["buddy"][$key]->buddy($user, $args[1]);
+					$this->bot->commands["buddy"][$key]->buddy($user, $args['online']);
 				}
 			}
 		}		
@@ -237,41 +237,18 @@ class BuddyList extends BasePassiveModule
 		}
 		foreach ($current_statuses as $status)
 		{
-			$this->log("BUDDY", "LOG", $user . " changed status [" . $status . "]" . $end);
+			$this->bot->log("BUDDY", "LOG", $user . " changed status [" . $status . "]" . $end);
 			if (! empty($this->bot->commands["buddy"]))
 			{
-				$keys = array_keys($this->commands["buddy"]);
+				$keys = array_keys($this->bot->commands["buddy"]);
 				foreach ($keys as $key)
 				{
 					if ($this->bot->commands["buddy"][$key] != NULL)
 					{
-						$this->bot->commands["buddy"][$key]->buddy($user, $status, $args[2], $args[3], $args[4]);
+						$this->bot->commands["buddy"][$key]->buddy($user, $status, $args['level'], $args['location'], $args['class']);
 					}
 				}
 			}
-		}
-	}
-	
-
-	/*
-	Buddy logging on/off
-	*/
-	function inc_buddy($args)
-	{
-		echo "Debug inc_buddy\n";
-		print_r($args);
-		echo "\n";
-		
-	
-		$user = $this->core("player")->name($args[0]);
-		$member = $this->core("notify")->check($user);
-		if ($this->game == "ao")
-		{
-
-		}
-		else
-		{
-			
 		}
 	}
 }

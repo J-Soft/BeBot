@@ -1098,7 +1098,9 @@ class AOChat
 				//$dispatcher->post($signal, 'onPlayerName');
 				//unset($signal);
 				
-				$event = new sfEvent($this, 'core.on_client_id', array('id' => $id, 'name' => $name));
+				echo "Debug: Firing event core.on_player_id";
+				
+				$event = new sfEvent($this, 'core.on_player_id', array('id' => $id, 'name' => $name));
 				$this->bot->dispatcher->notify($event);
 				
 				break;
@@ -1303,7 +1305,8 @@ class AOChat
 	function lookup_user($u)
 	{
 //		$stack = array();
-		$timeout = 15;
+		$i = 0;
+		$timeout = time() +  15;
 		$p = FALSE;
 		// put the user on the call stack.
 		$u = ucfirst(strtolower($u));
@@ -1314,12 +1317,20 @@ class AOChat
 		
 		while ($p == FALSE)
 		{
+			$i++;
 			$pr = $this->get_packet();
 			if ($pr->type == AOCP_CLIENT_LOOKUP)
 			{
 				$p = TRUE;
 			}
+			if ($timeout <= time())
+			{
+				echo "Debug: lookup_user timed out while looking up $u\n";
+				$p = TRUE;
+			}
 		}
+		
+		echo "Debug: lookup_user for $u completed in $i iterations\n";
 		
 		/*** FIXME ***/
 		// This is really ugly, and we really need to detect if we recieve a Client Lookup packet as the lookup could be negative or null.
