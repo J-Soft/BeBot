@@ -43,7 +43,7 @@ class tools extends BasePassiveModule
 		parent::__construct($bot, get_class($this));
 		$this->register_module("tools");
 		$this->bot->core("settings")->create("tools", "force_sockets", FALSE, "Should we force the usage of Sockets in get_site() even if Curl is available?");
-		$this->bot->core("settings")->create("tools", "connect_timeout", 20, "How long in seconds should we wait for data to be returned from the webserver when making get_data calls?");
+		$this->bot->core("settings")->create("tools", "connect_timeout", 25, "How long in seconds should we wait for data to be returned from the webserver when making get_data calls?");
 		// Please do not change this string.
 		$this->useragent = BOT_VERSION_NAME . "/" . BOT_VERSION . " (Originating bot: " . $this->bot->botname . "; Dimension: " . $this->bot->dimension . ";)";
 		$this->randomsource = "";

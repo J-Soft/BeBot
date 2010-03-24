@@ -50,6 +50,9 @@ set_time_limit(0);
 ini_set("html_errors", 0);
 
 // Make sure we can handle BIGINT on 32bit systems
+echo "Debug: PHP_INT_SIZE is ";
+var_dump(PHP_INT_SIZE);
+echo "\n";
 if (PHP_INT_SIZE != 8)
 {
 	$precision = ini_get('precision');
@@ -1090,13 +1093,6 @@ class AOChat
 			case AOCP_CLIENT_LOOKUP:
 				list ($id, $name) = $packet->args;
 				$name = ucfirst(strtolower($name));
-				
-				// *** FIXME ***
-				// This is an ugly workaround for now to deal with overflowing 32bit int in Age of Conan
-				if ($id == 4294967295)
-				{
-					$id = -1;
-				}
 				
 				//$signal = new signal_message('aochat', 'bot', array($id , $name));
 				//$dispatcher->post($signal, 'onPlayerName');

@@ -49,12 +49,17 @@ class PlayerList extends BasePassiveModule
 	{
 		//$data = $signal->getNotificationObject();
 		//list ($uid, $uname) = $data->message;
-		echo "Debug core.on_player_name and on_player_id\n";
-		echo $data['id'] . " " . $data['name'];
+		echo "Debug core.on_player_name and on_player_id ";
+		var_dump($data['id']);
+		echo " " . $data['name'];
 		echo "\n";
-		if ((bccomp($data['id'], '0') != 0)  && (bccomp($data['id'], '-1') != 0) && !empty($data['name']))
+		if ((!$data['id'] < 1) && !empty($data['name']))
 		{
 			$this->add($data['id'], $data['name']);
+		}
+		else
+		{
+			echo "Was NOT added due to invalid userID\n";
 		}
 		
 		return true;
@@ -64,7 +69,12 @@ class PlayerList extends BasePassiveModule
 	{
 		$name = ucfirst(strtolower($name));
 		
-		echo "Debug, caching $name ($id)\n";
+		echo "Debug caching $name ($id)\n";
+		if ($id == 0)
+		{
+			echo "Debug $name has an userid less than 1!!!\n";
+			debug_print_backtrace();
+		}
 		
 		$this->namecache[$name] = array('id' => $id , 'expire' => time() + 21600);
 		$this->uidcache[$id] = array('name' => $name , 'expire' => time() + 21600);
@@ -73,10 +83,10 @@ class PlayerList extends BasePassiveModule
 	public function id($uname)
 	{
 		if ($uname instanceof BotError)
-		{
+		{	
 
-			echo 'FIXME: core/PlayerList.php function id recieving BotError as $uname\nError is ' . $uname->get . '\n';
-			debug_print_backtrace();
+			echo 'FIXME: core/PlayerList.php function id recieving BotError as $uname' . "\nError is: " . $uname->get() . "\n";
+			//debug_print_backtrace();
 			return $uname;
 		}
 		
@@ -112,7 +122,7 @@ class PlayerList extends BasePassiveModule
 				// If we have a whois result, and its under 48 hours old, 
 				if (!empty($result) && isset($result[0]['UPDATED']))
 				{
-					if ($result[0]['UPDATED'] + 172800 >= time())
+					if (($result[0]['UPDATED'] + 172800 >= time()) && ($result[0]['ID'] >= 1))
 					{
 						$age = time() - $result[0]['UPDATED'];
 						$age = $age / 60 / 60;

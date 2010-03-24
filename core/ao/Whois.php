@@ -496,12 +496,19 @@ class Whois_Core extends BasePassiveModule
 	{ // Start function update()
 		//Adding in some validation and error handling due to an unknown bug (work around).
 		//If ID is stops being 0, then remove this code.
-		if ($who["id"] == 0 || $who["id"] === false)
+		if ($who instanceof BotError)
+		{
+			return FALSE;
+		}
+		
+		
+		if ($who["id"] < 1)
 		{
 			$this->bot->log('Whois', 'Update', $who["nickname"] . " had an invalid user ID! UID: " . $who["id"]);
 			$who["id"] = $this->bot->core("player")->id($who["nickname"]);
 		}
-		if ($who["id"] != 0 || $who["id"] !== false)
+		
+		if (!$who["id"] >= 1)
 		{
 			/*
 			Update our database cache
@@ -512,7 +519,9 @@ class Whois_Core extends BasePassiveModule
 			return TRUE;
 		}
 		else
+		{
 			return FALSE;
+		}
 	} // End function udpate()
 
 	function whois_details($source, $whois)
