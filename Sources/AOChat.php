@@ -5,7 +5,7 @@
 * from PHP 5.2.0+ and the BCMath extension (for generating
 * and calculating the login keys) to work.
 *
-* Copyright (C) 2006-2009 ShadowRealm Creations
+* Copyright (C) 2006-2010 ShadowRealm Creations
 * Copyright (c) 2008 Allan Noer <allan@noer.biz>
 * Copyright (C) 2002-2005  Oskari Saarenmaa <auno@auno.org>.
 *
@@ -148,13 +148,14 @@ define('AOEM_AI_REMOVE', 0x34);
 define('AOEM_AI_HQ_REMOVE_INIT', 0x35);
 define('AOEM_AI_HQ_REMOVE', 0x36);
 /* RPC Packet type definitions - so we won't have to use the number IDs */
-define('RPC_UNIVERSE_INIT', 0);
-define('RPC_UNIVERSE_CHALLENGE', 0);
-define('RPC_UNIVERSE_ANSWERCHALLENGE', 1);
-define('RPC_UNIVERSE_AUTHENTICATED', 1);
-define('RPC_UNIVERSE_ERROR', 2);
-define('RPC_UNIVERSE_INTERNAL_ERROR', 4);
-define('RPC_UNIVERSE_SETREGION', 5);
+define('RPC_UNIVERSE_INIT',             0 );
+define('RPC_UNIVERSE_CHALLENGE',        0 );
+define('RPC_UNIVERSE_ANSWERCHALLENGE',  1 );
+define('RPC_UNIVERSE_AUTHENTICATED',    1 );
+define('RPC_UNIVERSE_ERROR',            2 );
+define('RPC_UNIVERSE_INTERNAL_ERROR', 	4 );
+define('RPC_UNIVERSE_SETREGION',        5 );
+
 define('RPC_TERRITORY_INIT', 0x9CB2CB03);
 define('RPC_TERRITORY_INITACK', 0x5DC18991);
 define('RPC_TERRITORY_STARTUP', 0x6A546D41);
@@ -162,9 +163,74 @@ define('RPC_TERRITORY_CHARACTERLIST', 0xC414C5EF);
 define('RPC_TERRITORY_LOGINCHARACTER', 0xEF616EB6);
 define('RPC_TERRITORY_GETCHATSERVER', 0x23A632FA);
 define('RPC_TERRITORY_ERROR', 0xD4063CA0);
-define('RPC_TERRITORY_DIMENSIONLIST', 0xF899B14C);
-define('RPC_TERRITORY_SETUPCOMPLETE', 0x4F91A58C);
-define('RPC_TERRITORY_CSREADY',	0x5AED2A60);
+define('RPC_TERRITORY_DIMENSIONLIST', 	0xF899B14C);
+define('RPC_TERRITORY_SETUPCOMPLETE', 	0x4F91A58C);
+define('RPC_TERRITORY_CSREADY',			0x5AED2A60);
+
+// Patch 1.07.0 methods
+define('RPC_TERRITORY_CHECKSUMMAP',			0x0C09CA25);
+define('RPC_TERRITORY_SENDCHECKSUMMAP',		0xDFD8518E);
+define('RPC_TERRITORY_RECEIVEDCHARSETTINGS',0x233605B9);
+define('RPC_TERRITORY_SENDCHARSETTINGS',	0x3C7C926C);
+
+define('AOC_BUDDY_KNOWN',		0x01);
+define('AOC_BUDDY_ONLINE',		0x02);
+
+define('AOC_FLOOD_LIMIT',		7);
+define('AOC_FLOOD_INC',		2);
+
+define('AOC_PRIORITY_HIGH',		1000);
+define('AOC_PRIORITY_MED',		 500);
+define('AOC_PRIORITY_LOW',		 100);
+
+define('AOEM_UNKNOWN',                0xFF);
+define('AOEM_ORG_JOIN',               0x10);
+define('AOEM_ORG_KICK',               0x11);
+define('AOEM_ORG_LEAVE',              0x12);
+define('AOEM_ORG_DISBAND',            0x13);
+define('AOEM_ORG_FORM',               0x14);
+define('AOEM_ORG_VOTE',               0x15);
+define('AOEM_ORG_STRIKE',             0x16);
+define('AOEM_NW_ATTACK',              0x20);
+define('AOEM_NW_ABANDON',             0x21);
+define('AOEM_NW_OPENING',             0x22);
+define('AOEM_NW_TOWER_ATT_ORG',       0x23);
+define('AOEM_NW_TOWER_ATT',           0x24);
+define('AOEM_NW_TOWER',               0x25);
+define('AOEM_AI_CLOAK',               0x30);
+define('AOEM_AI_RADAR',               0x31);
+define('AOEM_AI_ATTACK',              0x32);
+define('AOEM_AI_REMOVE_INIT',         0x33);
+define('AOEM_AI_REMOVE',              0x34);
+define('AOEM_AI_HQ_REMOVE_INIT',      0x35);
+define('AOEM_AI_HQ_REMOVE',           0x36);
+
+
+/* RPC Packet type definitions - so we won't have to use the number IDs */
+define('RPC_UNIVERSE_INIT',             0 );
+define('RPC_UNIVERSE_CHALLENGE',        0 );
+define('RPC_UNIVERSE_ANSWERCHALLENGE',  1 );
+define('RPC_UNIVERSE_AUTHENTICATED',    1 );
+define('RPC_UNIVERSE_ERROR',            2 );
+define('RPC_UNIVERSE_INTERNAL_ERROR', 	4 );
+define('RPC_UNIVERSE_SETREGION',        5 );
+
+define('RPC_TERRITORY_INIT',			0x9CB2CB03 );
+define('RPC_TERRITORY_INITACK',			0x5DC18991 );
+define('RPC_TERRITORY_STARTUP',			0x6A546D41 );
+define('RPC_TERRITORY_CHARACTERLIST',	0xC414C5EF );
+define('RPC_TERRITORY_LOGINCHARACTER',	0xEF616EB6 );
+define('RPC_TERRITORY_GETCHATSERVER',	0x23A632FA );
+define('RPC_TERRITORY_ERROR',			0xD4063CA0 );
+define('RPC_TERRITORY_DIMENSIONLIST', 	0xF899B14C);
+define('RPC_TERRITORY_SETUPCOMPLETE', 	0x4F91A58C);
+define('RPC_TERRITORY_CSREADY',			0x5AED2A60);
+
+// Patch 1.07.0 methods
+define('RPC_TERRITORY_CHECKSUMMAP',			0x0C09CA25);
+define('RPC_TERRITORY_SENDCHECKSUMMAP',		0xDFD8518E);
+define('RPC_TERRITORY_RECEIVEDCHARSETTINGS',0x233605B9);
+define('RPC_TERRITORY_SENDCHARSETTINGS',	0x3C7C926C);
 
 class AOChat
 {
@@ -309,6 +375,10 @@ class AOChat
 			fwrite($this->debug, $data);
 			fwrite($this->debug, "\n=====\n");
 		}
+		echo "Received RPC Packet:" . $type . "\n";
+		
+		echo "Received RPC Packet:" . $type . "\n";
+		
 		$packet = new RPCPacket("in", $type, $data);
 		switch ($type)
 		{
@@ -382,15 +452,27 @@ class AOChat
 					$lang = substr($data, 2, $langlen);
 					$data = substr($data, 2 + $langlen);
 					// Blocked status
-					$temparray = unpack("N", $data);
-					$blocked = array_pop($temparray);
-					$data = substr($data, 4);
+					$temparray 	= unpack("N",$data);
+					$blocked	= array_pop($temparray);
+					$data		= substr($data, 4);
+
+					// ??
+					$temparray 	= unpack("N",$data);
+					$offlinelvl	= array_pop($temparray);
+					$data		= substr($data, 4);
+
+					// ??
+					$temparray 	= unpack("n",$data);
+					$strlen		= array_pop($temparray);
+					$date		= substr($data, 2, $strlen);
+					$data		= substr($data, 2 + $strlen);
+					
 					$this->chars[] = array(
-					"id" => $characterid ,
-					"name" => $name ,
-					"level" => $level ,
-					"online" => $loginstate ,
-					"language" => $lang);
+					"id"     	=> $characterid,
+					"name"   	=> $name,
+					"level"  	=> $level,
+					"online" 	=> $loginstate,
+					"language"	=> $lang );				
 				}
 		}
 		return $packet;
@@ -398,53 +480,66 @@ class AOChat
 
 	function send_rpcpacket($packet)
 	{
-		$instance = 0;
-		$callername = "";
-		$endpointname = "";
+		$instance		= 0;
+		$callername 	= "";
+		$endpointname	= "";
+		
 		// We have to create the callerid and endpoint
 		switch ($packet->type)
 		{
 			case RPC_UNIVERSE_INIT:
 			case RPC_UNIVERSE_ANSWERCHALLENGE:
-				$callername = "UniverseInterface";
-				$endpointname = "UniverseAgent";
-				$instance = 1;
+				$callername 	= "UniverseInterface";
+				$endpointname	= "UniverseAgent";
+				$instance		= 1;
 				break;
 			case RPC_TERRITORY_INIT:
 			case RPC_TERRITORY_STARTUP:
 			case RPC_TERRITORY_LOGINCHARACTER:
-				$callername = "PlayerInterface";
-				$endpointname = "PlayerAgent";
-				$instance = $this->accountid;
+			case RPC_TERRITORY_SENDCHECKSUMMAP:
+			case RPC_TERRITORY_SENDCHARSETTINGS:
+				$callername		= "PlayerInterface";
+				$endpointname	= "PlayerAgent";
+				$instance		= $this->accountid;
 				break;
+				
+			default:
+				trigger_error("send_rpcpacket: Unknown packettype " . $packet->type,E_USER_WARNING);
+				return;
 		}
 		// Create the RPC header
-		$header1 = pack("n", strlen($callername)) . $callername . pack("N2", $instance, 0);
-		$header2 = pack("n", strlen($endpointname)) . $endpointname . pack("N2", 0, 0);
-		$header = $header1 . $header2 . pack("N", $packet->type);
+		$header1		= pack("n", strlen($callername)) . $callername . pack("N2", $instance, 0);
+		$header2		= pack("n", strlen($endpointname)) . $endpointname . pack("N2", 0, 0);
+		$header			= $header1 . $header2 . pack("N", $packet->type);
+		
 		// Create the datablock (header+data)
-		$data = $header . $packet->data;
+		$data			= $header . $packet->data;
+
 		// Create the checksum for the packet
-		$packet->crc = crc32($data);
-		$data = pack("N", $packet->crc) . $data;
+		$packet->crc	= crc32($data);
+		$data			= pack("N", $packet->crc) . $data;
+		
 		// Add the packetsize in the header
-		$data = pack("N", strlen($data)) . $data;
-		if (is_resource($this->debug))
+		$data 			= pack("N", strlen($data) ) . $data;
+		
+		if(is_resource($this->debug))
 		{
 			fwrite($this->debug, ">>>>>\n");
 			fwrite($this->debug, $data);
 			fwrite($this->debug, "\n=====\n");
 		}
+
+		echo "Sending RPCPacket:" . $packet->type . "\n";
 		socket_write($this->socket, $data, strlen($data));
 		return true;
 	}
 
 	function handleRPCPackets($packet)
 	{
-		if (! is_object($packet))
+		if (!is_object($packet))
 		{
 			trigger_error("handleRPCPackets: Packet is not an object (no RPCPacket?)", E_USER_WARNING);
-			return - 1;
+			return -1;
 		}
 		switch ($packet->type)
 		{
@@ -453,7 +548,7 @@ class AOChat
 				if (strlen($this->serverseed) == NULL || strlen($this->username) == 0 || strlen($this->password) == 0)
 				{
 					trigger_error("RPC_UNIVERSE_CHALLENGE: Error in logininfo, [ServerSeed:" . $this->serverseed . "] [Username:" . $this->username . "] [Password:" . strlen($this->password) . "]", E_USER_WARNING);
-					return - 1;
+					return -1;
 				}
 				$key = $this->generate_login_key($this->serverseed, $this->username, $this->password);
 				$outPacket = new RPCPacket("out", RPC_UNIVERSE_ANSWERCHALLENGE, array($key));
@@ -484,7 +579,7 @@ class AOChat
 				if (strlen($this->ServerAddress) == 0 || $this->ServerPort == 0)
 				{
 					trigger_error("RPC_UNIVERSE_AUTHENTICATED: Error in serveraddress, [Ip:" . $this->ServerAddress . ":" . $this->ServerPort . "]", E_USER_WARNING);
-					return - 1;
+					return -1;
 				}
 				return 1;
 				
@@ -492,18 +587,18 @@ class AOChat
 				if (strlen($this->ServerAddress) == 0 || $this->ServerPort == 0)
 				{
 					trigger_error("RPC_TERRITORY_GETCHATSERVER: Error in serveraddress, [Ip:" . $this->ServerAddress . ":" . $this->ServerPort . "]", E_USER_WARNING);
-					return - 1;
+					return -1;
 				}
 				return 1;
 				
 			case RPC_TERRITORY_INITACK:
-				$territoryStartupPacket = new RPCPacket("out", RPC_TERRITORY_STARTUP, array());
+				$territoryStartupPacket = new RPCPacket("out", RPC_TERRITORY_STARTUP, array("") );
 				$this->send_rpcpacket($territoryStartupPacket);
 				break;
 				
 			case RPC_TERRITORY_CHARACTERLIST:
 				$this->char = $this->getLoginCharacter($this->character);
-				if (! is_array($this->char))
+				if (!is_array($this->char))
 				{
 					die("Could not find a valid character '" . $this->character . "' on this account.\n");
 				}
@@ -513,21 +608,32 @@ class AOChat
 				{
 					$lang = "en";
 				}
-				$outPacket = new RPCPacket("out", RPC_TERRITORY_LOGINCHARACTER, array($this->char["id"], "", $lang, 0, 0, 0) );
+				
+				$outPacket = new RPCPacket("out", RPC_TERRITORY_LOGINCHARACTER, array($this->char["id"], 1009, $lang, 0, 0, 0,0) );
 				$this->send_rpcpacket($outPacket);
 				break;
-			
+
+			case RPC_TERRITORY_CHECKSUMMAP:
+				$outPacket = new RPCPacket("out", RPC_TERRITORY_SENDCHECKSUMMAP, array(1009) );
+				$this->send_rpcpacket($outPacket);			
+				break;
+
+			case RPC_TERRITORY_RECEIVEDCHARSETTINGS:
+				$outPacket = new RPCPacket("out", RPC_TERRITORY_SENDCHARSETTINGS, array(1009) );
+				$this->send_rpcpacket($outPacket);			
+				break;
+				
 			case RPC_UNIVERSE_INTERNAL_ERROR:
 				trigger_error("RPC_UNIVERSE_INTERNAL_ERROR: Internal error", E_USER_WARNING);
 				return -1;
 				
 			case RPC_UNIVERSE_ERROR:
 				trigger_error("RPC_UNIVERSE_ERROR: Error while authenticating to universe [Err:" . $this->displayConanError($packet->args[0]) . "]", E_USER_WARNING);
-				return - 1;
+				return -1;
 				
 			case RPC_TERRITORY_ERROR:
 				trigger_error("RPC_UNIVERSE_ERROR: Error while authenticating to territory [Err:" . $this->displayConanError($packet->args[0]) . "]", E_USER_WARNING);
-				return - 1;
+				return -1;
 				
 			default:
 				// Ignore unhandled packets
@@ -564,7 +670,7 @@ class AOChat
 			$packet = $this->get_rpcpacket();
 			$ret = $this->handleRPCPackets($packet);
 			// We received an errorcode we cannot continue with
-			if ($ret == - 1)
+			if ($ret == -1)
 			{
 				return false;
 			}
@@ -578,7 +684,7 @@ class AOChat
 		
 		// Connect to the territoryserver
 		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-		if (! is_resource($this->socket))
+		if (!is_resource($this->socket))
 		{
 			die("Could not create socket.\n");
 		}
@@ -663,7 +769,7 @@ class AOChat
 			return 0;
 		}
 		// Make sure we have a valid character to login
-		if (! is_array($char))
+		if (!is_array($char))
 		{
 			foreach ($this->chars as $e)
 			{
@@ -807,7 +913,7 @@ class AOChat
 			$char = ucfirst(strtolower($char));
 		}
 		// Make sure we have a valid character to login
-		if (! is_array($char))
+		if (!is_array($char))
 		{
 			if (empty($field))
 			{
@@ -825,7 +931,7 @@ class AOChat
 				}
 			}
 		}
-		if (! is_array($char))
+		if (!is_array($char))
 		{
 			die("AOChat: no valid character to login.\n");
 		}
@@ -1366,7 +1472,7 @@ class AOChat
 		{
 			return $arg;
 		}
-		if (! $is_gid)
+		if (!$is_gid)
 		{
 			$arg = strtolower($arg);
 		}
@@ -1398,7 +1504,7 @@ class AOChat
 
 	function send_tell($user, $msg, $blob = "\0")
 	{
-		if (! is_numeric($user))
+		if (!is_numeric($user))
 		{
 			$uid = $this->bot->core('player')->id($user);
 		}
@@ -2203,7 +2309,7 @@ class AOExtMsg
 	function AOExtMsg($str = NULL)
 	{
 		$this->type = AOEM_UNKNOWN;
-		if (! empty($str))
+		if (!empty($str))
 			$this->read($str);
 	}
 
@@ -2222,7 +2328,7 @@ class AOExtMsg
 		$msg = substr($msg, 2);
 		$category = $this->b85g($msg);
 		$instance = $this->b85g($msg);
-		if (! isset($GLOBALS["msg_cat"][$category]) || ! isset($GLOBALS["msg_cat"][$category][$instance]))
+		if (!isset($GLOBALS["msg_cat"][$category]) || ! isset($GLOBALS["msg_cat"][$category][$instance]))
 		{
 			echo "\nAOChat ExtMsg Debug: Unknown Cat: $category Instance: $instance\n\n";
 			return false;
@@ -2296,14 +2402,18 @@ $GLOBALS["aochat-rpcpacketmap"] = array(
 	(string)RPC_TERRITORY_DIMENSIONLIST		=> array("name"=>"Dimension List",				"args"=>""),
 	(string)RPC_TERRITORY_SETUPCOMPLETE		=> array("name"=>"Setup complete",				"args"=>""),
 	(string)RPC_TERRITORY_CSREADY			=> array("name"=>"CS Server Ready",				"args"=>""),
+	(string)RPC_TERRITORY_CHECKSUMMAP			=> array("name"=>"Request Send Checksummap",	"args"=>""),
+	(string)RPC_TERRITORY_RECEIVEDCHARSETTINGS	=> array("name"=>"Received Character Settings",	"args"=>""),
 	(string)RPC_TERRITORY_ERROR				=> array("name"=>"Error while logging in",		"args"=>"I")),
 "out" => array(
 	(string)RPC_UNIVERSE_INIT				=> array("name"=>"Login Init",					"args"=>"SSI"),
 	(string)RPC_UNIVERSE_ANSWERCHALLENGE	=> array("name"=>"Login Answer Challenge",		"args"=>"S"),
 //	(string)RPC_UNIVERSE_ACCOUNT			=> array("name"=>"Login Player Account",		"args"=>"II"),
 	(string)RPC_TERRITORY_INIT				=> array("name"=>"Player Init",					"args"=>"III"),
-	(string)RPC_TERRITORY_STARTUP			=> array("name"=>"Player Startup",				"args"=>""),
-	(string)RPC_TERRITORY_LOGINCHARACTER    => array("name"=>"Login Character",             "args"=>"ISSIII"))
+	(string)RPC_TERRITORY_STARTUP			=> array("name"=>"Player Startup",				"args"=>"S"),
+	(string)RPC_TERRITORY_SENDCHECKSUMMAP	=> array("name"=>"Send Checksummap",			"args"=>"I"),
+	(string)RPC_TERRITORY_SENDCHARSETTINGS	=> array("name"=>"Send Character Setting",		"args"=>"I"),
+	(string)RPC_TERRITORY_LOGINCHARACTER   	=> array("name"=>"Login Character",             "args"=>"IISIIIB"))
 );
 /****************************************************
  *
@@ -2315,18 +2425,18 @@ class RPCPacket
 
 	function RPCPacket($dir, $type, $data)
 	{
-		$this->args = array();
-		$this->type = $type;
-		$this->dir = $dir;
+		$this->args 		= array();
+		$this->type 		= $type;
+		$this->dir  		= $dir;
 		$pmap = $GLOBALS["aochat-rpcpacketmap"][$dir][(string)$type];
-		if (! $pmap)
+		if (!$pmap)
 		{
 			echo "Unsupported rpcpacket type (" . $dir . ", " . $type . ")\n";
 			return;
 		}
 		if ($dir == "in")
 		{
-			if (! is_string($data))
+			if (!is_string($data))
 			{
 				echo "Incorrect argument for incoming rpcpacket, expecting a string.\n";
 				return 0;
@@ -2420,7 +2530,12 @@ class RPCPacket
 					case "i":
 						$data .= pack("n", $it);
 						break;
-					case "S":
+
+					case "B" :
+						$data .= pack("C", $it);
+						break;
+						
+					case "S" :
 						$data .= pack("n", strlen($it)) . $it;
 						break;
 					case "G":
