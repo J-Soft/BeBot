@@ -51,6 +51,7 @@ class Alts extends BaseActiveModule
 		$this->help['command']['alts [player]'] = "Shows information about [player]. If no player is given it shows information about yoru alts";
 		$this->help['command']['alts add <player>'] = "Adds <player> as your alt.";
 		$this->help['command']['alts del <player>'] = "Removes <player> from your alt list.";
+		$this->help['command']['alts confirm <main>'] = "Confirms you as alt of <main>.";
 		$this->help['command']['altadmin add <main> <alt>'] = "Adds <alt> as alt to <main>.";
 		$this->help['command']['altadmin del <main> <alt>'] = "Removes <alt> as alt from <main>.";
 		$this->help['command']['altadmin confirm <main> <alt>'] = "Confirms <alt> as alt of <main>.";
