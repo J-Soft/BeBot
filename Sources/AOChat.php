@@ -59,14 +59,19 @@ if (PHP_INT_SIZE != 8)
 	echo "Debug: Precision is $precision\n";
 	if ($precision <= 16)
 	{
-			if (!ini_set('precision', 16))
-			{
-				die("On 32bit systems we need precision of 16 or greater and we where unable to raise the limit.\nPlease set precision in php.ini to 16.");
-			}
-	}
+		if (!ini_set('precision', 16))
+		{
+			die("On 32bit systems we need precision of 16 or greater and we where unable to raise the limit.\nPlease set precision in php.ini to 16.");
+		}
 
-	$precision = ini_get('precision');
-	echo "Debug: Precision is $precision\n";
+		echo "Debug: Setting precision to 16...";
+		$precision = ini_get('precision');
+
+		if ($precision == 16)
+		{
+		echo "success\n";
+		}
+	}
 }
 
 
