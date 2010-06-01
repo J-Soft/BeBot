@@ -94,6 +94,13 @@ class AOChatWrapper_Core extends BasePassiveModule
 				$this -> bot -> log("BUDDY", "BUDDY-ADD", "Received add request for " . $this -> get_uname($uid) . "(" . $uid . ") This user is likely in the userlist and might need to be manually removed if this error persists.");
 				return FALSE;
 			}
+			
+			if ($uid < 1)
+			{
+				$this->bot->log("BUDDY", "BUDDY-ADD", "Received add request for " . $user . " but user appears to not exist!!");
+				return FALSE;
+			}
+			
 
 			if (! ($this->bot->aoc->buddy_exists($uid)) && $uid != $this->bot->core('player')->id($this->bot->botname) && ! ($this->bot->core('player')->name($uid) instanceof BotError))
 			{
