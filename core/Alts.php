@@ -265,17 +265,24 @@ class Alts_Core extends BasePassiveModule
 					$window .= $this->bot->core("tools")->chatcmd("whois " . $alt, $alt) . "</a>";
 					$online = $this->bot->core("online")->get_online_state($alt);
 					if ($online['status'] != - 1)
+					{
 						$window .= " " . $online;
+					}
+					
 					if ($this->bot->core("settings")->get('Alts', 'Detail'))
 					{
 						$whoisalt = $this->bot->core("whois")->lookup($alt);
 						if ($whoisalt instanceof BotError)
+						{
 							$whoisalt = array('nickname' => $alt);
+						}
 						if (! empty($whoisalt['level']))
 						{
 							$window .= "\n##normal## - (##highlight##" . $whoisalt['level'] . "##end##";
 							if ($this->bot->game == "ao")
+							{
 								$window .= "/##lime##" . $whoisalt['at_id'] . "##end##";
+							}
 							$window .= " " . $whoisalt['profession'] . ")##end##";
 						}
 						unset($whoisalt);
@@ -291,7 +298,7 @@ class Alts_Core extends BasePassiveModule
 							}
 						}
 					}
-					$window .= "\n";
+					$window .= "\n\n";
 				}
 			}
 		}

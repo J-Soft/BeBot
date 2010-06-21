@@ -127,14 +127,25 @@ class Alts extends BaseActiveModule
 		{
 			return "##error##Character ##highlight##$name##end## does not exist.##end##";
 		}
+		
 		$whois = $this->bot->core("whois")->lookup($name);
+		
 		if ($whois instanceof BotError)
+		{
 			$whois = array('nickname' => $name);
+		}
+		
 		$alts = $this->bot->core("alts")->show_alt($name);
+		
 		if ($this->bot->game == "aoc")
+		{
 			$retstr = "{$whois['nickname']} ({$whois['level']} / {$whois['class']}) - ";
+		}
 		else
+		{
 			$retstr = "{$whois['firstname']}' ##{$whois['faction']}##{$whois['nickname']}##end##' {$whois['lastname']} ({$whois['level']} / ##lime## {$whois['at_id']}##end## {$whois['profession']}) - ";
+		}
+		
 		if ($alts['alts'])
 		{
 			$retstr .= $alts['list'];
