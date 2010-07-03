@@ -567,7 +567,7 @@ class Whois_Core extends BasePassiveModule
 			$window .= "\n";
 		}
 		$online = $this->bot->core("online")->get_online_state($whois['nickname']);
-		$window .= "##normal## Status: " . $online . $seen . "##end##\n";
+		$window .= "##normal## Status: " . $online['content'] . $seen . "##end##\n";
 		if ($online['status'] <= 0)
 		{
 			if ($this->bot->core("settings")->get("Whois", "LastSeen"))
