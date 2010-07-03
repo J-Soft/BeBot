@@ -257,17 +257,15 @@ class Alts_Core extends BasePassiveModule
 	{
 		if (! empty($alts))
 		{
-			$window = "##normal##:::  $main's alts  :::##end##\n";
+			$window = "##normal##:::  $main's alts  :::##end##\n\n";
 			foreach ($alts as $alt)
 			{
 				if ($alt != $whois['nickname'] || $this->bot->core("settings")->get('Alts', "incAll"))
 				{
 					$window .= $this->bot->core("tools")->chatcmd("whois " . $alt, $alt) . "</a>";
 					$online = $this->bot->core("online")->get_online_state($alt);
-					if ($online['status'] != - 1)
-					{
-						$window .= " " . $online;
-					}
+					$window .= " " . $online['content'];
+
 					
 					if ($this->bot->core("settings")->get('Alts', 'Detail'))
 					{
