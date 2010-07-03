@@ -150,7 +150,7 @@ class Logon extends BaseActiveModule
 								}
 								else
 								{
-									$res = "\"" . $name . "\"";
+									$res = "\"##highlight##" . $name . "##end##\"";
 									if (! empty($result["firstname"]))
 									{
 										$res = $result["firstname"] . " " . $res;
@@ -182,7 +182,7 @@ class Logon extends BaseActiveModule
 										$main = $this->bot->core("alts")->main($name);
 										if (strcasecmp($main, $name) != 0)
 										{
-											$res .= " :: Alt of $main";
+											$res .= " :: Alt of ##highlight##$main##end##";
 										}
 									}
 									$res .= " :: " . $this->bot->core("whois")->whois_details($name, $result);
