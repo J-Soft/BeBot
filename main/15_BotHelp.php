@@ -55,14 +55,17 @@ class BotHelp_Core extends BaseActiveModule
 		$this -> help['description'] = "The bot help system.";
 		$this -> help['command']['help [command]'] = "Shows help on [command]. If no argument is given shows the help menu";
 		$this -> help['notes'] = "No notes";
-
-		$this -> update_cache();
 	}
 
 	function command_handler($name, $msg, $origin)
 	{
 		$vars = explode(' ', $msg);
 		unset($vars[0]);
+		
+		if (empty($this->help_cache))
+		{
+			$this -> update_cache();
+		}
 		
 		if (!isset($vars[1]))
 		{
@@ -119,7 +122,7 @@ class BotHelp_Core extends BaseActiveModule
 	{
 		$channel = strtolower($channel);
 		$lvl = $this -> bot -> core("security") -> get_access_name($this -> bot -> core("security") -> get_access_level($name));
-		$window = "-- Commands usable in $channel --<br>" . $this -> help_cache[$channel][$lvl];
+		$window = ":: BeBot Help ::\n\n" . $this -> help_cache[$channel][$lvl];
 		return $window;
 	}
 
