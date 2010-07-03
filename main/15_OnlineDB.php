@@ -379,7 +379,7 @@ class OnlineDB_Core extends BasePassiveModule
 			foreach ($bots as $bot)
 			{
 				// Only use valid botnames
-				if ( $this->bot->core('player')->id(trim($bot));
+				if ($this->bot->core('player')->id(trim($bot)))
 				{
 					$botnames[] = $prefix . "botname = '" . trim($bot) . "'";
 				}
