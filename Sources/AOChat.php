@@ -1577,7 +1577,7 @@ class AOChat
 
 	function privategroup_join($group)
 	{
-		$uid = $this->bot->core('player')->id($user);
+		$gid = $this->bot->core('player')->id($group);
 		if ($uid instanceof BotError)
 		{
 			return false;
