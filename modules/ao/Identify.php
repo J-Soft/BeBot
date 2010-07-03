@@ -43,6 +43,7 @@ class Identify extends BaseActiveModule
 		parent::__construct($bot, get_class($this));
 		$this->register_command('all', 'identify', 'GUEST');
 		$this->register_alias("identify", "bio");
+		$this->register_alias("identify", "inspect");
 		$this->help['description'] = "Identify the end result of a given item. Useful for biomaterial, galactic gems, and other misc items.";
 		$this->help['command']['identify <item>'] = "Identifies the object <item>.";
 		$this->help['notes'] = "<item> must be an item reference. Multiple items may be posted at a time.";

@@ -49,10 +49,13 @@ class PlayerList extends BasePassiveModule
 	{
 		//$data = $signal->getNotificationObject();
 		//list ($uid, $uname) = $data->message;
+		
+		/*
 		echo "Debug core.on_player_name and on_player_id ";
 		var_dump($data['id']);
 		echo " " . $data['name'];
 		echo "\n";
+		*/
 		if ((!$data['id'] < 1) && !empty($data['name']))
 		{
 			$this->add($data['id'], $data['name']);
@@ -69,7 +72,7 @@ class PlayerList extends BasePassiveModule
 	{
 		$name = ucfirst(strtolower($name));
 		
-		echo "Debug caching $name ($id)\n";
+		/*echo "Debug caching $name ($id)\n";*/
 		if ($id == 0)
 		{
 			echo "Debug $name has an userid less than 1!!!\n";

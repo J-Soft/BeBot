@@ -33,6 +33,7 @@ Version 0.7.0
 - Added waypoint support to rally
 - Added a General queue module Changed chatqueue buddy_queue and masmsg (invites) to use
 - Added a new setting: tools connect_timeout to allow the get_site function timeout to be adjusted.
+- Inspect has been added as an alias for Identify.
 
 API Changes:
 - Moved aochat event handling out of Main.php and in to AOChat.php
