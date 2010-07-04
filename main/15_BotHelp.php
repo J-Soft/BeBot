@@ -145,6 +145,9 @@ class BotHelp_Core extends BaseActiveModule
 		unset($this -> help_cache[$channel]["DELETED"]);
 		
 		ksort($this -> bot -> commands[$channel]);
+		echo "Debug help: \n";
+	    print_r($this->bot->commands[$channel]);
+		echo "\n\n";
 		foreach($this -> bot -> commands[$channel] as $command => $module)
 		{
 			if(is_array($module -> help))
