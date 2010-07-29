@@ -127,10 +127,15 @@ exact name of your guild.
 
 AO only: Set „$guild_id“ to the id of your guild. The easiest way to find 
 out the guild ID is going to http://www.anarchy-
-online.com/content/community/people/ and finding your guild. The URL will 
-now read something like this: „http://www.anarchy-
-online.com/org/stats/d/1/name/xxxxxx“ where the „xxxxxx“ would be your guild 
-ID. 
+online.com/content/community/people/ and finding your guild. Then scroll
+to the bottom of the page and click the "XML version of this membership
+roster" link.
+It will start with:
+<organization>
+ <id>
+  xxxxxx
+ </id>
+the xxxxxx is your guild ID. 
 
 To relay chat to another guild bot you want to set $guild_relay_target = 
 „Name_of_other_guildbot“; If you do not want this feature set 
