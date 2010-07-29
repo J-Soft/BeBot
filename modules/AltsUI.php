@@ -48,7 +48,7 @@ class Alts extends BaseActiveModule
 		$this->register_command("all", "alts", "GUEST", array("confirm" => "ANONYMOUS"));
 		$this->register_command("all", "altadmin", "ADMIN");
 		$this->help['description'] = "Shows information about alternative characters.";
-		$this->help['command']['alts [player]'] = "Shows information about [player]. If no player is given it shows information about yoru alts";
+		$this->help['command']['alts [player]'] = "Shows information about [player]. If no player is given it shows information about your alts";
 		$this->help['command']['alts add <player>'] = "Adds <player> as your alt.";
 		$this->help['command']['alts del <player>'] = "Removes <player> from your alt list.";
 		$this->help['command']['alts confirm <main>'] = "Confirms you as alt of <main>.";
