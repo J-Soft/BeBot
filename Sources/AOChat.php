@@ -1209,6 +1209,12 @@ class AOChat
 				//$dispatcher->post($signal, 'onPlayerName');
 				//unset($signal);
 				
+				// We need to make sure we catch 4294967295
+				if ($id > 4294967294)
+				{
+					$id = -1;
+				}
+		
 				echo "Debug: Firing event core.on_player_id ($id, $name)\n";
 				
 				$event = new sfEvent($this, 'core.on_player_id', array('id' => $id, 'name' => $name));
