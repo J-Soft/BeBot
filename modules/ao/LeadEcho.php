@@ -104,7 +104,7 @@ class LeadEcho extends BaseActiveModule
 			return "Leader cleared.";
 		}
 		// Check if new leader exists:
-		$id = $this->bot->core("chat")->get_uid($leadername);
+		$id = $this->bot->core('player')->id($leadername);
 		if ($id == 0)
 		{
 			return "##error##" . $leadername . " does not exist!##end##";

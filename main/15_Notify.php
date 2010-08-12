@@ -63,7 +63,7 @@ class Notify_Core extends BasePassiveModule
 
 	function add($source, $user)
 	{
-		$id = $this->bot->core("chat")->get_uid($user);
+		$id = $this->bot->core('player')->id($user);
 		$user = ucfirst(strtolower($user));
 		if ($id == 0)
 		{
@@ -96,7 +96,7 @@ class Notify_Core extends BasePassiveModule
 
 	function del($user)
 	{
-		$id = $this->bot->core("chat")->get_uid($user);
+		$id = $this->bot->core('player')->id($user);
 		$user = ucfirst(strtolower($user));
 		if ($id == 0)
 		{

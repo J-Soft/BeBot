@@ -206,7 +206,7 @@ class Points extends BaseActiveModule
 		{
 			if ($this->bot->core("security")->check_access($name, "admin"))
 			{
-				if (! $this->bot->core("chat")->get_uid($target))
+				if (! $this->bot->core('player')->id($target))
 				{
 					$this->bot->send_tell($name, "Player ##highlight##$target##end## does not exist.");
 				}
@@ -437,7 +437,7 @@ class Points extends BaseActiveModule
 				$this->bot->send_tell($name, "You only have ##highlight''" . ($result[0][0]) . "##end## raid points.");
 				return;
 			}
-			else if (! $this->bot->core("chat")->get_uid($who))
+			else if (! $this->bot->core('player')->id($who))
 			{
 				$this->bot->send_tell($name, "Player ##highlight##$who##end## does not exist.");
 				return;
@@ -467,7 +467,7 @@ class Points extends BaseActiveModule
 			$this->bot->send_tell($name, "$num is not a valid points value.");
 			return FALSE;
 		}
-		if (! $this->bot->core("chat")->get_uid($who))
+		if (! $this->bot->core('player')->id($who))
 		{
 			$this->bot->send_tell($name, "Player ##highlight##$who##end## does not exist.");
 			return FALSE;
@@ -496,7 +496,7 @@ class Points extends BaseActiveModule
 			$this->bot->send_tell($name, "$num is not a valid points value.");
 			return FALSE;
 		}
-		if (! $this->bot->core("chat")->get_uid($who))
+		if (! $this->bot->core('player')->id($who))
 		{
 			$this->bot->send_tell($name, "Player ##highlight##$who##end## does not exist.");
 			return FALSE;
@@ -521,9 +521,9 @@ class Points extends BaseActiveModule
 	function points_to($name, $tomain = TRUE)
 	{
 		if (! $tomain || ! $this->bot->core("settings")->get("Points", "To_main"))
-			return $this->bot->core("chat")->get_uid($name);
+			return $this->bot->core('player')->id($name);
 		$main = $this->bot->core("alts")->main($name);
-		return $this->bot->core("chat")->get_uid($main);
+		return $this->bot->core('player')->id($main);
 	}
 
 	function points_to_name($name, $tomain = TRUE)

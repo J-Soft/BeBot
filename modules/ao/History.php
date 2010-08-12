@@ -66,7 +66,7 @@ class History extends BaseActiveModule
 	function player_history($name)
 	{
 		$name = ucfirst(strtolower($name));
-		$id = $this->bot->core("chat")->get_uid($name);
+		$id = $this->bot->core('player')->id($name);
 		if (! empty($id))
 		{
 			$output = "##blob_title##::: Character history for " . $name . " :::##end##\n\n";

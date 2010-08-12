@@ -152,7 +152,7 @@ class PrivGroup extends BaseActiveModule
 		{
 			$msg = "##highlight##" . $who . "##end## is already in the bot!";
 		}
-		else if ($this->bot->core("chat")->get_uid($who))
+		else if ($this->bot->core('player')->id($who))
 		{
 			// We can simply invite, the access control has handled the rights
 			$this->bot->core("chat")->pgroup_invite($who);

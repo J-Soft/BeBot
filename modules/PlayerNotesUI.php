@@ -113,7 +113,7 @@ class PlayerNotes_UI extends BaseActiveModule
 	{ // Start function show_notes()
 		$source = ucfirst(strtolower($source));
 		$player = ucfirst(strtolower($player));
-		if (! $this->bot->core("chat")->get_uid($player))
+		if (! $this->bot->core('player')->id($player))
 		{
 			$this->error->set("Player '$player' is not a valid character");
 			return ($this->error);

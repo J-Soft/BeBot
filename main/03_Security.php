@@ -639,7 +639,7 @@ class Security_Core extends BaseActiveModule
 	{ // Start function add_group_member()
 		$target = ucfirst(strtolower($target));
 		$group = strtolower($group);
-		$uid = $this -> bot -> core("chat") -> get_uid($target);
+		$uid = $this->bot->core('player')->id($target);
 		if (!$uid)
 		{
 			$this->error->set($target." is not a valid character.");
@@ -680,7 +680,7 @@ class Security_Core extends BaseActiveModule
 	{ // Start function rem_group_member()
 		$target = ucfirst(strtolower($target));
 		$group = strtolower($group);
-		$uid = $this -> bot -> core("chat") -> get_uid($target);
+		$uid = $this->bot->core('player')->id($target);
 		if (!$uid)
 		{
 			$this->error->set($target." is not a valid character.");
@@ -729,7 +729,7 @@ class Security_Core extends BaseActiveModule
 		$admin = ucfirst(strtolower($admin));
 		$target = ucfirst(strtolower($target));
 		$level = strtoupper($level);
-		$uid = $this -> bot -> core("chat") -> get_uid($target);
+		$uid = $this->bot->core('player')->id($target);
 		// Check to see if user is banned.
 		if ($this -> is_banned($target))
 		{
@@ -819,7 +819,7 @@ class Security_Core extends BaseActiveModule
 		$admin = ucfirst(strtolower($admin));
 		$target = ucfirst(strtolower($target));
 
-		if (!$this -> bot -> core("chat") -> get_uid($target))
+		if (!$this->bot->core('player')->id(($target))
 		{
 			$this->error->set($target." is not a valid character!");
 			return $this->error;

@@ -243,7 +243,7 @@ class Logon extends BaseActiveModule
 
 	function set_msg($name, $message)
 	{
-		$id = $this->bot->core("chat")->get_uid($name);
+		$id = $this->bot->core('player')->id($name);
 		$message = mysql_real_escape_string($message);
 		$this->bot->db->query("REPLACE INTO #___logon (id, message) VALUES ('" . $id . "', '" . $message . "')");
 		return "Thank you " . $name . ". You logon message has been set.";

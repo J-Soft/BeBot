@@ -282,7 +282,7 @@ class Raid extends BaseActiveModule
 				{
 					$this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
 				}
-				$this->user[$name] = $this->bot->core("chat")->get_uid($name);
+				$this->user[$name] = $this->bot->core('player')->id($name);
 				$this->bot->db->query("UPDATE #___raid_points SET raiding = 1, raidingas = '" . $name . "' WHERE id = " . $this->points_to($name));
 				$this->bot->send_output("", "##highlight##$name##end## has Rejoined the raid.", "both");
 			}
@@ -497,7 +497,7 @@ class Raid extends BaseActiveModule
 				return "No raid in progress";
 			else if (isset($this->user[$player]))
 				return $player . " is already in the raid";
-			$uid = $this->bot->core("chat")->get_uid($player);
+			$uid = $this->bot->core('player')->id($player);
 			if (! $uid)
 				return "Player ##highlight##$player##end## does not exist.";
 			else
@@ -567,7 +567,7 @@ class Raid extends BaseActiveModule
 			//Update last_raid
 			$query = "UPDATE #___users SET last_raid = " . time() . " WHERE nickname = '$name'";
 			$this->bot->db->query($query);
-			$this->user[$name] = $this->bot->core("chat")->get_uid($name);
+			$this->user[$name] = $this->bot->core('player')->id($name);
 			$this->user2[$name] = "Joined";
 			$this->bot->send_output("", "##highlight##$name##end## has ##highlight##joined##end## the raid :: " . $this->clickjoin(), "both");
 			$this->bot->send_tell($name, "you have joined the Raid");

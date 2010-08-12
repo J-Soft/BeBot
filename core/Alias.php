@@ -127,7 +127,7 @@ class Alias extends BaseActiveModule
 
 	function add_alias($name, $alias)
 	{
-		if (! $this->bot->core("chat")->get_uid($name))
+		if (! $this->bot->core('player')->id($name))
 			return "##error##Character ##highlight##" . $name . "##end## does not exist.##end##";
 		if (strlen($alias) < 3)
 			return "##error##Alias ##highlight##" . $alias . "##end## is too Short. (min 3)##end##";

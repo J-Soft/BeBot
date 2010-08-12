@@ -366,7 +366,7 @@ class IRC extends BaseActiveModule
 					{
 						if ($this->last_log["on"][$name] < (time() - 5))
 						{
-							$id = $this->bot->core("chat")->get_uid($name);
+							$id = $this->bot->core('player')->id($name);
 							$who = $this->bot->core("whois")->lookup($name);
 							if ($who instanceof BotError)
 							{
@@ -795,7 +795,7 @@ class IRC extends BaseActiveModule
 		{
 			$info[1] = ucfirst(strtolower($info[1]));
 			$msg = "";
-			if (! $this->bot->core("chat")->get_uid($info[1]))
+			if (! $this->bot->core('player')->id($info[1]))
 				$msg = "Player " . $info[1] . " does not exist.";
 			else if ($info[1] == ucfirst(strtolower($this->bot->botname)))
 				$msg = "I'm online!";
@@ -834,7 +834,7 @@ class IRC extends BaseActiveModule
 		else
 		{
 			$info[1] = ucfirst(strtolower($info[1]));
-			$msg = $info[1] . ": " . $this->bot->core("chat")->get_uid($info[1]);
+			$msg = $info[1] . ": " . $this->bot->core('player')->id($info[1]);
 		}
 		if (! empty($msg))
 			$this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
@@ -955,7 +955,7 @@ class IRC extends BaseActiveModule
 		$this->target = $target;
 		preg_match("/^" . $this->bot->commpre . "whois (.+)$/i", $data->message, $info);
 		$info[1] = ucfirst(strtolower($info[1]));
-		if (! $this->bot->core("chat")->get_uid($info[1]))
+		if (! $this->bot->core('player')->id($info[1]))
 		{
 			$msg = "Player " . $info[1] . " does not exist.";
 		}

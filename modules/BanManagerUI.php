@@ -122,7 +122,7 @@ class BanManager extends BaseActiveModule
 
 	function add_ban($source, $user, $duration, $reason)
 	{
-		$id = $this->bot->core("chat")->get_uid($user);
+		$id = $this->bot->core('player')->id($user);
 		$user = ucfirst(strtolower($user));
 		if ($id == 0)
 		{
@@ -165,7 +165,7 @@ class BanManager extends BaseActiveModule
 
 	function del_ban($source, $user)
 	{
-		$id = $this->bot->core("chat")->get_uid($user);
+		$id = $this->bot->core('player')->id($user);
 		$user = ucfirst(strtolower($user));
 		if ($id == 0)
 		{

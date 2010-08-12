@@ -232,7 +232,7 @@ class Preferences_core extends BasePassiveModule
 	*/
 	function change($name, $module, $setting, $value)
 	{
-		$uid = $this->bot->core('chat')->get_uid($name);
+		$uid = $this->bot->core('player')->id($name);
 		$module = strtolower($module);
 		$setting = strtolower($setting);
 		//Get the value this setting already has.

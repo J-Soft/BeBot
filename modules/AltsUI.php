@@ -175,12 +175,12 @@ class Alts extends BaseActiveModule
 			return "##error##You cannot register yourself as your own alt.##end##";
 		}
 		//Check that $name is a valid character
-		if (! $this->bot->core("chat")->get_uid($name))
+		if (! $this->bot->core('player')->id($name))
 		{
 			return "##error##Character ##highlight##$name##end## does not exist.##end##";
 		}
 		//Check that the alt is a valid character
-		if (! $this->bot->core("chat")->get_uid($alt))
+		if (! $this->bot->core('player')->id($alt))
 		{
 			return "##error##Character ##highlight##$alt##end## does not exist.##end##";
 		}
