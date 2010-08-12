@@ -1209,7 +1209,7 @@ class AOChat
 				//$dispatcher->post($signal, 'onPlayerName');
 				//unset($signal);
 				
-				echo "Debug: Firing event core.on_player_id";
+				echo "Debug: Firing event core.on_player_id ($id, $name)\n";
 				
 				$event = new sfEvent($this, 'core.on_player_id', array('id' => $id, 'name' => $name));
 				$this->bot->dispatcher->notify($event);
