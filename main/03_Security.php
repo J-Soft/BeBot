@@ -819,7 +819,7 @@ class Security_Core extends BaseActiveModule
 		$admin = ucfirst(strtolower($admin));
 		$target = ucfirst(strtolower($target));
 
-		if (!$this->bot->core('player')->id(($target))
+		if (!$this->bot->core('player')->id($target))
 		{
 			$this->error->set($target." is not a valid character!");
 			return $this->error;
