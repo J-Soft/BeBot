@@ -144,6 +144,7 @@ class PrivGroup extends BaseActiveModule
 		if (! empty($who[1]))
 			$pmsg = " (" . $who[1] . ")";
 		$who = ucfirst(strtolower($who[0]));
+		$id = $this->bot->core('player')->id($who);
 		if ($this->bot->botname == $who)
 		{
 			$msg = "You cannot invite the bot to its own chat group";
@@ -152,7 +153,7 @@ class PrivGroup extends BaseActiveModule
 		{
 			$msg = "##highlight##" . $who . "##end## is already in the bot!";
 		}
-		else if (! $this->bot->core('player')->id($who) instanceof BotError)
+		else if (! ($id instanceof BotError) && ($id > 1))
 		{
 			// We can simply invite, the access control has handled the rights
 			$this->bot->core("chat")->pgroup_invite($who);
