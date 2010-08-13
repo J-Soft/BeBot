@@ -77,9 +77,14 @@ class AOChatWrapper_Core extends BasePassiveModule
 	{
 		$add = true;
 		if (is_numeric($user))
+		{
 			$uid = $user;
+		}
 		else
+		{
 			$uid = $this->bot->core('player')->id($user);
+		}
+		
 		if ($uid instanceof BotError)
 		{
 			return $uid;
@@ -89,9 +94,9 @@ class AOChatWrapper_Core extends BasePassiveModule
 			// FIXME
 			// Currently checking specifically for 4294967295 as userid to ensure we never ever send an add buddy
 			// packet to AoC as it will disconnect the player.
-			if ($uid == 4294967295)
+			if ($uid > 4294967294 && $uid < 4294967296)
 			{
-				$this -> bot -> log("BUDDY", "BUDDY-ADD", "Received add request for " . $this -> get_uname($uid) . "(" . $uid . ") This user is likely in the userlist and might need to be manually removed if this error persists.");
+				$this -> bot -> log("BUDDY", "BUDDY-ADD", "Received add request for " . $user . "(" . $uid . ") This user is likely in the userlist and might need to be manually removed if this error persists.");
 				return FALSE;
 			}
 			

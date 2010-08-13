@@ -1210,7 +1210,7 @@ class AOChat
 				//unset($signal);
 				
 				// We need to make sure we catch 4294967295
-				if ($id > 4294967294)
+				if ($id > 4294967294 && $id < 4294967296)
 				{
 					$id = -1;
 				}
