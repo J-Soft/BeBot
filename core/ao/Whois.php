@@ -508,7 +508,7 @@ class Whois_Core extends BasePassiveModule
 			$who["id"] = $this->bot->core("player")->id($who["nickname"]);
 		}
 		
-		if (!$who["id"] >= 1)
+		if ($who["id"] >= 1)
 		{
 			/*
 			Update our database cache
