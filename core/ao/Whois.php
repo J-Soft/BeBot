@@ -584,9 +584,9 @@ class Whois_Core extends BasePassiveModule
 			$whois_debug = $this->bot->db->select("SELECT updated FROM #___whois WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC);
 			$user_debug = $this->bot->db->select("SELECT id,notify,user_level,added_by,added_at,deleted_by,deleted_at,updated_at FROM #___users WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC);
 			$window .= "\n##red## Debug Information:##end##\n";
-			if (! empty($whois_debug[0]['updated']))
+			if (isset($whois_debug[0]) && ! empty($whois_debug[0]['updated']))
 				$window .= " ##normal##Whois Updated Time: ##highlight## " . gmdate($this->bot->core("settings")->get("time", "formatstring"), $whois_debug[0]['updated']) . "##end##\n";
-			if (! empty($user_debug[0]['id']))
+			if (isset($user_debug) && ! empty($user_debug[0]['id']))
 			{
 				if (! empty($user_debug[0]['added_by']))
 				{
