@@ -394,7 +394,7 @@ class IRC extends BaseActiveModule
 								$res .= ") logged on";
 							}
 							$main = $this->bot->core("alts")->main($name);
-							if ($main != $this->bot->core("chat")->get_uname($name))
+							if ($main != $this->bot->core('player')->name($name))
 							{
 								$alts = " :: Alt of " . $main;
 							}
