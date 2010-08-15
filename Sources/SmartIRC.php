@@ -2335,8 +2335,9 @@ class Net_SmartIRC_base
             if (isset($ircdata)) {
                 unset($ircdata);
             }
+			return TRUE;
         }
-
+		return FALSE;
     }
 
 

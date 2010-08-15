@@ -285,7 +285,7 @@ class IRC extends BaseActiveModule
 	*/
 	function cron()
 	{
-		if (($this->irc != null) && (! $this->irc->listenOnce()))
+		if (($this->irc != null) && (! $this->irc->_rawreceive()))
 		{
 			$this->irc_disconnect();
 			$this->bot->send_gc("IRC connection lost...");
