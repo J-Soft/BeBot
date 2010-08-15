@@ -1,14 +1,13 @@
 <?php
 /**
- * $Id: irccommands.php 241047 2007-08-10 15:10:30Z amir $
- * $Revision: 241047 $
- * $Author: amir $
-
- * $Date: 2007-08-11 00:40:30 +0930 (Sat, 11 Aug 2007) $
+ * Id: irccommands.php,v 1.1.2.1 2003/10/10 20:20:58 meebey Exp 
+ * Revision: 1.1.2.1 
+ * Author: meebey 
+ * Date: 2003/10/10 20:20:58 
  *
- * Copyright (c) 2002-2004 Mirco Bauer <meebey@meebey.net> <http://www.meebey.net>
+ * Copyright (c) 2002-2003 Mirco "MEEBEY" Bauer <mail@meebey.net> <http://www.meebey.net>
  * 
- * Full LGPL License: <http://www.gnu.org/licenses/lgpl.txt>
+ * Full LGPL License: <http://www.meebey.net/lgpl.txt>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,9 +23,9 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
 class Net_SmartIRC_irccommands extends Net_SmartIRC_base
 {
-
     /**
      * sends a new message
      *
@@ -35,50 +34,34 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @see DOCUMENTATION
      * @param integer $type specifies the type, like QUERY/ACTION or CTCP see 'Message Types'
      * @param string $destination can be a user or channel
-     * @param mixed $message the message
+     * @param string $message the message
      * @return boolean
      * @access public
      */
-    function message($type, $destination, $messagearray, $priority = SMARTIRC_MEDIUM)
-
-
+    function message($type, $destination, $message, $priority = SMARTIRC_MEDIUM)
     {
-        if (!is_array($messagearray)) {
-            $messagearray = array($messagearray);
-        }
-        
         switch ($type) {
             case SMARTIRC_TYPE_CHANNEL:
             case SMARTIRC_TYPE_QUERY:
-                foreach ($messagearray as $message) {
-                    $this->_send('PRIVMSG '.$destination.' :'.$message, $priority);
-                }
+                $this->_send('PRIVMSG '.$destination.' :'.$message, $priority);
             break;
             case SMARTIRC_TYPE_ACTION:
-                foreach ($messagearray as $message) {
-                    $this->_send('PRIVMSG '.$destination.' :'.chr(1).'ACTION '.$message.chr(1), $priority);
-                }
+                $this->_send('PRIVMSG '.$destination.' :'.chr(1).'ACTION '.$message.chr(1), $priority);
             break;
             case SMARTIRC_TYPE_NOTICE:
-                foreach ($messagearray as $message) {
-                    $this->_send('NOTICE '.$destination.' :'.$message, $priority);
-                }
+                $this->_send('NOTICE '.$destination.' :'.$message, $priority);
             break;
             case SMARTIRC_TYPE_CTCP: // backwards compatibilty
             case SMARTIRC_TYPE_CTCP_REPLY:
-                foreach ($messagearray as $message) {
-                    $this->_send('NOTICE '.$destination.' :'.chr(1).$message.chr(1), $priority);
-                }
+                $this->_send('NOTICE '.$destination.' :'.chr(1).$message.chr(1), $priority);
             break;
             case SMARTIRC_TYPE_CTCP_REQUEST:
-                foreach ($messagearray as $message) {
-                    $this->_send('PRIVMSG '.$destination.' :'.chr(1).$message.chr(1), $priority);
-                }
+                $this->_send('PRIVMSG '.$destination.' :'.chr(1).$message.chr(1), $priority);
             break;
             default:
                 return false;
         }
-        
+            
         return true;
     }
     
@@ -93,13 +76,8 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      */
     function &channel($channelname)
     {
-
-
         if (isset($this->_channels[strtolower($channelname)])) {
             return $this->_channels[strtolower($channelname)];
-
-
-
         } else {
             return false;
         }
@@ -117,21 +95,14 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      */
     function join($channelarray, $key = null, $priority = SMARTIRC_MEDIUM)
     {
-
-
         if (!is_array($channelarray)) {
             $channelarray = array($channelarray);
         }
         
         $channellist = implode(',', $channelarray);
-
-
         
         if ($key !== null) {
             $this->_send('JOIN '.$channellist.' '.$key, $priority);
-
-
-
         } else {
             $this->_send('JOIN '.$channellist, $priority);
         }
@@ -148,21 +119,14 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      */
     function part($channelarray, $reason = null, $priority = SMARTIRC_MEDIUM)
     {
-
-
         if (!is_array($channelarray)) {
             $channelarray = array($channelarray);
         }
         
         $channellist = implode(',', $channelarray);
-
-
         
         if ($reason !== null) {
             $this->_send('PART '.$channellist.' :'.$reason, $priority);
-
-
-
         } else {
             $this->_send('PART '.$channellist, $priority);
         }
@@ -180,21 +144,14 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      */
     function kick($channel, $nicknamearray, $reason = null, $priority = SMARTIRC_MEDIUM)
     {
-
-
         if (!is_array($nicknamearray)) {
             $nicknamearray = array($nicknamearray);
         }
         
         $nicknamelist = implode(',', $nicknamearray);
-
-
         
         if ($reason !== null) {
             $this->_send('KICK '.$channel.' '.$nicknamelist.' :'.$reason, $priority);
-
-
-
         } else {
             $this->_send('KICK '.$channel.' '.$nicknamelist, $priority);
         }
@@ -213,19 +170,13 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      */
     function getList($channelarray = null, $priority = SMARTIRC_MEDIUM)
     {
-
-
         if ($channelarray !== null) {
             if (!is_array($channelarray)) {
-
                 $channelarray = array($channelarray);
             }
             
             $channellist = implode(',', $channelarray);
             $this->_send('LIST '.$channellist, $priority);
-
-
-
         } else {
             $this->_send('LIST', $priority);
         }
@@ -243,19 +194,13 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      */
     function names($channelarray = null, $priority = SMARTIRC_MEDIUM)
     {
-
-
         if ($channelarray !== null) {
             if (!is_array($channelarray)) {
-
                 $channelarray = array($channelarray);
             }
             
             $channellist = implode(',', $channelarray);
             $this->_send('NAMES '.$channellist, $priority);
-
-
-
         } else {
             $this->_send('NAMES', $priority);
         }
@@ -301,13 +246,8 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      */
     function mode($target, $newmode = null, $priority = SMARTIRC_MEDIUM)
     {
-
-
         if ($newmode !== null) {
             $this->_send('MODE '.$target.' '.$newmode, $priority);
-
-
-
         } else {
             $this->_send('MODE '.$target, $priority);
         }
@@ -382,13 +322,8 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      */
     function ban($channel, $hostmask = null, $priority = SMARTIRC_MEDIUM)
     {
-
-
         if ($hostmask !== null) {
             $this->mode($channel, '+b '.$hostmask, $priority);
-
-
-
         } else {
             $this->mode($channel, 'b', $priority);
         }
@@ -482,24 +417,17 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * sends QUIT to IRC server and disconnects
      *
      * @param string $quitmessage optional quitmessage
-     * @param integer $priority message priority, default is SMARTIRC_CRITICAL
+     * @param integer $priority message priority, default is SMARTIRC_MEDIUM
      * @return void
      * @access public
      */
-    function quit($quitmessage = null, $priority = SMARTIRC_CRITICAL)
-
-
+    function quit($quitmessage = null, $priority = SMARTIRC_MEDIUM)
     {
         if ($quitmessage !== null) {
             $this->_send('QUIT :'.$quitmessage, $priority);
-
-
-
         } else {
             $this->_send('QUIT', $priority);
         }
-
-        $this->disconnect(true);
     }
 }
 ?>

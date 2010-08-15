@@ -1,9 +1,9 @@
 <?php
 /**
- * $Id: SmartIRC.php 253473 2008-02-21 18:58:34Z amir $
- * $Revision: 253473 $
- * $Author: amir $
- * $Date: 2008-02-22 05:28:34 +1030 (Fri, 22 Feb 2008) $
+ * Id: SmartIRC.php,v 1.54.2.14 2005/05/27 23:40:09 meebey Exp 
+ * Revision: 1.54.2.14 
+ * Author: meebey 
+ * Date: 2005/05/27 23:40:09 
  *
  * Net_SmartIRC
  * This is a PHP class for communication with IRC networks,
@@ -19,11 +19,11 @@
  * or get it through PEAR since SmartIRC is an official PEAR package.
  * See <http://pear.php.net/Net_SmartIRC>.
  *
- * Official Project Homepage: <http://sf.net/projects/phpsmartirc>
+ * Official Projet Homepage: <http://sf.net/projects/phpsmartirc>
  *
  * Net_SmartIRC conforms to RFC 2812 (Internet Relay Chat: Client Protocol)
  * 
- * Copyright (c) 2002-2005 Mirco Bauer <meebey@meebey.net> <http://www.meebey.net>
+ * Copyright (c) 2002-2003 Mirco 'meebey' Bauer <meebey@meebey.net> <http://www.meebey.net>
  * 
  * Full LGPL License: <http://www.gnu.org/licenses/lgpl.txt>
  * 
@@ -43,14 +43,17 @@
  *
  */
 // ------- PHP code ----------
-include_once ('SmartIRC/defines.php');
-define('SMARTIRC_VERSION', '1.1.0-dev ($Revision: 253473 $)');
-define('SMARTIRC_VERSIONSTRING', 'Net_SmartIRC ' . SMARTIRC_VERSION);
+include_once('IRC/defines.php');
+include_once('IRC/irccommands.php');
+include_once('IRC/messagehandler.php');
+define('SMARTIRC_VERSION', '1.0.0 ($Revision: 723 $)');
+define('SMARTIRC_VERSIONSTRING', 'Net_SmartIRC '.SMARTIRC_VERSION);
+
 /**
  * main SmartIRC class
  *
  * @package Net_SmartIRC
- * @version 0.6.0-dev
+ * @version 0.5.5
  * @author Mirco 'meebey' Bauer <mail@meebey.net>
  * @access public
  */
@@ -237,34 +240,6 @@ class Net_SmartIRC_base
     var $_channelsyncing = false;
     
     /**
-     * @var array
-     * @access private
-     */
-    var $_users = array();
-    
-    /**
-     * @var boolean
-     * @access private
-     */
-    var $_usersyncing = false;
-    
-    /**
-     * Stores the path to the modules that can be loaded.
-     *
-     * @var string
-     * @access privat
-     */
-    var $_modulepath = '';
-    
-    /**
-     * Stores all objects of the modules.
-     *
-     * @var string
-     * @access privat
-     */
-    var $_modules = array();
-    
-    /**
      * @var string
      * @access private
      */
@@ -319,42 +294,11 @@ class Net_SmartIRC_base
     var $_autoreconnect = false;
     
     /**
-     * @var integer
-     * @access private
-     */
-    var $_reconnectdelay = 10000;
-
-    /**
      * @var boolean
      * @access private
      */
     var $_autoretry = false;
-
-    /**
-     * @var integer
-     * @access private
-     */
-    var $_autoretrymax = 5;
-
-    /**
-     * @var integer
-     * @access private
-     */
-    var $_autoretrycount = 0;
     
-    /**
-     * @var boolean
-     * @access private
-     */
-    var $_connectionerror = false;
-
-    /**
-     * @var boolean
-     * @access  private
-     */
-    var $_runasdaemon = false;
-    
-
     /**
      * All IRC replycodes, the index is the replycode name.
      *
@@ -387,18 +331,6 @@ class Net_SmartIRC_base
     var $channel;
     
     /**
-     * Stores all users that had/have contact with us (channel/query/notice etc.), works only if usersyncing is activated.
-     * Eg. for accessing a user, use it like this: (in this example the SmartIRC object is stored in $irc)
-     * $irc->user['meebey']->host;
-     *
-     * @see setUserSyncing()
-     * @see Net_SmartIRC_ircuser
-     * @var array
-     * @access public
-     */
-    var $user;
-    
-    /**
      * Constructor. Initiales the messagebuffer and "links" the replycodes from
      * global into properties. Also some PHP runtime settings are configured.
      *
@@ -412,21 +344,18 @@ class Net_SmartIRC_base
         
         ob_implicit_flush(true);
         @set_time_limit(0);
-
+        ignore_user_abort(true);
         $this->_messagebuffer[SMARTIRC_CRITICAL] = array();
         $this->_messagebuffer[SMARTIRC_HIGH] = array();
         $this->_messagebuffer[SMARTIRC_MEDIUM] = array();
         $this->_messagebuffer[SMARTIRC_LOW] = array();
-        
         $this->replycodes = &$GLOBALS['SMARTIRC_replycodes'];
         $this->nreplycodes = &$GLOBALS['SMARTIRC_nreplycodes'];
         
-        // hack till PHP allows (PHP5) $object->somemethod($param)->memberofobject
+        // hack till PHP allows (PHP5) $object->method($param)->$object
         $this->channel = &$this->_channels;
         // another hack
         $this->user = &$this->_users;
-
-
         
         if (isset($_SERVER['REQUEST_METHOD'])) {
             // the script is called from a browser, lets set default log destination
@@ -448,47 +377,28 @@ class Net_SmartIRC_base
      */
     function setUseSockets($boolean)
     {
-
-
-
-
         if ($boolean === true) {
             if (@extension_loaded('sockets')) {
                 $this->_usesockets = true;
-
-
-
             } else {
                 $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: socket extension not loaded, trying to load it...', __FILE__, __LINE__);
-
-
                 
                 if (strtoupper(substr(PHP_OS, 0,3) == 'WIN')) {
                     $load_status = @dl('php_sockets.dll');
-
-
-
                 } else {
                     $load_status = @dl('sockets.so');
                 }
-
-
  
                 if ($load_status) {
                     $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: socket extension succesfully loaded', __FILE__, __LINE__);
                     $this->_usesockets = true;
-
-
-
                 } else {
                     $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: couldn\'t load the socket extension', __FILE__, __LINE__);
                     $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: your PHP build doesn\'t support real sockets, will use fsocks instead', __FILE__, __LINE__);
                     $this->_usesockets = false;
                 }
             }
-
         } else {
-
             $this->_usesockets = false;
         }
     }
@@ -534,13 +444,8 @@ class Net_SmartIRC_base
      */
     function setBenchmark($boolean)
     {
-
-
         if (is_bool($boolean)) {
             $this->_benchmark = $boolean;
-
-
-
         } else {
             $this->_benchmark = false;
         }
@@ -572,50 +477,16 @@ class Net_SmartIRC_base
      */
     function setChannelSyncing($boolean)
     {
-
-
         if (is_bool($boolean)) {
             $this->_channelsyncing = $boolean;
-
-
-
         } else {
             $this->_channelsyncing = false;
         }
-
-
         
         if ($this->_channelsyncing == true) {
             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: Channel syncing enabled', __FILE__, __LINE__);
         } else {
             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: Channel syncing disabled', __FILE__, __LINE__);
-        }
-
-    }
-
-    /**
-     * Enables/disables user syncing.
-     *
-     * User syncing means, all users we have or had contact with through channel, query or
-     * notice are tracked in the $irc->user array. This is very handy for botcoding.
-     *
-     * @param boolean $boolean
-     * @return void
-     * @access public
-     */
-    function setUserSyncing($boolean)
-    {
-
-        if (is_bool($boolean)) {
-            $this->_usersyncing = $boolean;
-        } else {
-            $this->_usersyncing = false;
-        }
-        
-        if ($this->_usersyncing == true) {
-            $this->log(SMARTIRC_DEBUG_USERSYNCING, 'DEBUG_USERSYNCING: User syncing enabled', __FILE__, __LINE__);
-        } else {
-            $this->log(SMARTIRC_DEBUG_USERSYNCING, 'DEBUG_USERSYNCING: User syncing disabled', __FILE__, __LINE__);
         }
     }
     
@@ -648,15 +519,12 @@ class Net_SmartIRC_base
      */
     function setLogdestination($type)
     {
-
-
-
         switch ($type) {
-            case SMARTIRC_FILE:
-            case SMARTIRC_STDOUT:
-            case SMARTIRC_SYSLOG:
-            case SMARTIRC_BROWSEROUT:
-            case SMARTIRC_NONE:
+            case (SMARTIRC_FILE ||
+                  SMARTIRC_STDOUT ||
+                  SMARTIRC_SYSLOG ||
+                  SMARTIRC_BROWSEROUT ||
+                  SMARTIRC_NONE):
                 $this->_logdestination = $type;
             break;
             default:
@@ -689,34 +557,13 @@ class Net_SmartIRC_base
      */
     function setDisconnecttime($milliseconds)
     {
-
-
         if (is_integer($milliseconds) && $milliseconds >= 100) {
             $this->_disconnecttime = $milliseconds;
         } else {
             $this->_disconnecttime = 100;
         }
-
     }
     
-    /**
-     * Sets the delaytime before attempting reconnect.
-     * Value of 0 disables the delay entirely.
-     *
-     * @param integer $milliseconds
-     * @return void
-     * @access public
-     */
-    function setReconnectdelay($milliseconds)
-    {
-
-        if (is_integer($milliseconds)) {
-            $this->_reconnectdelay = $milliseconds;
-        } else {
-            $this->_reconnectdelay = 10000;
-        }
-    }
-
     /**
      * Sets the delay for receiving data from the IRC server.
      *
@@ -730,13 +577,8 @@ class Net_SmartIRC_base
      */
     function setReceivedelay($milliseconds)
     {
-
-
         if (is_integer($milliseconds) && $milliseconds >= 100) {
             $this->_receivedelay = $milliseconds;
-
-
-
         } else {
             $this->_receivedelay = 100;
         }
@@ -755,13 +597,8 @@ class Net_SmartIRC_base
      */
     function setSenddelay($milliseconds)
     {
-
-
         if (is_integer($milliseconds)) {
             $this->_senddelay = $milliseconds;
-
-
-
         } else {
             $this->_senddelay = 250;
         }
@@ -776,13 +613,8 @@ class Net_SmartIRC_base
      */
     function setAutoReconnect($boolean)
     {
-
-
         if (is_bool($boolean)) {
             $this->_autoreconnect = $boolean;
-
-
-
         } else {
             $this->_autoreconnect = false;
         }
@@ -797,34 +629,13 @@ class Net_SmartIRC_base
      */
     function setAutoRetry($boolean)
     {
-
-
         if (is_bool($boolean)) {
             $this->_autoretry = $boolean;
         } else {
             $this->_autoretry = false;
         }
-
     }
-
-    /**
-     * Sets the maximum number of attempts to connect to a server
-     * before giving up.
-     *
-     * @param integer $autoretrymax
-     * @return void
-     * @access public
-     */
-    function setAutoRetryMax($autoretrymax)
-    {
-
-        if (is_integer($autoretrymax)) {
-            $this->_autoretrymax = $autoretrymax;
-        } else {
-            $this->_autoretrymax = 5;
-        }
-    }
-
+    
     /**
      * Sets the receive timeout.
      *
@@ -837,13 +648,8 @@ class Net_SmartIRC_base
      */
     function setReceiveTimeout($seconds)
     {
-
-
         if (is_integer($seconds)) {
             $this->_rxtimeout = $seconds;
-
-
-
         } else {
             $this->_rxtimeout = 300;
         }
@@ -861,44 +667,10 @@ class Net_SmartIRC_base
      */
     function setTransmitTimeout($seconds)
     {
-
-
         if (is_integer($seconds)) {
             $this->_txtimeout = $seconds;
         } else {
             $this->_txtimeout = 300;
-        }
-
-    }
-    
-    /**
-     * Sets the paths for the modules.
-     *
-     * @param integer $path
-     * @return void
-     * @access public
-     */
-    function setModulepath($path)
-    {
-
-        $this->_modulepath = $path;
-    }
-
-    /**
-     * Sets wheter the script should be run as a daemon or not
-     * ( actually disables/enables ignore_user_abort() )
-     *
-     * @param boolean $boolean
-     * @return void
-     * @access public
-     */
-    function setRunAsDaemon($boolean)
-    {
-        if ($boolean === true) {
-            $this->_runasdaemon = true;
-            ingore_user_abort(true);
-        } else {
-            $this->_runasdaemon = false;
         }
     }
     
@@ -924,8 +696,6 @@ class Net_SmartIRC_base
     {
         $this->_benchmark_stoptime = $this->_microint();
         $this->log(SMARTIRC_DEBUG_NOTICE, 'benchmark stopped', __FILE__, __LINE__);
-
-
         
         if ($this->_benchmark) {
             $this->showBenchmark();
@@ -973,39 +743,28 @@ class Net_SmartIRC_base
         // prechecks
         if (!(is_integer($level)) ||
             !($level & SMARTIRC_DEBUG_ALL)) {
-
             $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: invalid log level passed to log() ('.$level.')', __FILE__, __LINE__);
             return;
         }
         
         if (!($level & $this->_debug) ||
              ($this->_logdestination == SMARTIRC_NONE)) {
-
             return;
         }
-
-
         
         if (substr($entry, -1) != "\n") {
             $entry .= "\n";
         }
-
-
         
         if ($file !== null &&
             $line !== null) {
             $file = basename($file);
             $entry = $file.'('.$line.') '.$entry;
-
-
-
         } else {
             $entry = 'unknown(0) '.$entry;
         }
         
         $formatedentry = date('M d H:i:s ').$entry;
-
-
         switch ($this->_logdestination) {
             case SMARTIRC_STDOUT:
                 echo $formatedentry;
@@ -1015,28 +774,19 @@ class Net_SmartIRC_base
                 echo '<pre>'.htmlentities($formatedentry).'</pre>';
             break;
             case SMARTIRC_FILE:
-
-
-
-
                 if (!is_resource($this->_logfilefp)) {
                     if ($this->_logfilefp === null) {
                         // we reconncted and don't want to destroy the old log entries
-                        $this->_logfilefp = fopen($this->_logfile,'a');
-
-
-
+                        $this->_logfilefp = @fopen($this->_logfile,'a');
                     } else {
-                        $this->_logfilefp = fopen($this->_logfile,'w');
+                        $this->_logfilefp = @fopen($this->_logfile,'w');
                     }
                 }
-                fwrite($this->_logfilefp, $formatedentry);
+                @fwrite($this->_logfilefp, $formatedentry);
                 fflush($this->_logfilefp);
             break;
             case SMARTIRC_SYSLOG:
                 define_syslog_variables();
-
-
                 if (!is_int($this->_logfilefp)) {
                     $this->_logfilefp = openlog('Net_SmartIRC', LOG_NDELAY, LOG_DAEMON);
                 }
@@ -1068,54 +818,11 @@ class Net_SmartIRC_base
     }
     
     /**
-     * Returns a reference to the channel object of the specified channelname.
-     *
-     * @param string $channelname
-     * @return object
-     * @access public
-     */
-    function &getChannel($channelname)
-    {
-        if ($this->_channelsyncing != true) {
-            $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: getChannel() is called and the required Channel Syncing is not activated!', __FILE__, __LINE__);
-            return false;
-        }
-        
-        if ($this->isJoined($channelname)) {
-            return $this->_channels[strtolower($channelname)];
-        } else {
-            return false;
-        }
-    }
-    
-    /**
-     * Returns a reference to the user object for the specified username and channelname.
-     *
-     * @param string $channelname
-     * @param string $username
-     * @return object
-     * @access public
-     */
-    function &getUser($channelname, $username)
-    {
-        if ($this->_channelsyncing != true) {
-            $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: getUser() is called and the required Channel Syncing is not activated!', __FILE__, __LINE__);
-            return false;
-        }
-        
-        if ($this->isJoined($channelname, $username)) {
-            return $this->_channels[strtolower($channelname)]->users[strtolower($username)];
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Creates the sockets and connects to the IRC server on the given port.
      *
      * @param string $address 
      * @param integer $port
-     * @return boolean
+     * @return void
      * @access public
      */
     function connect($address, $port)
@@ -1123,61 +830,38 @@ class Net_SmartIRC_base
         $this->log(SMARTIRC_DEBUG_CONNECTION, 'DEBUG_CONNECTION: connecting', __FILE__, __LINE__);
         $this->_address = $address;
         $this->_port = $port;
-
-
         
         if ($this->_usesockets == true) {
             $this->log(SMARTIRC_DEBUG_SOCKET, 'DEBUG_SOCKET: using real sockets', __FILE__, __LINE__);
             $this->_socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-            $result = socket_connect($this->_socket, $this->_address, $this->_port);
-
-
-
+            $result = @socket_connect($this->_socket, $this->_address, $this->_port);
         } else {
             $this->log(SMARTIRC_DEBUG_SOCKET, 'DEBUG_SOCKET: using fsockets', __FILE__, __LINE__);
-            $result = fsockopen($this->_address, $this->_port, $errno, $errstr);
+            $result = @fsockopen($this->_address, $this->_port, $errno, $errstr);
         }
-
-
-
-
         
         if ($result === false) {
             if ($this->_usesockets == true) {
                 $error = socket_strerror(socket_last_error($this->_socket));
-
-
-
             } else {
                 $error = $errstr.' ('.$errno.')';
             }
             
             $error_msg = 'couldn\'t connect to "'.$address.'" reason: "'.$error.'"';
             $this->log(SMARTIRC_DEBUG_NOTICE, 'DEBUG_NOTICE: '.$error_msg, __FILE__, __LINE__);
-            // TODO! needs to be return value
+            // TODO! muss return wert sein
             $this->throwError($error_msg);
-
-
             
-            if (($this->_autoretry == true) &&
-
-                ($this->_autoretrycount < $this->_autoretrymax)) {
-                 $this->_delayReconnect();
-                 $this->_autoretrycount++;
-                 $this->reconnect();
-
-            } else {
-
-
-                return false;
-            }
+            // doesn't work somehow.... I only want to retry 4 times! no endless loop (causes segfault)
+            static $tries = 0;
+            if ($this->_autoretry == true && $tries < 5) {
+                $this->reconnect();
+                $tries++;
+            }// else {
+              //  die(); Dont die as this kills bot!
+            //}
         } else {
-
             $this->log(SMARTIRC_DEBUG_CONNECTION, 'DEBUG_CONNECTION: connected', __FILE__, __LINE__);
-
-
-            $this->_autoretrycount = 0;
-            $this->_connectionerror = false;
             
             if ($this->_usesockets != true) {
                 $this->_socket = $result;
@@ -1190,14 +874,11 @@ class Net_SmartIRC_base
         $this->_lasttx = $this->_lastrx;
         $this->_updatestate();
         
-        return $result !== false;
-
-
-
-
-
-
-
+        if ($result !== false) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
     /**
@@ -1214,37 +895,24 @@ class Net_SmartIRC_base
      */
     function disconnect($quickdisconnect = false)
     {
-
-
         if ($this->_state() == SMARTIRC_STATE_CONNECTED) {
             if ($quickdisconnect == false) {
-
                 $this->_send('QUIT', SMARTIRC_CRITICAL);
                 usleep($this->_disconnecttime*1000);
             }
-
-
             
             if ($this->_usesockets == true) {
                 @socket_shutdown($this->_socket);
                 @socket_close($this->_socket);
-
-
-
             } else {
                 fclose($this->_socket);
             }
             
             $this->_updatestate();
             $this->log(SMARTIRC_DEBUG_CONNECTION, 'DEBUG_CONNECTION: disconnected', __FILE__, __LINE__);
-
-
-
         } else {
             return false;
         }
-
-
         
         if ($this->_channelsyncing == true) {
             // let's clean our channel array
@@ -1252,19 +920,9 @@ class Net_SmartIRC_base
             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: cleaned channel array', __FILE__, __LINE__);
         }
         
-        if ($this->_usersyncing == true) {
-            // let's clean our user array
-            $this->_users = array();
-            $this->log(SMARTIRC_DEBUG_USERSYNCING, 'DEBUG_USERSYNCING: cleaned user array', __FILE__, __LINE__);
-        }
-        
         if ($this->_logdestination == SMARTIRC_FILE) {
-
             fclose($this->_logfilefp);
             $this->_logfilefp = null;
-
-
-
         } else if ($this->_logdestination == SMARTIRC_SYSLOG) {
             closelog();
         }
@@ -1285,16 +943,9 @@ class Net_SmartIRC_base
         
         // remember in which channels we are joined
         $channels = array();
-
-
-
-
         foreach ($this->_channels as $value) {
             if (empty($value->key)) {
                 $channels[] = array('name' => $value->name);
-
-
-
             } else {
                 $channels[] = array('name' => $value->name, 'key' => $value->key);
             }
@@ -1305,16 +956,9 @@ class Net_SmartIRC_base
         $this->login($this->_nick, $this->_realname, $this->_usermode, $this->_username, $this->_password);
         
         // rejoin the channels
-
-
-
-
         foreach ($channels as $value) {
             if (isset($value['key'])) {
                 $this->join($value['name'], $value['key']);
-
-
-
             } else {
                 $this->join($value['name']);
             }
@@ -1340,26 +984,17 @@ class Net_SmartIRC_base
         
         $this->_nick = str_replace(' ', '', $nick);
         $this->_realname = $realname;
-
-
         
         if ($username !== null) {
             $this->_username = str_replace(' ', '', $username);
-
-
-
         } else {
             $this->_username = str_replace(' ', '', exec('whoami'));
         }
-
-
         
         if ($password !== null) {
             $this->_password = $password;
             $this->_send('PASS '.$this->_password, SMARTIRC_CRITICAL);
         }
-
-
         
         if (!is_numeric($usermode)) {
             $this->log(SMARTIRC_DEBUG_NOTICE, 'DEBUG_NOTICE: login() usermode ('.$usermode.') is not valid, will use 0 instead', __FILE__, __LINE__);
@@ -1373,22 +1008,6 @@ class Net_SmartIRC_base
     // </IRC methods>
     
     /**
-     * checks if the passed nickname is our own nickname
-     *
-     * @param string $nickname
-     * @return boolean
-     * @access public
-     */
-    function isMe($nickname)
-    {
-        if ($nickname == $this->_nick) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    /**
      * checks if we or the given user is joined to the specified channel and returns the result
      * ChannelSyncing is required for this.
      *
@@ -1400,20 +1019,14 @@ class Net_SmartIRC_base
      */
     function isJoined($channel, $nickname = null)
     {
-
-
         if ($this->_channelsyncing != true) {
             $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: isJoined() is called and the required Channel Syncing is not activated!', __FILE__, __LINE__);
             return false;
         }
-
-
         
         if ($nickname === null) {
             $nickname = $this->_nick;
         }
-
-
         
         if (isset($this->_channels[strtolower($channel)]->users[strtolower($nickname)])) {
             return true;
@@ -1434,22 +1047,14 @@ class Net_SmartIRC_base
      */
     function isOpped($channel, $nickname = null)
     {
-
-
         if ($this->_channelsyncing != true) {
             $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: isOpped() is called and the required Channel Syncing is not activated!', __FILE__, __LINE__);
             return false;
         }
-
-
         
         if ($nickname === null) {
             $nickname = $this->_nick;
         }
-
-
-
-
         
         if ($this->isJoined($channel, $nickname)) {
             if ($this->_channels[strtolower($channel)]->users[strtolower($nickname)]->op) {
@@ -1472,22 +1077,14 @@ class Net_SmartIRC_base
      */
     function isVoiced($channel, $nickname = null)
     {
-
-
         if ($this->_channelsyncing != true) {
             $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: isVoiced() is called and the required Channel Syncing is not activated!', __FILE__, __LINE__);
             return false;
         }
-
-
         
         if ($nickname === null) {
             $nickname = $this->_nick;
         }
-
-
-
-
         
         if ($this->isJoined($channel, $nickname)) {
             if ($this->_channels[strtolower($channel)]->users[strtolower($nickname)]->voice) {
@@ -1510,19 +1107,13 @@ class Net_SmartIRC_base
      */
     function isBanned($channel, $hostmask)
     {
-
-
         if ($this->_channelsyncing != true) {
             $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: isBanned() is called and the required Channel Syncing is not activated!', __FILE__, __LINE__);
             return false;
         }
-
-
         
         if ($this->isJoined($channel)) {
             $result = array_search($hostmask, $this->_channels[strtolower($channel)]->bans);
-
-
             
             if ($result !== false) {
                 return true;
@@ -1531,7 +1122,7 @@ class Net_SmartIRC_base
         
         return false;
     }
-    
+
     /**
      * goes into receive mode
      *
@@ -1543,57 +1134,8 @@ class Net_SmartIRC_base
      */
     function listen()
     {
-
-
-
-
-        while ($this->_state() == SMARTIRC_STATE_CONNECTED) {
-            $this->listenOnce();
-        }
-
-
-            
-        return false;
-    }
-
-    
-    /**
-
-     * goes into receive mode _only_ for one pass
-     *
-
-
-
-     * Goes into receive mode. It will return when one pass is complete.
-     * Use this when you want to connect to multiple IRC servers.
-     *
-
-
-     * @return boolean
-     * @access public
-     */
-
-
-
-
-
-
-
-    function listenOnce()
-    {
-
         if ($this->_state() == SMARTIRC_STATE_CONNECTED) {
             $this->_rawreceive();
-            if ($this->_connectionerror) {
-                if ($this->_autoreconnect) {
-                    $this->log(SMARTIRC_DEBUG_CONNECTION, 'DEBUG_CONNECTION: connection error detected, will reconnect!', __FILE__, __LINE__);
-                    $this->reconnect();
-                } else {
-                    $this->log(SMARTIRC_DEBUG_CONNECTION, 'DEBUG_CONNECTION: connection error detected, will disconnect!', __FILE__, __LINE__);
-                    $this->disconnect();
-                }
-
-            }
             return true;
         } else {
             return false;
@@ -1606,30 +1148,50 @@ class Net_SmartIRC_base
      * Creates a special actionhandler for that given TYPE and returns the answer.
      * This will only receive the requested type, immediately quit and disconnect from the IRC server.
      * Made for showing IRC statistics on your homepage, or other IRC related information.
-
      *
      * @param integer $messagetype see in the documentation 'Message Types'
      * @return array answer from the IRC server for this $messagetype
      * @access public
      */
-
     function listenFor($messagetype)
     {
-        $listenfor = new Net_SmartIRC_listenfor();
-
+        $listenfor = &new Net_SmartIRC_listenfor();
         $this->registerActionhandler($messagetype, '.*', $listenfor, 'handler');
         $this->listen();
-
         $result = $listenfor->result;
         
         if (isset($listenfor)) {
-
-
             unset($listenfor);
         }
         
         return $result;
     }
+    
+    /**
+     * waits for a special message type and puts the answer in $result
+     *
+     * Creates a special actionhandler for that given TYPE and returns the answer.
+     * This will only receive the requested type, immediately quit and disconnect from the IRC server.
+     * Made for showing IRC statistics on your homepage, or other IRC related information.
+     * This special version of listenFor() stores the whole ircdata object, not just the message!
+     *
+     * @param integer $messagetype see in the documentation 'Message Types'
+     * @return array answer from the IRC server for this $messagetype
+     * @access public
+     */
+    function objListenFor($messagetype)
+    {
+        $objlistenfor = &new Net_SmartIRC_objListenFor();
+        $this->registerActionhandler($messagetype, '.*', $objlistenfor, 'handler');
+        $this->listen();
+        $result = $objlistenfor->result;
+        
+        if (isset($objlistenfor)) {
+            unset($objlistenfor);
+        }
+        
+        return $result;
+    }    
     
     /**
      * registers a new actionhandler and returns the assigned id
@@ -1649,13 +1211,12 @@ class Net_SmartIRC_base
     {
         // precheck
         if (!$this->_isValidType($handlertype)) {
-
             $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: passed invalid handlertype to registerActionhandler()', __FILE__, __LINE__);
             return false;
         }
         
         $id = $this->_actionhandlerid++;
-        $newactionhandler = new Net_SmartIRC_actionhandler();
+        $newactionhandler = &new Net_SmartIRC_actionhandler();
         
         $newactionhandler->id = $id;
         $newactionhandler->type = $handlertype;
@@ -1682,28 +1243,21 @@ class Net_SmartIRC_base
     {
         // precheck
         if (!$this->_isValidType($handlertype)) {
-
             $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: passed invalid handlertype to unregisterActionhandler()', __FILE__, __LINE__);
             return false;
         }
         
         $handler = &$this->_actionhandler;
         $handlercount = count($handler);
-
-
         
         for ($i = 0; $i < $handlercount; $i++) {
             $handlerobject = &$handler[$i];
-
-
                         
             if ($handlerobject->type == $handlertype &&
                 $handlerobject->message == $regexhandler &&
                 $handlerobject->method == $methodname) {
                 
                 $id = $handlerobject->id;
-
-
                 
                 if (isset($this->_actionhandler[$i])) {
                     unset($this->_actionhandler[$i]);
@@ -1730,14 +1284,8 @@ class Net_SmartIRC_base
     {
         $handler = &$this->_actionhandler;
         $handlercount = count($handler);
-
-
         for ($i = 0; $i < $handlercount; $i++) {
             $handlerobject = &$handler[$i];
-
-
-
-
                         
             if ($handlerobject->id == $id) {
                 if (isset($this->_actionhandler[$i])) {
@@ -1770,7 +1318,7 @@ class Net_SmartIRC_base
     function registerTimehandler($interval, &$object, $methodname)
     {
         $id = $this->_timehandlerid++;
-        $newtimehandler = new Net_SmartIRC_timehandler();
+        $newtimehandler = &new Net_SmartIRC_timehandler();
         
         $newtimehandler->id = $id;
         $newtimehandler->interval = $interval;
@@ -1780,8 +1328,6 @@ class Net_SmartIRC_base
         
         $this->_timehandler[] = &$newtimehandler;
         $this->log(SMARTIRC_DEBUG_TIMEHANDLER, 'DEBUG_TIMEHANDLER: timehandler('.$id.') registered', __FILE__, __LINE__);
-
-
         
         if (($interval < $this->_mintimer) || ($this->_mintimer == false)) {
             $this->_mintimer = $interval;
@@ -1802,14 +1348,8 @@ class Net_SmartIRC_base
     {
         $handler = &$this->_timehandler;
         $handlercount = count($handler);
-
-
         for ($i = 0; $i < $handlercount; $i++) {
             $handlerobject = &$handler[$i];
-
-
-
-
             
             if ($handlerobject->id == $id) {
                 if (isset($this->_timehandler[$i])) {
@@ -1824,97 +1364,6 @@ class Net_SmartIRC_base
         }
         
         $this->log(SMARTIRC_DEBUG_TIMEHANDLER, 'DEBUG_TIMEHANDLER: could not find timehandler id: '.$id.' _not_ unregistered', __FILE__, __LINE__);
-        return false;
-    }
-    
-    function loadModule($name)
-    {
-        // is the module already loaded?
-        if (in_array($name, $this->_modules)) {
-            $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING! module with the name "'.$name.'" already loaded!', __FILE__, __LINE__);
-            return false;
-        }
-        
-        $filename = $this->_modulepath.'/'.$name.'.php';
-        if (!file_exists($filename)) {
-            $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: couldn\'t load module "'.$filename.'" file doesn\'t exist', __FILE__, __LINE__);
-            return false;
-        }
-        
-        $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: loading module: "'.$name.'"...', __FILE__, __LINE__);
-        // pray that there is no parse error, it will kill us!
-        include_once($filename);
-        $classname = 'Net_SmartIRC_module_'.$name;
-        
-        if (!class_exists($classname)) {
-            $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: class '.$classname.' not found in '.$filename, __FILE__, __LINE__);
-            return false;
-        }
-        
-        $methods = get_class_methods($classname);
-        if (!in_array('module_init', $methods)) {
-            $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: required method'.$classname.'::module_init not found, aborting...', __FILE__, __LINE__);
-            return false;
-        }
-        
-        if (!in_array('module_exit', $methods)) {
-            $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: required method'.$classname.'::module_exit not found, aborting...', __FILE__, __LINE__);
-            return false;
-        }
-        
-        $vars = array_keys(get_class_vars($classname));
-        if (!in_array('name', $vars)) {
-            $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: required variable '.$classname.'::name not found, aborting...', __FILE__, __LINE__);
-            return false;
-        }
-        
-        if (!in_array('description', $vars)) {
-            $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: required variable '.$classname.'::description not found, aborting...', __FILE__, __LINE__);
-            return false;
-        }
-        
-        if (!in_array('author', $vars)) {
-            $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: required variable '.$classname.'::author not found, aborting...', __FILE__, __LINE__);
-            return false;
-        }
-        
-        if (!in_array('license', $vars)) {
-            $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: required variable '.$classname.'::license not found, aborting...', __FILE__, __LINE__);
-            return false;
-        }
-        
-        // looks like the module satisfies us
-        $module = new $classname;
-        $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: successful created instance of: '.$classname, __FILE__, __LINE__);
-        
-        $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: calling '.$classname.'::module_init()', __FILE__, __LINE__);
-        $module->module_init($this);
-        $this->_modules[$name] = &$module;
-        
-        $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: successful loaded module: '.$name, __FILE__, __LINE__);
-        return true;
-    }
-    
-    function unloadModule($name)
-    {
-        $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: unloading module: '.$name.'...', __FILE__, __LINE__);
-        
-        $modules_keys = array_keys($this->_modules);
-        $modulecount = count($modules_keys);
-        for ($i = 0; $i < $modulecount; $i++) {
-            $module = &$this->_modules[$modules_keys[$i]];
-            $modulename = strtolower(get_class($module));
-            
-            if ($modulename == 'net_smartirc_module_'.$name) {
-                $module->module_exit($this);
-                unset($this->_modules[$i]);
-                $this->_reordermodules();
-                $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: successful unloaded module: '.$name, __FILE__, __LINE__);
-                return true;
-            }
-        }
-        
-        $this->log(SMARTIRC_DEBUG_MODULES, 'DEBUG_MODULES: couldn\'t unloaded module: '.$name.' (it\'s not loaded!)', __FILE__, __LINE__);
         return false;
     }
     
@@ -1944,50 +1393,25 @@ class Net_SmartIRC_base
      * @param string $data
      * @param integer $priority must be one of the priority constants
      * @return boolean
-     * @access public
-     */
-    function send($data, $priority = SMARTIRC_MEDIUM)
-    {
-        return $this->_send($data, $priority);
-    }
-    
-    /**
-     * sends an IRC message
-     *
-     * Adds a message to the messagequeue, with the optional priority.
-     * $priority:
-     * SMARTIRC_CRITICAL
-     * SMARTIRC_HIGH
-     * SMARTIRC_MEDIUM
-     * SMARTIRC_LOW
-     *
-     * @param string $data
-     * @param integer $priority must be one of the priority constants
-     * @return boolean
      * @access private
      */
     function _send($data, $priority = SMARTIRC_MEDIUM)
     {
-
-
         switch ($priority) {
             case SMARTIRC_CRITICAL:
                 $this->_rawsend($data);
-
+                return true;
             break;
-
-            case SMARTIRC_HIGH:
-            case SMARTIRC_MEDIUM:
-            case SMARTIRC_LOW:
+            case (SMARTIRC_HIGH||
+                  SMARTIRC_MEDIUM||
+                  SMARTIRC_LOW):
                 $this->_messagebuffer[$priority][] = $data;
-
+                return true;
             break;
             default:
                 $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: message ('.$data.') with an invalid priority passed ('.$priority.'), message is ignored!', __FILE__, __LINE__);
                 return false;
         }
-        
-        return true;
     }
     
     /**
@@ -1999,14 +1423,11 @@ class Net_SmartIRC_base
     function _checkbuffer()
     {
         if (!$this->_loggedin) {
-
             return;
         }
         
         static $highsent = 0;
         static $lastmicrotimestamp = 0;
-
-
         
         if ($lastmicrotimestamp == 0) {
             $lastmicrotimestamp = $this->_microint();
@@ -2019,24 +1440,14 @@ class Net_SmartIRC_base
         
         // don't send them too fast
         if ($this->_microint() >= ($lastmicrotimestamp+($this->_senddelay/1000))) {
-
-
-
-            $result = null;
             if ($highcount > 0 && $highsent <= 2) {
                 $this->_rawsend(array_shift($this->_messagebuffer[SMARTIRC_HIGH]));
                 $lastmicrotimestamp = $this->_microint();
                 $highsent++;
-
-
-
             } else if ($mediumcount > 0) {
                 $this->_rawsend(array_shift($this->_messagebuffer[SMARTIRC_MEDIUM]));
                 $lastmicrotimestamp = $this->_microint();
                 $highsent = 0;
-
-
-
             } else if ($lowcount > 0) {
                 $this->_rawsend(array_shift($this->_messagebuffer[SMARTIRC_LOW]));
                 $lastmicrotimestamp = $this->_microint();
@@ -2053,25 +1464,18 @@ class Net_SmartIRC_base
      */
     function _checktimer()
     {
-
-
         if (!$this->_loggedin) {
             return;
         }
         
         // has to be count() because the array may change during the loop!
-
-
         for ($i = 0; $i < count($this->_timehandler); $i++) {
             $handlerobject = &$this->_timehandler[$i];
             $microtimestamp = $this->_microint();
             if ($microtimestamp >= ($handlerobject->lastmicrotimestamp+($handlerobject->interval/1000))) {
-
                 $methodobject = &$handlerobject->object;
                 $method = $handlerobject->method;
                 $handlerobject->lastmicrotimestamp = $microtimestamp;
-
-
                 
                 if (@method_exists($methodobject, $method)) {
                     $this->log(SMARTIRC_DEBUG_TIMEHANDLER, 'DEBUG_TIMEHANDLER: calling method "'.get_class($methodobject).'->'.$method.'"', __FILE__, __LINE__);
@@ -2089,22 +1493,13 @@ class Net_SmartIRC_base
      */
     function _checktimeout()
     {
-
-
         if ($this->_autoreconnect == true) {
             $timestamp = time();
-
-
             if ($this->_lastrx < ($timestamp - $this->_rxtimeout)) {
                 $this->log(SMARTIRC_DEBUG_CONNECTION, 'DEBUG_CONNECTION: receive timeout detected, doing reconnect...', __FILE__, __LINE__);
-                $this->_delayReconnect();
                 $this->reconnect();
-
-
-
             } else if ($this->_lasttx < ($timestamp - $this->_txtimeout)) {
                 $this->log(SMARTIRC_DEBUG_CONNECTION, 'DEBUG_CONNECTION: transmit timeout detected, doing reconnect...', __FILE__, __LINE__);
-                $this->_delayReconnect();
                 $this->reconnect();
             }
         }
@@ -2113,7 +1508,7 @@ class Net_SmartIRC_base
     /**
      * sends a raw message to the IRC server (don't use this!!)
      *
-     * Use message() or send() instead.
+     * Use message() or _send() instead.
      *
      * @param string $data
      * @return boolean
@@ -2121,46 +1516,29 @@ class Net_SmartIRC_base
      */
     function _rawsend($data)
     {
-
-
         if ($this->_state() == SMARTIRC_STATE_CONNECTED) {
             $this->log(SMARTIRC_DEBUG_IRCMESSAGES, 'DEBUG_IRCMESSAGES: sent: "'.$data.'"', __FILE__, __LINE__);
-
-
             
             if ($this->_usesockets == true) {
-                $result = socket_write($this->_socket, $data.SMARTIRC_CRLF);
-
-
-
+                $result = @socket_write($this->_socket, $data.SMARTIRC_CRLF);
             } else {
-                $result = fwrite($this->_socket, $data.SMARTIRC_CRLF);
+                $result = @fwrite($this->_socket, $data.SMARTIRC_CRLF);
             }
-
-
             
             
             if ($result === false) {
-                // writing to the socket failed, means the connection is broken
-                $this->_connectionerror = true;
-                
                 return false;
-
-
-
             } else {
                 $this->_lasttx = time();
                 return true;
             }
-
         } else {
-
             return false;
         }
     }
     
     /**
-     * goes into main receive mode _once_ per call and waits for messages from the IRC server
+     * goes into main idle loop for waiting messages from the IRC server
      *
      * @return void
      * @access private
@@ -2169,178 +1547,130 @@ class Net_SmartIRC_base
     {
         $lastpart = '';
         $rawdataar = array();
-
-
         
-        $this->_checkbuffer();
-
-
-        
-        $timeout = $this->_selecttimeout();
-        if ($this->_usesockets == true) {
-            $sread = array($this->_socket);
-            $result = socket_select($sread, $w = null, $e = null, 0, $timeout*1000);
-
-
+        if ($this->_state() == SMARTIRC_STATE_CONNECTED) {
+            $this->_checkbuffer();
             
-            if ($result == 1) {
-                // the socket got data to read
-                $rawdata = socket_read($this->_socket, 10240);
-
-
-
-            } else if ($result === false) {
-                // panic! panic! something went wrong!
-                $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: socket_select() returned false, something went wrong! Reason: '.socket_strerror(socket_last_error()), __FILE__, __LINE__);
-
-
-
-
-                exit;
+            if ($this->_usesockets == true) {
+                $sread = array($this->_socket);
+                $result = @socket_select($sread, $w = null, $e = null, 0);
+                
+                if ($result == 1) {
+                    // the socket got data to read
+                    $rawdata = @socket_read($this->_socket, 10240);
+                } else if ($result === false) {
+                    // panic! panic! something went wrong!
+                    $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: socket_select() returned false, something went wrong! Reason: '.socket_strerror(socket_last_error()), __FILE__, __LINE__);
+                    exit;
+                } else {
+                    // no data
+                    $rawdata = null;
+                }
             } else {
-                // no data
-                $rawdata = null;
+                usleep($this->_receivedelay*1000);
+                $rawdata = @fread($this->_socket, 10240);
             }
-
-        } else {
-
-            usleep($this->_receivedelay*1000);
-            $rawdata = fread($this->_socket, 10240);
-        }
-        if ($rawdata === false) {
-            // reading from the socket failed, the connection is broken
-            $this->_connectionerror = true;
-        }
-        
-        $this->_checktimer();
-        $this->_checktimeout();
-
-
-        
-        if ($rawdata !== null && !empty($rawdata)) {
-            $this->_lastrx = time();
-            $rawdata = str_replace("\r", '', $rawdata);
-            $rawdata = $lastpart.$rawdata;
             
-            $lastpart = substr($rawdata, strrpos($rawdata ,"\n")+1);
-            $rawdata = substr($rawdata, 0, strrpos($rawdata ,"\n"));
-            $rawdataar = explode("\n", $rawdata);
-        }
-        
-        // loop through our received messages
-
-
-        while (count($rawdataar) > 0) {
-            $rawline = array_shift($rawdataar);
-            $validmessage = false;
+            $this->_checktimer();
+            $this->_checktimeout();
             
-            $this->log(SMARTIRC_DEBUG_IRCMESSAGES, 'DEBUG_IRCMESSAGES: received: "'.$rawline.'"', __FILE__, __LINE__);
-            
-            // building our data packet
-            $ircdata = new Net_SmartIRC_data();
-            $ircdata->rawmessage = $rawline;
-            $lineex = explode(' ', $rawline);
-            $ircdata->rawmessageex = $lineex;
-            $messagecode = $lineex[0];
-
-
-            
-            if (substr($rawline, 0, 1) == ':') {
-                $validmessage = true;
-                $line = substr($rawline, 1);
-                $lineex = explode(' ', $line);
+            if ($rawdata !== null && !empty($rawdata)) {
+                $this->_lastrx = time();
+                $rawdata = str_replace("\r", '', $rawdata);
+                $rawdata = $lastpart.$rawdata;
                 
-                // conform to RFC 2812
-                $from = $lineex[0];
-                $messagecode = $lineex[1];
-                $exclamationpos = strpos($from, '!');
-                $atpos = strpos($from, '@');
-                $colonpos = strpos($line, ' :');
-
-
-                if ($colonpos !== false) {
-                    // we want the exact position of ":" not beginning from the space
-                    $colonpos += 1;
-                }
-                $ircdata->nick = substr($from, 0, $exclamationpos);
-                $ircdata->ident = substr($from, $exclamationpos+1, ($atpos-$exclamationpos)-1);
-                $ircdata->host = substr($from, $atpos+1);
-                $ircdata->type = $this->_gettype($rawline);
-                $ircdata->from = $from;
-
-
-                if ($colonpos !== false) {
-                    $ircdata->message = substr($line, $colonpos+1);
-                    $ircdata->messageex = explode(' ', $ircdata->message);
-                }
-
-
+                $lastpart = substr($rawdata, strrpos($rawdata ,"\n")+1);
+                $rawdata = substr($rawdata, 0, strrpos($rawdata ,"\n"));
+                $rawdataar = explode("\n", $rawdata);
+            }
+            
+            // loop through our received messages
+            while (count($rawdataar) > 0) {
+                $rawline = array_shift($rawdataar);
+                $validmessage = false;
                 
-                if ($ircdata->type & (SMARTIRC_TYPE_CHANNEL|
-                                SMARTIRC_TYPE_ACTION|
-                                SMARTIRC_TYPE_MODECHANGE|
-                                SMARTIRC_TYPE_TOPICCHANGE|
-                                SMARTIRC_TYPE_KICK|
-                                SMARTIRC_TYPE_PART|
-                                SMARTIRC_TYPE_JOIN)) {
-                    $ircdata->channel = $lineex[2];
-
-
-
-                } else if ($ircdata->type & (SMARTIRC_TYPE_WHO|
-                                    SMARTIRC_TYPE_BANLIST|
-                                    SMARTIRC_TYPE_TOPIC|
-                                    SMARTIRC_TYPE_CHANNELMODE)) {
-                    $ircdata->channel = $lineex[3];
-
-
-
-                } else if ($ircdata->type & SMARTIRC_TYPE_NAME) {
-                    $ircdata->channel = $lineex[4];
-                }
-
-
-
-
+                $this->log(SMARTIRC_DEBUG_IRCMESSAGES, 'DEBUG_IRCMESSAGES: received: "'.$rawline.'"', __FILE__, __LINE__);
                 
-                if ($ircdata->channel !== null) {
-                    if (substr($ircdata->channel, 0, 1) == ':') {
-                        $ircdata->channel = substr($ircdata->channel, 1);
+                // building our data packet
+                $ircdata = &new Net_SmartIRC_data();
+                $ircdata->rawmessage = $rawline;
+                $lineex = explode(' ', $rawline);
+                $ircdata->rawmessageex = $lineex;
+                $messagecode = $lineex[0];
+                
+                if (substr($rawline, 0, 1) == ':') {
+                    $validmessage = true;
+                    $line = substr($rawline, 1);
+                    $lineex = explode(' ', $line);
+                    
+                    // conform to RFC 2812
+                    $from = $lineex[0];
+                    $messagecode = $lineex[1];
+                    $exclamationpos = strpos($from, '!');
+                    $atpos = strpos($from, '@');
+                    $colonpos = strpos($line, ' :');
+                    if ($colonpos !== false) {
+                        // we want the exact position of ":" not beginning from the space
+                        $colonpos += 1;
                     }
+                    $ircdata->nick = substr($from, 0, $exclamationpos);
+                    $ircdata->ident = substr($from, $exclamationpos+1, ($atpos-$exclamationpos)-1);
+                    $ircdata->host = substr($from, $atpos+1);
+                    $ircdata->type = $this->_gettype($rawline);
+                    $ircdata->from = $from;
+                    if ($colonpos !== false) {
+                        $ircdata->message = substr($line, $colonpos+1);
+                        $ircdata->messageex = explode(' ', $ircdata->message);
+                    }
+                    
+                    if ($ircdata->type & (SMARTIRC_TYPE_CHANNEL|
+                                 SMARTIRC_TYPE_ACTION|
+                                 SMARTIRC_TYPE_MODECHANGE|
+                                 SMARTIRC_TYPE_KICK|
+                                 SMARTIRC_TYPE_PART|
+                                 SMARTIRC_TYPE_JOIN)) {
+                        $ircdata->channel = $lineex[2];
+                    } else if ($ircdata->type & (SMARTIRC_TYPE_WHO|
+                                        SMARTIRC_TYPE_BANLIST|
+                                        SMARTIRC_TYPE_TOPIC|
+                                        SMARTIRC_TYPE_CHANNELMODE)) {
+                        $ircdata->channel = $lineex[3];
+                    } else if ($ircdata->type & SMARTIRC_TYPE_NAME) {
+                        $ircdata->channel = $lineex[4];
+                    }
+                    
+                    if ($ircdata->channel !== null) {
+                        if (substr($ircdata->channel, 0, 1) == ':') {
+                            $ircdata->channel = substr($ircdata->channel, 1);
+                        }
+                    }
+                    
+                    $this->log(SMARTIRC_DEBUG_MESSAGEPARSER, 'DEBUG_MESSAGEPARSER: ircdata nick: "'.$ircdata->nick.
+                                                                '" ident: "'.$ircdata->ident.
+                                                                '" host: "'.$ircdata->host.
+                                                                '" type: "'.$ircdata->type.
+                                                                '" from: "'.$ircdata->from.
+                                                                '" channel: "'.$ircdata->channel.
+                                                                '" message: "'.$ircdata->message.
+                                                                '"', __FILE__, __LINE__);
                 }
-
                 
-                $this->log(SMARTIRC_DEBUG_MESSAGEPARSER, 'DEBUG_MESSAGEPARSER: ircdata nick: "'.$ircdata->nick.
-                                                            '" ident: "'.$ircdata->ident.
-                                                            '" host: "'.$ircdata->host.
-                                                            '" type: "'.$ircdata->type.
-                                                            '" from: "'.$ircdata->from.
-                                                            '" channel: "'.$ircdata->channel.
-                                                            '" message: "'.$ircdata->message.
-                                                            '"', __FILE__, __LINE__);
+                // lets see if we have a messagehandler for it
+                $this->_handlemessage($messagecode, $ircdata);
+                    
+                if ($validmessage == true) {
+                    // now the actionhandlers are comming
+                    $this->_handleactionhandler($ircdata);
+                }
+                
+                if (isset($ircdata)) {
+                    unset($ircdata);
+                }
             }
-            
-            // lets see if we have a messagehandler for it
-            $this->_handlemessage($messagecode, $ircdata);
-
-
-            
-            if ($validmessage == true) {
-                // now the actionhandlers are comming
-                $this->_handleactionhandler($ircdata);
-            }
-
-
-            
-            if (isset($ircdata)) {
-                unset($ircdata);
-            }
-			return TRUE;
+			return true;
         }
-		return FALSE;
+		return false;
     }
-
-
     
     /**
      * sends the pong for keeping alive
@@ -2363,20 +1693,13 @@ class Net_SmartIRC_base
      * @return integer selecttimeout in microseconds
      * @access private
      */
-    function _selecttimeout()
-    {
-
-
+    function _selecttimeout() {
         if ($this->_messagebuffersize == 0) {
             $this->_selecttimeout = null;
-
-
             
             if ($this->_mintimer != false) {
                 $this->_calculateselecttimeout($this->_mintimer);
             }
-
-
             
             if ($this->_autoreconnect == true) {
                 $this->_calculateselecttimeout($this->_rxtimeout*1000);
@@ -2384,9 +1707,6 @@ class Net_SmartIRC_base
             
             $this->_calculateselecttimeout($this->_maxtimer);
             return $this->_selecttimeout;
-
-
-
         } else {
             return $this->_senddelay;
         }
@@ -2400,8 +1720,6 @@ class Net_SmartIRC_base
      */
     function _calculateselecttimeout($microseconds)
     {
-
-
         if (($this->_selecttimeout > $microseconds) || $this->_selecttimeout === null) {
             $this->_selecttimeout = $microseconds;
         }
@@ -2416,20 +1734,13 @@ class Net_SmartIRC_base
     function _updatemintimer()
     {
         $timerarray = array();
-
-
         foreach ($this->_timehandler as $values) {
             $timerarray[] = $values->interval;
         }
         
         $result = array_multisort($timerarray, SORT_NUMERIC, SORT_ASC);
-
-
         if ($result == true && isset($timerarray[0])) {
             $this->_mintimer = $timerarray[0];
-
-
-
         } else {
             $this->_mintimer = false;
         }
@@ -2444,8 +1755,6 @@ class Net_SmartIRC_base
     function _reorderactionhandler()
     {
         $orderedactionhandler = array();
-
-
         foreach ($this->_actionhandler as $value) {
             $orderedactionhandler[] = $value;
         }
@@ -2461,8 +1770,6 @@ class Net_SmartIRC_base
     function _reordertimehandler()
     {
         $orderedtimehandler = array();
-
-
         foreach ($this->_timehandler as $value) {
             $orderedtimehandler[] = $value;
         }
@@ -2478,8 +1785,6 @@ class Net_SmartIRC_base
     function _reordermodules()
     {
         $orderedmodules = array();
-
-
         foreach ($this->_modules as $value) {
             $orderedmodules[] = $value;
         }
@@ -2497,13 +1802,9 @@ class Net_SmartIRC_base
      */
     function _gettype($line)
     {
-
-
         if (preg_match('/^:[^ ]+? [0-9]{3} .+$/', $line) == 1) {
             $lineex = explode(' ', $line);
             $code = $lineex[1];
-
-
                 
             switch ($code) {
                 case SMARTIRC_RPL_WELCOME:
@@ -2561,72 +1862,31 @@ class Net_SmartIRC_base
         }
         
         if (preg_match('/^:.*? PRIVMSG .* :'.chr(1).'ACTION .*'.chr(1).'$/', $line) == 1) {
-
             return SMARTIRC_TYPE_ACTION;
-
         } else if (preg_match('/^:.*? PRIVMSG .* :'.chr(1).'.*'.chr(1).'$/', $line) == 1) {
-
-            return (SMARTIRC_TYPE_CTCP_REQUEST|SMARTIRC_TYPE_CTCP);
-        } else if (preg_match('/^:.*? NOTICE .* :'.chr(1).'.*'.chr(1).'$/', $line) == 1) {
-            return (SMARTIRC_TYPE_CTCP_REPLY|SMARTIRC_TYPE_CTCP);
-
-
-
+            return SMARTIRC_TYPE_CTCP;
         } else if (preg_match('/^:.*? PRIVMSG (\&|\#|\+|\!).* :.*$/', $line) == 1) {
             return SMARTIRC_TYPE_CHANNEL;
-
-
-
         } else if (preg_match('/^:.*? PRIVMSG .*:.*$/', $line) == 1) {
             return SMARTIRC_TYPE_QUERY;
-
-
-
         } else if (preg_match('/^:.*? NOTICE .* :.*$/', $line) == 1) {
             return SMARTIRC_TYPE_NOTICE;
-
-
-
         } else if (preg_match('/^:.*? INVITE .* .*$/', $line) == 1) {
             return SMARTIRC_TYPE_INVITE;
-
-
-
         } else if (preg_match('/^:.*? JOIN .*$/', $line) == 1) {
             return SMARTIRC_TYPE_JOIN;
-
-
-
         } else if (preg_match('/^:.*? TOPIC .* :.*$/', $line) == 1) {
             return SMARTIRC_TYPE_TOPICCHANGE;
-
-
-
         } else if (preg_match('/^:.*? NICK .*$/', $line) == 1) {
             return SMARTIRC_TYPE_NICKCHANGE;
-
-
-
         } else if (preg_match('/^:.*? KICK .* .*$/', $line) == 1) {
             return SMARTIRC_TYPE_KICK;
-
-
-
         } else if (preg_match('/^:.*? PART .*$/', $line) == 1) {
             return SMARTIRC_TYPE_PART;
-
-
-
         } else if (preg_match('/^:.*? MODE .* .*$/', $line) == 1) {
             return SMARTIRC_TYPE_MODECHANGE;
-
-
-
         } else if (preg_match('/^:.*? QUIT :.*$/', $line) == 1) {
             return SMARTIRC_TYPE_QUIT;
-
-
-
         } else {
             $this->log(SMARTIRC_DEBUG_MESSAGETYPES, 'DEBUG_MESSAGETYPES: SMARTIRC_TYPE_UNKNOWN!: "'.$line.'"', __FILE__, __LINE__);
             return SMARTIRC_TYPE_UNKNOWN;
@@ -2641,16 +1901,14 @@ class Net_SmartIRC_base
      */
     function _updatestate()
     {
-        if (is_resource($this->_socket)) {
-            $rtype = get_resource_type($this->_socket);
-            if (($this->_socket !== false) && 
-                ($rtype == 'socket' || $rtype == 'Socket' || $rtype == 'stream')) {
-
-                $this->_state = true;
-                return true;
-            }
+        $rtype = get_resource_type($this->_socket);
+        if ((is_resource($this->_socket)) &&
+            ($this->_socket !== false) &&
+            ($rtype == 'socket' || $rtype == 'Socket' || $rtype == 'stream')) {
+            
+            $this->_state = true;
+            return true;
         } else {
-
             $this->_state = false;
             $this->_loggedin = false;
             return false;
@@ -2666,14 +1924,9 @@ class Net_SmartIRC_base
     function _state()
     {
         $result = $this->_updatestate();
-
-
         
         if ($result == true) {
             return SMARTIRC_STATE_CONNECTED;
-
-
-
         } else {
             return SMARTIRC_STATE_DISCONNECTED;
         }
@@ -2690,14 +1943,10 @@ class Net_SmartIRC_base
     function _handlemessage($messagecode, &$ircdata)
     {
         $found = false;
-
-
-
-
         
         if (is_numeric($messagecode)) {
             if (!array_key_exists($messagecode, $this->nreplycodes)) {
-                $this->log(SMARTIRC_DEBUG_MESSAGEHANDLER, 'DEBUG_MESSAGEHANDLER: ignoring unrecognized messagecode! "'.$messagecode.'"', __FILE__, __LINE__);
+                $this->log(SMARTIRC_DEBUG_MESSAGEHANDLER, 'DEBUG_MESSAGEHANDLER: ignoring unreconzied messagecode! "'.$messagecode.'"', __FILE__, __LINE__);
                 $this->log(SMARTIRC_DEBUG_MESSAGEHANDLER, 'DEBUG_MESSAGEHANDLER: this IRC server ('.$this->_address.') doesn\'t conform to the RFC 2812!', __FILE__, __LINE__);
                 return;
             }
@@ -2705,9 +1954,6 @@ class Net_SmartIRC_base
             $methodname = 'event_'.strtolower($this->nreplycodes[$messagecode]);
             $_methodname = '_'.$methodname;
             $_codetype = 'by numeric';
-
-
-
         } else if (is_string($messagecode)) { // its not numericcode so already a name/string
             $methodname = 'event_'.strtolower($messagecode);
             $_methodname = '_'.$methodname;
@@ -2715,8 +1961,6 @@ class Net_SmartIRC_base
         }
         
         // if exists call internal method for the handling
-
-
         if (@method_exists($this, $_methodname)) {
            $this->log(SMARTIRC_DEBUG_MESSAGEHANDLER, 'DEBUG_MESSAGEHANDLER: calling internal method "'.get_class($this).'->'.$_methodname.'" ('.$_codetype.')', __FILE__, __LINE__);
            $this->$_methodname($ircdata);
@@ -2724,15 +1968,11 @@ class Net_SmartIRC_base
         }
         
         // if exist, call user defined method for the handling
-
-
         if (@method_exists($this, $methodname)) {
            $this->log(SMARTIRC_DEBUG_MESSAGEHANDLER, 'DEBUG_MESSAGEHANDLER: calling user defined method "'.get_class($this).'->'.$methodname.'" ('.$_codetype.')', __FILE__, __LINE__);
            $this->$methodname($ircdata);
            $found = true;
         }
-
-
         
         if ($found == false) {
             $this->log(SMARTIRC_DEBUG_MESSAGEHANDLER, 'DEBUG_MESSAGEHANDLER: no method found for "'.$messagecode.'" ('.$methodname.')', __FILE__, __LINE__);
@@ -2750,23 +1990,14 @@ class Net_SmartIRC_base
     {
         $handler = &$this->_actionhandler;
         $handlercount = count($handler);
-
-
         for ($i = 0; $i < $handlercount; $i++) {
             $handlerobject = &$handler[$i];
-
-
             
             if (substr($handlerobject->message, 0, 1) == '/') {
                 $regex = $handlerobject->message;
-
-
-
             } else {
                 $regex = '/'.$handlerobject->message.'/';
             }
-
-
             
             if (($handlerobject->type & $ircdata->type) &&
                 (preg_match($regex, $ircdata->message) == 1)) {
@@ -2775,34 +2006,16 @@ class Net_SmartIRC_base
                 
                 $methodobject = &$handlerobject->object;
                 $method = $handlerobject->method;
-
-
                 
                 if (@method_exists($methodobject, $method)) {
                     $this->log(SMARTIRC_DEBUG_ACTIONHANDLER, 'DEBUG_ACTIONHANDLER: calling method "'.get_class($methodobject).'->'.$method.'"', __FILE__, __LINE__);
                     $methodobject->$method($this, $ircdata);
-
-
-
                 } else {
                     $this->log(SMARTIRC_DEBUG_ACTIONHANDLER, 'DEBUG_ACTIONHANDLER: method doesn\'t exist! "'.get_class($methodobject).'->'.$method.'"', __FILE__, __LINE__);
                 }
-
+                
+                break;
             }
-        }
-    }
-
-    /**
-     * Delay reconnect
-     *
-     * @return void
-     * @access private
-     */
-    function _delayReconnect()
-    {
-        if ($this->_reconnectdelay > 0) {
-            $this->log(SMARTIRC_DEBUG_CONNECTION, 'DEBUG_CONNECTION: delaying reconnect for '.$this->_reconnectdelay.' ms', __FILE__, __LINE__);
-            usleep($this->_reconnectdelay * 1000);
         }
     }
     
@@ -2831,62 +2044,39 @@ class Net_SmartIRC_base
     function _adduser(&$channel, &$newuser)
     {
         $lowerednick = strtolower($newuser->nick);
-
-
-        if ($this->isJoined($channel->name, $newuser->nick)) {
+        if (isset($channel->users[$lowerednick])) {
             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: updating user: '.$newuser->nick.' on channel: '.$channel->name, __FILE__, __LINE__);
             
             // lets update the existing user
             $currentuser = &$channel->users[$lowerednick];
-
-
             
             if ($newuser->ident !== null) {
                 $currentuser->ident = $newuser->ident;
             }
-
-
             if ($newuser->host !== null) {
                 $currentuser->host = $newuser->host;
             }
-
-
             if ($newuser->realname !== null) {
                 $currentuser->realname = $newuser->realname;
             }
-
-
             if ($newuser->op !== null) {
                 $currentuser->op = $newuser->op;
             }
-
-
             if ($newuser->voice !== null) {
                 $currentuser->voice = $newuser->voice;
             }
-
-
             if ($newuser->ircop !== null) {
                 $currentuser->ircop = $newuser->ircop;
             }
-
-
             if ($newuser->away !== null) {
                 $currentuser->away = $newuser->away;
             }
-
-
             if ($newuser->server !== null) {
                 $currentuser->server = $newuser->server;
             }
-
-
             if ($newuser->hopcount !== null) {
                 $currentuser->hopcount = $newuser->hopcount;
             }
-
-
-
         } else {
             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: adding user: '.$newuser->nick.' to channel: '.$channel->name, __FILE__, __LINE__);
             
@@ -2895,14 +2085,10 @@ class Net_SmartIRC_base
         }
         
         $user = &$channel->users[$lowerednick];
-
-
         if ($user->op) {
             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: adding op: '.$user->nick.' to channel: '.$channel->name, __FILE__, __LINE__);
             $channel->ops[$user->nick] = true;
         }
-
-
         if ($user->voice) {
             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: adding voice: '.$user->nick.' to channel: '.$channel->name, __FILE__, __LINE__);
             $channel->voices[$user->nick] = true;
@@ -2918,65 +2104,41 @@ class Net_SmartIRC_base
      */
     function _removeuser(&$ircdata)
     {
-
-
         if ($ircdata->type & (SMARTIRC_TYPE_PART|SMARTIRC_TYPE_QUIT)) {
             $nick = $ircdata->nick;
-
-
-
         } else if ($ircdata->type & SMARTIRC_TYPE_KICK) {
             $nick = $ircdata->rawmessageex[3];
-
-
-
         } else {
             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: unknown TYPE ('.$ircdata->type.') in _removeuser(), trying default', __FILE__, __LINE__);
             $nick = $ircdata->nick;
         }
         
         $lowerednick = strtolower($nick);
-
-
         
         if ($this->_nick == $nick) {
             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: we left channel: '.$ircdata->channel.' destroying...', __FILE__, __LINE__);
             unset($this->_channels[strtolower($ircdata->channel)]);
-
-
-
-
-
         } else {
             if ($ircdata->type & SMARTIRC_TYPE_QUIT) {
                 $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: user '.$nick.' quit, removing him from all channels', __FILE__, __LINE__);
                 // remove the user from all channels
-
-
-                $channelkeys = array_keys($this->_channels);
-                foreach ($channelkeys as $channelkey) {
+                foreach ($this->_channels as $channelkey => $channelvalue) {
                     // loop through all channels
                     $channel = &$this->_channels[$channelkey];
-                    foreach ($channel->users as $uservalue) {
-
+                    foreach ($channel->users as $userkey => $uservalue) {
                         // loop through all user in this channel
-
-
+                        
                         if ($nick == $uservalue->nick) {
                             // found him
                             // kill him
                             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: found him on channel: '.$channel->name.' destroying...', __FILE__, __LINE__);
                             unset($channel->users[$lowerednick]);
-
-
                             
                             if (isset($channel->ops[$nick])) {
                                 // die!
                                 $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: removing him from op list', __FILE__, __LINE__);
                                 unset($channel->ops[$nick]);
                             }
-
-
                             
                             if (isset($channel->voices[$nick])) {
                                 // die!!
@@ -2988,22 +2150,15 @@ class Net_SmartIRC_base
                         }
                     }
                 }
-
-
-
             } else {
                 $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: removing user: '.$nick.' from channel: '.$ircdata->channel, __FILE__, __LINE__);
                 $channel = &$this->_channels[strtolower($ircdata->channel)];
                 unset($channel->users[$lowerednick]);
-
-
                 
                 if (isset($channel->ops[$nick])) {
                     $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: removing him from op list', __FILE__, __LINE__);
                     unset($channel->ops[$nick]);
                 }
-
-
                 
                 if (isset($channel->voices[$nick])) {
                     $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: removing him from voice list', __FILE__, __LINE__);
@@ -3030,58 +2185,23 @@ class Net_SmartIRC_base
      * @access private
      */
     function _isValidType($handlertype) {
-        if ($handlertype & SMARTIRC_TYPE_ALL) {
+        if ($handlertype & SMARTIRC_TYPE_ALL ) {
             return true;
         } else {
             return false;
         }
     }
     
-    function _addIrcUser()
-    {
-
-    }
-    
-    function _updateIrcUser()
-    {
-
-    }
-
-    
-    function _removeIrcUser()
-    {
-
-    }
-    
-    function _addChannelUser()
-    {
-    }
-    
-    function _updateChannelUser()
-    {
-    }
-    
-    function _removeChannelUser()
-    {
-    }
-    
     // </private methods>
     
-    function isError($object)
-    {
+    function isError($object) {
         return (bool)(is_object($object) && (strtolower(get_class($object)) == 'net_smartirc_error'));
     }
     
-    function &throwError($message)
-    {
-        $error = new Net_SmartIRC_Error($message);
-        return $error;
+    function &throwError($message) {
+        return new Net_SmartIRC_Error($message);
     }
 }
-
-// includes must be after the base class definition, required for PHP5
-require_once 'SmartIRC/irccommands.php';
-require_once 'SmartIRC/messagehandler.php';
 
 class Net_SmartIRC extends Net_SmartIRC_messagehandler
 {
@@ -3277,31 +2397,7 @@ class Net_SmartIRC_channel
      * @var string
      * @access public
      */
-    var $user_limit = false;
-    
-    /**
-     * @var string
-     * @access public
-     */
     var $mode;
-    
-    /**
-     * @var integer
-     * @access public
-     */
-    var $synctime_start = 0;
-    
-    /**
-     * @var integer
-     * @access public
-     */
-    var $synctime_stop = 0;
-    
-    /**
-     * @var integer
-     * @access public
-     */
-    var $synctime;
 }
 
 /**
@@ -3409,32 +2505,33 @@ class Net_SmartIRC_listenfor
     function handler(&$irc, &$ircdata)
     {
         $irc->log(SMARTIRC_DEBUG_ACTIONHANDLER, 'DEBUG_ACTIONHANDLER: listenfor handler called', __FILE__, __LINE__);
+        $this->result[] = $ircdata->message;
+        $irc->disconnect(true);
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// so we don't break BC!
+/**
+ * @access public
+ */
+class Net_SmartIRC_objListenFor
+{
+    /**
+     * @var array
+     * @access public
+     */
+    var $result = array();
+    
+    /**
+     * stores the received answer into the result array
+     *
+     * @param object $irc
+     * @param object $ircdata
+     * @return void
+     */
+    function handler(&$irc, &$ircdata)
+    {
+        $irc->log(SMARTIRC_DEBUG_ACTIONHANDLER, 'DEBUG_ACTIONHANDLER: objListenFor handler called', __FILE__, __LINE__);
         $this->result[] = $ircdata;
         $irc->disconnect(true);
     }
