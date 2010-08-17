@@ -75,7 +75,7 @@ class PlayerList extends BasePassiveModule
 		/*echo "Debug caching $name ($id)\n";*/
 		if ($id == 0)
 		{
-			$this->bot->log("DEBUG", "PlayerList", "Debug " . $name . " has an userid less than 1!!!\n";
+			$this->bot->log("DEBUG", "PlayerList", "Debug " . $name . " has an userid less than 1!!!\n");
 			$this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
 		}
 		
@@ -88,7 +88,7 @@ class PlayerList extends BasePassiveModule
 		if ($uname instanceof BotError)
 		{	
 
-			$this->bot->log("DEBUG", "PlayerList", "FIXME: core/PlayerList.php function id recieving BotError as " . $uname . "\nError is: " . $uname->get() . "\n";
+			$this->bot->log("DEBUG", "PlayerList", "FIXME: core/PlayerList.php function id recieving BotError as " . $uname . "\nError is: " . $uname->get() . "\n");
 			$this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
 			return $uname;
 		}
