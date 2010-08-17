@@ -1007,7 +1007,7 @@ class AOChat
 		static $already_running = false;
 		if ($already_running) {
 			$this->bot->log("NETWORK", "ERROR", "AOChat::wait_for_certain_packet() called recursively! Don't do that!");
-			debug_print_backtrace();
+			$this->bot->log("DEBUG", "AOChat", $this->bot->debug_bt());
 			return false;
 		}
 		$already_running = true;

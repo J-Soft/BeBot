@@ -34,6 +34,7 @@ Version 0.7.0
 - Added a General queue module Changed chatqueue buddy_queue and masmsg (invites) to use
 - Added a new setting: tools connect_timeout to allow the get_site function timeout to be adjusted.
 - Inspect has been added as an alias for Identify.
+- The function debug_bt() as been added to Bot.php to allow for displaying a formatted backtrace to console. Returns a string.
 
 API Changes:
 - Moved aochat event handling out of Main.php and in to AOChat.php

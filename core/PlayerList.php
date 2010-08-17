@@ -75,8 +75,8 @@ class PlayerList extends BasePassiveModule
 		/*echo "Debug caching $name ($id)\n";*/
 		if ($id == 0)
 		{
-			echo "Debug $name has an userid less than 1!!!\n";
-			debug_print_backtrace();
+			$this->bot->log("DEBUG", "PlayerList", "Debug " . $name . " has an userid less than 1!!!\n";
+			$this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
 		}
 		
 		$this->namecache[$name] = array('id' => $id , 'expire' => time() + 21600);
@@ -88,8 +88,8 @@ class PlayerList extends BasePassiveModule
 		if ($uname instanceof BotError)
 		{	
 
-			echo 'FIXME: core/PlayerList.php function id recieving BotError as $uname' . "\nError is: " . $uname->get() . "\n";
-			//debug_print_backtrace();
+			$this->bot->log("DEBUG", "PlayerList", "FIXME: core/PlayerList.php function id recieving BotError as " . $uname . "\nError is: " . $uname->get() . "\n";
+			$this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
 			return $uname;
 		}
 		
@@ -97,7 +97,8 @@ class PlayerList extends BasePassiveModule
 		{
 			// This is normal and can happen, if the user just types "!whois" etc.
 			$this->error->set("Tried to get user id for an empty user name.");
-			debug_print_backtrace();
+			$this->bit->log("DEBUG", "PlayerList", "Tried to get user id for an empty user name.");
+			$this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
 			return $this->error;
 		}
 		$uname = ucfirst(strtolower($uname));
@@ -154,14 +155,15 @@ class PlayerList extends BasePassiveModule
 		//echo "Looking up uname for $uid!\n";
 		if (! is_numeric($uid))
 		{
-			$this->debug_output("Attempting to look up a username for a username ($uid)");
-			debug_print_backtrace();
+			$this->bot->log("DEBUG", "PlayerList", "Attempting to look up a username for a username (" . $uid . ")");
+			$this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
 			return $uid;
 		}
 		if (empty($uid))
 		{
 			$this->error->set("name() called with empty string");
-			debug_print_backtrace();
+			$this->bot->log("DEBUG", "PlayerList", "name() called with empty string");
+			$this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
 			return ($this->error);
 		}
 		//Check if we need to ask the server about the user
@@ -211,7 +213,8 @@ class PlayerList extends BasePassiveModule
 		if (empty($user))
 		{
 			$this->error->set("exist() called with empty string.");
-			debug_print_backtrace();
+			$this->bot->log("DEBUG", "PlayerList", "exist() called with empty string.");
+			$this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
 			return $this->error;
 		}
 		if (is_numeric($user))

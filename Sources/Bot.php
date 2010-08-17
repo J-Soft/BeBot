@@ -1694,5 +1694,38 @@ class Bot
 		}
 		return false;
 	}
+	
+	function debug_bt()
+	{
+		$trace = debug_backtrace();
+		$r = '';
+		
+		foreach($trace as $i=>$call)
+		{
+			if (is_object($call['object'])) 
+			{ 
+				$call['object'] = 'CONVERTED OBJECT OF CLASS '.get_class($call['object']);
+			}
+			
+			if (is_array($call['args'])) 
+			{
+				foreach ($call['args'] AS &$arg) 
+				{
+					if (is_object($arg)) 
+					{ 
+						$arg = 'CONVERTED OBJECT OF CLASS '.get_class($arg); 
+					}
+				}
+			}
+			
+			$r .= "#" . $i . " " . (isset($call['file']) ?  $call['file'] : '') . '(' . (isset($call['line']) ? $call['line'] : '' ) . ') ';
+			$r .= (!empty($call['object'])?$call['object'].$call['type']:'');
+			$r .= $call['function'].'('.implode(', ',$call['args']).')';
+			$r .= "\n";
+		}
+	  
+		return $r;
+	}	
+	
 }
 ?>

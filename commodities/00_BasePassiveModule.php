@@ -133,7 +133,7 @@ class BasePassiveModule
 			{
 				echo $title . "\n";
 			}
-			debug_print_backtrace();
+			$this->bot->log("DEBUG", "BasePassive", $this->bot->debug_bt());
 		}
 	}
 }

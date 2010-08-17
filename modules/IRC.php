@@ -364,7 +364,7 @@ class IRC extends BaseActiveModule
 				{
 					if ($msg == 1)
 					{
-						if ($this->last_log["on"][$name] < (time() - 5))
+						if (isset($this->last_log["on"][$name]) &&  $this->last_log["on"][$name] < (time() - 5))
 						{
 							$id = $this->bot->core('player')->id($name);
 							$who = $this->bot->core("whois")->lookup($name);
@@ -387,7 +387,7 @@ class IRC extends BaseActiveModule
 								if ($this->bot->game == "ao")
 									$res .= "/ " . $who['at_id'] . " (" . $who['at'] . ") ";
 								$res .= $who['class'];
-								if ($who['org_name'] != '')
+								if (isset($who['org_name']) &&  $who['org_name'] != '')
 								{
 									$res .= ", " . $who['org_rank'] . " of " . $who['org'];
 								}
