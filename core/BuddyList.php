@@ -59,7 +59,7 @@ class BuddyList extends BasePassiveModule
 
 		if (empty($user))
 		{
-			$this->bot->log("DEBUG", "BuddyList", "buddy_ao() got empty user";
+			$this->bot->log("DEBUG", "BuddyList", "buddy_ao() got empty user");
 			$this->bot->log("DEBUG", "BuddyList", $this->bot->debug_bt());
 			return $this->error;
 		}
