@@ -502,10 +502,10 @@ class Bot
 	/*
 	sends a message over IRC if it's enabled and connected
 	*/
+	function send_irc($prefix, $name, $msg)	
+	{
 //		if (isset($this -> irc) && $this -> exists_module("irc"))
 		if ($this -> exists_module("irc"))
-	{
-		if (isset($this->irc) && $this->exists_module("irc"))
 		{
 			if ($this->core("settings")->get("Irc", "Connected"))
 			{
