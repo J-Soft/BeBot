@@ -105,6 +105,8 @@ class Logon extends BaseActiveModule
 
 	function buddy($name, $msg)
 	{
+		$spam = FALSE;
+	
 		if ($msg == 1 || $msg == 0)
 		{
 			if (($this->start < time()) && ($this->bot->core("settings")->get("Logon", "Enable")))
@@ -252,6 +254,12 @@ class Logon extends BaseActiveModule
 			}
 			$this->bot->core("relay")->relay_to_bot($pre . $txt);
 		}
+		
+		if ($this->bot->core("settings")->get("Irc", "Announce"))
+		{
+			$this->bot->send_irc($this->bot->core("settings")->get("Irc", "Ircguildprefix"), "", chr(2) . chr(3) . '3***' . chr(2) . " " . $txt);
+		}
+		
 	}
 
 	function connect()

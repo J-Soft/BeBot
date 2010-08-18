@@ -95,8 +95,6 @@ class IRC extends BaseActiveModule
 		$this->bot->core("settings")->create("Irc", "IrcGuildPrefix", $guildprefix, "Which prefix should ingame guild chat relayed to IRC get?");
 		$this->bot->core("settings")->create("Irc", "IrcGuestPrefix", $pgroupprefix, "Which prefix should ingame chat in the chat group of the bot relayed to IRC get?");
 		$this->bot->core("settings")->create("Irc", "GuildPrefix", "[IRC]", "Which prefix should IRC chat relayed to ingame chat get?");
-		$this->bot->core("settings")->create("Irc", "AnnounceTo", "both", "Where should joins and leaves to the IRC channel be announced to?", "none;gc;pgmsg;both");
-		$this->bot->core("settings")->create("Irc", "AnnounceWhat", $announcewhat, "Which events should be announced to IRC? None, only buddies logging on, only joins to the chatgroup or both?", "none;buddies;joins;both");
 		$this->bot->core("settings")->create("Irc", "Reconnect", TRUE, "Should the bot automatically reconnect to IRC?");
 		$this->bot->core("settings")->create("Irc", "RelayGuildName", "", "What is the name for GC guildrelay?");
 		$this->bot->core("settings")->create("Irc", "ItemRef", "AOMainframe", "Should AO Mainframe of AUNO be used for links in item refs?", "AOMainframe;AUNO");
@@ -104,6 +102,11 @@ class IRC extends BaseActiveModule
 		$this->bot->core("settings")->create("Irc", "MaxRelaySize", 500, "What's the maximum amount of characters relayed to IRC?");
 		$this->bot->core("settings")->create("Irc", "NotifyOnDrop", FALSE, "Should the chat be notified if something isn't relayed because it's too large?");
 		$this->bot->core("settings")->create("Irc", "UseGuildRelay", TRUE, "Should chat coming from IRC also be relayed over the guild relay if it's set up?");
+		$this->bot->core("settings")->create("Irc", "Announce", TRUE, "Should we announce logons and logoffs as controlled by the Logon module to IRC?");
+		
+		$this->bot->core("settings")->del("Irc", "AnnounceTo");
+		$this->bot->core("settings")->del("Irc", "AnnounceWhat");
+		
 		$this->bot->core("colors")->define_scheme("Irc", "Text", "normal");
 		$this->bot->core("colors")->define_scheme("Irc", "User", "normal");
 		$this->bot->core("colors")->define_scheme("Irc", "Group", "normal");
@@ -358,74 +361,21 @@ class IRC extends BaseActiveModule
 			{
 				return;
 			}
-			if ($this->last_log["st"] < time() - $this->bot->crondelay)
+
+			if ((! $this->bot->core("notify")->check($name)) && isset($this->is[$name]))
 			{
-				if (($this->bot->core("notify")->check($name)) && ((strtolower($this->bot->core("settings")->get("Irc", "AnnounceWhat")) == "buddies") || (strtolower($this->bot->core("settings")->get("Irc", "AnnounceWhat")) == "both")))
-				{
-					if ($msg == 1)
-					{
-						if (isset($this->last_log["on"][$name]) &&  $this->last_log["on"][$name] < (time() - 5))
-						{
-							$id = $this->bot->core('player')->id($name);
-							$who = $this->bot->core("whois")->lookup($name, $this->bot->core("settings")->get("Logon", "NoLookup"));
-							if ($who instanceof BotError)
-							{
-								$res = $name . " logged on";
-							}
-							else
-							{
-								$res = "\"" . $name . "\"";
-								if (! empty($who['firstname']))
-								{
-									$res = $who['firstname'] . " " . $res;
-								}
-								if (! empty($who['lastname']))
-								{
-									$res .= " " . $who['lastname'];
-								}
-								$res .= " (Lvl " . $who['level'] . " ";
-								if ($this->bot->game == "ao")
-									$res .= "/ " . $who['at_id'] . " (" . $who['at'] . ") ";
-								$res .= $who['class'];
-								if (isset($who['org_name']) &&  $who['org_name'] != '')
-								{
-									$res .= ", " . $who['org_rank'] . " of " . $who['org'];
-								}
-								$res .= ") logged on";
-							}
-							$main = $this->bot->core("alts")->main($name);
-							if ($main != $this->bot->core('player')->name($name))
-							{
-								$alts = " :: Alt of " . $main;
-							}
-							$this->send_irc($this->bot->core("settings")->get("Irc", "Ircguildprefix"), "", chr(2) . chr(3) . '3***' . chr(2) . " " . $res . $alts);
-							$this->last_log["on"][$name] = time();
-						}
-					}
-					else
-					{
-						if ($this->last_log["off"][$name] < (time() - 5))
-						{
-							$this->send_irc($this->bot->core("settings")->get("Irc", "Ircguildprefix"), "", chr(2) . chr(3) . '3***' . chr(2) . " " . $name . " has logged off.");
-							$this->last_log["off"][$name] = time();
-						}
-					}
-				}
-				else if ((! $this->bot->core("notify")->check($name)) && isset($this->is[$name]))
-				{
-					if ($msg == 1)
-						$msg = $name . " is online.";
-					else
-						$msg = $name . " is offline.";
-					$this->irc->message(SMARTIRC_TYPE_CHANNEL, $this->is[$name], $msg);
-					unset($this->is[$name]);
-				}
-				else if ((! $this->bot->core("notify")->check($name)) && isset($this->whois[$name]))
-				{
-					$msg = $this->whois_player($name) . " ";
-					$this->irc->message(SMARTIRC_TYPE_CHANNEL, $this->whois[$name], $msg);
-					unset($this->whois[$name]);
-				}
+				if ($msg == 1)
+					$msg = $name . " is online.";
+				else
+					$msg = $name . " is offline.";
+				$this->irc->message(SMARTIRC_TYPE_CHANNEL, $this->is[$name], $msg);
+				unset($this->is[$name]);
+			}
+			else if ((! $this->bot->core("notify")->check($name)) && isset($this->whois[$name]))
+			{
+				$msg = $this->whois_player($name) . " ";
+				$this->irc->message(SMARTIRC_TYPE_CHANNEL, $this->whois[$name], $msg);
+				unset($this->whois[$name]);
 			}
 		}
 	}
