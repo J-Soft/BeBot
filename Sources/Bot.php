@@ -509,6 +509,8 @@ class Bot
 		{
 			if ($this->core("settings")->get("Irc", "Connected"))
 			{
+				// Parse the color codes and let the IRC module deal with filtering.
+				$msg = $this->core("colors")->parse($msg);
 				$this->core("irc")->send_irc($prefix, $name, $msg);
 			}
 		}
