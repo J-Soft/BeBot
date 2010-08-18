@@ -64,6 +64,10 @@ class Logon extends BaseActiveModule
 		$this->bot->core("settings")->create("Logon", "Members", TRUE, "Should Members logon be spamed?");
 		$this->bot->core("settings")->create("Logon", "Guests", FALSE, "Should Guests logon be spamed?");
 		$this->bot->core("settings")->create("Logon", "Others", FALSE, "Should Others logon be spamed?");
+		$this->bot->core("settings")->create("Logon", "ShowMain", TRUE, "Should we display the main of the player logging in if it's an alt?");
+		$this->bot->core("settings")->create("Logon", "ShowDetails", FALSE, "Should we display list of details of the player logging on in a chatblob?");
+		$this->bot->core("settings")->create("Logon", "ShowAlts", FALSE, "Should we display the list of alts if the player logging on is a main in the details chatblob?");
+		$this->bot->core("settings")->create("Logon", "NoLookup", TRUE, "Tell the bot to use the built in cache for logon notice. If nothing is cache, no details of the player will be displayed. Warning, setting this to false can cause delays in displaying the logon notice, especially if Funcom XML is being slow.");
 		$this->bot->core("settings")->create("Relay", "Logon", FALSE, "Should logon spam be relayed to the linked org bots?");
 		$this->bot->core("settings")->create("Relay", "LogonInPgroup", TRUE, "Should logons be shown in the private group of the bot too?");
 		$this->bot->core("settings")->create("Relay", "OrgLogon", FALSE, "Should prefixing the org channel shortcut to the logon information be used when relaying logons?");
@@ -139,7 +143,7 @@ class Logon extends BaseActiveModule
 						{
 							if ($this->last_log["on"][$name] < (time() - 5))
 							{
-								$result = $this->bot->core("whois")->lookup($name);
+								$result = $this->bot->core("whois")->lookup($name, $this->bot->core("settings")->get("Logon", "NoUpdate"));
 								if ($result instanceof BotError)
 									$result = array("level" => 0);
 								$aliasm = $this->bot->core("alias")->get_main($name);
@@ -171,23 +175,32 @@ class Logon extends BaseActiveModule
 									}
 								}
 								else
-									$res .= " " . $result["class"];
-								$res .= ")";
-								if (! $aliasm)
-									$res .= " Logged On";
-								if ($this->bot->core("settings")->get("Whois", "Details") == TRUE)
 								{
-									if ($this->bot->core("settings")->get("Whois", "ShowMain") == TRUE)
+									$res .= " " . $result["class"];
+								}
+								
+								$res .= ")";
+								
+								if (! $aliasm)
+								{
+									$res .= " Logged On";
+								}
+								
+								if ($this->bot->core("settings")->get("Logon", "ShowMain") == TRUE)
+								{
+									$main = $this->bot->core("alts")->main($name);
+									if (strcasecmp($main, $name) != 0)
 									{
-										$main = $this->bot->core("alts")->main($name);
-										if (strcasecmp($main, $name) != 0)
-										{
-											$res .= " :: Alt of ##highlight##$main##end##";
-										}
+										$res .= " :: Alt of ##highlight##$main##end##";
 									}
+								}
+								
+								if ($this->bot->core("settings")->get("Logon", "ShowDetails") == TRUE)
+								{
 									$res .= " :: " . $this->bot->core("whois")->whois_details($name, $result);
 								}
-								else if ($this->bot->core("settings")->get("Whois", "Alts") == TRUE)
+
+								else if ($this->bot->core("settings")->get("Logon", "ShowAlts") == TRUE)
 								{
 									$alts = $this->bot->core("alts")->show_alt($name);
 									if ($alts['alts'])
@@ -195,11 +208,14 @@ class Logon extends BaseActiveModule
 										$res .= " :: " . $alts['list'];
 									}
 								}
+								
 								$result = $this->bot->db->select("SELECT message FROM #___logon WHERE id = " . $id);
+								
 								if (! empty($result))
 								{
 									$res .= "  ::  " . stripslashes($result[0][0]);
 								}
+								
 								$this->show_logon("##logon_logon_spam##" . $res . "##end##");
 								$this->last_log["on"][$name] = time();
 							}
