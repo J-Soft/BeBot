@@ -367,7 +367,7 @@ class IRC extends BaseActiveModule
 						if (isset($this->last_log["on"][$name]) &&  $this->last_log["on"][$name] < (time() - 5))
 						{
 							$id = $this->bot->core('player')->id($name);
-							$who = $this->bot->core("whois")->lookup($name);
+							$who = $this->bot->core("whois")->lookup($name, $this->bot->core("settings")->get("Logon", "NoLookup"));
 							if ($who instanceof BotError)
 							{
 								$res = $name . " logged on";
