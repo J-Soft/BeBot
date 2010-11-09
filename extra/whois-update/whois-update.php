@@ -213,7 +213,7 @@ if (! extension_loaded("mysql"))
 			$query = "UPDATE whois SET org_id = 0, org_name = '', updated = updated - 86400 WHERE org_id = " . $orgid['org_id'] . " AND updated < " . $thistime . " - 10";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
-			echo "     completed in " . (time() - $starttime) . " seconds\n";
+			echo "     " . $i . " members completed in " . (time() - $starttime) . " seconds\n";
 		}
 		if ($show_org_names)
 		{

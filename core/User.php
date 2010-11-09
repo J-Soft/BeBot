@@ -137,19 +137,20 @@ class User_Core extends BasePassiveModule
 		if ($this->bot->game == "ao")
 		{
 			// Add the user to the whois cache.
-			$members = $this->bot->core("whois")->lookup($name);
+			// If we are just adding the user to the whois cache, why do any error checking here if we are not going to actually use the data for anything?
+			// When adding a new alt that has just been created there will not be any whois data to lookup anyways.
+			$this->bot->core("whois")->lookup($name);
+		/*			$members = $this->bot->core("whois")->lookup($name);
 			if ($members instanceof BotError)
 			{
 				$this->bot->log("USER", "ERROR", "Could not lookup $name whois.");
-				$members["id"] = $id;
-				$members["nickname"] = $name;
 			}
+		*/
 		}
-		else
-		{
-			$members["id"] = $id;
-			$members["nickname"] = $name;
-		}
+		
+		$members["id"] = $id;
+		$members["nickname"] = $name;
+
 		// Mark members for notify in org bots, otherwise no notify as default
 		if ($this->bot->core("settings")->get("Members", "Mark_notify") && $user_level >= $this->bot->core("settings")->get("Members", "Notify_level"))
 		{
