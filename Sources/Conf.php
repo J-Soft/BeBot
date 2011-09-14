@@ -63,7 +63,7 @@ class Conf
 
 	function check($argv = FALSE)
 	{
-		if (! $this->cf)
+		if (!isset($this->cf))
 		{
 			// If an argument is given, use that to create the config file name.
 			if (is_array($argv) && count($argv) > 1)
