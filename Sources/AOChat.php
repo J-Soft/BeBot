@@ -747,7 +747,7 @@ class AOChat
 		if ($this->char["id"] != 0 && $this->serverseed != 0)
 		{
 			$this->login_num ++;
-			$loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(1 , $this->char["id"] , $this->serverseed), $this->game);
+			$loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(1 , $this->char["id"] , $this->serverseed, "en"), $this->game);
 			$this->send_packet($loginCharacterPacket);
 			$this->state = "connected";
 			return true;
@@ -1289,7 +1289,7 @@ class AOChat
 					}
 					// echo "Resending auth to chatserver [Character:" . $this->char["name"] . ", id:" . $this->char["id"] . "]\n";
 					$this->state = "connected";
-					$loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(1 , $this->char["id"] , $this->serverseed), $this->game);
+					$loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(1 , $this->char["id"] , $this->serverseed, "en"), $this->game);
 					$this->send_packet($loginCharacterPacket);
 				}
 				break;
@@ -2019,7 +2019,7 @@ class AOChatPacket
 		AOCP_FORWARD	=> array("name"=>"Forward",			"args"=>"IM"),
 		AOCP_ADM_MUX_INFO	=> array("name"=>"Adm Mux Info",		"args"=>"iii")),
 		"out" => array(
-		AOCP_LOGIN_CHARID      => array("name"=>"Login CharacterID",                   "args"=>"III"),
+		AOCP_LOGIN_CHARID      => array("name"=>"Login CharacterID",                   "args"=>"IIIS"),
 		AOCP_LOGIN_REQUEST	=> array("name"=>"Login Response GetCharLst",	"args"=>"ISS"),
 		AOCP_LOGIN_SELECT	=> array("name"=>"Login Select Character",	"args"=>"I"),
 		AOCP_CLIENT_LOOKUP	=> array("name"=>"Name Lookup",			"args"=>"S"),
