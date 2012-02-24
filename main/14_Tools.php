@@ -6,7 +6,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2010 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2012 J-Soft and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -286,10 +286,10 @@ function get_site_curl($url, $strip_headers = FALSE, $timeout = FALSE, $post = N
 		{
 			// Generic header for all info windows, shamelessly borrowed from VhaBot
 			$inside .= "##blob_title##:::::::::::##end## ##blob_text##BeBot Client Terminal##end## ##blob_title##::::::::::::##end##\n";
-			$inside .= $this->chatcmd('about', '##blob_title##«##end## ##blob_text##About##end## ##blob_title##»##end##', FALSE, TRUE) . "     ";
-			$inside .= $this->chatcmd('help', '##blob_title##«##end## ##blob_text##Help##end## ##blob_title##»##end##', FALSE, TRUE) . "     ";
-			$inside .= $this->chatcmd('close InfoView', '##blob_title##«##end## ##blob_text##Close Terminal##end## ##blob_title##»##end##', '/', TRUE);
-			$inside .= "\n##blob_title##¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯##end##\n";
+			$inside .= $this->chatcmd('about', '##blob_title##ï¿½##end## ##blob_text##About##end## ##blob_title##ï¿½##end##', FALSE, TRUE) . "     ";
+			$inside .= $this->chatcmd('help', '##blob_title##ï¿½##end## ##blob_text##Help##end## ##blob_title##ï¿½##end##', FALSE, TRUE) . "     ";
+			$inside .= $this->chatcmd('close InfoView', '##blob_title##ï¿½##end## ##blob_text##Close Terminal##end## ##blob_title##ï¿½##end##', '/', TRUE);
+			$inside .= "\n##blob_title##ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½##end##\n";
 		}
 		// Using " inside a blob will end the blob.
 		// Convert opening and closing tags with " to '
