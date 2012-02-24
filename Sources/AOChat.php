@@ -5,7 +5,7 @@
 * from PHP 5.2.0+ and the BCMath extension (for generating
 * and calculating the login keys) to work.
 *
-* Copyright (C) 2006-2010 ShadowRealm Creations
+* Copyright (C) 2006-2012 J-Soft and the BeBot development team.
 * Copyright (c) 2008 Allan Noer <allan@noer.biz>
 * Copyright (C) 2002-2005  Oskari Saarenmaa <auno@auno.org>.
 *

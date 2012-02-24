@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2010 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2012 J-Soft and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -32,7 +32,7 @@
 *  USA
 */
 define('BOT_VERSION', "0.7.0");
-define('BOT_VERSION_INFO', ".bzr(snapshot)");
+define('BOT_VERSION_INFO', ".git(snapshot)");
 define('BOT_VERSION_NAME', "BeBot");
 
 // Is this a development snapshot from BZR?
