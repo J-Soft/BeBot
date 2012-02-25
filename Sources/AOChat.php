@@ -948,7 +948,6 @@ class AOChat
         $p = TRUE;
       }
     }
-    $loginServer->Disconnect("Done");
 
     echo "Debug: lookup_user for $u completed in $i iterations\n";
 
@@ -1486,7 +1485,7 @@ class AOChatPacket
   function AOChatPacket($dir, $type, $data)
   {
     //This is a hack that should be done better. I'm just not sure how.
-    if (strtolower($this->game) == "ao") {
+    if (strtolower(AOCHAT_GAME) == "ao") {
       $aocpdifs = array("IS",
                         "IIS",
                         "IS",

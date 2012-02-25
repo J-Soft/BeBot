@@ -53,7 +53,7 @@ if (empty($os)) {
   $os = getenv("OS");
 }
 if (preg_match("/^windows/i", $os)) {
-  $os_windows = true;
+  define('OS_WINDOWS', true);
 }
 
 echo "

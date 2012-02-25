@@ -239,7 +239,7 @@ class Roster_Core extends BasePassiveModule
     $this->running = TRUE;
     $this->bot->log("ROSTER", "UPDATE", "Starting roster update for guild id: " . $this->bot->guildid . " on RK" . $this->bot->dimension);
     if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
-      $this->bot->send_gc("##normal##" . $msg . "Roster update starting ::: System busy##end##");
+      $this->bot->send_gc("##normal##Roster update starting ::: System busy##end##");
     }
     // Get the guild roster
     if ($this->bot->game == "ao") {

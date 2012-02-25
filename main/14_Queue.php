@@ -119,7 +119,14 @@ class Queue_Core extends BasePassiveModule
     $time = time();
     $add = ($time - $this->last_call[$name]) / $this->delay[$name];
     if ($add > 0) {
+      if (!isset($this->queue_left[$name]))
+      {
+        $this->queue_left[$name] = $add;
+      }
+      else
+      {
       $this->queue_left[$name] += $add;
+    }
       $this->last_call[$name] = $time;
       if ($this->queue_left[$name] > $this->max[$name] && $this->max[$name] != 0) {
         $this->queue_left[$name] = $this->max[$name];

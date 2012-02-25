@@ -226,7 +226,7 @@ class User_Core extends BasePassiveModule
       }
       // Rerolled character, we need to make sure our information is updated.
       if ($reroll == 1) {
-        $this->bot->db->query("UPDATE #___users SET char_id = '" . $id . "', user_level = '0', deleted_by = '" . mysql_real_escape_string($source) . "', deleted_at = '" . time() . "', nofity = '0' WHERE nickname = '" . $name . "'");
+        $this->bot->db->query("UPDATE #___users SET char_id = '" . $id . "', user_level = '0', deleted_by = '" . mysql_real_escape_string($source) . "', deleted_at = '" . time() . "', notify = '0' WHERE nickname = '" . $name . "'");
       }
       else
       {

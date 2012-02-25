@@ -184,11 +184,11 @@ class Bot
     }
     //Determine which game we are playing
     if (!empty($server_list['ao'][$dimension])) {
-      $game = 'ao';
+      define('AOCHAT_GAME',  'ao');
     }
     elseif (!empty($server_list['aoc'][$dimension]))
     {
-      $game = 'aoc';
+      define('AOCHAT_GAME', 'aoc');
     }
     else
     {
@@ -208,8 +208,8 @@ class Bot
     //instantiate bot
     $class = __CLASS__;
     self::$instance[$bothandle] = new $class($bothandle);
-    self::$instance[$bothandle]->server = $server_list[$game][$dimension]['server'];
-    self::$instance[$bothandle]->port = $server_list[$game][$dimension]['port'];
+    self::$instance[$bothandle]->server = $server_list[AOCHAT_GAME][$dimension]['server'];
+    self::$instance[$bothandle]->port = $server_list[AOCHAT_GAME][$dimension]['port'];
     //initialize bot.
     self::$instance[$bothandle]->username = $ao_username;
     self::$instance[$bothandle]->password = $ao_password;
@@ -234,7 +234,7 @@ class Bot
     self::$instance[$bothandle]->use_proxy_server = $use_proxy_server;
     self::$instance[$bothandle]->proxy_server_address = explode(",", $proxy_server_address);
     self::$instance[$bothandle]->starttime = time();
-    self::$instance[$bothandle]->game = $game;
+    self::$instance[$bothandle]->game = AOCHAT_GAME;
     self::$instance[$bothandle]->accessallbots = $accessallbots;
     self::$instance[$bothandle]->core_directories = $core_directories;
     self::$instance[$bothandle]->module_directories = $module_directories;
