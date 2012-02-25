@@ -1,3 +1,5 @@
+                                                                               $this->serverseed,
+                                                                               $this->char["language"]));
 <?php
 /*
 * AOChat, a PHP class for talking with the Age of Conan and Anarchy Online chat servers.
@@ -76,6 +78,9 @@ if (PHP_INT_SIZE != 8) {
 * they are mostly the same for same type packets, but maybe it should
 * have been done anyway..  // auno - 2004/mar/26
 */
+
+include "AocLogin/LoginServerConnection.php";
+include "AocLogin/CharacterServerConnection.php";
 define('AOCP_LOGIN_CHARID', 0);
 define('AOCP_LOGIN_SEED', 0);
 define('AOCP_LOGIN_REQUEST', 2);
@@ -205,33 +210,6 @@ define('AOEM_AI_REMOVE_INIT', 0x33);
 define('AOEM_AI_REMOVE', 0x34);
 define('AOEM_AI_HQ_REMOVE_INIT', 0x35);
 define('AOEM_AI_HQ_REMOVE', 0x36);
-
-
-/* RPC Packet type definitions - so we won't have to use the number IDs */
-define('RPC_UNIVERSE_INIT', 0);
-define('RPC_UNIVERSE_CHALLENGE', 0);
-define('RPC_UNIVERSE_ANSWERCHALLENGE', 1);
-define('RPC_UNIVERSE_AUTHENTICATED', 1);
-define('RPC_UNIVERSE_ERROR', 2);
-define('RPC_UNIVERSE_INTERNAL_ERROR', 4);
-define('RPC_UNIVERSE_SETREGION', 5);
-
-define('RPC_TERRITORY_INIT', 0x9CB2CB03);
-define('RPC_TERRITORY_INITACK', 0x5DC18991);
-define('RPC_TERRITORY_STARTUP', 0x6A546D41);
-define('RPC_TERRITORY_CHARACTERLIST', 0xC414C5EF);
-define('RPC_TERRITORY_LOGINCHARACTER', 0xEF616EB6);
-define('RPC_TERRITORY_GETCHATSERVER', 0x23A632FA);
-define('RPC_TERRITORY_ERROR', 0xD4063CA0);
-define('RPC_TERRITORY_DIMENSIONLIST', 0xF899B14C);
-define('RPC_TERRITORY_SETUPCOMPLETE', 0x4F91A58C);
-define('RPC_TERRITORY_CSREADY', 0x5AED2A60);
-
-// Patch 1.07.0 methods
-define('RPC_TERRITORY_CHECKSUMMAP', 0x0C09CA25);
-define('RPC_TERRITORY_SENDCHECKSUMMAP', 0xDFD8518E);
-define('RPC_TERRITORY_RECEIVEDCHARSETTINGS', 0x233605B9);
-define('RPC_TERRITORY_SENDCHARSETTINGS', 0x3C7C926C);
 
 class AOChat
 {
@@ -632,7 +610,7 @@ class AOChat
   /*
   Connecting to the universe function
   */
-  function authenticateConan($username, $password, $character)
+  function authenticateConan($serverAddress, $serverPort, $username, $password, $character, $sixtyfourbit)
   {
     $this->accountid = 0;
     $this->serverseed = NULL;
@@ -641,12 +619,14 @@ class AOChat
     $this->username = $username;
     $this->character = $character;
     $this->password = $password;
-    // Clear password
-    unset($password);
-
-    // Send the username and universeversion
-    $key = $username . ":2";
-    $initPacket = new RPCPacket("out", RPC_UNIVERSE_INIT, array("",
+    $this->sixtyfourbit = $sixtyfourbit;
+    //
+    // Connect to the login server and log in with the username and password
+    //
+    $loginServer = new LoginServerConnection($this, $username, $password, $serverAddress, $serverPort, LOGIN_TYPE_PROTOBUF);
+    if (!$loginServer->Connect()) {
+      trigger_error("Could not connect to the Loginserver (" . $serverAddress . ":" . $serverPort . ")");
+      return false;
                                                                $key,
                                                                1));
     $this->send_rpcpacket($initPacket);
@@ -666,30 +646,33 @@ class AOChat
     if (is_resource($this->socket)) {
       socket_close($this->socket);
     }
-
-    // Connect to the territoryserver
-    $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-    if (!is_resource($this->socket)) {
-      die("Could not create socket.\n");
+    if (!$loginServer->HandlePackets()) {
+      $loginServer->Disconnect("Error while handling packets for loginserver");
+      trigger_error("Error while handling packets for Loginserver (" . $serverAddress . ":" . $serverPort . ")");
+      return false;
     }
 
-    // Connect to the territory server
-    if (@socket_connect($this->socket, $this->ServerAddress, $this->ServerPort) === false) {
+    //
+    // Connect to the character server and log in the bot character
+    //
+    $characterServer = new CharacterServerConnection($this, $loginServer->GetAccountID(), $character, $loginServer->GetLoginCookie(), $loginServer->GetCharacterServerAddress(), $loginServer->GetCharacterServerPort(), $loginServer->GetEndpointType());
+    if (!$characterServer->Connect()) {
+      trigger_error("Could not connect to the Characterserver (" . $loginServer->GetCharacterServerAddress() . ":" . $loginServer->GetCharacterServerPort() . ")");
       trigger_error("Could not connect to the Territory server (" . $this->ServerAddress . ":" . $this->ServerPort . "): " . socket_strerror(socket_last_error($this->socket)), E_USER_WARNING);
       $this->disconnect();
       return false;
     }
 
-    // Reset this
-    $this->ServerAddress = "";
-    $this->ServerPort = 0;
-
-    // Log the player on to the territory server
-    if ($this->accountid == 0 || $this->serverseed == NULL || $this->serverseed == 0) {
-      trigger_error("Broken accountid or serverseed. (Should be trapped earlier): ", E_USER_WARNING);
+    if (!$characterServer->HandlePackets()) {
+      $characterServer->Disconnect("Error while handling packets for characterserver");
+      trigger_error("Error while handling packets for Characterserver (" . $loginServer->GetCharacterServerAddress() . ":" . $loginServer->GetCharacterServerPort() . ")");
       return false;
     }
-    $territoryInitPacket = new RPCPacket("out", RPC_TERRITORY_INIT, array($this->accountid,
+    // Make sure we give this to the main program
+    $this->accountid = $loginServer->GetAccountID();
+    $this->serverseed = $characterServer->GetChatServerCookie();
+    $this->ServerAddress = $characterServer->GetChatServerAddress();
+    $this->ServerPort = $characterServer->GetChatServerPort();
                                                                          $this->serverseed,
                                                                          1));
     $this->send_rpcpacket($territoryInitPacket);
@@ -698,10 +681,8 @@ class AOChat
     {
       $packet = $this->get_rpcpacket();
       $ret = $this->handleRPCPackets($packet);
-      // We received an errorcode we cannot continue with
-      if ($ret == -1) {
-        return false;
-      }
+    // Resolve the login character
+    $this->char = $this->getLoginCharacter($this->character);
     }
     while ($ret != 1);
     // Disconnect from the territoryserver
@@ -714,7 +695,7 @@ class AOChat
       die("Could not create socket.\n");
     }
     if (@socket_connect($this->socket, $this->ServerAddress, $this->ServerPort) === false) {
-      trigger_error("Could not connect to the " . strtoupper($this->game) . " Chatserver (" . $this->ServerAddress . ":" . $this->ServerPort . ")" . socket_strerror(socket_last_error($s)), E_USER_WARNING);
+      trigger_error("Could not connect to the " . strtoupper($this->game) . " Chatserver (" . $this->ServerAddress . ":" . $this->ServerPort . ")" . socket_strerror(socket_last_error($this->socket)), E_USER_WARNING);
       $this->disconnect();
       return false;
     }
@@ -916,12 +897,20 @@ class AOChat
     if ($pr->type != AOCP_LOGIN_OK) {
       return false;
     }
+    $characterServer->Disconnect("Done");
     $this->char = $char;
     // We are authenticated and logged in. Everything is ok.
     $this->state = "ok";
     return true;
   }
 
+    if ($this->serverseed != 0) {
+      trigger_error("Could not connect to the " . strtoupper($this->game) . " Chatserver (" . $this->ServerAddress . ":" . $this->ServerPort . ") Character array/id was missing.\n");
+    }
+    else
+    {
+      trigger_error("Could not connect to the " . strtoupper($this->game) . " Chatserver (" . $this->ServerAddress . ":" . $this->ServerPort . ") Login cookie was missing.\n");
+    }
   function wait_for_packet($time = 1)
   {
     $b = array();
@@ -1412,6 +1401,7 @@ class AOChat
         $p = TRUE;
       }
     }
+    $loginServer->Disconnect("Done");
 
     echo "Debug: lookup_user for $u completed in $i iterations\n";
 

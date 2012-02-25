@@ -346,8 +346,7 @@ class Bot
     {
       die("Unknown dimension " . $this->dimension);
     }
-    // Open connection
-    $this->log("LOGIN", "STATUS", "Connecting to $this->game server $server:$port");
+
     if (!$this->aoc->connect($this->server, $this->port)) {
       $this->cron_activated = false;
       $this->disconnect();
@@ -357,11 +356,12 @@ class Bot
     }
     // AoC authentication is a bit different
     if ($this->game == "aoc") {
-      $this->log("LOGIN", "STATUS", "Authenticating");
-      if ($this->aoc->authenticateConan($this->username, $this->password, $this->botname) == false) {
+      // Open connection
+      $this->log("LOGIN", "STATUS", "Connecting to $this->game server $server:$port");
+      if (!$this->aoc->connect($server, $port, $this->sixtyfourbit)) {
         $this->cron_activated = false;
         $this->disconnect();
-        $this->log("CONN", "ERROR", "Failed authenticating to server. Retrying in " . $this->reconnecttime . " seconds.");
+        $this->log("CONN", "ERROR", "Can't connect to server. Retrying in " . $this->reconnecttime . " seconds.");
         sleep($this->reconnecttime);
         die("The bot is restarting.\n");
       }
