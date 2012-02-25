@@ -39,7 +39,7 @@ define('BOT_VERSION_NAME', "BeBot");
 define('BOT_VERSION_SNAPSHOT', TRUE);
 
 // Is this a stable release or a development release?
-define('BOT_VERSION_STABLE', TRUE);
+define('BOT_VERSION_STABLE', FALSE);
 
 $bot_version = BOT_VERSION;
 $php_version = phpversion();
