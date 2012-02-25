@@ -39,65 +39,66 @@ The Class itself...
 */
 class Say extends BaseActiveModule
 { // Start Class
-    var $whosaidthat;
+  var $whosaidthat;
 
-    function __construct(&$bot)
+  function __construct(&$bot)
+  {
+    parent::__construct($bot, get_class($this));
+    $this->whosaidthat = array();
+    // Setup Access Control
+    $this->register_command("all", "say", "ADMIN");
+    $this->register_command("all", "whosaidthat", "MEMBER");
+    $this->bot->core("settings")->create("Say", "OutputChannel", "both", "Into which channel should the output of say be sent? Either gc, pgmsg, both or original channel.", "gc;pgmsg;both;origin");
+    $this->help['description'] = 'Makes the bot say things.';
+    $this->help['command']['say something'] = "Makes that bot say 'something'";
+    $this->help['command']['whosaidthat'] = "Find out who made the bot say that.";
+  }
+
+  function command_handler($name, $msg, $source)
+  { // Start function handler()
+    $args = $this->parse_com($msg, array("com",
+                                        "args"));
+    switch ($args['com'])
     {
-        parent::__construct($bot, get_class($this));
-        $this->whosaidthat = array();
-        // Setup Access Control
-        $this->register_command("all", "say", "ADMIN");
-        $this->register_command("all", "whosaidthat", "MEMBER");
-        $this->bot->core("settings")->create("Say", "OutputChannel", "both", "Into which channel should the output of say be sent? Either gc, pgmsg, both or original channel.", "gc;pgmsg;both;origin");
-        $this->help['description'] = 'Makes the bot say things.';
-        $this->help['command']['say something'] = "Makes that bot say 'something'";
-        $this->help['command']['whosaidthat'] = "Find out who made the bot say that.";
-    }
-
-    function command_handler($name, $msg, $source)
-    { // Start function handler()
-        $args = $this->parse_com($msg, array("com", "args"));
-        switch ($args['com'])
-        {
-            case "say":
-                if (strtolower($this->bot->core("settings")->get("Say", "OutputChannel")) == "origin") {
-                    return $this->saythis($name, $args['args']);
-                }
-                else
-                {
-                    $this->bot->send_output($name, $this->saythis($name, $args['args']), $this->bot->core("settings")->get("Say", "OutputChannel"));
-                }
-                return false;
-            case "whosaidthat":
-                return $this->whosaidthat();
-        }
-        $this->bot->send_help($name);
-        return false;
-    } // End function handler()
-
-    function saythis($name, $message)
-    {
-        $this->whosaidthat['time'] = time();
-        $this->whosaidthat['name'] = $name;
-        $this->whosaidthat['what'] = $message;
-        return $message;
-    }
-
-    function whosaidthat()
-    {
-        if (empty($this->whosaidthat)) {
-            $output = "Nobody has used the say command since I logged in.";
+      case "say":
+        if (strtolower($this->bot->core("settings")->get("Say", "OutputChannel")) == "origin") {
+          return $this->saythis($name, $args['args']);
         }
         else
         {
-            $output = $this->whosaidthat['name'];
-            $output .= ' made me say "';
-            $output .= $this->whosaidthat['what'];
-            $output .= '" ';
-            $output .= time() - $this->whosaidthat['time'];
-            $output .= ' seconds ago.';
+          $this->bot->send_output($name, $this->saythis($name, $args['args']), $this->bot->core("settings")->get("Say", "OutputChannel"));
         }
-        return $output;
+        return false;
+      case "whosaidthat":
+        return $this->whosaidthat();
     }
+    $this->bot->send_help($name);
+    return false;
+  } // End function handler()
+
+  function saythis($name, $message)
+  {
+    $this->whosaidthat['time'] = time();
+    $this->whosaidthat['name'] = $name;
+    $this->whosaidthat['what'] = $message;
+    return $message;
+  }
+
+  function whosaidthat()
+  {
+    if (empty($this->whosaidthat)) {
+      $output = "Nobody has used the say command since I logged in.";
+    }
+    else
+    {
+      $output = $this->whosaidthat['name'];
+      $output .= ' made me say "';
+      $output .= $this->whosaidthat['what'];
+      $output .= '" ';
+      $output .= time() - $this->whosaidthat['time'];
+      $output .= ' seconds ago.';
+    }
+    return $output;
+  }
 } // End of Class
 ?>

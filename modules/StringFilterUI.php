@@ -39,56 +39,56 @@ The Class itself...
 class StringFilter_Interface extends BaseActiveModule
 {
 
-    function __construct(&$bot)
-    {
-        parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'filter', 'ADMIN');
-        $this->help['description'] = 'Add and remove strings to the bot\'s filter.';
-        $this->help['command']['filter'] = "- Display the current string filter list.";
-        $this->help['command']['filter add <string>'] = "- Replace <strong> with default replacment text.";
-        $this->help['command']['filter add <string1> replace: <string2>'] = "- Replace <string1> with <string2>.";
-        $this->help['command']['filter rem <string>'] = "Remove <string> from the list.";
-    }
+  function __construct(&$bot)
+  {
+    parent::__construct($bot, get_class($this));
+    $this->register_command('all', 'filter', 'ADMIN');
+    $this->help['description'] = 'Add and remove strings to the bot\'s filter.';
+    $this->help['command']['filter'] = "- Display the current string filter list.";
+    $this->help['command']['filter add <string>'] = "- Replace <strong> with default replacment text.";
+    $this->help['command']['filter add <string1> replace: <string2>'] = "- Replace <string1> with <string2>.";
+    $this->help['command']['filter rem <string>'] = "Remove <string> from the list.";
+  }
 
-    function command_handler($name, $msg, $type)
-    {
-        // preg_match just works better than explode for string based input that may have spaces.
-        if (preg_match("/^filter add (.+?) replace: (.+)$/i", $msg, $info)) {
-            return $this->add($info[1], $info[2]);
-        }
-        else if (preg_match("/^filter add (.+?)$/i", $msg, $info)) {
-            return $this->add($info[1]);
-        }
-        else if (preg_match("/^filter rem (.+)$/i", $msg, $info)) {
-            return $this->rem($info[1]);
-        }
-        else
-        {
-            return $this->show($name);
-        }
+  function command_handler($name, $msg, $type)
+  {
+    // preg_match just works better than explode for string based input that may have spaces.
+    if (preg_match("/^filter add (.+?) replace: (.+)$/i", $msg, $info)) {
+      return $this->add($info[1], $info[2]);
     }
+    else if (preg_match("/^filter add (.+?)$/i", $msg, $info)) {
+      return $this->add($info[1]);
+    }
+    else if (preg_match("/^filter rem (.+)$/i", $msg, $info)) {
+      return $this->rem($info[1]);
+    }
+    else
+    {
+      return $this->show($name);
+    }
+  }
 
-    function add($string, $new = NULL)
-    {
-        return $this->bot->core("stringfilter")->add_string($string, $new);
-    }
+  function add($string, $new = NULL)
+  {
+    return $this->bot->core("stringfilter")->add_string($string, $new);
+  }
 
-    function rem($string)
-    {
-        return $this->bot->core("stringfilter")->rem_string($string);
-    }
+  function rem($string)
+  {
+    return $this->bot->core("stringfilter")->rem_string($string);
+  }
 
-    function show($source)
+  function show($source)
+  {
+    $return = $this->bot->core("stringfilter")->get_strings();
+    $inside = "Filtered String List:\n\n";
+    foreach ($return as $string => $replace)
     {
-        $return = $this->bot->core("stringfilter")->get_strings();
-        $inside = "Filtered String List:\n\n";
-        foreach ($return as $string => $replace)
-        {
-            $inside .= "Search for: \"" . $string . "\" Replace with: \"" . $replace . "\" " . $this->bot->core("tools")->chatcmd("filter rem " . $string, "[REMOVE]");
-            $inside .= "\n";
-        }
-        return $this->bot->core("tools")->make_blob("Filtered String List", $inside);
+      $inside .= "Search for: \"" . $string . "\" Replace with: \"" . $replace . "\" " . $this->bot->core("tools")->chatcmd("filter rem " . $string, "[REMOVE]");
+      $inside .= "\n";
     }
+    return $this->bot->core("tools")->make_blob("Filtered String List", $inside);
+  }
 }
 
 ?>

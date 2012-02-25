@@ -1,17 +1,24 @@
 <?php
 // AO
-$server_list['ao']['Testlive'] = array('server' => 'chat.dt.funcom.com', 'port' => 7109);
-$server_list['ao']['Atlantean'] = array('server' => 'chat.d1.funcom.com', 'port' => 7101);
-$server_list['ao']['Rimor'] = array('server' => 'chat.d2.funcom.com', 'port' => 7102);
-$server_list['ao']['Die neue welt'] = array('server' => 'chat.d3.funcom.com', 'port' => 7103);
+$server_list['ao']['Testlive'] = array('server' => 'chat.dt.funcom.com',
+                                       'port' => 7109);
+$server_list['ao']['Atlantean'] = array('server' => 'chat.d1.funcom.com',
+                                        'port' => 7101);
+$server_list['ao']['Rimor'] = array('server' => 'chat.d2.funcom.com',
+                                    'port' => 7102);
+$server_list['ao']['Die neue welt'] = array('server' => 'chat.d3.funcom.com',
+                                            'port' => 7103);
 $server_list['ao']['1'] = $server_list['ao']['Atlantean'];
 $server_list['ao']['2'] = $server_list['ao']['Rimor'];
 $server_list['ao']['3'] = $server_list['ao']['Die neue welt'];
 
 // AOC
-$server_list['aoc']['EU'] = array('server' => 'aoc-eu-um.live.ageofconan.com', 'port' => 7000);
-$server_list['aoc']['US'] = array('server' => 'aoc-us-um.live.ageofconan.com', 'port' => 7000);
-$server_list['aoc']['Aoctestlive'] = array('server' => 'testlive.ageofconan.com', 'port' => 7000);
+$server_list['aoc']['EU'] = array('server' => 'aoc-eu-um.live.ageofconan.com',
+                                  'port' => 7000);
+$server_list['aoc']['US'] = array('server' => 'aoc-us-um.live.ageofconan.com',
+                                  'port' => 7000);
+$server_list['aoc']['Aoctestlive'] = array('server' => 'testlive.ageofconan.com',
+                                           'port' => 7000);
 
 // all EU servers use the same login server
 $server_list['aoc']['Bloodbrand'] = $server_list['aoc']['EU'];

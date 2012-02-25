@@ -41,140 +41,143 @@ The Class itself...
 */
 class Queue_Core extends BasePassiveModule
 {
-    private $que;
-    private $que_low;
-    private $queue_left;
-    private $last_call;
+  private $que;
+  private $que_low;
+  private $queue_left;
+  private $last_call;
 
-    /*
-     Constructor:
-     Hands over a referance to the "Bot" class.
-     */
-    function __construct(&$bot)
+  /*
+  Constructor:
+  Hands over a referance to the "Bot" class.
+  */
+  function __construct(&$bot)
+  {
+    parent::__construct(&$bot, get_class($this));
+
+    $this->register_module("queue");
+    $this->register_event("cron", "1sec");
+
+    $this->queue = array();
+    $this->queue_low = array();
+  }
+
+  /*
+  $name = name of module, to be used when adding stuff to que
+  $delay = min time between each in seconds
+  $max = max count on items before que
+  */
+  function register(&$module, $name, $delay, $max = 0, $filter = TRUE)
+  {
+    $name = strtolower($name);
+    $this->link[$name] = $module;
+    $this->delay[$name] = $delay;
+    $this->max[$name] = $max;
+    $this->filter = (bool)$filter;
+  }
+
+
+  /*
+  This gets called on cron
+  */
+  function cron()
+  {
+    foreach ($this->link as $name => $mod)
     {
-        parent::__construct(&$bot, get_class($this));
-
-        $this->register_module("queue");
-        $this->register_event("cron", "1sec");
-
-        $this->queue = array();
-        $this->queue_low = array();
-    }
-
-    /*
-     $name = name of module, to be used when adding stuff to que
-     $delay = min time between each in seconds
-     $max = max count on items before que
-     */
-    function register(&$module, $name, $delay, $max = 0, $filter = TRUE)
-    {
-        $name = strtolower($name);
-        $this->link[$name] = $module;
-        $this->delay[$name] = $delay;
-        $this->max[$name] = $max;
-        $this->filter = (bool)$filter;
-    }
-
-
-    /*
-     This gets called on cron
-     */
-    function cron()
-    {
-        foreach ($this->link as $name => $mod)
-        {
-            if (!empty($this->queue[$name])) {
-                $this->set_queue($name);
-                foreach ($this->queue[$name] as $key => $value)
-                {
-                    if ($this->queue_left[$name] >= 1) {
-                        $mod->queue($name, $value);
-
-                        unset($this->queue[$name][$key]);
-                        $this->queue_left[$name] -= 1;
-                    }
-                }
-            }
-            if (!empty($this->queue_low[$name]) && empty($this->queue[$name])) {
-                $this->set_queue($name);
-                foreach ($this->queue_low[$name] as $key => $value)
-                {
-                    if ($this->queue_left[$name] >= 1) {
-                        $mod->queue($name, $value);
-
-                        unset($this->queue_low[$name][$key]);
-                        $this->queue_left[$name] -= 1;
-                    }
-                }
-            }
-        }
-    }
-
-
-    /*
-     Sets messages left...
-     */
-    function set_queue($name)
-    {
-        $time = time();
-        $add = ($time - $this->last_call[$name]) / $this->delay[$name];
-        if ($add > 0) {
-            $this->queue_left[$name] += $add;
-            $this->last_call[$name] = $time;
-            if ($this->queue_left[$name] > $this->max[$name] && $this->max[$name] != 0)
-                $this->queue_left[$name] = $this->max[$name];
-        }
-    }
-
-
-    /*
-     Checks if tell can be sent. true if yes, false it has to be put to queue
-     */
-    function check_queue($name)
-    {
-        $name = strtolower($name);
+      if (!empty($this->queue[$name])) {
         $this->set_queue($name);
-        if (($this->queue_left[$name] >= 1) && empty($this->queue[$name]) && empty($this->queue_low[$name])) {
-            $this->queue_left[$name] -= 1;
-            return true;
-        }
-        return false;
-    }
-
-
-    /*
-     Puts a msg into queue
-     */
-    function into_queue($name, $info, $priority = 0)
-    {
-        $name = strtolower($name);
-        if ($priority == 0) {
-            // Filter duplicate messages. The exact same message twice in a queue
-            // results most likely from double clicking a link or spamming the bot
-            // (like if 100 people are klicking on a guild info link multiple times).
-            // There is no point in sending the same answer back twice in a row.
-            if ($this->filter[$name]) {
-                foreach ($this->queue[$name] as $item)
-                {
-                    if ($this->bot->core("tools")->compare($info, $item))
-                        return;
-                }
-            }
-            $this->queue[$name][] = $info;
-        }
-        else
+        foreach ($this->queue[$name] as $key => $value)
         {
-            // Filter duplicate messages.
-            if ($this->filter[$name]) {
-                foreach ($this->queue_low[$name] as $item)
-                {
-                    if ($this->bot->core("tools")->compare($info, $item))
-                        return;
-                }
-            }
-            $this->queue_low[$name][] = $info;
+          if ($this->queue_left[$name] >= 1) {
+            $mod->queue($name, $value);
+
+            unset($this->queue[$name][$key]);
+            $this->queue_left[$name] -= 1;
+          }
         }
+      }
+      if (!empty($this->queue_low[$name]) && empty($this->queue[$name])) {
+        $this->set_queue($name);
+        foreach ($this->queue_low[$name] as $key => $value)
+        {
+          if ($this->queue_left[$name] >= 1) {
+            $mod->queue($name, $value);
+
+            unset($this->queue_low[$name][$key]);
+            $this->queue_left[$name] -= 1;
+          }
+        }
+      }
     }
+  }
+
+
+  /*
+  Sets messages left...
+  */
+  function set_queue($name)
+  {
+    $time = time();
+    $add = ($time - $this->last_call[$name]) / $this->delay[$name];
+    if ($add > 0) {
+      $this->queue_left[$name] += $add;
+      $this->last_call[$name] = $time;
+      if ($this->queue_left[$name] > $this->max[$name] && $this->max[$name] != 0) {
+        $this->queue_left[$name] = $this->max[$name];
+      }
+    }
+  }
+
+
+  /*
+  Checks if tell can be sent. true if yes, false it has to be put to queue
+  */
+  function check_queue($name)
+  {
+    $name = strtolower($name);
+    $this->set_queue($name);
+    if (($this->queue_left[$name] >= 1) && empty($this->queue[$name]) && empty($this->queue_low[$name])) {
+      $this->queue_left[$name] -= 1;
+      return true;
+    }
+    return false;
+  }
+
+
+  /*
+  Puts a msg into queue
+  */
+  function into_queue($name, $info, $priority = 0)
+  {
+    $name = strtolower($name);
+    if ($priority == 0) {
+      // Filter duplicate messages. The exact same message twice in a queue
+      // results most likely from double clicking a link or spamming the bot
+      // (like if 100 people are klicking on a guild info link multiple times).
+      // There is no point in sending the same answer back twice in a row.
+      if ($this->filter[$name]) {
+        foreach ($this->queue[$name] as $item)
+        {
+          if ($this->bot->core("tools")->compare($info, $item)) {
+            return;
+          }
+        }
+      }
+      $this->queue[$name][] = $info;
+    }
+    else
+    {
+      // Filter duplicate messages.
+      if ($this->filter[$name]) {
+        foreach ($this->queue_low[$name] as $item)
+        {
+          if ($this->bot->core("tools")->compare($info, $item)) {
+            return;
+          }
+        }
+      }
+      $this->queue_low[$name][] = $info;
+    }
+  }
 }
 
 ?>

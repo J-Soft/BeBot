@@ -36,62 +36,68 @@ Take a decent stab at what OS we run on and try using some sane defaults
 */
 $os = getenv("OSTYPE");
 if (empty($os)) {
-    $os = getenv("OS");
+  $os = getenv("OS");
 }
 if (preg_match("/^windows/i", $os)) {
-    /*
-     This default should work for Windows installs where php is installed to the bot directory.
-     */
-    $php_bin = "php.exe";
-    $php_args = " -c ./ ";
-    $main_php = "Main.php";
-    /*
-     If the above fails you can try specifying full paths, example:
-     $php_bin = "C:\php\php.exe";
-     $main_php = "C:\BeBot\Main.php";
-     */
+  /*
+  This default should work for Windows installs where php is installed to the bot directory.
+  */
+  $php_bin = "php.exe";
+  $php_args = " -c ./ ";
+  $main_php = "Main.php";
+  /*
+  If the above fails you can try specifying full paths, example:
+  $php_bin = "C:\php\php.exe";
+  $main_php = "C:\BeBot\Main.php";
+  */
 }
 else
 {
-    /*
-     This is a sane default for the php binary on Unix systems.
-     If your php binary is located someplace else, edit the php_bin path accordingly.
-     */
-    $php_bin = trim(shell_exec('which php'));
-    $php_args = " -c ./ ";
-    $main_php = "Main.php";
+  /*
+  This is a sane default for the php binary on Unix systems.
+  If your php binary is located someplace else, edit the php_bin path accordingly.
+  */
+  $php_bin = trim(shell_exec('which php'));
+  $php_args = " -c ./ ";
+  $main_php = "Main.php";
 }
 $confc = TRUE;
 require_once "./Sources/Conf.php";
 if ($argv[1] != $conf->argv) {
-    echo "Use \"StartBot.php " . $conf->argv . "\" to start bot next time\n";
-    $argv[1] = $conf->argv;
-    $conf->ask("Press Enter to load Bot");
-    if (!$argv[1] || $argv[1] == "")
-        $argc = 1;
-    else
-        $argc = 2;
+  echo "Use \"StartBot.php " . $conf->argv . "\" to start bot next time\n";
+  $argv[1] = $conf->argv;
+  $conf->ask("Press Enter to load Bot");
+  if (!$argv[1] || $argv[1] == "") {
+    $argc = 1;
+  }
+  else
+  {
+    $argc = 2;
+  }
 }
 if (!empty($conf->pw)) {
-    $pw = $conf->pw;
-    $conf->pw = NULL;
+  $pw = $conf->pw;
+  $conf->pw = NULL;
 }
 // Create the command to execute in the system() call of the main loop:
 $systemcommand = $php_bin . $php_args . " " . $main_php;
 if ($argc > 1) {
-    $systemcommand .= " " . $argv[1];
+  $systemcommand .= " " . $argv[1];
 }
 while (true)
 {
-    if ($pw) {
-        $fp = fopen('./conf/pw', 'w');
-        fwrite($fp, $pw);
-        fclose($fp);
-    }
-    $last_line = system($systemcommand);
-    if (preg_match("/^The bot has been shutdown/i", $last_line))
-        die();
-    else
-        sleep(1);
+  if ($pw) {
+    $fp = fopen('./conf/pw', 'w');
+    fwrite($fp, $pw);
+    fclose($fp);
+  }
+  $last_line = system($systemcommand);
+  if (preg_match("/^The bot has been shutdown/i", $last_line)) {
+    die();
+  }
+  else
+  {
+    sleep(1);
+  }
 }
 ?>

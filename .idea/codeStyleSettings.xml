@@ -11,6 +11,21 @@
         <option name="HTML_KEEP_WHITESPACES_INSIDE" value="" />
         <option name="HTML_INLINE_ELEMENTS" value="" />
         <option name="HTML_DONT_ADD_BREAKS_IF_INLINE_CONTENT" value="" />
+        <codeStyleSettings language="PHP">
+          <option name="ELSE_ON_NEW_LINE" value="true" />
+          <option name="SPECIAL_ELSE_IF_TREATMENT" value="true" />
+          <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="2" />
+          <option name="IF_BRACE_FORCE" value="3" />
+          <option name="DOWHILE_BRACE_FORCE" value="3" />
+          <option name="WHILE_BRACE_FORCE" value="3" />
+          <option name="FOR_BRACE_FORCE" value="3" />
+          <indentOptions>
+            <option name="INDENT_SIZE" value="2" />
+            <option name="CONTINUATION_INDENT_SIZE" value="2" />
+            <option name="TAB_SIZE" value="2" />
+          </indentOptions>
+        </codeStyleSettings>
       </value>
     </option>
     <option name="USE_PER_PROJECT_SETTINGS" value="true" />

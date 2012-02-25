@@ -38,71 +38,71 @@
 $VhItems = new VhItems($bot);
 class VhItems extends BaseActiveModule
 {
-    var $icons = 'true';
-    var $color_header = 'DFDF00';
-    var $color_highlight = '97BE37';
-    var $color_normal = 'CCF0AD';
-    var $server = 'http://cidb.xyphos.com/';
-    var $max = 50;
+  var $icons = 'true';
+  var $color_header = 'DFDF00';
+  var $color_highlight = '97BE37';
+  var $color_normal = 'CCF0AD';
+  var $server = 'http://cidb.xyphos.com/';
+  var $max = 50;
 
-    function __construct(&$bot)
-    {
-        parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'items', 'GUEST');
-        $this->help['description'] = 'Searches the central database for information about an item.';
-        $this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";
-        $this->help['notes'] = "This module uses the Xyphos Items Database .";
-    }
+  function __construct(&$bot)
+  {
+    parent::__construct($bot, get_class($this));
+    $this->register_command('all', 'items', 'GUEST');
+    $this->help['description'] = 'Searches the central database for information about an item.';
+    $this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";
+    $this->help['notes'] = "This module uses the Xyphos Items Database .";
+  }
 
-    function command_handler($name, $msg, $origin)
-    {
-        if (preg_match('/^items/i', $msg, $info)) {
-            $words = trim(substr($msg, strlen('items')));
-            if (!empty($words)) {
-                $parts = explode(' ', $words);
-                if (count($parts) > 1 && is_numeric($parts[0])) {
-                    $ql = $parts[0];
-                    unset($parts[0]);
-                    $search = implode(' ', $parts);
-                }
-                else
-                {
-                    $ql = 0;
-                    $search = $words;
-                }
-                $url = $this->server;
-                $url .= '?bot=BeBot';
-                $url .= '&output=aoml';
-                $url .= '&max=' . $this->max;
-                $url .= '&search=' . urlencode($search);
-                $url .= '&ql=' . $ql;
-                $url .= '&icons=' . $this->icons;
-                if ($this->color_header) {
-                    $url .= '&color_header=' . $this->color_header;
-                }
-                if ($this->color_highlight) {
-                    $url .= '&color_highlight=' . $this->color_highlight;
-                }
-                if ($this->color_normal) {
-                    $url .= '&color_normal=' . $this->color_normal;
-                }
-                $result = $this->bot->core("tools")->get_site($url, 1);
-                //Again I do not see why we're looking for mysql_real_escape_string
-                if (strstr($result, 'mysql_real_escape_string') !== false) {
-                    return ("Recieved garbled reply from vhabot!");
-                }
-                return $result;
-            }
-            else
-            {
-                return "Usage: items [quality] [item]";
-            }
+  function command_handler($name, $msg, $origin)
+  {
+    if (preg_match('/^items/i', $msg, $info)) {
+      $words = trim(substr($msg, strlen('items')));
+      if (!empty($words)) {
+        $parts = explode(' ', $words);
+        if (count($parts) > 1 && is_numeric($parts[0])) {
+          $ql = $parts[0];
+          unset($parts[0]);
+          $search = implode(' ', $parts);
         }
         else
         {
-            $this->bot->send_help($name);
+          $ql = 0;
+          $search = $words;
         }
+        $url = $this->server;
+        $url .= '?bot=BeBot';
+        $url .= '&output=aoml';
+        $url .= '&max=' . $this->max;
+        $url .= '&search=' . urlencode($search);
+        $url .= '&ql=' . $ql;
+        $url .= '&icons=' . $this->icons;
+        if ($this->color_header) {
+          $url .= '&color_header=' . $this->color_header;
+        }
+        if ($this->color_highlight) {
+          $url .= '&color_highlight=' . $this->color_highlight;
+        }
+        if ($this->color_normal) {
+          $url .= '&color_normal=' . $this->color_normal;
+        }
+        $result = $this->bot->core("tools")->get_site($url, 1);
+        //Again I do not see why we're looking for mysql_real_escape_string
+        if (strstr($result, 'mysql_real_escape_string') !== false) {
+          return ("Recieved garbled reply from vhabot!");
+        }
+        return $result;
+      }
+      else
+      {
+        return "Usage: items [quality] [item]";
+      }
     }
+    else
+    {
+      $this->bot->send_help($name);
+    }
+  }
 }
 
 ?>

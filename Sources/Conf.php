@@ -34,116 +34,133 @@
 $conf = new Conf($argv, $confc);
 class Conf
 {
-    private $conf;
-    private $login;
+  private $conf;
+  private $login;
 
-    function __construct($argv, $confc)
-    {
-        $this->confc = $confc;
-        $this->argv = $argv[1];
-        $this->check($argv);
-        $this->mysql_check();
-        $this->load();
+  function __construct($argv, $confc)
+  {
+    $this->confc = $confc;
+    $this->argv = $argv[1];
+    $this->check($argv);
+    $this->mysql_check();
+    $this->load();
+  }
+
+  function load($argv = FALSE)
+  {
+    if (file_exists("./conf/" . $this->cf)) {
+      require "./conf/" . $this->cf;
+      if (empty($ao_password) || $ao_password == "") {
+        fwrite(STDOUT, "Password for $ao_username:");
+        system('stty -echo');
+        $this->pw = trim(fgets(STDIN));
+        system('stty echo');
+      }
     }
+  }
 
-    function load($argv = FALSE)
-    {
-        if (file_exists("./conf/" . $this->cf)) {
-            require "./conf/" . $this->cf;
-            if (empty($ao_password) || $ao_password == "") {
-                fwrite(STDOUT, "Password for $ao_username:");
-                system('stty -echo');
-                $this->pw = trim(fgets(STDIN));
-                system('stty echo');
-            }
-        }
+  function check($argv = FALSE)
+  {
+    if (!isset($this->cf)) {
+      // If an argument is given, use that to create the config file name.
+      if (is_array($argv) && count($argv) > 1) {
+        $this->cf = ucfirst(strtolower($argv[1])) . ".Bot.conf";
+      }
+      else
+      {
+        $this->cf = "Bot.conf";
+      }
     }
-
-    function check($argv = FALSE)
-    {
-        if (!isset($this->cf)) {
-            // If an argument is given, use that to create the config file name.
-            if (is_array($argv) && count($argv) > 1)
-                $this->cf = ucfirst(strtolower($argv[1])) . ".Bot.conf";
-            else
-                $this->cf = "Bot.conf";
-        }
-        if (!file_exists("./conf/" . $this->cf)) {
-            $setup = $this->todo();
-        }
+    if (!file_exists("./conf/" . $this->cf)) {
+      $setup = $this->todo();
     }
+  }
 
-    function todo($rep = FALSE)
-    {
-        if (!$rep)
-            echo $this->cf . " Does not Exist\n What do you want to do?\n(r=Retry, n=new, c=Change, q=quit)\n";
-        $do = $this->ask("Select: ");
-        $do = strtolower($do);
-        if ($do == "q")
-            Die("The bot has been shutdown\n");
-        elseif ($do == "c")
-        {
-            echo "Please Enter a New Value to use:\n";
-            $newarg = $this->ask("");
-            if ($newarg == "") {
-                $this->argv = FALSE;
-                $this->cf = "Bot.conf";
-            }
-            else
-            {
-                $this->argv = $newarg;
-                $this->cf = ucfirst(strtolower($newarg)) . ".Bot.conf";
-            }
-            Return $this->check();
-        }
-        elseif ($do == "r")
-            Return $this->check();
-        elseif ($do == "n")
-            Return $this->set_conf();
-        else
-            $this->todo(TRUE);
+  function todo($rep = FALSE)
+  {
+    if (!$rep) {
+      echo $this->cf . " Does not Exist\n What do you want to do?\n(r=Retry, n=new, c=Change, q=quit)\n";
     }
-
-    function set_conf()
+    $do = $this->ask("Select: ");
+    $do = strtolower($do);
+    if ($do == "q") {
+      Die("The bot has been shutdown\n");
+    }
+    elseif ($do == "c")
     {
-        echo "\nCreating Conf File: " . $this->cf . "\n";
-        $ao_username = $this->ask("User Name:");
-        $ao_password = $this->ask("Password:");
-        $bot_name = $this->ask("Botname:");
-        $dimension = $this->ask("Dimension/Server Name:");
-        if (!is_numeric($dimension))
-            $guild = $this->ask("Guild:");
-        $owner = $this->ask("Owner:");
-        while (!$guildbot)
-        {
-            echo "Is this a Guild Bot? (y/yes or n/no)\n";
-            $gb = $this->ask("Guild bot:");
-            $gb = strtolower($gb);
-            if ($gb == "y" || $gb == "yes")
-                $guildbot = "TRUE";
-            elseif ($gb == "n" || $gb == "no")
-                $guildbot = "FALSE";
-        }
-        echo "Superadmins enter nothing when done.\n";
-        $sa[0] = '
+      echo "Please Enter a New Value to use:\n";
+      $newarg = $this->ask("");
+      if ($newarg == "") {
+        $this->argv = FALSE;
+        $this->cf = "Bot.conf";
+      }
+      else
+      {
+        $this->argv = $newarg;
+        $this->cf = ucfirst(strtolower($newarg)) . ".Bot.conf";
+      }
+      Return $this->check();
+    }
+    elseif ($do == "r")
+    {
+      Return $this->check();
+    }
+    elseif ($do == "n")
+    {
+      Return $this->set_conf();
+    }
+    else
+    {
+      $this->todo(TRUE);
+    }
+  }
+
+  function set_conf()
+  {
+    echo "\nCreating Conf File: " . $this->cf . "\n";
+    $ao_username = $this->ask("User Name:");
+    $ao_password = $this->ask("Password:");
+    $bot_name = $this->ask("Botname:");
+    $dimension = $this->ask("Dimension/Server Name:");
+    if (!is_numeric($dimension)) {
+      $guild = $this->ask("Guild:");
+    }
+    $owner = $this->ask("Owner:");
+    while (!$guildbot)
+    {
+      echo "Is this a Guild Bot? (y/yes or n/no)\n";
+      $gb = $this->ask("Guild bot:");
+      $gb = strtolower($gb);
+      if ($gb == "y" || $gb == "yes") {
+        $guildbot = "TRUE";
+      }
+      elseif ($gb == "n" || $gb == "no")
+      {
+        $guildbot = "FALSE";
+      }
+    }
+    echo "Superadmins enter nothing when done.\n";
+    $sa[0] = '
 	// $super_admin["Superadmin1"] = true;';
-        $sa[1] = '
+    $sa[1] = '
 	// $super_admin["Superadmin2"] = true;';
-        $san = 0;
-        while (!$sac)
-        {
-            $saask = $this->ask("SuperAdmin:");
-            if ($saask != "") {
-                $sa[$san] = '
+    $san = 0;
+    while (!$sac)
+    {
+      $saask = $this->ask("SuperAdmin:");
+      if ($saask != "") {
+        $sa[$san] = '
 	$super_admin["' . $saask . '"] = true;';
-                $san++;
-            }
-            else
-                $sac = TRUE;
-        }
-        $sa[0] .= '// Bot superadmins.';
-        $sa = implode("", $sa);
-        $file = '<?php
+        $san++;
+      }
+      else
+      {
+        $sac = TRUE;
+      }
+    }
+    $sa[0] .= '// Bot superadmins.';
+    $sa = implode("", $sa);
+    $file = '<?php
 	//These are the general settings of the bot:
 
 	$ao_username = "' . $ao_username . '";				// Account username
@@ -211,92 +228,115 @@ class Conf
 	$proxy_server_address = "";				// Proxy server to use address to use
 
 ?>';
-        $fp = fopen('./conf/' . $this->cf, 'w');
-        fwrite($fp, $file);
-        fclose($fp);
-        echo $this->cf . " Created\n";
-    }
+    $fp = fopen('./conf/' . $this->cf, 'w');
+    fwrite($fp, $file);
+    fclose($fp);
+    echo $this->cf . " Created\n";
+  }
 
-    function mysql_check()
-    {
-        //get botname
-        include ("./conf/" . $this->cf);
-        $botname = ucfirst(strtolower($bot_name));
-        $botname_mysql_conf = "conf/" . $botname . ".MySQL.conf";
-        if (file_exists($botname_mysql_conf))
-            Return;
-        elseif (file_exists("conf/MySQL.conf"))
-            Return;
-        else
-            $this->mysql_todo($botname);
+  function mysql_check()
+  {
+    //get botname
+    include ("./conf/" . $this->cf);
+    $botname = ucfirst(strtolower($bot_name));
+    $botname_mysql_conf = "conf/" . $botname . ".MySQL.conf";
+    if (file_exists($botname_mysql_conf)) {
+      Return;
     }
-
-    function mysql_todo($botname, $rep = FALSE)
+    elseif (file_exists("conf/MySQL.conf"))
     {
-        if (!$rep)
-            echo $botname . ".MySQL.conf and MySQL.conf Does not Exist\n What do you want to do?\n(r=Retry, n=new, q=quit)\n";
-        $do = $this->ask("Select: ");
-        $do = strtolower($do);
-        if ($do == "q")
-            Die("The bot has been shutdown\n");
-        elseif ($do == "r")
-            Return $this->mysql_check();
-        elseif ($do == "n")
-            Return $this->mysql_set_conf($botname);
-        else
-            $this->mysql_todo(TRUE);
+      Return;
     }
-
-    function mysql_set_conf($botname)
+    else
     {
-        echo "\nCreating MySQL Conf File\n";
-        echo "Would u like to use botname like botname.MySQL.conf  (y/yes or n/no)\n";
-        while (!$filename)
-        {
-            $ubn = $this->ask("Use Botname:");
-            $ubn = strtolower($ubn);
-            if ($ubn == "y" || $ubn == "yes")
-                $filename = $botname . ".MySQL.conf";
-            elseif ($ubn == "n" || $ubn == "no")
-                $filename = "MySQL.conf";
-        }
-        echo "MySQL Details:\n";
-        $dbase = $this->ask("Database name:");
-        $user = $this->ask("Username:");
-        $pass = $this->ask("Password:");
-        echo "Database server (usually localhost) Enter nothing for localhost";
-        $server = $this->ask("Server:");
-        if ($server == "")
-            $server = "localhost";
-        echo "The bot will use " . $botname . " as prefix on default, Do you want to use Default? (y/yes or n/no)\n";
-        while (!$prefix)
-        {
-            $ubn = $this->ask("Use default prefix:");
-            $ubn = strtolower($ubn);
-            if ($ubn == "y" || $ubn == "yes")
-                $prefix = '//$table_prefix = "";';
-            elseif ($ubn == "n" || $ubn == "no")
-                $prefix = "ask";
-        }
-        if ($prefix == "ask") {
-            $prefix = $this->ask("Prefix:");
-            $prefix = '$table_prefix = "' . $prefix . '";';
-        }
-        echo "The bot will use " . $botname . "_tablenames for tablename table on default, Do you want to use Default? (y/yes or n/no)\n";
-        while (!$mt)
-        {
-            $mtq = $this->ask("Use default prefix:");
-            $mtq = strtolower($mtq);
-            if ($mtq == "y" || $mtq == "yes")
-                $mt = '//$master_tablename = "botname_tablenames";';
-            elseif ($mtq == "n" || $mtq == "no")
-                $mt = "ask";
-        }
-        if ($mt == "ask") {
-            $mt = $this->ask("Table name for tablenames:");
-            $mt = '$master_tablename = "' . $mt . '";';
-        }
-        $file = '<?php
+      $this->mysql_todo($botname);
+    }
+  }
+
+  function mysql_todo($botname, $rep = FALSE)
+  {
+    if (!$rep) {
+      echo $botname . ".MySQL.conf and MySQL.conf Does not Exist\n What do you want to do?\n(r=Retry, n=new, q=quit)\n";
+    }
+    $do = $this->ask("Select: ");
+    $do = strtolower($do);
+    if ($do == "q") {
+      Die("The bot has been shutdown\n");
+    }
+    elseif ($do == "r")
+    {
+      Return $this->mysql_check();
+    }
+    elseif ($do == "n")
+    {
+      Return $this->mysql_set_conf($botname);
+    }
+    else
+    {
+      $this->mysql_todo(TRUE);
+    }
+  }
+
+  function mysql_set_conf($botname)
+  {
+    echo "\nCreating MySQL Conf File\n";
+    echo "Would u like to use botname like botname.MySQL.conf  (y/yes or n/no)\n";
+    while (!$filename)
+    {
+      $ubn = $this->ask("Use Botname:");
+      $ubn = strtolower($ubn);
+      if ($ubn == "y" || $ubn == "yes") {
+        $filename = $botname . ".MySQL.conf";
+      }
+      elseif ($ubn == "n" || $ubn == "no")
+      {
+        $filename = "MySQL.conf";
+      }
+    }
+    echo "MySQL Details:\n";
+    $dbase = $this->ask("Database name:");
+    $user = $this->ask("Username:");
+    $pass = $this->ask("Password:");
+    echo "Database server (usually localhost) Enter nothing for localhost";
+    $server = $this->ask("Server:");
+    if ($server == "") {
+      $server = "localhost";
+    }
+    echo "The bot will use " . $botname . " as prefix on default, Do you want to use Default? (y/yes or n/no)\n";
+    while (!$prefix)
+    {
+      $ubn = $this->ask("Use default prefix:");
+      $ubn = strtolower($ubn);
+      if ($ubn == "y" || $ubn == "yes") {
+        $prefix = '//$table_prefix = "";';
+      }
+      elseif ($ubn == "n" || $ubn == "no")
+      {
+        $prefix = "ask";
+      }
+    }
+    if ($prefix == "ask") {
+      $prefix = $this->ask("Prefix:");
+      $prefix = '$table_prefix = "' . $prefix . '";';
+    }
+    echo "The bot will use " . $botname . "_tablenames for tablename table on default, Do you want to use Default? (y/yes or n/no)\n";
+    while (!$mt)
+    {
+      $mtq = $this->ask("Use default prefix:");
+      $mtq = strtolower($mtq);
+      if ($mtq == "y" || $mtq == "yes") {
+        $mt = '//$master_tablename = "botname_tablenames";';
+      }
+      elseif ($mtq == "n" || $mtq == "no")
+      {
+        $mt = "ask";
+      }
+    }
+    if ($mt == "ask") {
+      $mt = $this->ask("Table name for tablenames:");
+      $mt = '$master_tablename = "' . $mt . '";';
+    }
+    $file = '<?php
 	/*
 	Database name
 	*/
@@ -335,19 +375,19 @@ class Conf
 	*/
 	' . $mt . '
 ?>';
-        $fp = fopen('./conf/' . $filename, 'w');
-        fwrite($fp, $file);
-        fclose($fp);
-        echo $filename . " Created\n";
-    }
+    $fp = fopen('./conf/' . $filename, 'w');
+    fwrite($fp, $file);
+    fclose($fp);
+    echo $filename . " Created\n";
+  }
 
-    function ask($ask)
-    {
-        // ask for input
-        fwrite(STDOUT, $ask);
-        // get input
-        Return (trim(fgets(STDIN)));
-    }
+  function ask($ask)
+  {
+    // ask for input
+    fwrite(STDOUT, $ask);
+    // get input
+    Return (trim(fgets(STDIN)));
+  }
 }
 
 ?>

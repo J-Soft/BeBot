@@ -38,77 +38,77 @@ The Class itself...
 class About extends BaseActiveModule
 {
 
-    /*
-     Constructor:
-     Hands over a referance to the "Bot" class.
-     */
-    function __construct(&$bot)
-    {
-        parent::__construct($bot, get_class($this));
-        //Sed default access control levels
-        $this->register_command('all', 'about', 'GUEST');
-        $this->register_alias('about', 'version');
-        $this->help['description'] = "Shows information about the bot.";
-        $this->help['command']['about'] = "See description";
-    }
+  /*
+  Constructor:
+  Hands over a referance to the "Bot" class.
+  */
+  function __construct(&$bot)
+  {
+    parent::__construct($bot, get_class($this));
+    //Sed default access control levels
+    $this->register_command('all', 'about', 'GUEST');
+    $this->register_alias('about', 'version');
+    $this->help['description'] = "Shows information about the bot.";
+    $this->help['command']['about'] = "See description";
+  }
 
+  /*
+  Unified message handler
+  */
+  function command_handler($name, $msg, $origin)
+  {
+    $return = false;
     /*
-     Unified message handler
-     */
-    function command_handler($name, $msg, $origin)
+    This should really be moved to the bot core.. but until i get the time to modify every single module... :\
+    */
+    $vars = explode(' ', strtolower($msg));
+    $command = $vars[0];
+    switch ($command)
     {
-        $return = false;
-        /*
-          This should really be moved to the bot core.. but until i get the time to modify every single module... :\
-          */
-        $vars = explode(' ', strtolower($msg));
-        $command = $vars[0];
-        switch ($command)
-        {
-            case 'about':
-                return $this->about_blob();
-                break;
-            default:
-                return "Broken plugin, recieved unhandled command: $command";
-        }
+      case 'about':
+        return $this->about_blob();
+        break;
+      default:
+        return "Broken plugin, recieved unhandled command: $command";
     }
+  }
 
-    /*
-     Makes the about-blob
-     */
-    function about_blob()
-    {
-        $version = BOT_VERSION_NAME . " v." . BOT_VERSION;
-        $inside .= "##blob_text##Bot Client:##end##\n";
-        $inside .= "$version\n\n";
-        $inside .= "##blob_text##Developers:##end##\n";
-        $inside .= "Alreadythere (RK2)\n";
-        $inside .= "Blondengy (RK1)\n";
-        $inside .= "Blueeagl3 (RK1)\n";
-        $inside .= "Glarawyn (RK1)\n";
-        $inside .= "Khalem (RK1)\n";
-        $inside .= "Naturalistic (RK1)\n";
-        $inside .= "Temar (RK1 / Doomsayer)\n\n";
-        $inside .= "##blob_text##Special thanks to:##end##\n";
-        $inside .= "Akarah (RK1)\n";
-        $inside .= "Bigburtha (RK2) aka Craized\n";
-        $inside .= "Derroylo (RK2)\n";
-        $inside .= "Foxferal (RK1)\n";
-        $inside .= "Jackjonez (RK1)\n";
-        $inside .= "Sabkor (RK1)\n";
-        $inside .= "Vhab (RK1)\n";
-        $inside .= "Wolfbiter (RK1)\n";
-        $inside .= "Xenixa (RK1)\n";
-        $inside .= "Zacix (RK2)\n";
-        $inside .= "Zarkingu (RK2)\n";
-        $inside .= "Auno for writing and maintaining the PHP AOChat library\n";
-        $inside .= "And last but not least, the greatest MMORPG community in existence.\n\n";
-        $inside .= "##blob_text##Links:##end##\n";
-        $inside .= $this->bot->core("tools")->chatcmd("http://bebot.shadow-realm.org", "BeBot website and support forums", "start") . "\n";
-        $inside .= $this->bot->core("tools")->chatcmd("http://bugs.launchpad.net/bebot", "BeBot bugtracker", "start") . "\n";
-        $return = "$version ::: " . $this->bot->core("tools")->make_blob('More details', $inside);
-        return $return;
-    }
+  /*
+  Makes the about-blob
+  */
+  function about_blob()
+  {
+    $version = BOT_VERSION_NAME . " v." . BOT_VERSION;
+    $inside .= "##blob_text##Bot Client:##end##\n";
+    $inside .= "$version\n\n";
+    $inside .= "##blob_text##Developers:##end##\n";
+    $inside .= "Alreadythere (RK2)\n";
+    $inside .= "Blondengy (RK1)\n";
+    $inside .= "Blueeagl3 (RK1)\n";
+    $inside .= "Glarawyn (RK1)\n";
+    $inside .= "Khalem (RK1)\n";
+    $inside .= "Naturalistic (RK1)\n";
+    $inside .= "Temar (RK1 / Doomsayer)\n\n";
+    $inside .= "##blob_text##Special thanks to:##end##\n";
+    $inside .= "Akarah (RK1)\n";
+    $inside .= "Bigburtha (RK2) aka Craized\n";
+    $inside .= "Derroylo (RK2)\n";
+    $inside .= "Foxferal (RK1)\n";
+    $inside .= "Jackjonez (RK1)\n";
+    $inside .= "Sabkor (RK1)\n";
+    $inside .= "Vhab (RK1)\n";
+    $inside .= "Wolfbiter (RK1)\n";
+    $inside .= "Xenixa (RK1)\n";
+    $inside .= "Zacix (RK2)\n";
+    $inside .= "Zarkingu (RK2)\n";
+    $inside .= "Auno for writing and maintaining the PHP AOChat library\n";
+    $inside .= "And last but not least, the greatest MMORPG community in existence.\n\n";
+    $inside .= "##blob_text##Links:##end##\n";
+    $inside .= $this->bot->core("tools")->chatcmd("http://bebot.shadow-realm.org", "BeBot website and support forums", "start") . "\n";
+    $inside .= $this->bot->core("tools")->chatcmd("http://bugs.launchpad.net/bebot", "BeBot bugtracker", "start") . "\n";
+    $return = "$version ::: " . $this->bot->core("tools")->make_blob('More details', $inside);
+    return $return;
+  }
 }
 
 ?>

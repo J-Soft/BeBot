@@ -50,10 +50,10 @@ OS detection, borrowed from Angelsbot.
 */
 $os = getenv("OSTYPE");
 if (empty($os)) {
-    $os = getenv("OS");
+  $os = getenv("OS");
 }
 if (preg_match("/^windows/i", $os)) {
-    $os_windows = true;
+  $os_windows = true;
 }
 
 echo "
@@ -94,11 +94,11 @@ Creating the bot.
 */
 echo "Creating main Bot class!\n";
 if (isset($argv[1])) {
-    $bothandle = Bot::factory($argv[1]);
+  $bothandle = Bot::factory($argv[1]);
 }
 else
 {
-    $bothandle = Bot::factory();
+  $bothandle = Bot::factory();
 }
 $bot = Bot::get_instance($bothandle);
 $bot->dispatcher = new sfEventDispatcher();
@@ -111,30 +111,30 @@ $bot->load_files('Core', 'core');
 $bot->load_files('Core', "core/{$bot->game}");
 $bot->load_files('Core', 'custom/core');
 if (!empty($bot->core_directories)) {
-    $core_dirs = explode(",", $bot->core_directories);
-    foreach ($core_dirs as $core_dir)
-    {
-        $bot->load_files('Core', trim($core_dir));
-    }
+  $core_dirs = explode(",", $bot->core_directories);
+  foreach ($core_dirs as $core_dir)
+  {
+    $bot->load_files('Core', trim($core_dir));
+  }
 }
 $bot->load_files('Modules', 'modules');
 $bot->load_files('Modules', "modules/{$bot->game}");
 $bot->load_files('Modules', 'custom/modules');
 if (!empty($bot->module_directories)) {
-    $module_dirs = explode(",", $bot->module_directories);
-    foreach ($module_dirs as $module_dir)
-    {
-        $bot->load_files('Modules', trim($module_dir));
-    }
+  $module_dirs = explode(",", $bot->module_directories);
+  foreach ($module_dirs as $module_dir)
+  {
+    $bot->load_files('Modules', trim($module_dir));
+  }
 }
 // Start up the bot.
 $bot->connect();
 
 while (true)
 {
-    if ($bot->aoc->wait_for_packet() == "disconnected") {
-        $bot->reconnect();
-    }
-    $bot->cron();
+  if ($bot->aoc->wait_for_packet() == "disconnected") {
+    $bot->reconnect();
+  }
+  $bot->cron();
 }
 ?>
