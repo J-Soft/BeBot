@@ -281,7 +281,7 @@ class Vote extends BaseActiveModule
 
   function restrict_vote($name, $vote_no, $level = false)
   {
-    if (level === false) {
+    if ($level === false) {
       //Show a list of ranks as listed in $this -> bot -> core("security") -> cache[orgranks] and guest, member, leader. admin.
     }
     else

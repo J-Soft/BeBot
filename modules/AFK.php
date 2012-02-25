@@ -160,7 +160,7 @@ class AFK extends BaseActiveModule
         $this->afkmsgs[$key][] = array(time(),
                                        $name,
                                        $msg);
-        return ($key . " has been AFK for " . $this->afk_time($key) . " (" . $value[msg] . ").");
+        return ($key . " has been AFK for " . $this->afk_time($key) . " (" . $value[$msg] . ").");
       }
     }
     if ($this->bot->core("settings")->get("Afk", "Alias")) {

@@ -186,9 +186,9 @@ class Rolls extends BaseActiveModule
     $notyet = true;
     for ($i = 1; $i <= $this->count; $i++)
     {
-      if ($msg == $this->loot[$i][item]) {
-        $this->loot[$i][num]++;
-        $num = $this->loot[$i][num];
+      if ($msg == $this->loot[$i]['item']) {
+        $this->loot[$i]['num']++;
+        $num = $this->loot[$i]['num'];
         $notyet = false;
         $numslot = $i;
       }
@@ -197,8 +197,8 @@ class Rolls extends BaseActiveModule
       $this->count++;
       $num = 1;
       $numslot = $this->count;
-      $this->loot[$numslot][item] = $msg;
-      $this->loot[$numslot][num] = 1;
+      $this->loot[$numslot]['item'] = $msg;
+      $this->loot[$numslot]['num'] = 1;
     }
     $this->bot->send_pgroup("##loot_highlight##" . $num . "x " . $msg . "##end## being rolled in slot##loot_highlight## #" . $numslot);
     if ($this->count == 1) {

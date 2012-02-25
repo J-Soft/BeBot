@@ -143,7 +143,7 @@ class OnlineDisplay extends BaseActiveModule
   {
     if ($param == "all") {
       if ($this->bot->core("security")->check_access($name, $this->bot->core("settings")->get('Online', 'Showall'))) {
-        $what = guild;
+        $what = "guild";
       }
       $param = "";
     }
