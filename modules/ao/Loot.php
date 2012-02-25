@@ -1,6 +1,6 @@
 <?php
 /*
-* Loot Module - allows you to flatroll items
+* Loot Module - allows you to flat roll items
 * Module originally coded by Craized <http://www.craized.net>
 * Module heavily updated and rewritten by Ebag333
 *

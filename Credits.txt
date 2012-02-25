@@ -2,7 +2,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2010 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
+* Copyright (C) 2005-2012 J-Soft and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -30,7 +30,7 @@
 */
 
 /*
-* This file attempts to aknowledge and give credit to everyone who have directly or indirectly
+* This file attempts to acknowledge and give credit to everyone who have directly or indirectly
 * helped in the development of BeBot over the years.
 * Names are never to be removed from this list.
 * If you redistribute BeBot or fork it, please include this file.
@@ -42,7 +42,7 @@ Currently maintained by a small group of dedicated community members with good h
 
 The following people have written code that have made it into BeBot in one form or another:
 	- Akarah (RK1)
-	- Bigburtha (RK2) aka Craized
+	- Bigburtha (RK2) aka. Craized
 	- Derroylo (RK2)
 	- Ebag333 (RK2)
 	- Foxferal (RK1)
@@ -56,4 +56,4 @@ The following people have written code that have made it into BeBot in one form 
 	- Zacix (RK2)
 	- Zarkingu (RK2)
 	
-Special thanks go out to the best MMORPG community in exsistance and Auno for writing and maintaining the PHP AOChat library.
+Special thanks go out to the best MMORPG community in existence and Auno for writing and maintaining the PHP AOChat library.

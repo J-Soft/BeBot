@@ -2,13 +2,16 @@
   <dictionary name="Thomas">
     <words>
       <w>ageofconan</w>
+      <w>akarah</w>
       <w>alreadythere</w>
       <w>angelsbot</w>
       <w>aquilonia</w>
       <w>argc</w>
       <w>argv</w>
       <w>atlantean</w>
+      <w>auno</w>
       <w>bebot</w>
+      <w>bigburtha</w>
       <w>blondengy</w>
       <w>blueeagl</w>
       <w>botname</w>
@@ -16,10 +19,13 @@
       <w>confc</w>
       <w>craized</w>
       <w>dbase</w>
+      <w>derroylo</w>
+      <w>ebag</w>
       <w>forestgreen</w>
       <w>funcom</w>
       <w>galway</w>
       <w>glarawyn</w>
+      <w>ingame</w>
       <w>irccommands</w>
       <w>itemref</w>
       <w>juberg</w>
@@ -29,11 +35,15 @@
       <w>magik</w>
       <w>meebey</w>
       <w>neue</w>
+      <w>noer</w>
       <w>omni</w>
       <w>ostype</w>
+      <w>pocketboss</w>
       <w>readme</w>
       <w>rimor</w>
       <w>subcommands</w>
+      <w>superadmin</w>
+      <w>symbiants</w>
       <w>symfony</w>
       <w>systemcommand</w>
       <w>temar</w>
@@ -42,6 +52,7 @@
       <w>wolfbiter</w>
       <w>xyphos</w>
       <w>yyyy</w>
+      <w>zbikowski</w>
     </words>
   </dictionary>
 </component>

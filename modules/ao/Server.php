@@ -1,6 +1,6 @@
 <?php
 /*
-* Server.php - Show the serverload.
+* Server.php - Show the server load.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax

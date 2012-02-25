@@ -1,6 +1,6 @@
 <?php
 /*
-* Module parsing Org Msg to catch orbital bombardememnts and set timers to notify when those are ready again.
+* Module parsing Org Msg to catch orbital bombardments and set timers to notify when those are ready again.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax

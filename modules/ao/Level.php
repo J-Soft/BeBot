@@ -1,6 +1,6 @@
 <?php
 /*
-* Level.php - Displayes teaming, pvp and mission levels.
+* Level.php - Displays teaming, pvp and mission levels.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
