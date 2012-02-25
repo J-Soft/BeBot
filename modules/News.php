@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ class News extends BaseActiveModule
 
   /*
   Constructor:
-  Hands over a referance to the "Bot" class.
+  Hands over a reference to the "Bot" class.
   */
   function __construct(&$bot)
   {
@@ -136,7 +136,7 @@ class News extends BaseActiveModule
         return $this->sub_handler($name, $com, 3);
         break;
       default:
-        $this->error->set("News recieved unknown command '{$com['com']}'.");
+        $this->error->set("News received unknown command '{$com['com']}'.");
         return $this->error;
         break;
     }

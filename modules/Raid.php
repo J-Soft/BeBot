@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -228,7 +228,7 @@ class Raid extends BaseActiveModule
         }
         Break;
       Default:
-        Return "##error##Error : Broken plugin, Raid.php recieved unhandled command: " . $var[0] . "##end##";
+        Return "##error##Error : Broken plugin, Raid.php received unhandled command: " . $var[0] . "##end##";
     }
   }
 

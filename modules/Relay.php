@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ class Relay extends BaseActiveModule
     $this->register_event("extpgjoin");
     $this->register_event("pgjoin");
     $this->register_event("pgleave");
-    $this->bot->core('prefs')->create('AutoInv', 'recieve_auto_invite', 'Automatic invites to private group should be?', 'Off', 'Off;On');
+    $this->bot->core('prefs')->create('AutoInv', 'receive_auto_invite', 'Automatic invites to private group should be?', 'Off', 'Off;On');
     $this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("relay", "false") . "
                (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 						botname VARCHAR(20),
@@ -389,7 +389,7 @@ class Relay extends BaseActiveModule
           if (!empty($members)) {
             foreach ($members as $member)
             {
-              if ($this->bot->core('prefs')->get($member[0], 'AutoInv', 'recieve_auto_invite') == 'On') {
+              if ($this->bot->core('prefs')->get($member[0], 'AutoInv', 'receive_auto_invite') == 'On') {
                 $this->bot->core("chat")->pgroup_invite($member[0]);
                 echo "Inviting " . $member[0] . " to the bot\n";
               }
@@ -456,7 +456,7 @@ class Relay extends BaseActiveModule
         if (!empty($members)) {
           foreach ($members as $member)
           {
-            if ($this->bot->core('prefs')->get($member[0], 'AutoInv', 'recieve_auto_invite') == 'On') {
+            if ($this->bot->core('prefs')->get($member[0], 'AutoInv', 'receive_auto_invite') == 'On') {
               $this->bot->core("chat")->pgroup_invite($member[0]);
               echo "Inviting " . $member[0] . " to the bot\n";
             }
@@ -510,7 +510,7 @@ class Relay extends BaseActiveModule
       {
         $members = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level >= 1 AND nickname = '$name'");
         if (!empty($members)) {
-          if ($this->bot->core('prefs')->get($name, 'AutoInv', 'recieve_auto_invite') == 'On') {
+          if ($this->bot->core('prefs')->get($name, 'AutoInv', 'receive_auto_invite') == 'On') {
             $this->bot->core("chat")->pgroup_invite($name);
             echo "Inviting " . $name . " to the bot\n";
           }

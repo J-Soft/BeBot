@@ -6,7 +6,7 @@ Version 0.7.0
 - Moved the configuration reading from Main.php and into Bot.php
 - Added debugging function toggled by a bot variable.
 - Changed most Commands to SuperAdmin instead of Owner as Superadmin should be almost as good as owner but isn't owner.
-- Moved the server list into it's own file and changed the way game and server is detected. Dimension 0-3 are no longer valid and are replaced by Testlive, Atlantean, Rimor and Die neue welt. No backwards compatibility implimented
+- Moved the server list into it's own file and changed the way game and server is detected. Dimension 0-3 are no longer valid and are replaced by Testlive, Atlantean, Rimor and Die neue welt. No backwards compatibility implemented
 - Added level command to IRC (coded by nyt), Prefix no longer Required for /msg botname in IRC, /msg botname now Output error if unknown command.
 - Created a commodities directory for class files that do not instantiate themselves
 - Fixed countless php warnings and notices meaning it should now be possible to run the bot with php E_ALL logging turned on to help ease debugging.
@@ -56,9 +56,9 @@ Removed Modules:
 - ao/Glyph has been removed as it no longer serves a purpose.
 - ao/Tier2 has been removed as it no longer serves a purpose.
 
-+Possible BREAKAGE! - Peliminary testing shows modules appear to be working as expected.
-+- Moving from Status array to BotError. This WILL cause breakage until the checks have been converted aswell.
-+- Moving uid/uname cache from AOChat to core/PlayerList.php. Calls to core("chat")->get_u* are now depricated and PlayerList does return BotError on failures.
++Possible BREAKAGE! - Preliminary testing shows modules appear to be working as expected.
++- Moving from Status array to BotError. This WILL cause breakage until the checks have been converted as well.
++- Moving uid/uname cache from AOChat to core/PlayerList.php. Calls to core("chat")->get_u* are now deprecated and PlayerList does return BotError on failures.
 +- rosterupdate seems to output alot of errors todo with failed to get whois (confirmed by luyu)
  
 +Known breakage

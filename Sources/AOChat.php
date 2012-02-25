@@ -844,7 +844,7 @@ class AOChat
                                                             $key), $this->game);
     $this->send_packet($pak);
     $packet = $this->get_packet();
-    // If we recieve anything but the character list, something's wrong.
+    // If we receive anything but the character list, something's wrong.
     if ($packet->type != AOCP_LOGIN_CHARLIST) {
       die("AOChat: {$packet->args[0]}\n");
     }
@@ -1416,9 +1416,9 @@ class AOChat
     echo "Debug: lookup_user for $u completed in $i iterations\n";
 
     /*** FIXME ***/
-    // This is really ugly, and we really need to detect if we recieve a Client Lookup packet as the lookup could be negative or null.
+    // This is really ugly, and we really need to detect if we receive a Client Lookup packet as the lookup could be negative or null.
     // In those cases this loop would run 200 times or for 15 seconds even if we have gotten a reply.
-    // We now detect when we recieve the AOCP_CLIENT_LOOKUP package so we don't loop uneccecary. Maybe add some error catching in the event we do complete 200 loops?
+    // We now detect when we receive the AOCP_CLIENT_LOOKUP package so we don't loop uneccecary. Maybe add some error catching in the event we do complete 200 loops?
     /*** FIXME no. 2 ***/
     // Maybe the new function $this->wait_for_lookup_user(...) could be used.
     // But its still untested and forbidden recursive calls are likely!

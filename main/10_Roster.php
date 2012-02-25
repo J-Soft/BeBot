@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -99,14 +99,14 @@ class Roster_Core extends BasePassiveModule
         $this->update_table();
         return;
       case 3:
-        $this->bot->db->update_table('users', array('recieve_announce',
-                                                   'recieve_invite',
-                                                   'admin_level'), 'drop', "ALTER TABLE #___users DROP recieve_announce, DROP recieve_invite, DROP admin_level");
+        $this->bot->db->update_table('users', array('receive_announce',
+                                                   'receive_invite',
+                                                   'admin_level'), 'drop', "ALTER TABLE #___users DROP receive_announce, DROP receive_invite, DROP admin_level");
         $this->bot->db->set_version("users", 4);
         $this->update_table();
         return;
       case 4:
-        if ($this->bot->core('prefs')->exists('AutoInv', 'recieve_auto_invite')) {
+        if ($this->bot->core('prefs')->exists('AutoInv', 'receive_auto_invite')) {
           $fields = $this->bot->db->select("EXPLAIN #___users", MYSQL_ASSOC);
           if (!empty($fields)) {
             foreach ($fields as $field)
@@ -119,7 +119,7 @@ class Roster_Core extends BasePassiveModule
             if (!empty($invited_users)) {
               foreach ($invited_users as $invited_user)
               {
-                $this->bot->core('prefs')->change($invited_user['char_id'], 'AutoInv', 'recieve_auto_invite', 'On');
+                $this->bot->core('prefs')->change($invited_user['char_id'], 'AutoInv', 'receive_auto_invite', 'On');
               }
             }
             $this->bot->db->update_table('users', array('auto_invite'), 'drop', "ALTER TABLE #___users DROP auto_invite");
@@ -144,7 +144,7 @@ class Roster_Core extends BasePassiveModule
           {
             $set = "Off";
           }
-          $this->bot->core("prefs")->change_default("Roster Module", "MassMsg", "recieve_message", $set);
+          $this->bot->core("prefs")->change_default("Roster Module", "MassMsg", "receive_message", $set);
           $this->bot->core("settings")->del("members", "Receiveannounce");
         }
         if ($this->bot->core("settings")->exists("members", "Receiveinvite")) {
@@ -155,7 +155,7 @@ class Roster_Core extends BasePassiveModule
           {
             $set = "Off";
           }
-          $this->bot->core("prefs")->change_default("Roster Module", "MassMsg", "recieve_invite", $set);
+          $this->bot->core("prefs")->change_default("Roster Module", "MassMsg", "receive_invite", $set);
           $this->bot->core("settings")->del("members", "Receiveinvite");
         }
         $this->bot->db->set_version("users", 6);

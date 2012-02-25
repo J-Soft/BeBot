@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class IRC extends BaseActiveModule
 
   /*
   Constructor:
-  Hands over a referance to the "Bot" class.
+  Hands over a reference to the "Bot" class.
   */
   function __construct(&$bot)
   {
@@ -605,13 +605,13 @@ class IRC extends BaseActiveModule
     $this->irc->registerActionhandler(SMARTIRC_TYPE_QUERY, $this->bot->commpre . 'whois', $this->bot->commands["tell"]["irc"], 'irc_whois');
     $this->irc->registerActionhandler(SMARTIRC_TYPE_QUERY, $this->bot->commpre . 'uid (.*)', $this->bot->commands["tell"]["irc"], 'irc_uid');
     $this->irc->registerActionhandler(SMARTIRC_TYPE_NAME, '.*', $this->bot->commands["tell"]["irc"], 'irc_query');
-    $this->irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.*', $this->bot->commands["tell"]["irc"], 'irc_recieve');
+    $this->irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.*', $this->bot->commands["tell"]["irc"], 'irc_receive');
     $this->irc->registerActionhandler(SMARTIRC_TYPE_JOIN, '.*', $this->bot->commands["tell"]["irc"], 'irc_join');
     $this->irc->registerActionhandler(SMARTIRC_TYPE_NICKCHANGE, '.*', $this->bot->commands["tell"]["irc"], 'irc_nick');
     $this->irc->registerActionhandler(SMARTIRC_TYPE_PART, '.*', $this->bot->commands["tell"]["irc"], 'irc_part');
     $this->irc->registerActionhandler(SMARTIRC_TYPE_QUIT, '.*', $this->bot->commands["tell"]["irc"], 'irc_part');
     $this->irc->registerActionhandler(SMARTIRC_TYPE_KICK, '.*', $this->bot->commands["tell"]["irc"], 'irc_part');
-    $this->irc->registerActionhandler(SMARTIRC_TYPE_QUERY, '.*', $this->bot->commands["tell"]["irc"], 'irc_recieve_msg');
+    $this->irc->registerActionhandler(SMARTIRC_TYPE_QUERY, '.*', $this->bot->commands["tell"]["irc"], 'irc_receive_msg');
     $this->irc->setCtcpVersion($this->bot->botversionname . " (" . $this->bot->botversion . ")");
     $this->irc->setAutoReconnect((($this->bot->core("settings")->get("Irc", "Reconnect")) ? 1 : 0));
     $this->irc->connect($this->bot->core("settings")->get("Irc", "Server"), $this->bot->core("settings")->get("Irc", "Port"));
@@ -645,7 +645,7 @@ class IRC extends BaseActiveModule
   /*
   * Gets called for an inc IRC message
   */
-  function irc_recieve(&$irc, &$data)
+  function irc_receive(&$irc, &$data)
   {
     if ((strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'online'))) && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'is'))) && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'whois'))) && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'level')))) {
       $msg = str_replace("<", "&lt;", $data->message);
@@ -992,7 +992,7 @@ class IRC extends BaseActiveModule
     }
   }
 
-  function irc_recieve_msg(&$irc, &$data)
+  function irc_receive_msg(&$irc, &$data)
   {
     $msg = explode(" ", $data->message, 2);
     Switch ($msg[0])

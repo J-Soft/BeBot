@@ -19,7 +19,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ class SecurityTest extends BaseActiveModule
         }
         break;
       default:
-        $this->bot->send_tell($name, "Broken plugin, recieved unhandled command: $command");
+        $this->bot->send_tell($name, "Broken plugin, received unhandled command: $command");
     }
   } // End function handler()
 

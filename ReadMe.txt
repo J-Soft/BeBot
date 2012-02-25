@@ -10,7 +10,7 @@ INSTALLING BEBOT 0.6
 This bot works for both, Anarchy Online (AO) and Age of Conan (AoC). Some 
 settings and modules only make sense for AO and some make only sense for 
 AoC. Whenever something is only applicable for one of the games, it is 
-marked as „AO only“ or „AoC only“. 
+marked as "AO only" or "AoC only". 
 
 PREREQUISITES (WHAT DO YOU NEED?)
 ---------------------------------
@@ -24,13 +24,13 @@ To install and run BeBot you need the following:
 
 Optional (helps run it effectively): 
 
-* An „always-on“ internet connection
+* An "always-on" internet connection
 * A dedicated machine to run the bot
 
 CREATE A PLAYER
 ---------------
 
-A bot is basically a regular player character so you’ll need to start AO/AoC 
+A bot is basically a regular player character so you"ll need to start AO/AoC 
 and create a character on the appropriate dimension/server. The breed, 
 gender, and profession (AO only) or the class and race (AoC only) is 
 irrelevant for the function of the bot. The name of the character will be 
@@ -67,15 +67,15 @@ text editor. Here you need to set the $php_bin to the path and name of your
 php executable. 
 
 If you start the bot from the same directory as the binary php file (for 
-windows „php.exe“) you can just enter the name. Otherwise you’ll have to 
+windows "php.exe") you can just enter the name. Otherwise you"ll have to 
 enter the name and path of the binary executable (ie C:/Program 
 files/PHP/php.exe or C:\\Programfiles\\PHP\\php.exe or /usr/local/bin/php5). 
 Note that you can use forward slashes (recommended) or double backslashes 
 (not recommended) on windows systems. Using single backslashes WILL NOT WORK 
-as php interpets \ as a special escape character. 
+as php interprets \ as a special escape character.
 
-Set $main_php to the location of the „Main.php“ file. Once again you can 
-just enter „Main.php“ if you’re starting the bot from the directory its in. 
+Set $main_php to the location of the "Main.php" file. Once again you can 
+just enter "Main.php" if you"re starting the bot from the directory its in. 
 
 If StartBot.php is in another directory than the bot itself (not 
 recommended) you must specify the complete path to Main.php. 
@@ -101,20 +101,20 @@ superadmins.
 
 The next section works just like the superadmins. You can tell the bot what 
 other bots it may encounter in the guild. This is so that the bot just 
-ignores tells and messages from the other bot and doesn’t end up in a spam 
+ignores tells and messages from the other bot and doesn't end up in a spam
 war with it. 
 
 For setting up the guild bot section please see bottom of this section. 
 
-To switch logging off set „$log“ to „off“. You can also set it to „chat“ 
-which will only log incoming and outgoing messages. If set to „all“ 
+To switch logging off set "$log" to "off". You can also set it to "chat" 
+which will only log incoming and outgoing messages. If set to "all" 
 everything displayed on the console will be put into the log. The default is 
-„chat“. Set „$log_path“ to the place where you want logs to be saved. 
+"chat". Set "$log_path" to the place where you want logs to be saved. 
 
-With „$command_prefix“ you can determine what symbol commands start with. 
-The default here is „!“. Note that you need to use the regex string here. 
-This means that to use „.“ as your command prefix you need to enter „\.“ 
-because „.“ has got a special meaning in regular expressions. This goes for 
+With "$command_prefix" you can determine what symbol commands start with. 
+The default here is "!". Note that you need to use the regex string here. 
+This means that to use "." as your command prefix you need to enter "\." 
+because "." has got a special meaning in regular expressions. This goes for 
 a lot of other characters as well. 
 
 The last 4 values are probably best left at default. 
@@ -122,10 +122,10 @@ The last 4 values are probably best left at default.
 Guild bot
 ---------
 
-To make a guild bot set „$guildbot“ to true. Change „$guild_name“ to the 
+To make a guild bot set "$guildbot" to true. Change "$guild_name" to the 
 exact name of your guild. 
 
-AO only: Set „$guild_id“ to the id of your guild. The easiest way to find 
+AO only: Set "$guild_id" to the id of your guild. The easiest way to find 
 out the guild ID is going to http://www.anarchy-
 online.com/content/community/people/ and finding your guild. Then scroll
 to the bottom of the page and click the "XML version of this membership
@@ -138,16 +138,16 @@ It will start with:
 the xxxxxx is your guild ID. 
 
 To relay chat to another guild bot you want to set $guild_relay_target = 
-„Name_of_other_guildbot“; If you do not want this feature set 
-$guild_relay_target = False; (note: False, not „False“. If you use quotes 
-your bot will attempt to relay to the player named ‘False’) 
+"Name_of_other_guildbot"; If you do not want this feature set 
+$guild_relay_target = False; (note: False, not "False". If you use quotes 
+your bot will attempt to relay to the player named "False") 
 
 Raid bot
 --------
 
-To make a raid bot set „$guildbot“ to false and leave „$guild_name“ blank. 
-Set „$guild_id“ to 0. For a raid bot you most likely want to set 
-$guild_relay_target = false; (note: false, not „false“) 
+To make a raid bot set "$guildbot" to false and leave "$guild_name" blank. 
+Set "$guild_id" to 0. For a raid bot you most likely want to set 
+$guild_relay_target = false; (note: false, not "false") 
 
 CONF/MYSQL.CONF
 ---------------
@@ -159,19 +159,19 @@ database name for the bot (see below).
 STARTING THE BOT
 ================
 
-* Open a console (In windows press „Start“ => „Run“ => enter „cmd“ and
+* Open a console (In windows press "Start" => "Run" => enter "cmd" and
   press enter).
 * Now run the start.php
 * Windows: Navigate to the directory of your bot assuming you have the
-  php.exe in the same directory and write „php start.php“.
+  php.exe in the same directory and write "php start.php".
 * Linux: Assuming your can run php5 from anywhere navigate to your bot 
-  directory and write „php5 start.php“ (assuming your php binary is 
-  named „php5“).
+  directory and write "php5 start.php" (assuming your php binary is 
+  named "php5").
 
 The console should now state that the bot is loading the modules, 
 authenticating and connecting. Once this is done (AoC only: wait 5 minutes 
 now) you can log onto an character in-game which you have configured as 
-„superadmin“. You should now be able to talk to the bot. 
+"superadmin". You should now be able to talk to the bot. 
 
 PLAYING WHILE RUNNING THE BOT (AO ONLY)
 ---------------------------------------
@@ -193,16 +193,16 @@ IN-GAME SETUP
 
 There is a settings module to handle configuration of most aspects and many 
 modules for BeBot. Most notable is the Security module. To start configuring 
-it send a tell to your bot with „!settings security“. For a list of modules 
+it send a tell to your bot with "!settings security". For a list of modules 
 whose settings are configurable by the new interface send a tell to your bot 
-with „!settings“. 
+with "!settings". 
 
 
 ADDING AND REMOVING MODULES
 ===========================
 
 If you do not wish for certain modules to be used by a bot just put an 
-underscore („_“) at the front of the name in the „modules“ directory. There 
+underscore ("_") at the front of the name in the "modules" directory. There 
 are several files already in the distribution that have been commented out 
 in this way: Most notable is _ExampleModule.php which is a template to make 
 your own modules. 
@@ -214,15 +214,15 @@ We recommend you put any 3rd party modules into the directory named custom
 instead of putting it directly into the modules or core directories. This is 
 because if a 3rd party module has got the same name as a standard module or 
 a module with that name is added later it will be over-written if you 
-upgrade the bot. Modules in the ‘custom’ directory are never touched by 
+upgrade the bot. Modules in the "custom" directory are never touched by 
 installing upgrades to BeBot. 
 
 
 INSTALLING MYSQL ON WINDOWS
 ===========================
 
-First, you’ll need MySQL. Download the Windows Essentials package from 
-MySQL.com. This is a MSI based installer. If it doesn’t work for you, go to 
+First, you"ll need MySQL. Download the Windows Essentials package from 
+MySQL.com. This is a MSI based installer. If it doesn"t work for you, go to 
 Microsoft Update to install the latest Windows Installer. 
 
 The installer is simple. 
@@ -236,9 +236,9 @@ PHASE 1: MYSQL INSTALLER
 4.	Select Skip Sign-Up, Click Next.
 5.	Check Configure MySQL Server Now, Click Finish.
 
-Now you should be in the MySQL Server Instance Configuration Wizzard. 
+Now you should be in the MySQL Server Instance Configuration Wizard.
 
-PHASE 2: MYSQL SERVER INSTANCE CONFIGURATION WIZZARD
+PHASE 2: MYSQL SERVER INSTANCE CONFIGURATION WIZARD
 ----------------------------------------------------
 
 1.	Click Next.
@@ -253,13 +253,13 @@ PHASE 2: MYSQL SERVER INSTANCE CONFIGURATION WIZZARD
 
         automatically, Check Include Bin Directory in Windows PATH, Click 
         Next.
-10.	Enter and confim your root password. Write down your root password 
+10.	Enter and comfirm your root password. Write down your root password
         and do not loose it!!! Do not check Enable root access from remote 
         machines. Click Next.
 11.	Click Execute.
 12.	Click Finish. Reboot your computer. 
 
-At this point, you have MySQL installed and configured, but you haven’t yet 
+At this point, you have MySQL installed and configured, but you haven"t yet 
 created a MySQL database. 
 
 PHASE 3: LOGGING INTO MYSQL
@@ -267,7 +267,7 @@ PHASE 3: LOGGING INTO MYSQL
 
 1.	Open a command prompt. (Start > Run > CMD, Click OK)
 2.	In the command prompt, enter the command mysql -u root -p
-3.	Enter your root password (You did write it down so you wouldn’t 
+3.	Enter your root password (You did write it down so you wouldn"t 
         forget it right?)
 
 You should now have a MySQL prompt that looks like: mysql> 
@@ -281,7 +281,7 @@ PHASE 4: CREATE A DATABASE AND DATABASE USER FOR BEBOT
 3.	CREATE USER username@localhost; (Change username to the username you 
         want, keep @localhost)
 4.	Press Enter/Return. 
-5.	SET PASSWORD FOR username@localhost = PASSWORD(’newpassword’); 
+5.	SET PASSWORD FOR username@localhost = PASSWORD("newpassword"); 
         (Change username and newpassword to your selected username and 
         password, again keep @localhost)
 6.	Press Enter/Return. 
@@ -300,13 +300,13 @@ PHASE 5: CONFIGURE BEBOT
   $pass = "newpassword";
   $server = "localhost";
 
-That’s it, you should now be able to start the bot provided PHP is set up 
+That"s it, you should now be able to start the bot provided PHP is set up 
 correctly. 
 
 Backing Up and Restoring your Database
 --------------------------------------
 
-It’s reccomended that you backup your database. If the worst happens, you 
+It"s reccomended that you backup your database. If the worst happens, you 
 can easily recover. And the command to do so is simple: 
 
   mysqldump -u username -p --databases databasename --add-drop-table -a -f  > filename.sql

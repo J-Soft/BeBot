@@ -17,7 +17,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ class ClassName extends BaseActiveModule
 
   /*
   Constructor:
-  Hands over a referance to the "Bot" class.
+  Hands over a reference to the "Bot" class.
   Defines access control for the commands
   Creates settings for the module
   Defines help for the commands
@@ -166,7 +166,7 @@ class ClassName extends BaseActiveModule
         return ($this->someotherfunction($name, $com));
       default:
         // Just a safety net to allow you to catch errors where a module has registered  a command, but fails to actually do anything about it
-        $this->error->set("Broken plugin, recieved unhandled command: $command");
+        $this->error->set("Broken plugin, received unhandled command: $command");
         return ($this->error->message());
     }
   }

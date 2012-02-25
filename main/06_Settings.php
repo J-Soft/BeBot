@@ -1,9 +1,9 @@
 <?php
 /*
-* Settings_Core.php - Settings Managment Functions.
+* Settings_Core.php - Settings Management Functions.
 * Version: 1.5
 * Created by Andrew Zbikowski <andyzib@gmail.com> (AKA Glarawyn, RK1)
-* Core module for saving, retriving, and modyfing settings in a standard way.
+* Core module for saving, retriving, and modifying settings in a standard way.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -18,7 +18,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@
 Main Functions:
 
 All main functions return an array with 'error' and 'errordesc' elements.
-If the 'error' element is TRUE, an error occured. The 'errordesc'
+If the 'error' element is TRUE, an error occurred. The 'errordesc'
 contains the description of the error.
 
 get($module, $setting)
@@ -91,7 +91,7 @@ class Settings_Core extends BasePassiveModule
 
   /*
   Constructor:
-  Hands over a referance to the "Bot" class.
+  Hands over a reference to the "Bot" class.
   */
   function __construct(&$bot)
   {

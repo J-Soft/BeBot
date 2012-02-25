@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class Vote extends BaseActiveModule
     $this->help['description'] = 'This module enables the guild to arrange votes.';
     $this->help['command']['vote'] = "Shows the vote interface";
     $this->help['command']['vote new <description> [;option 1;...;option n]'] = "Adds adds a new vote about <description>. It is possible to add options here separated by semicolons.";
-    $this->help['command']['vote restrict <vote#> [min_level]'] = "Only players with <min_level> access can vote on vote <vote#>. If min_level is omitted a menu of availible levels is shown";
+    $this->help['command']['vote restrict <vote#> [min_level]'] = "Only players with <min_level> access can vote on vote <vote#>. If min_level is omitted a menu of available levels is shown";
     $this->help['command']['vote addopt <vote#> <option1> [;option 2;...;option n]'] = "Adds adds new option(s) to <vote#>";
     $this->help['command']['vote delopt <option_id>'] = "Remove option with id <option_id>";
     $this->help['command']['vote edit <option_id> <newtext>'] = "Replaces the text for option with id <option_id> with <newtext>";
@@ -164,7 +164,7 @@ class Vote extends BaseActiveModule
       default:
         // Just a safety net to allow you to catch errors where a module has registered  a command, but fails to actually do anything about it
         // $this -> bot -> send_output($source, $text, $type) will send $text to $source by tell if $type is 1 (tell) or to the apropriate channel if $type is 2 or 3.
-        $this->bot->send_output($source, "Broken plugin, recieved unhandled command: $command", $type);
+        $this->bot->send_output($source, "Broken plugin, received unhandled command: $command", $type);
     }
   }
 
@@ -355,7 +355,7 @@ class Vote extends BaseActiveModule
     //Check the highest rank of this player to determine if he can vote
     //Add the vote to the ballots table
     $this->bot->db->query("INSERT INTO #___vote_ballots (vote_id, player, option_id) VALUES ($vote_no, $name, $option_no)");
-    //Update the number of votes recieved by the option
+    //Update the number of votes received by the option
     $this->bot->db->query("UPDATE #___vote_options SET votes = votes + 1 WHERE vote_id = $vote_no AND id = " . $option_no);
     //Update the number of votes on the vote
     $this->bot->db->query("UPDATE #___votes SET votes_total = votes_total + 1 WHERE id = " . $vote_no);
@@ -382,7 +382,7 @@ class Vote extends BaseActiveModule
             $window .= "{$vote['id']}: <a href='chat:///tell <botname> <pre>vote show {$vote['id']}'>{$vote['description']}</a><br>";
           }
         }
-        return $this->bot->core("tools")->make_blob("Availible votes", $window);
+        return $this->bot->core("tools")->make_blob("Available votes", $window);
       }
       else
       {

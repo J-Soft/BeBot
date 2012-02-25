@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ class Mail extends BaseActiveModule
     //$this -> register_event("cron", "12hour");
     $this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("mail_message", "true") . "
 						(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-						recieved TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+						received TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 						expires TIMESTAMP,
 						is_read BOOL DEFAULT false,
 						mailbox VARCHAR(13),
@@ -165,7 +165,7 @@ class Mail extends BaseActiveModule
     //Returns a window containing new and read mail
     $mailbox = $this->bot->core("alts")->main($user);
     $window = "##yellow##:::##end## Mail for ##highlight##$user##end## ($mailbox) ##yellow##:::##end##<br><br>";
-    $query = "SELECT * FROM #___mail_message WHERE mailbox='$mailbox' ORDER BY is_read, recieved DESC";
+    $query = "SELECT * FROM #___mail_message WHERE mailbox='$mailbox' ORDER BY is_read, received DESC";
     $messages = $this->bot->db->select($query, MYSQL_ASSOC);
     if (!empty($messages)) {
       foreach ($messages as $message)
@@ -186,7 +186,7 @@ class Mail extends BaseActiveModule
           $message['message'] = substr($message['message'], 0, 20) . '...';
         }
         $window .= $this->bot->core("tools")->chatcmd("mail delete " . $message['id'], "[delete]") . " ";
-        $window .= "{$message['recieved']} ";
+        $window .= "{$message['received']} ";
         $window .= "To: ##highlight##{$message['recipient']}##end## ";
         $window .= "From: ##highlight##{$message['sender']}##end##  ::: ";
         $window .= $this->bot->core("tools")->chatcmd("mail read " . $message['id'], $message['message']) . "<br>";
@@ -209,10 +209,10 @@ class Mail extends BaseActiveModule
       $message = $messages[0];
       $window .= "##highlight##To:##end## {$message['recipient']}<br>";
       $window .= "##highlight##From:##end## {$message['sender']}<br>";
-      $window .= "##highlight##Sent:##end## {$message['recieved']}<br><br>";
+      $window .= "##highlight##Sent:##end## {$message['received']}<br><br>";
       $window .= "##normal##" . base64_decode($message['message']) . "##end##<br><br>";
       $window .= "[" . $this->bot->core("tools")->chatcmd("mail delete " . $message['id'], "delete") . "] ";
-      $window .= "[" . $this->bot->core("tools")->chatcmd("mail send {$message['sender']} The message you sent on {$message['recieved']} has been read", "Notify sender") . "]";
+      $window .= "[" . $this->bot->core("tools")->chatcmd("mail send {$message['sender']} The message you sent on {$message['received']} has been read", "Notify sender") . "]";
       $time = strtotime("+" . str_replace('_', ' ', $this->bot->core("prefs")->get($user, 'Mail', 'Life_read')));
       $query = "UPDATE #___mail_message SET is_read=true, expires=FROM_UNIXTIME('$time') WHERE id=$id AND is_read=false";
       $this->bot->db->query($query);
@@ -258,7 +258,7 @@ class Mail extends BaseActiveModule
       if (!empty($online)) {
         foreach ($online as $send)
         {
-          $this->bot->send_tell($send, $this->make_item_blob("You've just Recieved a new message.", $this->mail_list($send)));
+          $this->bot->send_tell($send, $this->make_item_blob("You've just received a new message.", $this->mail_list($send)));
         }
       }
       return ("Message sent to $recipient ($mailbox).");

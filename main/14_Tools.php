@@ -1,6 +1,6 @@
 <?php
 /*
-* Tools.php - Module Containing Usefull Functions to be used by other Modules
+* Tools.php - Module Containing Useful Functions to be used by other Modules
 *
 * Made by Temar (most code is Simply Taken from elsewhere)
 *
@@ -17,7 +17,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by

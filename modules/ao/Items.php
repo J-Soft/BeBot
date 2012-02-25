@@ -19,7 +19,7 @@
  * - Naturalistic (RK1)
  * - Temar (RK1)
  *
- * See Credits file for all aknowledgements.
+ * See Credits file for all acknowledgements.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class VhItems extends BaseActiveModule
         $result = $this->bot->core("tools")->get_site($url, 1);
         //Again I do not see why we're looking for mysql_real_escape_string
         if (strstr($result, 'mysql_real_escape_string') !== false) {
-          return ("Recieved garbled reply from vhabot!");
+          return ("received garbled reply from vhabot!");
         }
         return $result;
       }

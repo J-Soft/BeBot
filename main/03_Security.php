@@ -3,7 +3,7 @@
 * Security.php - Provide security to all of BeBot.
 *
 * See http://bebot.shadow-realm.org/wiki/doku.php?id=security for full on
-* usage of BeBot's Security System.
+* usage of BeBots Security System.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -18,7 +18,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -35,8 +35,8 @@
 *  USA
 */
 
-// Define Access Levels as Constants, these are availabe globally...
-// There is no way to change these durring runtime.
+// Define Access Levels as Constants, these are available globally...
+// There is no way to change these during runtime.
 define("OWNER", 256); // Outside range of MySQL TINYINT UNSIGNED
 define("SUPERADMIN", 255);
 define("ADMIN", 192);
@@ -67,7 +67,7 @@ class Security_Core extends BaseActiveModule
   var $last_alts_status; // Check status of setting UseAlts, if it changes clear main cache.
   /*
   Constructor:
-  Hands over a referance to the "Bot" class.
+  Hands over a reference to the "Bot" class.
   */
   function __construct(&$bot)
   {
@@ -499,7 +499,7 @@ class Security_Core extends BaseActiveModule
         }
         break;
       default:
-        $this->bot->send_tell($source, "Broken plugin, recieved unhandled command: $command");
+        $this->bot->send_tell($source, "Broken plugin, received unhandled command: $command");
     }
   } // End funciton handler
 

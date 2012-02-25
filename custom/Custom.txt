@@ -1,2 +1,2 @@
-Custom core and non core modules should be placed in the apropriate sub directory and will be loaded automatically upon startup.
+Custom core and non core modules should be placed in the appropriate sub directory and will be loaded automatically upon startup.
 Custom help files should be placed in the help directory and will take precedence over default help files.

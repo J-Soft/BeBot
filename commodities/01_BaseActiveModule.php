@@ -13,7 +13,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -160,7 +160,7 @@ abstract class BaseActiveModule extends BasePassiveModule
   }
 
   /************************************************************************
-  Default to replying in the same channel as the command has been recieved
+  Default to replying in the same channel as the command has been received
    *************************************************************************/
   public function reply($name, $msg)
   {

@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class Maintenance extends BaseActiveModule
 
   /*
   Constructor:
-  Hands over a referance to the "Bot" class.
+  Hands over a reference to the "Bot" class.
   */
   function __construct(&$bot)
   {
@@ -83,7 +83,7 @@ class Maintenance extends BaseActiveModule
           return $this->main($origin);
         }
       default:
-        return "Broken plugin, recieved unhandled command: $command in Maintenance.php";
+        return "Broken plugin, received unhandled command: $command in Maintenance.php";
     }
   }
 

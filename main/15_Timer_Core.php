@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@
 *	$owner is the nickname of the owner of the timer
 *	$duration is the duration of the timer in seconds
 *	$name is a string defining the name of the timer
-*	$channel is the chat channel the timer should be outputed to
-*	$repeat is the intervall in seconds in which the timer should be repeated until it is deleted
+*	$channel is the chat channel the timer should be output to
+*	$repeat is the interval in seconds in which the timer should be repeated until it is deleted
 *	$class is the name of the timer class for this timer
 *   The function returns the ID of the newly created timer
 *

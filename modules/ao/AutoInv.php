@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -40,14 +40,14 @@ class AutoInv extends BaseActiveModule
 
   /*
   Constructor:
-  Hands over a referance to the "Bot" class.
+  Hands over a reference to the "Bot" class.
   */
   function __construct(&$bot)
   {
     parent::__construct($bot, get_class($this));
     $this->bot->core("settings")->create("AutoInv", "Activated", FALSE, "Is the autoinvite activated?");
     $this->bot->core("settings")->create("AutoInv", "ShowInfo", TRUE, "Should an informative message telling how to disable autoinvite be sent to all characters that are invited via autoinvite?");
-    $this->bot->core('prefs')->create('AutoInv', 'recieve_auto_invite', 'Automatic invites to private group should be?', 'Off', 'Off;On');
+    $this->bot->core('prefs')->create('AutoInv', 'receive_auto_invite', 'Automatic invites to private group should be?', 'Off', 'Off;On');
     $this->register_command("tell", "autoinvite", "GUEST");
     // Register for logon notifies
     $this->register_event("logon_notify");
@@ -79,18 +79,18 @@ class AutoInv extends BaseActiveModule
 
   function get_status($name)
   {
-    return ($this->bot->core('prefs')->get($name, 'AutoInv', 'recieve_auto_invite'));
+    return ($this->bot->core('prefs')->get($name, 'AutoInv', 'receive_auto_invite'));
   }
 
   function enable_invite($name)
   {
-    $this->bot->core('prefs')->change($name, 'AutoInv', 'recieve_auto_invite', 'On');
+    $this->bot->core('prefs')->change($name, 'AutoInv', 'receive_auto_invite', 'On');
     return ('Autoinvite has been enabled');
   }
 
   function disable_invite($name)
   {
-    $this->bot->core('prefs')->change($name, 'AutoInv', 'recieve_auto_invite', 'Off');
+    $this->bot->core('prefs')->change($name, 'AutoInv', 'receive_auto_invite', 'Off');
     return ('Autoinvite has been disabled');
   }
 
@@ -125,7 +125,7 @@ class AutoInv extends BaseActiveModule
       Return;
     }
     if ($this->bot->core("settings")->get("Autoinv", "Activated")) {
-      if ($this->bot->core('prefs')->get($user, 'AutoInv', 'recieve_auto_invite') == 'On' && $this->check_access($user) && !($this->bot->core("online")->in_chat($user))) {
+      if ($this->bot->core('prefs')->get($user, 'AutoInv', 'receive_auto_invite') == 'On' && $this->check_access($user) && !($this->bot->core("online")->in_chat($user))) {
         if ($this->bot->core("settings")->get("AutoInv", "ShowInfo")) {
           $blob = $this->bot->core("tools")->chatcmd("autoinvite off", "Click here to remove yourself from autoinvite");
           $this->bot->send_tell($user, "If you don't want this bot to invite you in the future, click " . $this->bot->core("tools")->make_blob('here', $blob) . " or type: /tell <botname> <pre>autoinvite off");

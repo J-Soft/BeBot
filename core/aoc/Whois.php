@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class Whois_Core extends BasePassiveModule
   {
     parent::__construct($bot, get_class($this));
     /*
-    Create tables for our whois cache if it does not already exsist.
+    Create tables for our whois cache if it does not already exist.
     */
     $this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("whois", "false") . " (
 					ID bigint NOT NULL default '0',

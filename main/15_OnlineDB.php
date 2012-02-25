@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -53,12 +53,12 @@ The Class itself...
 */
 class OnlineDB_Core extends BasePassiveModule
 { // Start Class
-  var $last_seen; // Caches all known last seen infos for faster access
+  var $last_seen; // Caches all known last seen info for faster access
   var $guest_cache; // Caches all character in the guest channel for optional security handling
 
   /*
   Constructor:
-  Hands over a referance to the "Bot" class.
+  Hands over a reference to the "Bot" class.
   */
   function __construct(&$bot)
   {

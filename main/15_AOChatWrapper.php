@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class AOChatWrapper_Core extends BasePassiveModule
 
   /*
   Constructor:
-  Hands over a referance to the "Bot" class.
+  Hands over a reference to the "Bot" class.
   */
   function __construct(&$bot)
   {
@@ -49,7 +49,7 @@ class AOChatWrapper_Core extends BasePassiveModule
   }
 
   /*
-  This is a wrapper function for aoc->get_uid() that checks the whois cache if aoc->get_uid() failes
+  This is a wrapper function for aoc->get_uid() that checks the whois cache if aoc->get_uid() fails
   */
   function get_uid($user)
   {

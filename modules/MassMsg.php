@@ -15,7 +15,7 @@
 * - Naturalistic (RK1)
 * - Temar (RK1)
 *
-* See Credits file for all aknowledgements.
+* See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -50,8 +50,8 @@ class MassMsg extends BaseActiveModule
     $this->bot->core("settings")->create('MassMsg', 'MinAccess', 'GUEST', 'Which access level must characters online have to receive mass messages and invites?', 'ANONYMOUS;GUEST;MEMBER;LEADER;ADMIN;SUPERADMIN;OWNER');
     $this->bot->core("settings")->create('MassMsg', 'IncludePrefLink', TRUE, 'Should a link to preferences be included in the messages/invites?');
     $this->bot->core("settings")->create('MassMsg', 'tell_to_PG_users', FALSE, 'Should Bot Send message to users in PG instead of just Outputing to PG and ignoreing them');
-    $this->bot->core('prefs')->create('MassMsg', 'recieve_message', 'Do you want to recieve mass-messages?', 'Yes', 'Yes;No');
-    $this->bot->core('prefs')->create('MassMsg', 'recieve_invites', 'Do you want to recieve mass-invites?', 'Yes', 'No;Yes');
+    $this->bot->core('prefs')->create('MassMsg', 'receive_message', 'Do you want to receive mass-messages?', 'Yes', 'Yes;No');
+    $this->bot->core('prefs')->create('MassMsg', 'receive_invites', 'Do you want to receive mass-invites?', 'Yes', 'No;Yes');
     $this->bot->core("colors")->define_scheme("massmsg", "type", "aqua");
     $this->bot->core("colors")->define_scheme("massmsg", "msg", "orange");
     $this->bot->core("colors")->define_scheme("massmsg", "disable", "seablue");
@@ -97,14 +97,14 @@ class MassMsg extends BaseActiveModule
     $msg = $this->bot->core("colors")->colorize("normal", $msg);
     foreach ($users as $recipient)
     {
-      if ($this->bot->core('prefs')->get($recipient, 'MassMsg', 'recieve_message') == 'Yes') {
+      if ($this->bot->core('prefs')->get($recipient, 'MassMsg', 'receive_message') == 'Yes') {
         $massmsg = TRUE;
       }
       else
       {
         $massmsg = FALSE;
       }
-      if ($this->bot->core('prefs')->get($recipient, 'MassMsg', 'recieve_invites') == 'Yes') {
+      if ($this->bot->core('prefs')->get($recipient, 'MassMsg', 'receive_invites') == 'Yes') {
         $massinv = TRUE;
       }
       else
@@ -141,7 +141,7 @@ class MassMsg extends BaseActiveModule
       {
         $status[$recipient]['sent'] = false;
       }
-      //If type is an invite and they want invites, they will recieve both a message and an invite regardless of recieve_message setting
+      //If type is an invite and they want invites, they will receive both a message and an invite regardless of receive_message setting
       if ($type == 'Invite') {
         if ($massinv) {
           if ($this->bot->core("online")->in_chat($recipient)) {

@@ -1,4 +1,4 @@
-This directory contains a script to update the entries in the whois cache outside of the bot. To do this it queries the whois cache for all existing orgs first. It reads in all org roster from the FC servers, and updates all characters in those organisations. Characters in the org roster but not yet in the cache are added to the cache during this step. After all organisation informations are processed the remaining not yet updated characters are queried on the FC site and updated if they still exist. Stale entries - this means entries that haven't been updated for some time - are deleted out of the cache after a user defined time. Usually those are deleted characters.
+This directory contains a script to update the entries in the whois cache outside of the bot. To do this it queries the whois cache for all existing orgs first. It reads in all org roster from the FC servers, and updates all characters in those organisations. Characters in the org roster but not yet in the cache are added to the cache during this step. After all organisation information are processed the remaining not yet updated characters are queried on the FC site and updated if they still exist. Stale entries - this means entries that haven't been updated for some time - are deleted out of the cache after a user defined time. Usually those are deleted characters.
 Depending on the size of the cache those updates can take several hours.
 
 BeBot does update outdated entries itself, the script takes the whole load out of the bot though, possible reducing lag that way.
@@ -10,7 +10,7 @@ After entering all information just start the php file with something like "php 
 
 
 PHP SETUP:
-If you recieve the error:
+If you receive the error:
 Fatal error: Call to undefined function: mysql_connect()
 You may need to add the following line to your PHP.ini file.
 
