@@ -45,7 +45,7 @@ class BanManager extends BaseActiveModule
   {
     parent::__construct($bot, get_class($this));
     $this->register_command("all", "ban", "GUEST", array("add" => "ADMIN",
-                                                        "del" => "ADMIN"));
+                                                         "del" => "ADMIN"));
     $this->help['description'] = "Handling the bans for <botname>.";
     $this->help['command']['banlist'] = "Shows the list of all currently banned characters.";
     $this->help['command']['ban'] = $this->help['command']['banlist'];

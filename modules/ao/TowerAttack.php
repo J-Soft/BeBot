@@ -110,11 +110,11 @@ class TowerAttack extends BaseActiveModule
       case 1:
         $this->bot->db->update_table("tower_result", "zone", "add", "ALTER IGNORE TABLE #___tower_result ADD zone VARCHAR(50)");
         $this->bot->db->update_table("tower_result", array("time",
-                                                          "win_guild",
-                                                          "win_side",
-                                                          "lose_guild",
-                                                          "lose_side",
-                                                          "zone"), "alter", "ALTER IGNORE TABLE #___tower_result " . "ADD UNIQUE (time, win_guild, win_side, lose_guild, lose_side, zone), " . "ADD INDEX (win_guild), ADD INDEX (win_side), ADD INDEX (zone)");
+                                                           "win_guild",
+                                                           "win_side",
+                                                           "lose_guild",
+                                                           "lose_side",
+                                                           "zone"), "alter", "ALTER IGNORE TABLE #___tower_result " . "ADD UNIQUE (time, win_guild, win_side, lose_guild, lose_side, zone), " . "ADD INDEX (win_guild), ADD INDEX (win_side), ADD INDEX (zone)");
     }
     $this->bot->db->set_version("tower_result", 2);
     switch ($this->bot->db->get_version("tower_attack"))

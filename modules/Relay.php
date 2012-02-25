@@ -137,7 +137,7 @@ class Relay extends BaseActiveModule
   function tell($name, $msg)
   {
     $input = $this->parse_com($msg, array('com',
-                                         'args'));
+                                          'args'));
     if (strtolower($input['com']) == 'gcrc') {
       $this->inc_com($name, $input['args'], "tell");
     }
@@ -157,7 +157,7 @@ class Relay extends BaseActiveModule
   function extpgmsg($pgroup, $name, $msg, $db = FALSE)
   {
     $input = $this->parse_com($msg, array('com',
-                                         'args'));
+                                          'args'));
     if (strtolower($input['com']) == 'gcrc') {
       $this->inc_com($name, $input['args'], "extpg");
     }

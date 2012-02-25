@@ -43,7 +43,7 @@ class MySQL
 
   public function get_instance($bothandle)
   {
-    $bot = Bot->get_instance($bothandle);
+    $bot = Bot::get_instance($bothandle);
     if (!isset(self::$instance[$bothandle])) {
       $class = __CLASS__;
       self::$instance[$bothandle] = new $class($bothandle);
@@ -53,24 +53,25 @@ class MySQL
 
   private function __construct($bothandle)
   {
-    $this->bot = Bot->get_instance($bothandle);
+    $this->bot = Bot::get_instance($bothandle);
     $this->botname = $this->bot->botname;
     $this->error_count = 0;
     $this->last_error = 0;
     $this->last_reconnect = 0;
     $this->underscore = "_";
+    $nounderscore = FALSE;
     /*
     Load up config
     */
     $botname_mysql_conf = "conf/" . $this->botname . ".MySQL.conf";
     if (file_exists($botname_mysql_conf)) {
       include $botname_mysql_conf;
-      echo "Loaded MySQL configuration from " . $botname_mysql_conf . "\n";
+      $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from " . $botname_mysql_conf, FALSE);
     }
     else
     {
       include "conf/MySQL.conf";
-      echo "Loaded MySQL configuration from conf/MySQL.conf\n";
+      $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from conf/MySQL.conf", FALSE);
     }
     $this->USER = $user;
     $this->PASS = $pass;
@@ -108,9 +109,9 @@ class MySQL
   function update_master_table()
   {
     $columns = array_flip(array("internal_name",
-                               "prefix",
-                               "use_prefix",
-                               "schemaversion"));
+                                "prefix",
+                                "use_prefix",
+                                "schemaversion"));
     $fields = $this->select("EXPLAIN " . $this->master_tablename, MYSQL_ASSOC);
     if (!empty($fields)) {
       foreach ($fields as $field)
@@ -133,13 +134,16 @@ class MySQL
 
   function connect($initial = false)
   {
-    $conn = mysql_connect($this->SERVER, $this->USER, $this->PASS);
+    if ($initial) {
+      $this->bot->log("MYSQL", "START", "Establishing MySQL database connection....");
+    }
+    $conn = @mysql_connect($this->SERVER, $this->USER, $this->PASS);
     if (!$conn) {
-      $this->error("Cannot connect to the database server!", $initial);
+      $this->error("Cannot connect to the database server!", $initial, false);
       return false;
     }
     if (!mysql_select_db($this->DBASE, $conn)) {
-      $this->error("Database not found or insufficient priviledges!", $initial);
+      $this->error("Database not found or insufficient priviledges!", $initial, false);
       return false;
     }
     if ($initial == true) {
@@ -156,14 +160,16 @@ class MySQL
     }
   }
 
-  function error($text, $fatal = false)
+  function error($text, $fatal = false, $connected = true)
   {
     $msg = mysql_error();
     $this->error_count++;
-    $this->bot->log("MySQL", "ERROR", "(# " . $this->error_count . ") on query: $text\n$msg", TRUE);
+    $this->bot->log("MySQL", "ERROR", "(# " . $this->error_count . ") on query: $text", $connected);
+    $this->bot->log("MySQL", "ERROR", $msg, $connected);
     // If this error is occuring while we are trying to first connect to the database when starting
     // rthe bot its a fatal error.
     if ($fatal == true) {
+      $this->bot->log("MySQL", "ERROR", "A fatal database error has occurred. Shutting down.", $connected);
       exit();
     }
   }
@@ -237,7 +243,7 @@ class MySQL
   {
     $pattern = '/\w?(#___.+?)\b/';
     return preg_replace_callback($pattern, array(&$this,
-                                                'strip_prefix_control'), $sql);
+                                                 'strip_prefix_control'), $sql);
   }
 
   function strip_prefix_control($matches)

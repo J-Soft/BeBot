@@ -79,7 +79,7 @@ class Is extends BaseActiveModule
       return ('Please wait until your previous lookup is completed');
     }
     $com = $this->parse_com($msg, array('com',
-                                       'player'));
+                                        'player'));
     $player = $this->bot->core('tools')->validate_player($com['player']);
     if ($player instanceof BotError) {
       unset($this->is_queue[$name]);

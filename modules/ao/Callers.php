@@ -43,8 +43,8 @@ class Callers extends BaseActiveModule
     parent::__construct($bot, get_class($this));
     $this->callers = array();
     $this->register_command('all', 'caller', 'GUEST', array("clear" => "LEADER",
-                                                           "add" => "LEADER",
-                                                           "del" => "LEADER"));
+                                                            "add" => "LEADER",
+                                                            "del" => "LEADER"));
     $this->register_alias("caller", "callers");
     $this->help['description'] = "Designate and list 'callers' for raids and events";
     $this->help['command']['caller'] = "Lists the set callers";

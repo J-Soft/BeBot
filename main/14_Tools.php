@@ -59,13 +59,13 @@ class tools extends BasePassiveModule
       case 'o':
       case 'gu':
       case '3':
-      if ($this->bot->game == "aoc") {
-        $chatcmd = "gu <pre>";
-      }
-      else
-      {
-        $chatcmd = "o <pre>";
-      }
+        if ($this->bot->game == "aoc") {
+          $chatcmd = "gu <pre>";
+        }
+        else
+        {
+          $chatcmd = "o <pre>";
+        }
         Break;
       case 'pgmsg':
       case 'pg':
@@ -158,7 +158,7 @@ class tools extends BasePassiveModule
     }
 
     socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array("sec" => $read_timeout,
-                                                             "usec" => 0));
+                                                              "usec" => 0));
 
     $connect_result = @socket_connect($socket, $address, $service_port);
 

@@ -48,17 +48,17 @@ class Rolls extends BaseActiveModule
     parent::__construct($bot, get_class($this));
     $this->count = 0;
     $this->register_command("gc", "loot", "ANONYMOUS", array("add" => "ANONYMOUS",
-                                                            "rem" => "ANONYMOUS",
-                                                            "list" => "ANONYMOUS",
-                                                            "clear" => "ADMIN",
-                                                            "result" => "ADMIN",
-                                                            "reroll" => "ADMIN"));
+                                                             "rem" => "ANONYMOUS",
+                                                             "list" => "ANONYMOUS",
+                                                             "clear" => "ADMIN",
+                                                             "result" => "ADMIN",
+                                                             "reroll" => "ADMIN"));
     $this->register_command("tell", "loot", "ANONYMOUS", array("add" => "ANONYMOUS",
-                                                              "rem" => "ANONYMOUS",
-                                                              "list" => "ANONYMOUS",
-                                                              "clear" => "ADMIN",
-                                                              "result" => "ADMIN",
-                                                              "reroll" => "ADMIN"));
+                                                               "rem" => "ANONYMOUS",
+                                                               "list" => "ANONYMOUS",
+                                                               "clear" => "ADMIN",
+                                                               "result" => "ADMIN",
+                                                               "reroll" => "ADMIN"));
     $this->bot->core("settings")->create("Loot", "Roll", "SINGLE", "Should you be allowed to be added to the roll of more than one slot?", "SINGLE;MULTI");
     $this->bot->core("colors")->define_scheme("loot", "highlight", "yellow");
     $this->help['description'] = 'Module to flat roll on items.';
@@ -80,8 +80,8 @@ class Rolls extends BaseActiveModule
   { // Start function handler()
     $this->error->reset(); //Reset the error message so we don't trigger the handler by old error messages.
     $com = $this->parse_com($msg, array('com',
-                                       'sub',
-                                       'args'));
+                                        'sub',
+                                        'args'));
     switch (strtolower($com['sub']))
     {
       case 'clear':

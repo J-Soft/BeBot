@@ -127,7 +127,7 @@ class OnlineDB_Core extends BasePassiveModule
         $this->bot->db->update_table("online", "profession", "drop", "ALTER IGNORE TABLE #___online DROP `profession`, DROP `level`, DROP `ailevel`");
       case 2:
         $this->bot->db->update_table("online", array("status_irc",
-                                                    "status_irc_changetime"), "drop", "ALTER IGNORE TABLE #___online DROP status_irc, DROP status_irc_changetime");
+                                                     "status_irc_changetime"), "drop", "ALTER IGNORE TABLE #___online DROP status_irc, DROP status_irc_changetime");
       case 3:
         $this->bot->db->update_table("online", "reinvite", "add", "ALTER IGNORE TABLE #___online ADD reinvite INT(1) DEFAULT '0'");
       case 4:

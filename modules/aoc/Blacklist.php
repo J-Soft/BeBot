@@ -53,7 +53,7 @@ class Blacklist extends BaseActiveModule
     $this->table_version = 2;
     $this->table_update(); // Update Blacklist table if needed.
     $this->register_command('all', 'blacklist', 'MEMBER', array('add' => 'LEADER',
-                                                               'del' => 'LEADER'));
+                                                                'del' => 'LEADER'));
     $this->register_event("cron", "5min");
     $this->help['description'] = "Handles blacklist.";
     $this->help['command']['blacklist'] = "Shows the blacklist.";

@@ -80,9 +80,9 @@ class Mail extends BaseActiveModule
   {
     $this->error->reset();
     $com = $this->parse_com($msg, array('com',
-                                       'sub',
-                                       'target',
-                                       'message'));
+                                        'sub',
+                                        'target',
+                                        'message'));
     switch (ucfirst($com['sub']))
     {
       case 'Delete':

@@ -57,7 +57,7 @@ class Say extends BaseActiveModule
   function command_handler($name, $msg, $source)
   { // Start function handler()
     $args = $this->parse_com($msg, array("com",
-                                        "args"));
+                                         "args"));
     switch ($args['com'])
     {
       case "say":

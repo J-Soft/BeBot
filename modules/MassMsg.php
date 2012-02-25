@@ -60,7 +60,7 @@ class MassMsg extends BaseActiveModule
   function command_handler($name, $msg, $origin)
   {
     $com = $this->parse_com($msg, array('com',
-                                       'args'));
+                                        'args'));
     switch ($com['com'])
     {
       case 'announce':

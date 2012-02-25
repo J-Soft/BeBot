@@ -57,7 +57,7 @@ class AccessControl_Core extends BasePassiveModule
 					command varchar(50) NOT NULL default '',
 					subcommand varchar(50) NOT NULL default '*',
 					channel varchar(20) NOT NULL default '',
-					minlevel enum('ANONYMOUS', 'GUEST', 'MEMBER', 'LEADER', 'ADMIN', 'SUPERADMIN', 'OWNER', 'DISABLED', 'DELETED') default 'DISABLED', 
+					minlevel enum('ANONYMOUS', 'GUEST', 'MEMBER', 'LEADER', 'ADMIN', 'SUPERADMIN', 'OWNER', 'DISABLED', 'DELETED') default 'DISABLED',
 					PRIMARY KEY (command, subcommand, channel)
 				)");
     $this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("access_control_saves", "false") . " (
@@ -110,8 +110,8 @@ class AccessControl_Core extends BasePassiveModule
         $this->bot->db->update_table("access_control", "subcommand", "add", "ALTER IGNORE TABLE #___access_control ADD COLUMN subcommand VARCHAR(50) NOT NULL DEFAULT '*' AFTER command");
         $this->bot->db->query("ALTER IGNORE TABLE #___access_control DROP PRIMARY KEY");
         $this->bot->db->update_table("access_control", array("command",
-                                                            "subcommand",
-                                                            "channel"), "alter", "ALTER IGNORE TABLE #___access_control ADD PRIMARY KEY (command, subcommand, channel)");
+                                                             "subcommand",
+                                                             "channel"), "alter", "ALTER IGNORE TABLE #___access_control ADD PRIMARY KEY (command, subcommand, channel)");
         $this->bot->db->query("UPDATE #___access_control SET subcommand = '*' WHERE subcommand = ''");
       case 2:
         $this->bot->db->update_table("access_control", "minlevel", "modify", "ALTER IGNORE TABLE #___access_control MODIFY minlevel enum('ANONYMOUS', 'GUEST', 'MEMBER', 'LEADER', 'ADMIN', 'SUPERADMIN', 'OWNER', 'DISABLED', 'DELETED') NOT NULL DEFAULT 'DISABLED'");

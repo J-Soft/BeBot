@@ -69,13 +69,13 @@ class Roll extends BaseActiveModule
   function command_handler($name, $msg, $origin)
   {
     $com = $this->parse_com($msg, array("com",
-                                       "args"));
+                                        "args"));
     switch ($com['com'])
     {
       case 'roll':
         $args = $this->parse_com($com['args'], array('min',
-                                                    'max',
-                                                    'item'));
+                                                     'max',
+                                                     'item'));
         if (!isset($args['max'])) {
           $args['max'] = $args['min'];
           $args['min'] = 1;

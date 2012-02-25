@@ -54,10 +54,10 @@ class Preferences_GUI extends BaseActiveModule
   function command_handler($name, $msg, $origin)
   {
     $com = $this->parse_com($msg, array('com',
-                                       'sub',
-                                       'module',
-                                       'preference',
-                                       'value'));
+                                        'sub',
+                                        'module',
+                                        'preference',
+                                        'value'));
     switch ($com['sub'])
     {
       case '':

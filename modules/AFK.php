@@ -63,7 +63,7 @@ class AFK extends BaseActiveModule
   {
     $this->error->reset();
     $com = $this->parse_com($msg, array('com',
-                                       'args'));
+                                        'args'));
     $this->gone($name, $com['args']);
     return ("##highlight##$name##end## is now AFK.");
   }

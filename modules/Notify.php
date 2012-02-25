@@ -54,8 +54,8 @@ class Notify extends BaseActiveModule
   function command_handler($name, $msg, $origin)
   {
     $com = $this->parse_com($msg, array('com',
-                                       'sub',
-                                       'arg'));
+                                        'sub',
+                                        'arg'));
     Switch ($com['sub'])
     {
       case 'on':

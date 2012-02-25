@@ -362,7 +362,7 @@ function get_site_data($url, $strip_headers = FALSE, $read_timeout = FALSE, $pro
   }
 
   socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array("sec" => $read_timeout,
-                                                           "usec" => 0));
+                                                            "usec" => 0));
 
   $connect_result = @socket_connect($socket, $address, $service_port);
 

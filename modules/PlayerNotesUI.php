@@ -43,7 +43,7 @@ class PlayerNotes_UI extends BaseActiveModule
   {
     parent::__construct($bot, get_class($this));
     $this->register_command("all", "notes", "MEMBER", array('add' => 'MEMBER',
-                                                           'rem' => 'ADMIN'));
+                                                            'rem' => 'ADMIN'));
     $this->register_alias("notes", "note");
   }
 
@@ -84,7 +84,7 @@ class PlayerNotes_UI extends BaseActiveModule
   function add_note($author, $msg, $admin = FALSE)
   { // Start function add_note()
     $args = $this->parse_com($msg, array('target',
-                                        'reason'));
+                                         'reason'));
     $author = ucfirst(strtoupper($author));
     $player = ucfirst(strtoupper($args['target']));
     $note = $args['reason'];

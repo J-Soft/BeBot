@@ -137,7 +137,7 @@ $this -> bot -> db -> set_version("symbiants", 2); */
   function command_handler($name, $msg, $origin)
   {
     $com = $this->parse_com($msg, array('com',
-                                       'args'));
+                                        'args'));
     switch ($com['com'])
     {
       case 'pb':

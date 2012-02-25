@@ -154,8 +154,8 @@ class ClassName extends BaseActiveModule
     //The default is to split the command to com, sub and args. If you want to split it some other way change the pattern for it
     //parse_com() returns an array where the pattern is the keys and the values are split out from $msg
     $com = $this->parse_com($msg, array('com',
-                                       'sub',
-                                       'args'));
+                                        'sub',
+                                        'args'));
     $command = $vars[0];
     switch ($com['com'])
     {

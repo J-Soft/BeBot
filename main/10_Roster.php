@@ -87,21 +87,21 @@ class Roster_Core extends BasePassiveModule
     {
       case 1:
         $this->bot->db->update_table("users", array("banned_for",
-                                                   "banned_until"), "add", "ALTER TABLE #___users ADD banned_for VARCHAR(100) AFTER banned_at, ADD banned_until INT(11) DEFAULT '0' AFTER banned_for");
+                                                    "banned_until"), "add", "ALTER TABLE #___users ADD banned_for VARCHAR(100) AFTER banned_at, ADD banned_until INT(11) DEFAULT '0' AFTER banned_for");
         $this->bot->db->set_version("users", 2);
         $this->update_table();
         return;
       case 2:
         $this->bot->db->update_table("users", array("user_level",
-                                                   "banned_until",
-                                                   "notify"), "alter", "ALTER TABLE #___users ADD INDEX (user_level), ADD INDEX (banned_until), ADD INDEX (notify)");
+                                                    "banned_until",
+                                                    "notify"), "alter", "ALTER TABLE #___users ADD INDEX (user_level), ADD INDEX (banned_until), ADD INDEX (notify)");
         $this->bot->db->set_version("users", 3);
         $this->update_table();
         return;
       case 3:
         $this->bot->db->update_table('users', array('receive_announce',
-                                                   'receive_invite',
-                                                   'admin_level'), 'drop', "ALTER TABLE #___users DROP receive_announce, DROP receive_invite, DROP admin_level");
+                                                    'receive_invite',
+                                                    'admin_level'), 'drop', "ALTER TABLE #___users DROP receive_announce, DROP receive_invite, DROP admin_level");
         $this->bot->db->set_version("users", 4);
         $this->update_table();
         return;

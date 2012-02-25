@@ -100,7 +100,7 @@ class Symb_sql extends BaseActiveModule
   function command_handler($name, $msg, $source)
   {
     $com = $this->parse_com($msg, array('com',
-                                       'args'));
+                                        'args'));
     switch ($com['com'])
     {
       case 'symb':

@@ -184,7 +184,7 @@ class PlayerNotes_Core extends BasePassiveModule
       case 1:
         // Rename timestmp column to timestamp.
         $this->bot->db->update_table("player_notes", array("timestmp",
-                                                          "timestamp"), "change", "ALTER TABLE #___player_notes CHANGE timestmp timestamp INTEGER");
+                                                           "timestamp"), "change", "ALTER TABLE #___player_notes CHANGE timestmp timestamp INTEGER");
       case 2:
         // Change player column to VARCHAR(30) NOT NULL
         $this->bot->db->update_table("player_notes", "player", "alter", "ALTER TABLE #___player_notes CHANGE player player VARCHAR(30) NOT NULL");

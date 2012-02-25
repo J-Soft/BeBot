@@ -60,7 +60,7 @@ class AutoInv extends BaseActiveModule
   function command_handler($name, $msg, $origin)
   {
     $com = $this->parse_com($msg, array('com',
-                                       'state'));
+                                        'state'));
     switch ($com['state'])
     {
       case '':

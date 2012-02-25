@@ -254,12 +254,12 @@ class Bot
       self::$instance[$bothandle]->super_admin = null;
     }
     // create new ConfigMagik-Object (HACXX ALERT! This should most likely be a singleton!)
-    self::$instance[$bothandle]->ini = ConfigMagik->get_instance($bothandle, "conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", true, true);
+    self::$instance[$bothandle]->ini = ConfigMagik::get_instance($bothandle, "conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", true, true);
     self::$instance[$bothandle]->register_module(self::$instance[$bothandle]->ini, 'ini');
     //Instantiate singletons
     self::$instance[$bothandle]->irc = &$irc; //To do: This should probably be a singleton aswell.
-    self::$instance[$bothandle]->aoc = AOChat->get_instance($bothandle);
-    self::$instance[$bothandle]->db = MySQL->get_instance($bothandle);
+    self::$instance[$bothandle]->aoc = AOChat::get_instance($bothandle);
+    self::$instance[$bothandle]->db = MySQL::get_instance($bothandle);
     //Pass back the handle of the bot for future reference.
     return ($bothandle);
   }

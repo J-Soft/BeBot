@@ -63,7 +63,7 @@ class News extends BaseActiveModule
     $this->register_command('all', 'news', 'GUEST', array('add' => 'MEMBER'));
     $this->register_command('all', 'headline', 'GUEST', array('add' => 'ADMIN'));
     $this->register_command('all', 'raids', 'MEMBER', array('add' => 'LEADER',
-                                                           'del' => 'LEADER'));
+                                                            'del' => 'LEADER'));
     // Register for logon notifies and pgjoin
     $this->register_event("logon_notify");
     $this->register_event("pgjoin");
@@ -148,13 +148,13 @@ class News extends BaseActiveModule
     {
       case '':
       case 'read':
-      if (($type == 1) || ($type == 2)) {
-        return $this->get_news($name);
-      }
-      else
-      {
-        return $this->get_raids($name);
-      }
+        if (($type == 1) || ($type == 2)) {
+          return $this->get_news($name);
+        }
+        else
+        {
+          return $this->get_raids($name);
+        }
         break;
       case 'add':
         return $this->set_news($name, $com['args'], $type);

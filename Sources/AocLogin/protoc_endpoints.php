@@ -1,4 +1,4 @@
-<?
+<?php
 // This will autogenerate the php file from the .proto file
 require_once('protocolbuf/parser/pb_parser.php');
 
