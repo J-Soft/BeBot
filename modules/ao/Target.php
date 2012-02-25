@@ -38,42 +38,42 @@ The Class itself...
 class Target extends BaseActiveModule
 {
 
-	function __construct(&$bot)
-	{
-		parent::__construct($bot, get_class($this));
-		$this->register_command("all", "target", "LEADER");
-		if ($this->bot->guildbot)
-		{
-			$def = "both";
-		}
-		else
-		{
-			$def = "pgmsg";
-		}
-		$this->bot->core("settings")->create("Target", "Channel", $def, "Which channel should be used for output of the target spam?", "pgmsg;gc;both");
-		$this->help['description'] = 'Calls a target';
-		$this->help['command']['target'] = "Calls for attack on <target>.";
-	}
+    function __construct(&$bot)
+    {
+        parent::__construct($bot, get_class($this));
+        $this->register_command("all", "target", "LEADER");
+        if ($this->bot->guildbot) {
+            $def = "both";
+        }
+        else
+        {
+            $def = "pgmsg";
+        }
+        $this->bot->core("settings")->create("Target", "Channel", $def, "Which channel should be used for output of the target spam?", "pgmsg;gc;both");
+        $this->help['description'] = 'Calls a target';
+        $this->help['command']['target'] = "Calls for attack on <target>.";
+    }
 
-	function command_handler($name, $msg, $origin)
-	{
-		$this->call_target($name, $msg);
-		return false;
-	}
+    function command_handler($name, $msg, $origin)
+    {
+        $this->call_target($name, $msg);
+        return false;
+    }
 
-	/*
-	Makes the message
-	*/
-	function call_target($name, $msg)
-	{
-		$msg = explode(" ", $msg);
-		$message = "";
-		for ($i = 1; $i < count($msg); $i ++)
-			$message .= $msg[$i] . " ";
-		$inside = "<font color=CCInfoHeadline>:::: ASSIST TARGET ::::</font>\n\n";
-		$inside .= " - <a href='chatcmd:///macro $name /assist $name'>Make assist macro</a>\n\n";
-		$inside .= " - <a href='chatcmd:///assist $name'>Assist $name</a>\n\n";
-		$this->bot->send_output($name, "ALL ASSIST <font color=#ffff00>$name</font>! " . "Target is <font color=#ff1111>&gt;&gt;<font color=#ffff00> $message</font>&lt;&lt;</font> :: " . $this->bot->core("tools")->make_blob("click for more", $inside), $this->bot->core("settings")->get("target", "channel"));
-	}
+    /*
+     Makes the message
+     */
+    function call_target($name, $msg)
+    {
+        $msg = explode(" ", $msg);
+        $message = "";
+        for ($i = 1; $i < count($msg); $i++)
+            $message .= $msg[$i] . " ";
+        $inside = "<font color=CCInfoHeadline>:::: ASSIST TARGET ::::</font>\n\n";
+        $inside .= " - <a href='chatcmd:///macro $name /assist $name'>Make assist macro</a>\n\n";
+        $inside .= " - <a href='chatcmd:///assist $name'>Assist $name</a>\n\n";
+        $this->bot->send_output($name, "ALL ASSIST <font color=#ffff00>$name</font>! " . "Target is <font color=#ff1111>&gt;&gt;<font color=#ffff00> $message</font>&lt;&lt;</font> :: " . $this->bot->core("tools")->make_blob("click for more", $inside), $this->bot->core("settings")->get("target", "channel"));
+    }
 }
+
 ?>

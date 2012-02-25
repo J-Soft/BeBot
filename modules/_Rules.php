@@ -38,31 +38,32 @@ The Class itself...
 class Rules extends BaseActiveModule
 {
 
-	function __construct(&$bot)
-	{
-		parent::__construct($bot, get_class($this));
-		$this->register_command('all', 'rules', 'GUEST');
-	}
+    function __construct(&$bot)
+    {
+        parent::__construct($bot, get_class($this));
+        $this->register_command('all', 'rules', 'GUEST');
+    }
 
-	/*
-	This gets called on a tell with the command
-	*/
-	function command_handler($name, $msg, $origin)
-	{
-		return $this->make_rules();
-	}
+    /*
+     This gets called on a tell with the command
+     */
+    function command_handler($name, $msg, $origin)
+    {
+        return $this->make_rules();
+    }
 
-	/*
-	Make the rules
-	*/
-	function make_rules()
-	{
-		$content = "<font color=CCInfoHeadline> :::: RULES ::::</font>\n\n";
-		if (file_exists("./txt/" . $this->bot->botname . "_rules.txt"))
-			$content .= implode("", file("./txt/" . $this->bot->botname . "_rules.txt"));
-		elseif (file_exists("./txt/rules.txt"))
-			$content .= implode("", file("./txt/rules.txt"));
-		return "<botname>'s Rules :: " . $this->bot->core("tools")->make_blob("click to view", $content);
-	}
+    /*
+     Make the rules
+     */
+    function make_rules()
+    {
+        $content = "<font color=CCInfoHeadline> :::: RULES ::::</font>\n\n";
+        if (file_exists("./txt/" . $this->bot->botname . "_rules.txt"))
+            $content .= implode("", file("./txt/" . $this->bot->botname . "_rules.txt"));
+        elseif (file_exists("./txt/rules.txt"))
+            $content .= implode("", file("./txt/rules.txt"));
+        return "<botname>'s Rules :: " . $this->bot->core("tools")->make_blob("click to view", $content);
+    }
 }
+
 ?>
