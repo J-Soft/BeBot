@@ -43,7 +43,7 @@ class MySQL
 
   public function get_instance($bothandle)
   {
-    $bot = Bot::get_instance($bothandle);
+    $bot = Bot->get_instance($bothandle);
     if (!isset(self::$instance[$bothandle])) {
       $class = __CLASS__;
       self::$instance[$bothandle] = new $class($bothandle);
@@ -53,7 +53,7 @@ class MySQL
 
   private function __construct($bothandle)
   {
-    $this->bot = Bot::get_instance($bothandle);
+    $this->bot = Bot->get_instance($bothandle);
     $this->botname = $this->bot->botname;
     $this->error_count = 0;
     $this->last_error = 0;

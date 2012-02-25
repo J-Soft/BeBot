@@ -85,7 +85,6 @@ class CommandAlias_Core extends BasePassiveModule
     if (empty($get) && isset($this->alias[$alias])) {
       unset($this->alias[$alias]);
       Return TRUE;
-      ;
     }
     else
     {

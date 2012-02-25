@@ -101,7 +101,6 @@ class PlayerNotes_Core extends BasePassiveModule
       $this->error->set("An unknown error occurred. Check your bot console for more information.");
       return ($this->error);
     }
-    return $return;
   } // End function add()
 
   /*
@@ -119,7 +118,6 @@ class PlayerNotes_Core extends BasePassiveModule
       $this->error->set("Could not delete player note " . $pnid . ". No note with that ID could be found.");
       return ($this->error);
     }
-    return $return;
   } // End function del()
 
   /*

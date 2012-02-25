@@ -65,16 +65,21 @@ class Maintenance extends BaseActiveModule
               case 1:
               case 'start':
                 return $this->step1($name, $vars[1], $origin);
+                break;
               case 'dont':
                 return $this->dontdo($name, $vars[3], $origin);
+                break;
               case 'check':
               case 'refresh':
                 $inside = $this->check($this->old_data, $this->new_data, $this->compare);
                 Return ("Maintenance ToDo list: " . $this->bot->core("tools")->make_blob("Click to view", $inside));
+                break;
               case 'done':
                 Return $this->step3($vars[1]);
+                break;
               Default:
                 Return ("Error: Unknown Action " . $vars[2]);
+                break;
             }
           }
         }
@@ -118,20 +123,23 @@ class Maintenance extends BaseActiveModule
               {
                 case 2:
                   $this->step2($info[1], "settings", $info[2]);
-                  Break;
+                  break;
                 //case 3:
                 //	$this -> step3($info[1], "settings", $info[2]);
                 //	Break;
                 Default:
                   $this->bot->send_output($info[1], "Error: Unknown Step number: " . $info[3], $info[2]);
+                  break;
               }
-              Break;
+              break;
             Default:
               $this->bot->send_output($info[1], "Error: Unknown Mode: " . $info[0], $info[2]);
+              break;
           }
         }
       Default:
         $this->unregister_event("cron", "5sec");
+        break;
     }
   }
 

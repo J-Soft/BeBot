@@ -1903,7 +1903,6 @@ class Security_Core extends BaseActiveModule
     if (empty($result)) {
       $this->bot->log("SECURITY", "ERROR", "No groups exisit, not even the groups created by default. Something is very wrong.");
       exit();
-      return FALSE;
     }
     foreach ($result as $group)
     { //gid, name, description, access_level

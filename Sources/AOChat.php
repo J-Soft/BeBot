@@ -242,7 +242,7 @@ class AOChat
   /* Initialization */
   private function __construct($bothandle)
   {
-    $this->bot = Bot::get_instance($bothandle);
+    $this->bot = Bot->get_instance($bothandle);
     $this->bothandle = $bothandle;
     $this->game = $this->bot->game;
     $this->disconnect();
@@ -1078,7 +1078,7 @@ class AOChat
   function get_packet()
   {
     // Get the bot instance
-    $bot = Bot::get_instance($this->bothandle);
+    $bot = Bot->get_instance($this->bothandle);
     // Include a the signal_message (Should probably be included somewhere else)
     //require_once ('Dispatcher/signal_message.php');
     $head = $this->read_data(4);
