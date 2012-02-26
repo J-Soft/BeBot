@@ -150,7 +150,7 @@ class Bot
     public $dispatcher;
 
 
-    public function factory($config_file = null)
+    public static function factory($config_file = null)
     {
         require ('./conf/ServerList.php');
         if (!empty($config_file)) {
@@ -266,7 +266,7 @@ class Bot
     }
 
 
-    public function get_instance($bothandle)
+    public static function get_instance($bothandle)
     {
         if (!isset(self::$instance[$bothandle])) {
             return false;
