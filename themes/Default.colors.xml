@@ -1,4 +1,5 @@
-<theme name="Default theme for BeBot" version="1.0" author="Alreadythere" link="">
+<theme name="Default theme for BeBot" version="1.0" author="Alreadythere"
+       link="">
     <color name="normal" color="lightyellow"/>
     <color name="highlight" color="aqua"/>
     <color name="error" color="red"/>

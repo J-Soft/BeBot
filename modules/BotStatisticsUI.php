@@ -35,48 +35,53 @@ $botstatisticsui = new BotStatisticsUI($bot);
 class BotStatisticsUI extends BaseActiveModule
 {
 
-  function __construct(&$bot)
-  {
-    parent::__construct($bot, get_class($this));
-    $this->register_command("all", "bots", "MEMBER");
-  }
-
-  function command_handler($name, $msg, $origin)
-  {
-    $var = explode(" ", $msg, 2);
-    $command = $var[0];
-    switch ($var[0])
+    function __construct(&$bot)
     {
-      case 'bots':
-        $reply = $this->check_bots($name, $origin, $var[1]);
-        if ($reply !== FALSE) {
-          Return ($reply);
+        parent::__construct($bot, get_class($this));
+        $this->register_command("all", "bots", "MEMBER");
+    }
+
+
+    function command_handler($name, $msg, $origin)
+    {
+        $var     = explode(" ", $msg, 2);
+        $command = $var[0];
+        switch ($var[0])
+        {
+            case 'bots':
+                $reply = $this->check_bots($name, $origin, $var[1]);
+                if ($reply !== FALSE) {
+                    Return ($reply);
+                }
+            default:
+                Return ("##error##Error : Broken plugin, received unhandled command: ##highlight##" . $var[0] . "##end## in Bots.php##end##");
         }
-      default:
-        Return ("##error##Error : Broken plugin, received unhandled command: ##highlight##" . $var[0] . "##end## in Bots.php##end##");
     }
-  }
 
-  function check_bots($name, $origin, $msg)
-  {
-    if (!$this->bot->accessallbots) {
-      $msg = $this->bot->botname . " " . $this->bot->dimension;
-    }
-    if (!empty($msg)) {
-      $msg = explode(" ", $msg, 2);
-      if (!empty($msg[1])) {
-        Return $this->bot->core("bot_statistics")->check_bots($name, $origin, $msg[0], $msg[1]);
-      }
-      else
-      {
-        Return $this->bot->core("bot_statistics")->check_bots($name, $origin, $msg[0]);
-      }
-    }
-    else
+
+    function check_bots($name, $origin, $msg)
     {
-      Return $this->bot->core("bot_statistics")->check_bots($name, $origin);
+        if (!$this->bot->accessallbots) {
+            $msg = $this->bot->botname . " " . $this->bot->dimension;
+        }
+        if (!empty($msg)) {
+            $msg = explode(" ", $msg, 2);
+            if (!empty($msg[1])) {
+                Return $this->bot->core("bot_statistics")
+                    ->check_bots($name, $origin, $msg[0], $msg[1]);
+            }
+            else
+            {
+                Return $this->bot->core("bot_statistics")
+                    ->check_bots($name, $origin, $msg[0]);
+            }
+        }
+        else
+        {
+            Return $this->bot->core("bot_statistics")
+                ->check_bots($name, $origin);
+        }
     }
-  }
 }
 
 ?>

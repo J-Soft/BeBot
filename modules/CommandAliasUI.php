@@ -38,31 +38,32 @@ $commandaliasinterface = new CommandAliasInterface($bot);
 class CommandAliasInterface extends BaseActiveModule
 {
 
-  function __construct(&$bot)
-  {
-    parent::__construct($bot, get_class($this));
-    $this->register_command('all', 'comalias', 'SUPERADMIN');
-    $this->help['description'] = 'Handles Command Aliases.';
-    $this->help['command']['comalias add <alias> <command>'] = "Sets <alias> as an alias of <command>.";
-    $this->help['command']['comalias del <alias>'] = "Deletes <alias>.";
-    $this->help['command']['comalias rem <alias>'] = $this->help['command']['comalias del <alias>'];
-    $this->help['command']['comalias'] = "Show All Aliases.";
-  }
-
-  function command_handler($name, $msg, $origin)
-  {
-    $var = explode(" ", $msg, 3);
-    switch ($var[1])
+    function __construct(&$bot)
     {
-      case 'add':
-        Return ($this->bot->core("command_alias")->add($var[2]));
-      case 'del':
-      case 'rem':
-        Return ($this->bot->core("command_alias")->del($var[2]));
-      default:
-        Return ($this->bot->core("command_alias")->get_list());
+        parent::__construct($bot, get_class($this));
+        $this->register_command('all', 'comalias', 'SUPERADMIN');
+        $this->help['description']                               = 'Handles Command Aliases.';
+        $this->help['command']['comalias add <alias> <command>'] = "Sets <alias> as an alias of <command>.";
+        $this->help['command']['comalias del <alias>']           = "Deletes <alias>.";
+        $this->help['command']['comalias rem <alias>']           = $this->help['command']['comalias del <alias>'];
+        $this->help['command']['comalias']                       = "Show All Aliases.";
     }
-  }
+
+
+    function command_handler($name, $msg, $origin)
+    {
+        $var = explode(" ", $msg, 3);
+        switch ($var[1])
+        {
+            case 'add':
+                Return ($this->bot->core("command_alias")->add($var[2]));
+            case 'del':
+            case 'rem':
+                Return ($this->bot->core("command_alias")->del($var[2]));
+            default:
+                Return ($this->bot->core("command_alias")->get_list());
+        }
+    }
 }
 
 ?>

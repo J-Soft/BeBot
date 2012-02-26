@@ -38,92 +38,98 @@ The Class itself...
 class ModuleControlGUI extends BaseActiveModule
 {
 
-  function __construct(&$bot)
-  {
-    parent::__construct($bot, get_class($this));
-    $this->register_command("tell", "modules", "OWNER");
-    $this->help['description'] = "Allows you to enable and disable modules.";
-    $this->help['command']['modules'] = "Shows the GUI to enable and disable modules.";
-    $this->help['notes'] = "Changes to the module loading only take effect after a restart of the bot.";
-  }
+    function __construct(&$bot)
+    {
+        parent::__construct($bot, get_class($this));
+        $this->register_command("tell", "modules", "OWNER");
+        $this->help['description']        = "Allows you to enable and disable modules.";
+        $this->help['command']['modules'] = "Shows the GUI to enable and disable modules.";
+        $this->help['notes']              = "Changes to the module loading only take effect after a restart of the bot.";
+    }
 
-  /*
-  This gets called on a tell with the command
-  */
-  function command_handler($name, $msg, $origin)
-  {
-    if (preg_match("/^modules$/i", $msg)) {
-      return $this->show_stuff();
-    }
-    elseif (preg_match("/^modules d ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info))
-    {
-      return $this->disable($name, $info[1], $info[2]);
-    }
-    elseif (preg_match("/^modules e ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info))
-    {
-      return $this->enable($name, $info[1], $info[2]);
-    }
-    else
-    {
-      $this->bot->send_help($name);
-      return false;
-    }
-  }
 
-  /*
-  Lists all module directories and available modules:
-  */
-  function show_stuff()
-  {
-    $sections = $this->bot->core("ini")->listSections();
-    natcasesort($sections);
-    foreach ($sections as $section)
+    /*
+    This gets called on a tell with the command
+    */
+    function command_handler($name, $msg, $origin)
     {
-      $blob .= "<font color='yellow'>" . $section . "</font>\n";
-      $keys = $this->bot->core("ini")->listKeys($section);
-      natcasesort($keys);
-      foreach ($keys as $key)
-      {
-        $value = $this->bot->core("ini")->get($key, $section);
-        if ($value == "TRUE") {
-          $blob .= "-<font color='green'>" . $key;
-          $blob .= "</font> [";
-          $blob .= $this->bot->core("tools")->chatcmd("modules d " . $key . " " . $section, "Disable");
-          $blob .= "]";
+        if (preg_match("/^modules$/i", $msg)) {
+            return $this->show_stuff();
+        }
+        elseif (preg_match("/^modules d ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info))
+        {
+            return $this->disable($name, $info[1], $info[2]);
+        }
+        elseif (preg_match("/^modules e ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info))
+        {
+            return $this->enable($name, $info[1], $info[2]);
         }
         else
         {
-          $blob .= "-<font color='red'>" . $key;
-          $blob .= "</font> [";
-          $blob .= $this->bot->core("tools")->chatcmd("modules e " . $key . " " . $section, "Enable");
-          $blob .= "]";
+            $this->bot->send_help($name);
+            return false;
         }
-        $blob .= "\n";
-      }
-      $blob .= "\n";
     }
-    return $this->bot->core("tools")->make_blob("Module List", $blob);
-  }
 
-  /*
-  Disables a module on next restart:
-  */
-  function disable($name, $key, $section)
-  {
-    $this->bot->core("ini")->set($key, "FALSE", $section);
-    $msg = "Disabled " . $section . "/" . $key . ".  You will need to restart the bot for the changes to take effect.";
-    return $msg;
-  }
 
-  /*
-  Enables a module on next restart:
-  */
-  function enable($name, $key, $section)
-  {
-    $this->bot->core("ini")->set($key, "TRUE", $section);
-    $msg = "Enabled " . $section . "/" . $key . ".  You will need to restart the bot for the changes to take effect.";
-    return $msg;
-  }
+    /*
+    Lists all module directories and available modules:
+    */
+    function show_stuff()
+    {
+        $sections = $this->bot->core("ini")->listSections();
+        natcasesort($sections);
+        foreach ($sections as $section)
+        {
+            $blob .= "<font color='yellow'>" . $section . "</font>\n";
+            $keys = $this->bot->core("ini")->listKeys($section);
+            natcasesort($keys);
+            foreach ($keys as $key)
+            {
+                $value = $this->bot->core("ini")->get($key, $section);
+                if ($value == "TRUE") {
+                    $blob .= "-<font color='green'>" . $key;
+                    $blob .= "</font> [";
+                    $blob .= $this->bot->core("tools")
+                        ->chatcmd("modules d " . $key . " " . $section, "Disable");
+                    $blob .= "]";
+                }
+                else
+                {
+                    $blob .= "-<font color='red'>" . $key;
+                    $blob .= "</font> [";
+                    $blob .= $this->bot->core("tools")
+                        ->chatcmd("modules e " . $key . " " . $section, "Enable");
+                    $blob .= "]";
+                }
+                $blob .= "\n";
+            }
+            $blob .= "\n";
+        }
+        return $this->bot->core("tools")->make_blob("Module List", $blob);
+    }
+
+
+    /*
+    Disables a module on next restart:
+    */
+    function disable($name, $key, $section)
+    {
+        $this->bot->core("ini")->set($key, "FALSE", $section);
+        $msg = "Disabled " . $section . "/" . $key . ".  You will need to restart the bot for the changes to take effect.";
+        return $msg;
+    }
+
+
+    /*
+    Enables a module on next restart:
+    */
+    function enable($name, $key, $section)
+    {
+        $this->bot->core("ini")->set($key, "TRUE", $section);
+        $msg = "Enabled " . $section . "/" . $key . ".  You will need to restart the bot for the changes to take effect.";
+        return $msg;
+    }
 }
 
 ?>
