@@ -104,8 +104,8 @@ $bot             = Bot::get_instance($bothandle);
 $bot->dispatcher = new sfEventDispatcher();
 
 //Load modules.
-$bot->load_files('Commodities', 'commodities'); //Classes that do not instantiate themselves.
-$bot->load_files('Commodities', "commodities/{$bot->game}");
+$bot->load_files('Commodities', 'Commodities'); //Classes that do not instantiate themselves.
+$bot->load_files('Commodities', "Commodities/{$bot->game}");
 $bot->load_files('Main', 'main');
 $bot->load_files('Core', 'core');
 $bot->load_files('Core', "core/{$bot->game}");
