@@ -86,7 +86,7 @@ abstract class BaseActiveModule extends BasePassiveModule
             }
             else
             {
-                //Say something useful for modules not registering commands properly.
+                //Say something useful for Modules not registering commands properly.
                 $old_module = $this->bot->get_command_handler($channel, $command);
                 $this->error->set("Duplicate command definition! The command '$command' for channel '$channel'" . " has already been registered by '$old_module' and is attempted re-registered by {$this->module_name}");
             }
@@ -135,7 +135,7 @@ abstract class BaseActiveModule extends BasePassiveModule
                                                             'args'))
     {
         //preg_match for items and insert a replacement.
-        if ($this->bot->game == "aoc") {
+        if (strtolower(AOCHAT_GAME) == "aoc") {
             $search_pattern = '/' . $this->bot->core('items')->itemPattern . '/i';
         }
         else

@@ -165,7 +165,6 @@ class AOChat
     {
         $this->bot       = Bot::get_instance($bothandle);
         $this->bothandle = $bothandle;
-        $this->game      = $this->bot->game;
         $this->disconnect();
         $this->login_num = 0;
         /*
@@ -216,7 +215,7 @@ class AOChat
     /* Network stuff */
     function connect($server = "default", $port = "default")
     {
-        if ($this->game == "ao") {
+        if (strtolower(AOCHAT_GAME) == "ao") {
             if ($server == "default") {
                 $server = "chat2.d1.funcom.com";
             }
@@ -239,7 +238,7 @@ class AOChat
             return false;
         }
         /* For AO we expect the login seed when we connect to the chatserver */
-        if ($this->game == "ao") {
+        if (strtolower(AOCHAT_GAME) == "ao") {
             $packet = $this->get_packet();
             if (!is_object($packet) || $packet->type != AOCP_LOGIN_SEED) {
                 trigger_error("Received invalid greeting packet from " . strtoupper($this->game) . " Chat server.", E_USER_WARNING);
@@ -668,7 +667,7 @@ class AOChat
                 //$signal = new signal_message('aochat', $gid, $name);
                 //$dispatcher->post($signal, 'onGroupAnnounce');
                 //unset($signal);
-                $event = new sfEvent($this, 'core.on_group_announce', array('source'  => $gid,
+                $event = new sfEvent($this, 'Core.on_group_announce', array('source'  => $gid,
                                                                             'message' => $name,
                                                                             'status'  => $status));
                 $this->bot->dispatcher->notify($event);
@@ -687,7 +686,7 @@ class AOChat
                 //$signal = new signal_message('aochat', $gid, 'invite');
                 //$dispatcher->post($signal, 'onGroupInvite');
 
-                $event = new sfEvent($this, 'core.on_group_invite', array('source'  => $gid,
+                $event = new sfEvent($this, 'Core.on_group_invite', array('source'  => $gid,
                                                                           'message' => 'invite'));
                 $this->bot->dispatcher->notify($event);
 
@@ -710,7 +709,7 @@ class AOChat
                 //$dispatcher->post($signal, 'onPlayerName');
                 //unset($signal);
 
-                $event = new sfEvent($this, 'core.on_player_name', array('id'   => $id,
+                $event = new sfEvent($this, 'Core.on_player_name', array('id'   => $id,
                                                                          'name' => $name));
                 $this->bot->dispatcher->notify($event);
 
@@ -728,9 +727,9 @@ class AOChat
                     $id = -1;
                 }
 
-                echo "Debug: Firing event core.on_player_id ($id, $name)\n";
+                echo "Debug: Firing event Core.on_player_id ($id, $name)\n";
 
-                $event = new sfEvent($this, 'core.on_player_id', array('id'   => $id,
+                $event = new sfEvent($this, 'Core.on_player_id', array('id'   => $id,
                                                                        'name' => $name));
                 $this->bot->dispatcher->notify($event);
 
@@ -742,7 +741,7 @@ class AOChat
                 if ($this->game == "aoc") {
                     list ($bid, $bonline, $blevel, $blocation, $bclass) = $packet->args;
                     $this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | AOC_BUDDY_KNOWN;
-                    $event               = new sfEvent($this, 'core.on_buddy_onoff', array('id'       => $bid,
+                    $event               = new sfEvent($this, 'Core.on_buddy_onoff', array('id'       => $bid,
                                                                                            'online'   => $bonline,
                                                                                            'level'    => $blevel,
                                                                                            'location' => $blocation,
@@ -752,7 +751,7 @@ class AOChat
                 {
                     list ($bid, $bonline, $btype) = $packet->args;
                     $this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | (ord($btype) ? AOC_BUDDY_KNOWN : 0);
-                    $event               = new sfEvent($this, 'core.on_buddy_onoff', array('id'     => $bid,
+                    $event               = new sfEvent($this, 'Core.on_buddy_onoff', array('id'     => $bid,
                                                                                            'online' => $bonline,
                                                                                            'type'   => $btype));
                 }
@@ -779,7 +778,7 @@ class AOChat
 //				$dispatcher->post($signal, 'onBuddyRemove');
 //				unset($signal);
 
-                $event = new sfEvent($this, 'core.on_buddy_remove', array('source'  => 'system',
+                $event = new sfEvent($this, 'Core.on_buddy_remove', array('source'  => 'system',
                                                                           'message' => $pakcte->args[0]));
                 $this->bot->dispatcher->notify($event);
 
@@ -824,7 +823,7 @@ class AOChat
                 //$dispatcher->post($signal, 'onPgJoin');
                 //unset($signal);
 
-                $event = new sfEvent($this, 'core.on_privgroup_join', array('source'  => $id,
+                $event = new sfEvent($this, 'Core.on_privgroup_join', array('source'  => $id,
                                                                             'message' => 'join'));
                 $this->bot->dispatcher->notify($event);
 
@@ -840,7 +839,7 @@ class AOChat
                 //$dispatcher->post($signal, 'onPgLeave');
                 //unset($signal);
 
-                $event = new sfEvent($this, 'core.on_privgroup_leave', array('source'  => $id,
+                $event = new sfEvent($this, 'Core.on_privgroup_leave', array('source'  => $id,
                                                                              'message' => 'leave'));
                 $this->bot->dispatcher->notify($event);
 
@@ -857,7 +856,7 @@ class AOChat
                 //$dispatcher->post($signal, 'onTell');
                 //unset($signal);
 
-                $event = new sfEvent($this, 'core.on_tell', array('source'  => $id,
+                $event = new sfEvent($this, 'Core.on_tell', array('source'  => $id,
                                                                   'message' => $message));
                 $this->bot->dispatcher->notify($event);
 
@@ -871,7 +870,7 @@ class AOChat
                 //$signal = new signal_message('aochat', $id, $message);
                 //$dispatcher->post($signal, 'onPgMessage');
 
-                $event = new sfEvent($this, 'core.on_privgroup_message', array('source'  => $id,
+                $event = new sfEvent($this, 'Core.on_privgroup_message', array('source'  => $id,
                                                                                'message' => $message));
                 $this->bot->dispatcher->notify($event);
 
@@ -979,7 +978,7 @@ class AOChat
         // But its still untested and forbidden recursive calls are likely!
 
         /*
-        for ($i = 0; ($i < 200) && (!$this->bot->core('player')->exists($stack[0]['user'])) && ($stack[0]['timeout'] > time()) && (!$p); $i ++)
+        for ($i = 0; ($i < 200) && (!$this->bot->Core('player')->exists($stack[0]['user'])) && ($stack[0]['timeout'] > time()) && (!$p); $i ++)
         {
             $pr = $this->get_packet();
             if ($pr->type == AOCP_CLIENT_LOOKUP)
@@ -999,7 +998,7 @@ class AOChat
     function lookup_group($arg, $type = 0)
     {
         $is_gid = false;
-        // This should probably be moved out of AOChat and into core/PlayerList.php
+        // This should probably be moved out of AOChat and into Core/PlayerList.php
         if ($type && ($is_gid = (strlen($arg) === 5 && (ord($arg[0]) & ~0x80) < 0x10))) {
             return $arg;
         }
@@ -1012,14 +1011,14 @@ class AOChat
 
     function get_gid($g)
     {
-        // This should probably be moved out of AOChat and into core/PlayerList.php
+        // This should probably be moved out of AOChat and into Core/PlayerList.php
         return $this->lookup_group($g, 1);
     }
 
 
     function get_gname($g)
     {
-        // This should probably be moved out of AOChat and into core/GroupList.php
+        // This should probably be moved out of AOChat and into Core/GroupList.php
         if (($gid = $this->lookup_group($g, 1)) === false) {
             return false;
         }
@@ -1031,7 +1030,7 @@ class AOChat
     function send_ping()
     {
         $this->last_ping = time();
-        return $this->send_packet(new AOChatPacket("out", AOCP_PING, "AOChat.php"));
+        return $this->send_packet(new AOChatPacket("out", AOCP_PING, "AoChat.php"));
     }
 
 
@@ -1183,7 +1182,7 @@ class AOChat
         if ($uid === $this->char['id']) {
             return false;
         }
-        if ($this->game == "ao") {
+        if (strtolower(AOCHAT_GAME) == "ao") {
             $uid = array($uid,
                          $type);
         }
@@ -1203,7 +1202,7 @@ class AOChat
 
     function buddy_remove_unknown()
     {
-        if ($this->game == "ao") {
+        if (strtolower(AOCHAT_GAME) == "ao") {
             $array = array("rembuddy",
                            "?");
         }

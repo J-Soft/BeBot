@@ -1,6 +1,6 @@
 <?php
 /*
-* MySQL.php - MySQL interaction
+* Mysql.php - MySQL interaction
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -65,15 +65,15 @@ class MySQL
         /*
         Load up config
         */
-        $botname_mysql_conf = "conf/" . $this->botname . ".MySQL.conf";
+        $botname_mysql_conf = "Conf/" . $this->botname . ".MySQL.conf";
         if (file_exists($botname_mysql_conf)) {
             include $botname_mysql_conf;
             $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from " . $botname_mysql_conf, FALSE);
         }
         else
         {
-            include "conf/MySQL.conf";
-            $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from conf/MySQL.conf", FALSE);
+            include "Conf/MySQL.conf";
+            $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from Conf/MySQL.conf", FALSE);
         }
         $this->USER   = $user;
         $this->PASS   = $pass;

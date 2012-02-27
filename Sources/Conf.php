@@ -50,8 +50,8 @@ class Conf
 
     function load($argv = FALSE)
     {
-        if (file_exists("./conf/" . $this->cf)) {
-            require "./conf/" . $this->cf;
+        if (file_exists("./Conf/" . $this->cf)) {
+            require "./Conf/" . $this->cf;
             if (empty($ao_password) || $ao_password == "") {
                 fwrite(STDOUT, "Password for $ao_username:");
                 system('stty -echo');
@@ -74,7 +74,7 @@ class Conf
                 $this->cf = "Bot.conf";
             }
         }
-        if (!file_exists("./conf/" . $this->cf)) {
+        if (!file_exists("./Conf/" . $this->cf)) {
             $setup = $this->todo();
         }
     }
@@ -196,16 +196,16 @@ class Conf
 
 
 	$log = "chat";					 // logging all/chat/off
-	$log_path = "./log";			 // relative/absolute path of logfiles
+	$log_path = "./Logs";			 // relative/absolute path of logfiles
 	$log_timestamp = "none";	//Valid options are: datetime, date, time, none.  Always defaults to datetime if missing or invalid.
 
 
 	/*
-	The next two entries define a list of additional core and module directories to be loaded after the core/ and custom/core/
-	btw the module/ and custom/module/ directories. The list is parsed as a comma-seperated list relative the the base directory
+	The next two entries define a list of additional Core and module directories to be loaded after the Core/ and Custom/Core/
+	btw the module/ and Custom/module/ directories. The list is parsed as a comma-seperated list relative the the base directory
 	of the bot, without any / at the end of the directory names.
 	*/
-	$core_directories = "";	// optional additional core directories
+	$core_directories = "";	// optional additional Core directories
 	$module_directories = "";	// optional additional module directories
 
 
@@ -233,7 +233,7 @@ class Conf
 	$proxy_server_address = "";				// Proxy server to use address to use
 
 ?>';
-        $fp   = fopen('./conf/' . $this->cf, 'w');
+        $fp   = fopen('./Conf/' . $this->cf, 'w');
         fwrite($fp, $file);
         fclose($fp);
         echo $this->cf . " Created\n";
@@ -243,13 +243,13 @@ class Conf
     function mysql_check()
     {
         //get botname
-        include ("./conf/" . $this->cf);
+        include ("./Conf/" . $this->cf);
         $botname            = ucfirst(strtolower($bot_name));
-        $botname_mysql_conf = "conf/" . $botname . ".MySQL.conf";
+        $botname_mysql_conf = "Conf/" . $botname . ".MySQL.conf";
         if (file_exists($botname_mysql_conf)) {
             Return;
         }
-        elseif (file_exists("conf/MySQL.conf"))
+        elseif (file_exists("Conf/MySQL.conf"))
         {
             Return;
         }
@@ -383,7 +383,7 @@ class Conf
 	*/
 	' . $mt . '
 ?>';
-        $fp   = fopen('./conf/' . $filename, 'w');
+        $fp   = fopen('./Conf/' . $filename, 'w');
         fwrite($fp, $file);
         fclose($fp);
         echo $filename . " Created\n";

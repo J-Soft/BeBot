@@ -152,7 +152,7 @@ class Bot
 
     public static function factory($config_file = null)
     {
-        require ('./conf/ServerList.php');
+        require ('./Conf/ServerList.php');
         if (!empty($config_file)) {
             $config_file = ucfirst(strtolower($config_file)) . ".Bot.conf";
         }
@@ -161,35 +161,35 @@ class Bot
             $config_file = "Bot.conf";
         }
         //Read config_file
-        if (file_exists("./conf/" . $config_file)) {
-            require_once "./conf/" . $config_file;
-            echo "Loaded bot configuration from conf/" . $config_file . "\n";
+        if (file_exists("./Conf/" . $config_file)) {
+            require_once "./Conf/" . $config_file;
+            echo "Loaded bot configuration from Conf/" . $config_file . "\n";
         }
         else
         {
-            die("Could not read config file conf/" . $config_file);
+            die("Could not read config file Conf/" . $config_file);
         }
 
         if (empty($ao_password) || $ao_password == "") {
-            $fp = fopen('./conf/pw', 'r');
+            $fp = fopen('./Conf/pw', 'r');
             if ($fp) {
-                $ao_password = fread($fp, filesize('./conf/pw'));
+                $ao_password = fread($fp, filesize('./Conf/pw'));
                 fclose($fp);
-                $fp = fopen('./conf/pw', 'w');
+                $fp = fopen('./Conf/pw', 'w');
                 fwrite($fp, "");
                 fclose($fp);
             }
             else if (empty($ao_password) || $ao_password == "") {
-                die("No password set in either ./conf/" . $config_file . " or in conf/pw");
+                die("No password set in either ./Conf/" . $config_file . " or in Conf/pw");
             }
         }
         //Determine which game we are playing
-        if (!empty($server_list['ao'][$dimension])) {
-            define('AOCHAT_GAME', 'ao');
+        if (!empty($server_list['Ao'][$dimension])) {
+            define('AOCHAT_GAME', 'Ao');
         }
-        elseif (!empty($server_list['aoc'][$dimension]))
+        elseif (!empty($server_list['Aoc'][$dimension]))
         {
-            define('AOCHAT_GAME', 'aoc');
+            define('AOCHAT_GAME', 'Aoc');
         }
         else
         {
@@ -255,7 +255,7 @@ class Bot
             self::$instance[$bothandle]->super_admin = null;
         }
         // create new ConfigMagik-Object (HACXX ALERT! This should most likely be a singleton!)
-        self::$instance[$bothandle]->ini = ConfigMagik::get_instance($bothandle, "conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", true, true);
+        self::$instance[$bothandle]->ini = ConfigMagik::get_instance($bothandle, "Conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", true, true);
         self::$instance[$bothandle]->register_module(self::$instance[$bothandle]->ini, 'ini');
         //Instantiate singletons
         self::$instance[$bothandle]->irc = &$irc; //To do: This should probably be a singleton aswell.
@@ -289,7 +289,7 @@ class Bot
         }
         $bot     = $this;
         $section = ucfirst(strtolower($section));
-        $this->log(strtoupper($section), "LOAD", "Loading $section-modules from '$directory'");
+        $this->log(strtoupper($section), "LOAD", "Loading $section-Modules from '$directory'");
         $folder   = dir("./$directory");
         $filelist = array();
         //Create an array of files loadable.
@@ -337,15 +337,15 @@ class Bot
             Default:
                 $dimension = ucfirst(strtolower($this->dimension));
         }
-        Require ("conf/ServerList.php");
-        if (isset($server_list['ao'][$dimension])) {
-            $server = $server_list['ao'][$dimension]['server'];
-            $port   = $server_list['ao'][$dimension]['port'];
+        Require ("Conf/ServerList.php");
+        if (isset($server_list['Ao'][$dimension])) {
+            $server = $server_list['Ao'][$dimension]['server'];
+            $port   = $server_list['Ao'][$dimension]['port'];
         }
-        elseif (isset($server_list['aoc'][$dimension]))
+        elseif (isset($server_list['Aoc'][$dimension]))
         {
-            $server = $server_list['aoc'][$dimension]['server'];
-            $port   = $server_list['aoc'][$dimension]['port'];
+            $server = $server_list['Aoc'][$dimension]['server'];
+            $port   = $server_list['Aoc'][$dimension]['port'];
         }
         else
         {
@@ -431,7 +431,7 @@ class Bot
         $this->core("settings")
             ->create("Core", "DisablePGMSGchat", $dispg, "Should the Bot read none command chat in it's own private group?");
 
-        // Tell modules that the bot is connected
+        // Tell Modules that the bot is connected
         if (!empty($this->commands["connect"])) {
             $keys = array_keys($this->commands["connect"]);
             foreach ($keys as $key)
@@ -647,7 +647,7 @@ class Bot
         // Never send any privategroup message in AoC, because this would disconnect the bot
         if ($this->game == "aoc") {
             /*** FIXME ***/
-            // We need to eradicate calls to this from all modules for sanitys sake.
+            // We need to eradicate calls to this from all Modules for sanitys sake.
             return FALSE;
         }
         if ($group == NULL) {
@@ -713,7 +713,7 @@ class Bot
             if ($this->core("settings")->get("Core", "ColorizeGC")) {
                 $msg = $this->core("colors")->colorize("normal", $msg);
             }
-            if ($this->game == "ao") {
+            if ($strtolower(AOCHAT_GAME) == "Ao") {
                 $guild = $this->guildname;
             }
             else
@@ -923,7 +923,7 @@ class Bot
 
     /*
     * This function handles input after a successless try to find a command in it.
-    * If some modules has registered a chat handover for $channel it will hand it over here.
+    * If some Modules has registered a chat handover for $channel it will hand it over here.
     * It checks $found first, if $found = true it doesn't do anything.
     * $group is used by external private groups and to listen to specific chat channels outside the bot.
     * Returns true if some module accessing this chat returns true, false otherwise.
@@ -1158,7 +1158,7 @@ class Bot
     */
     function inc_gannounce($args)
     {
-        if ($args[2] == 32772 && $this->game == "ao") {
+        if ($args[2] == 32772 && strtolower(AOCHAT_GAME) == "ao") {
             $this->guildname = $args[1];
             $this->log("CORE", "INC_GANNOUNCE", "Detected org name as: $args[1]");
         }
@@ -1409,7 +1409,7 @@ class Bot
     }
 
 
-    // Registers a new reference to a module, used to access the new module by other modules.
+    // Registers a new reference to a module, used to access the new module by other Modules.
     public function register_module(&$ref, $name)
     {
         if (isset($this->module_links[strtolower($name)])) {
