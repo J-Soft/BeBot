@@ -1,0 +1,47 @@
+<?php
+	/*
+	Database name
+	*/
+	$dbase = "";
+
+	/*
+	Database username
+	*/
+	$user = "";
+
+	/*
+	Database password
+	*/
+	$pass = "";
+
+	/*
+	Database server (usually localhost)
+	*/
+	$server = "";
+
+	/*
+	Database table prefix
+	The bot will use <botname> as prefix on default, you only need to change this entry if you
+	want a different prefix or none at all, in which case you have to set it to an empty
+	string ("").
+	If you want a different or no prefix you will have to uncomment the line below by removing
+	the // in front of it and set it to the wished value.
+	you may also use <botname> as part of the string and it will be replaces with the botname in lowercase
+	*/
+	// $table_prefix = "";
+
+	/*
+	If you have $table_prefix Defined your tables will be prefixed as above with a _ added on
+	if you dont want the _ added uncomment below
+	*/
+	//$nounderscore = TRUE;
+
+	/*
+	Master prefix table.
+	This is the mastertable containing information about all tablenames and whether those use
+	or don't use a prefix. Only uncomment the line below by removing the // in front of it if
+	you want to use a different mastertable then botname_tablenames, which is used on default.
+	you may also use <botname> as part of the string and it will be replaces with the botname in lowercase
+	*/
+	// $master_tablename = "botname_tablenames";
+?>

@@ -72,8 +72,8 @@ class ModuleCatcher_Core extends BasePassiveModule
             }
         }
         // Load up game Core-Modules
-        if (is_dir("./Core/" . $this->bot->game . "/")) {
-            $folder = dir("./Core/" . $this->bot->game . "/");
+        if (is_dir("./Core/" . AOCHAT_GAME . "/")) {
+            $folder = dir("./Core/" . AOCHAT_GAME . "/");
             while ($mod = $folder->read())
             {
                 if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
@@ -131,8 +131,8 @@ class ModuleCatcher_Core extends BasePassiveModule
             }
         }
         // Load up all game Modules
-        if (is_dir("./Modules/" . $this->bot->game . "/")) {
-            $folder = dir("./Modules/" . $this->bot->game . "/");
+        if (is_dir("./Modules/" . AOCHAT_GAME . "/")) {
+            $folder = dir("./Modules/" . AOCHAT_GAME . "/");
             while ($mod = $folder->read())
             {
                 if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {

@@ -87,7 +87,7 @@ require_once "./Sources/Mysql.php";
 require_once "./Sources/AoChat.php";
 require_once "./Sources/ConfigMagik.php";
 require_once "./Sources/Bot.php";
-require_once "./Sources/sfEventDispatcher.php";
+require_once "./Sources/SymfonyEvent/sfEventDispatcher.php";
 
 /*
 Creating the bot.

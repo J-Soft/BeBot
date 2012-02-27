@@ -235,7 +235,6 @@ class Bot
         self::$instance[$bothandle]->use_proxy_server     = $use_proxy_server;
         self::$instance[$bothandle]->proxy_server_address = explode(",", $proxy_server_address);
         self::$instance[$bothandle]->starttime            = time();
-        self::$instance[$bothandle]->game                 = AOCHAT_GAME;
         self::$instance[$bothandle]->accessallbots        = $accessallbots;
         self::$instance[$bothandle]->core_directories     = $core_directories;
         self::$instance[$bothandle]->module_directories   = $module_directories;
@@ -360,9 +359,9 @@ class Bot
             die("The bot is restarting.\n");
         }
         // AoC authentication is a bit different
-        if ($this->game == "aoc") {
+        if (strtolower(AOCHAT_GAME) == "aoc") {
             // Open connection
-            $this->log("LOGIN", "STATUS", "Connecting to $this->game server $server:$port");
+            $this->log("LOGIN", "STATUS", "Connecting to " . AOCHAT_GAME . " server $server:$port");
             if (!$this->aoc->connect($server, $port, $this->sixtyfourbit)) {
                 $this->cron_activated = false;
                 $this->disconnect();
@@ -385,7 +384,7 @@ class Bot
         */
         unset($this->username);
         unset($this->password);
-        if ($this->game == "aoc") {
+        if (strtolower(AOCHAT_GAME) == "aoc") {
             $dispg = TRUE;
         }
         else
@@ -645,7 +644,7 @@ class Bot
                          $parsecolors = TRUE)
     {
         // Never send any privategroup message in AoC, because this would disconnect the bot
-        if ($this->game == "aoc") {
+        if (strtolower(AOCHAT_GAME) == "aoc") {
             /*** FIXME ***/
             // We need to eradicate calls to this from all Modules for sanitys sake.
             return FALSE;
@@ -934,7 +933,7 @@ class Bot
             return true;
         }
         if ($channel == "gmsg") {
-            if ($group == $this->guildname || ($this->game == "aoc" && $group == "~Guild")) {
+            if ($group == $this->guildname || (strtolower(AOCHAT_GAME) == "aoc" && $group == "~Guild")) {
                 $group = "org";
             }
             $registered = $this->commands[$channel][$group];
@@ -1194,8 +1193,10 @@ class Bot
             $group = $this->core("chat")->get_gname($args[0]);
         }
         $args[2] = utf8_decode($args[2]);
-        if (isset($this->commands["gmsg"][$group]) || $group == $this->guildname || ($this->game == "aoc" && $group == "~Guild")) {
-            if ($this->game == "aoc" && $group == "~Guild") {
+        if (isset($this->commands["gmsg"][$group]) || $group == $this->guildname || (strtolower(AOCHAT_GAME) ==
+                                                                                                  "aoc" &&
+                                                                                         $group == "~Guild")) {
+            if (strtolower(AOCHAT_GAME) == "aoc" && $group == "~Guild") {
                 $msg = "[" . $this->guildname . "] ";
             }
             else
@@ -1214,7 +1215,7 @@ class Bot
         }
         $disgc     = $this->core("settings")->get("Core", "DisableGC");
         $disgcchat = $this->core("settings")->get("Core", "DisableGCchat");
-        if (($group == $this->guildname || ($this->game == "aoc" && $group == "~Guild")) && $disgc && $disgcchat) {
+        if (($group == $this->guildname || (strtolower(AOCHAT_GAME) == "aoc" && $group == "~Guild")) && $disgc && $disgcchat) {
             Return FALSE;
         }
         if ($args[1] == 0) {
@@ -1236,7 +1237,7 @@ class Bot
             $this->log("GROUP", "MSG", $msg);
         }
         if (!isset($this->other_bots[$user])) {
-            if ($group == $this->guildname || ($this->game == "aoc" && $group == "~Guild")) {
+            if ($group == $this->guildname || (strtolower(AOCHAT_GAME) == "aoc" && $group == "~Guild")) {
                 if (!$disgc) {
                     $found = $this->handle_command_input($user, $args[2], "gc");
                 }
