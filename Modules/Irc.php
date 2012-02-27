@@ -34,7 +34,7 @@
 /*
 Add a "_" at the beginning of the file (_IRC.php) if you do not want it to be loaded.
 */
-include_once ('Sources/SmartIRC.php');
+include_once ('Sources/SmartIRC/SmartIRC.php');
 $irc = new IRC($bot);
 /*
 The Class itself...

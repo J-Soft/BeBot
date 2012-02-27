@@ -712,7 +712,7 @@ class Bot
             if ($this->core("settings")->get("Core", "ColorizeGC")) {
                 $msg = $this->core("colors")->colorize("normal", $msg);
             }
-            if ($strtolower(AOCHAT_GAME) == "Ao") {
+            if (strtolower(AOCHAT_GAME) == "Ao") {
                 $guild = $this->guildname;
             }
             else

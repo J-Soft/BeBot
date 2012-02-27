@@ -311,7 +311,12 @@ class Roster_Core extends BasePassiveModule
                 */
                 foreach ($members as $member)
                 {
+                    $db_member = null;
+
+                    if (isset($db_members[$member["nickname"]])){
                     $db_member = $db_members[$member["nickname"]];
+                    }
+
                     /*
                     If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
                     its a new member we havent picked up for some reason.
