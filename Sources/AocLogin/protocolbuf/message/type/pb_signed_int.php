@@ -17,7 +17,7 @@ class PBSignedInt extends PBScalar
         echo "ParseArray from pb_signed_int.php";
         parent::ParseFromArray();
 
-        $saved       = $this->value;
+        $saved = $this->value;
         $this->value = round($this->value / 2);
         if ($saved % 2 == 1) {
             $this->value = -($this->value);
@@ -35,8 +35,7 @@ class PBSignedInt extends PBScalar
         if ($this->value < 0) {
             $this->value = abs($this->value) * 2 - 1;
         }
-        else
-        {
+        else {
             $this->value = $this->value * 2;
         }
         $string = parent::SerializeToString($rec);

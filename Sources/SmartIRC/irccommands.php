@@ -45,25 +45,25 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
     function message($type, $destination, $message, $priority = SMARTIRC_MEDIUM)
     {
         switch ($type) {
-            case SMARTIRC_TYPE_CHANNEL:
-            case SMARTIRC_TYPE_QUERY:
-                $this->_send('PRIVMSG ' . $destination . ' :' . $message, $priority);
-                break;
-            case SMARTIRC_TYPE_ACTION:
-                $this->_send('PRIVMSG ' . $destination . ' :' . chr(1) . 'ACTION ' . $message . chr(1), $priority);
-                break;
-            case SMARTIRC_TYPE_NOTICE:
-                $this->_send('NOTICE ' . $destination . ' :' . $message, $priority);
-                break;
-            case SMARTIRC_TYPE_CTCP: // backwards compatibilty
-            case SMARTIRC_TYPE_CTCP_REPLY:
-                $this->_send('NOTICE ' . $destination . ' :' . chr(1) . $message . chr(1), $priority);
-                break;
-            case SMARTIRC_TYPE_CTCP_REQUEST:
-                $this->_send('PRIVMSG ' . $destination . ' :' . chr(1) . $message . chr(1), $priority);
-                break;
-            default:
-                return false;
+        case SMARTIRC_TYPE_CHANNEL:
+        case SMARTIRC_TYPE_QUERY:
+            $this->_send('PRIVMSG ' . $destination . ' :' . $message, $priority);
+            break;
+        case SMARTIRC_TYPE_ACTION:
+            $this->_send('PRIVMSG ' . $destination . ' :' . chr(1) . 'ACTION ' . $message . chr(1), $priority);
+            break;
+        case SMARTIRC_TYPE_NOTICE:
+            $this->_send('NOTICE ' . $destination . ' :' . $message, $priority);
+            break;
+        case SMARTIRC_TYPE_CTCP: // backwards compatibilty
+        case SMARTIRC_TYPE_CTCP_REPLY:
+            $this->_send('NOTICE ' . $destination . ' :' . chr(1) . $message . chr(1), $priority);
+            break;
+        case SMARTIRC_TYPE_CTCP_REQUEST:
+            $this->_send('PRIVMSG ' . $destination . ' :' . chr(1) . $message . chr(1), $priority);
+            break;
+        default:
+            return false;
         }
 
         return true;
@@ -157,8 +157,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function kick($channel, $nicknamearray, $reason = null,
-                  $priority = SMARTIRC_MEDIUM)
+    function kick(
+        $channel, $nicknamearray, $reason = null,
+        $priority = SMARTIRC_MEDIUM
+    )
     {
         if (!is_array($nicknamearray)) {
             $nicknamearray = array($nicknamearray);

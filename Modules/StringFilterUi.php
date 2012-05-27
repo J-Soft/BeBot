@@ -43,11 +43,11 @@ class StringFilter_Interface extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'filter', 'ADMIN');
-        $this->help['description']                                        = 'Add and remove strings to the bot\'s filter.';
-        $this->help['command']['filter']                                  = "- Display the current string filter list.";
-        $this->help['command']['filter add <string>']                     = "- Replace <strong> with default replacment text.";
+        $this->help['description'] = 'Add and remove strings to the bot\'s filter.';
+        $this->help['command']['filter'] = "- Display the current string filter list.";
+        $this->help['command']['filter add <string>'] = "- Replace <strong> with default replacment text.";
         $this->help['command']['filter add <string1> replace: <string2>'] = "- Replace <string1> with <string2>.";
-        $this->help['command']['filter rem <string>']                     = "Remove <string> from the list.";
+        $this->help['command']['filter rem <string>'] = "Remove <string> from the list.";
     }
 
 
@@ -57,15 +57,18 @@ class StringFilter_Interface extends BaseActiveModule
         if (preg_match("/^filter add (.+?) replace: (.+)$/i", $msg, $info)) {
             return $this->add($info[1], $info[2]);
         }
-        else if (preg_match("/^filter add (.+?)$/i", $msg, $info)) {
-            return $this->add($info[1]);
-        }
-        else if (preg_match("/^filter rem (.+)$/i", $msg, $info)) {
-            return $this->rem($info[1]);
-        }
-        else
-        {
-            return $this->show($name);
+        else {
+            if (preg_match("/^filter add (.+?)$/i", $msg, $info)) {
+                return $this->add($info[1]);
+            }
+            else {
+                if (preg_match("/^filter rem (.+)$/i", $msg, $info)) {
+                    return $this->rem($info[1]);
+                }
+                else {
+                    return $this->show($name);
+                }
+            }
         }
     }
 
@@ -86,8 +89,7 @@ class StringFilter_Interface extends BaseActiveModule
     {
         $return = $this->bot->core("stringfilter")->get_strings();
         $inside = "Filtered String List:\n\n";
-        foreach ($return as $string => $replace)
-        {
+        foreach ($return as $string => $replace) {
             $inside .= "Search for: \"" . $string . "\" Replace with: \"" . $replace . "\" " . $this->bot
                 ->core("tools")->chatcmd("filter rem " . $string, "[REMOVE]");
             $inside .= "\n";

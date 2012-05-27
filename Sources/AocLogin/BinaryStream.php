@@ -24,9 +24,9 @@ class BinaryStream
 
     public function __construct($data = "", $len = 0)
     {
-        $this->m_Data     = $data;
-        $this->m_DataLen  = $len;
-        $this->m_ReadPtr  = 0;
+        $this->m_Data = $data;
+        $this->m_DataLen = $len;
+        $this->m_ReadPtr = 0;
         $this->m_WritePtr = 0;
     }
 
@@ -51,8 +51,7 @@ class BinaryStream
         if ($this->m_DataLen > $this->m_WritePtr) {
             return $this->m_DataLen;
         }
-        else
-        {
+        else {
             $this->m_WritePtr;
         }
     }
@@ -128,10 +127,10 @@ class BinaryStream
     {
         $tmp1 = $this->m_Data[$this->m_ReadPtr++];
         $tmp2 = $this->m_Data[$this->m_ReadPtr++];
-        $tmp  = $tmp1 . $tmp2;
+        $tmp = $tmp1 . $tmp2;
 
         $data = unpack("n", $tmp);
-        $res  = array_pop($data);
+        $res = array_pop($data);
 
         //echo("[BinaryStream][ReadUInt16] " . $res . " [pos:" . ($this->m_ReadPtr-2) . " -> " . ($this->m_ReadPtr ) . "]\n");
 
@@ -149,10 +148,10 @@ class BinaryStream
         $tmp2 = $this->m_Data[$this->m_ReadPtr++];
         $tmp3 = $this->m_Data[$this->m_ReadPtr++];
         $tmp4 = $this->m_Data[$this->m_ReadPtr++];
-        $tmp  = $tmp1 . $tmp2 . $tmp3 . $tmp4;
+        $tmp = $tmp1 . $tmp2 . $tmp3 . $tmp4;
 
         $data = unpack("N", $tmp);
-        $res  = array_pop($data);
+        $res = array_pop($data);
 
         // Make sure the value is unsigned
         if ($res < 0) {
@@ -209,7 +208,7 @@ class BinaryStream
     /// @author Chaoz
     public function WriteUInt8($data)
     {
-        $packedData                        = pack("C", $data);
+        $packedData = pack("C", $data);
         $this->m_Data[$this->m_WritePtr++] = $packedData[0];
         //echo("[BinaryStream][WriteUInt8] " . $data . " [pos:" . ($this->m_WritePtr-1) . " -> " . ($this->m_WritePtr ) . "] \n");
     }
@@ -221,7 +220,7 @@ class BinaryStream
     /// @author Chaoz
     public function WriteUInt16($data)
     {
-        $packedData                        = pack("n", $data);
+        $packedData = pack("n", $data);
         $this->m_Data[$this->m_WritePtr++] = $packedData[0];
         $this->m_Data[$this->m_WritePtr++] = $packedData[1];
         //echo("[BinaryStream][WriteUInt16] " . $data . " [pos:" . ($this->m_WritePtr-2) . " -> " . ($this->m_WritePtr ) . "] \n");
@@ -234,7 +233,7 @@ class BinaryStream
     /// @author Chaoz
     public function WriteUInt32($data)
     {
-        $packedData                        = pack("N", $data);
+        $packedData = pack("N", $data);
         $this->m_Data[$this->m_WritePtr++] = $packedData[0];
         $this->m_Data[$this->m_WritePtr++] = $packedData[1];
         $this->m_Data[$this->m_WritePtr++] = $packedData[2];
@@ -251,8 +250,7 @@ class BinaryStream
     public function WriteRaw($str, $len)
     {
         //echo("[BinaryStream][WriteRaw] " . $str . " [pos:" . ($this->m_WritePtr) . " to " . ($this->m_WritePtr + $len) . "] len:" . $len . "]\n");
-        for ($i = 0; $i < $len; $i++)
-        {
+        for ($i = 0; $i < $len; $i++) {
             $this->m_Data[$this->m_WritePtr++] = $str[$i];
         }
     }

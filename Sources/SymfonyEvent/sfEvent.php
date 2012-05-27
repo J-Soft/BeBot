@@ -51,7 +51,7 @@ class sfEvent implements ArrayAccess
     public function __construct($subject, $name, $parameters = array())
     {
         $this->subject = $subject;
-        $this->name    = $name;
+        $this->name = $name;
 
         $this->parameters = $parameters;
     }

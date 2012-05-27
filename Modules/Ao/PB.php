@@ -34,51 +34,74 @@
 $pb = new PB($bot);
 class PB extends BaseActiveModule
 {
-    private $slots = array('ocullar'     => 'eye',
-                           'brain'       => 'head',
-                           'right arm'   => 'rarm',
-                           'left arm'    => 'larm',
-                           'right wrist' => 'rwrist',
-                           'left wrist'  => 'lwrist',
-                           'right hand'  => 'rhand',
-                           'thigh'       => 'legs',
-                           'left hand'   => 'lhand');
-    private $profs = array('adventurer'      => 'adv',
-                           'agent'           => 'agent',
-                           'bureaucrat'      => 'crat',
-                           'doctor'          => 'doc',
-                           'enforcer'        => 'enf',
-                           'engineer'        => 'eng',
-                           'fixer'           => 'fixer',
-                           'keeper'          => 'keeper',
-                           'martial artist'  => 'ma',
-                           'meta-physicist'  => 'mp',
-                           'nano-technician' => 'nt',
-                           'soldier'         => 'sol',
-                           'trader'          => 'trader');
-    private $units = array('adv'    => array('infantry',
-                                             'artillery',
-                                             'support'),
-                           'agent'  => array('artillery'),
-                           'crat'   => array('control',
-                                             'extermination'),
-                           'doc'    => array('support'),
-                           'enf'    => array('infantry'),
-                           'eng'    => array('control'),
-                           'fixer'  => array('artillery',
-                                             'support'),
-                           'keeper' => array('infantry',
-                                             'support'),
-                           'ma'     => array('infantry',
-                                             'support'),
-                           'mp'     => array('control',
-                                             'extermination',
-                                             'support'),
-                           'nt'     => array('extermination'),
-                           'sol'    => array('artillery'),
-                           'trader' => array('artillery',
-                                             'control',
-                                             'support'));
+    private $slots
+        = array(
+            'ocullar' => 'eye',
+            'brain' => 'head',
+            'right arm' => 'rarm',
+            'left arm' => 'larm',
+            'right wrist' => 'rwrist',
+            'left wrist' => 'lwrist',
+            'right hand' => 'rhand',
+            'thigh' => 'legs',
+            'left hand' => 'lhand'
+        );
+    private $profs
+        = array(
+            'adventurer' => 'adv',
+            'agent' => 'agent',
+            'bureaucrat' => 'crat',
+            'doctor' => 'doc',
+            'enforcer' => 'enf',
+            'engineer' => 'eng',
+            'fixer' => 'fixer',
+            'keeper' => 'keeper',
+            'martial artist' => 'ma',
+            'meta-physicist' => 'mp',
+            'nano-technician' => 'nt',
+            'soldier' => 'sol',
+            'trader' => 'trader'
+        );
+    private $units
+        = array(
+            'adv' => array(
+                'infantry',
+                'artillery',
+                'support'
+            ),
+            'agent' => array('artillery'),
+            'crat' => array(
+                'control',
+                'extermination'
+            ),
+            'doc' => array('support'),
+            'enf' => array('infantry'),
+            'eng' => array('control'),
+            'fixer' => array(
+                'artillery',
+                'support'
+            ),
+            'keeper' => array(
+                'infantry',
+                'support'
+            ),
+            'ma' => array(
+                'infantry',
+                'support'
+            ),
+            'mp' => array(
+                'control',
+                'extermination',
+                'support'
+            ),
+            'nt' => array('extermination'),
+            'sol' => array('artillery'),
+            'trader' => array(
+                'artillery',
+                'control',
+                'support'
+            )
+        );
 
 
     function __construct(&$bot)
@@ -86,13 +109,15 @@ class PB extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "pb", "GUEST");
         //$this -> register_command("all", "symb", "GUEST");
-        $this->help['description']                         = "Shows know pocket bosses and their loot.";
-        $this->help['command']['pb <name>']                = "Shows the known loot of the pocket boss <name>.";
-        $this->help['command']['symb <type> <slot>']       = "Shows all known drops of symbs of <type> in <slot>.";
+        $this->help['description'] = "Shows know pocket bosses and their loot.";
+        $this->help['command']['pb <name>'] = "Shows the known loot of the pocket boss <name>.";
+        $this->help['command']['symb <type> <slot>'] = "Shows all known drops of symbs of <type> in <slot>.";
         $this->help['command']['symb <profession> <slot>'] = "Shows all known drops of symbs usable by <profession> in <slot>";
-        $this->help['notes']                               = "Supported slots: eye, ocullar, head, brain, ear, rarm, right arm, chest, larm, left arm, rwrist, right wrist, waist, lwrist, left wrist, rhand, right hand, legs, thigh, lhand, left hand, feet.<br>";
+        $this->help['notes']
+            = "Supported slots: eye, ocullar, head, brain, ear, rarm, right arm, chest, larm, left arm, rwrist, right wrist, waist, lwrist, left wrist, rhand, right hand, legs, thigh, lhand, left hand, feet.<br>";
         $this->help['notes'] .= "Supported type: support, control, infantry, artillery, extermination.";
-        $this->help['notes'] .= "Supported professions: adventurer, adv, agent, bureaucrat, crat, doctor, doc, enforcer, enf, engineer, eng, fixer, martial artist, ma, meta-Physicist, mp, nano-technician, nt, soldier, sol, keeper, trader<br>";
+        $this->help['notes']
+            .= "Supported professions: adventurer, adv, agent, bureaucrat, crat, doctor, doc, enforcer, enf, engineer, eng, fixer, martial artist, ma, meta-Physicist, mp, nano-technician, nt, soldier, sol, keeper, trader<br>";
         $this->help['notes'] .= "For this module to work you need to have run pb_data.php in the 'extras' folder!";
         $this->tables();
     }
@@ -117,21 +142,19 @@ case 1:
 }
 $this -> bot -> db -> set_version("symbiants", 2); */
         $this->bot->db->define_tablename("pocketbosses", "false");
-        Switch ($this->bot->db->get_version("pocketbosses"))
-        {
-            case 1:
-            case 2:
-                $filename = "./Extras/Symbiants/PocketBosses.sql";
-                $handle   = fopen($filename, "r");
-                $query    = fread($handle, filesize($filename));
-                fclose($handle);
-                $query = explode(";", $query);
-                foreach ($query as $q)
-                {
-                    if (!empty($q)) {
-                        $this->bot->db->query($q);
-                    }
+        Switch ($this->bot->db->get_version("pocketbosses")) {
+        case 1:
+        case 2:
+            $filename = "./Extras/Symbiants/PocketBosses.sql";
+            $handle = fopen($filename, "r");
+            $query = fread($handle, filesize($filename));
+            fclose($handle);
+            $query = explode(";", $query);
+            foreach ($query as $q) {
+                if (!empty($q)) {
+                    $this->bot->db->query($q);
                 }
+            }
         }
         $this->bot->db->set_version("pocketbosses", 3);
     }
@@ -139,21 +162,23 @@ $this -> bot -> db -> set_version("symbiants", 2); */
 
     function command_handler($name, $msg, $origin)
     {
-        $com = $this->parse_com($msg, array('com',
-                                            'args'));
-        switch ($com['com'])
-        {
-            case 'pb':
-                switch ($com['args'])
-                {
-                    case '':
-                        return $this->list_all($name);
-                        break;
-                    default:
-                        return $this->SearchPB($com['args']);
-                        break;
-                }
+        $com = $this->parse_com(
+            $msg, array(
+                'com',
+                'args'
+            )
+        );
+        switch ($com['com']) {
+        case 'pb':
+            switch ($com['args']) {
+            case '':
+                return $this->list_all($name);
                 break;
+            default:
+                return $this->SearchPB($com['args']);
+                break;
+            }
+            break;
             /*	case 'symb':
            //Condition professions
            foreach($this->profs as $prof => $name)
@@ -168,8 +193,8 @@ $this -> bot -> db -> set_version("symbiants", 2); */
            $args = $this -> parse_com($com['args'], array('unit', 'slot'));
            return $this -> SearchSymb($args['unit'], $args['slot']);
            break; */
-            Default:
-                Return "##error##Error: Unknown Command ##highlight##" . $com['com'] . "##end## in PB module##end##";
+        Default:
+            Return "##error##Error: Unknown Command ##highlight##" . $com['com'] . "##end## in PB module##end##";
         }
     }
 
@@ -184,12 +209,11 @@ $this -> bot -> db -> set_version("symbiants", 2); */
         $msg .= "##highlight##General Location: ##end##" . $pb[3] . "\n";
         $msg .= "____________________________________  ##end##\n";
         asort($symbs);
-        foreach ($symbs as $symb)
-        {
+        foreach ($symbs as $symb) {
             $title = "QL {$symb[0]} {$symb[3]} " . array_search($symb[1], $this->slots) . " symbiant, {$symb[2]} unit aban";
             $title = ucwords($title);
             $msg .= $this->bot->core("tools")
-                        ->make_item($symb[4], $symb[4], $symb[0], $title, TRUE) . "\n";
+                ->make_item($symb[4], $symb[4], $symb[0], $title, TRUE) . "\n";
         }
         return $this->bot->core("tools")
             ->make_blob("Remains of " . $pb[1], $msg);
@@ -211,8 +235,7 @@ $this -> bot -> db -> set_version("symbiants", 2); */
     {
         $haystack = $this->bot->db->select("SELECT name FROM #___pocketbosses");
         // 1st lets check for pocketbosses that contain the string
-        foreach ($haystack as $straw)
-        {
+        foreach ($haystack as $straw) {
             //echo "is $search in ".$straw[0]."\n";
             if (stristr($straw[0], $search)) {
                 $smallerhaystack[] = $straw;
@@ -221,8 +244,7 @@ $this -> bot -> db -> set_version("symbiants", 2); */
         if (empty($smallerhaystack)) {
             $smallerhaystack = $haystack;
         }
-        foreach ($smallerhaystack as $straw)
-        {
+        foreach ($smallerhaystack as $straw) {
             $distance[levenshtein($search, $straw[0])] = $straw[0];
         }
         ksort($distance);
@@ -258,7 +280,7 @@ $this -> bot -> db -> set_version("symbiants", 2); */
             return ("I found no pocket boss like '$search'");
         }
         $query = "SELECT ID, name, level, Playfield, Place, pattern_mobs FROM #___pocketbosses WHERE name LIKE '$boss'";
-        $boss  = $this->bot->db->select($query);
+        $boss = $this->bot->db->select($query);
         if (empty($boss)) {
             return 'Could not find the Pocketboss "##highlight##' . $search . '##end##"';
         }
@@ -279,12 +301,11 @@ $this -> bot -> db -> set_version("symbiants", 2); */
 
     function list_all($name)
     {
-        $query    = "SELECT Playfield, name FROM #___pocketbosses ORDER BY Playfield, level, name";
+        $query = "SELECT Playfield, name FROM #___pocketbosses ORDER BY Playfield, level, name";
         $bosslist = $this->bot->db->select($query);
-        $window   = "##blob_title## :::  Pocket Bosses  :::##end####blob_text##\n";
-        $area     = false;
-        foreach ($bosslist as $boss)
-        {
+        $window = "##blob_title## :::  Pocket Bosses  :::##end####blob_text##\n";
+        $area = false;
+        foreach ($bosslist as $boss) {
             if ($boss[0] !== $area) {
                 $area = $boss[0];
                 $window .= "\n##blob_title##  :: " . $boss[0] . " ::##end##\n";

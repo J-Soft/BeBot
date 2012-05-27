@@ -96,11 +96,10 @@ echo "Creating Main Bot class!\n";
 if (isset($argv[1])) {
     $bothandle = Bot::factory($argv[1]);
 }
-else
-{
+else {
     $bothandle = Bot::factory();
 }
-$bot             = Bot::get_instance($bothandle);
+$bot = Bot::get_instance($bothandle);
 $bot->dispatcher = new sfEventDispatcher();
 
 //Load Modules.
@@ -112,8 +111,7 @@ $bot->load_files('Core', "Core/" . AOCHAT_GAME);
 $bot->load_files('Core', 'Custom/Core');
 if (!empty($bot->core_directories)) {
     $core_dirs = explode(",", $bot->core_directories);
-    foreach ($core_dirs as $core_dir)
-    {
+    foreach ($core_dirs as $core_dir) {
         $bot->load_files('Core', trim($core_dir));
     }
 }
@@ -122,16 +120,14 @@ $bot->load_files('Modules', "Modules/" . AOCHAT_GAME);
 $bot->load_files('Modules', 'Custom/Modules');
 if (!empty($bot->module_directories)) {
     $module_dirs = explode(",", $bot->module_directories);
-    foreach ($module_dirs as $module_dir)
-    {
+    foreach ($module_dirs as $module_dir) {
         $bot->load_files('Modules', trim($module_dir));
     }
 }
 // Start up the bot.
 $bot->connect();
 
-while (true)
-{
+while (true) {
     if ($bot->aoc->wait_for_packet() == "disconnected") {
         $bot->reconnect();
     }

@@ -63,8 +63,7 @@ class Rules extends BaseActiveModule
         if (file_exists("./Text/" . $this->bot->botname . "_rules.txt")) {
             $content .= implode("", file("./Text/" . $this->bot->botname . "_rules.txt"));
         }
-        elseif (file_exists("./Text/Rules.txt"))
-        {
+        elseif (file_exists("./Text/Rules.txt")) {
             $content .= implode("", file("./Text/Rules.txt"));
         }
         return "<botname>'s Rules :: " . $this->bot->core("tools")

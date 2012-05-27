@@ -27,16 +27,18 @@ class ServerConnection
     private $m_Socket;
 
 
-    public function ServerConnection($logname, $serverAddress, $serverPort,
-                                     $clientEndpoint, $serverEndpoint,
-                                     $endpointType)
+    public function ServerConnection(
+        $logname, $serverAddress, $serverPort,
+        $clientEndpoint, $serverEndpoint,
+        $endpointType
+    )
     {
         $this->m_LogName = $logname;
 
         $this->m_ServerAddress = $serverAddress;
-        $this->m_ServerPort    = $serverPort;
+        $this->m_ServerPort = $serverPort;
 
-        $this->m_EndpointType   = $endpointType;
+        $this->m_EndpointType = $endpointType;
         $this->m_ClientEndpoint = $clientEndpoint;
         $this->m_ServerEndpoint = $serverEndpoint;
     }
@@ -124,21 +126,23 @@ class ServerConnection
 
             $rpcID = $stream->ReadUInt32();
         }
-        else if ($this->m_EndpointType == LOGIN_TYPE_PROTOBUF) {
-            $stream->ReadUInt32(); // Skip CRC
+        else {
+            if ($this->m_EndpointType == LOGIN_TYPE_PROTOBUF) {
+                $stream->ReadUInt32(); // Skip CRC
 
-            $size = $stream->ReadUInt32();
-            $raw  = $stream->ReadRaw($size);
+                $size = $stream->ReadUInt32();
+                $raw = $stream->ReadRaw($size);
 
-            //ServerConnection::hexdump("[header::in]",$raw, $size );
+                //ServerConnection::hexdump("[header::in]",$raw, $size );
 
-            $header = new RpcHeader();
-            $header->parseFromString($raw);
+                $header = new RpcHeader();
+                $header->parseFromString($raw);
 
-            $rpcID = $header->method_instance();
+                $rpcID = $header->method_instance();
 
-            if (isset($rpcID) == false) {
-                $rpcID = -1;
+                if (isset($rpcID) == false) {
+                    $rpcID = -1;
+                }
             }
         }
         //echo("[" . $this->m_LogName . "] Received data [len:" . $stream->GetLength() . "] RpcID: " . $rpcID . "\n");
@@ -162,41 +166,42 @@ class ServerConnection
 
             $stream->WriteUInt32($rpcID);
         }
-        else if ($this->m_EndpointType == LOGIN_TYPE_PROTOBUF) {
-            $header = new RpcHeader();
+        else {
+            if ($this->m_EndpointType == LOGIN_TYPE_PROTOBUF) {
+                $header = new RpcHeader();
 
-            $callerID = new ProtoEndpoint();
-            $callerID->set_type($this->m_ClientEndpoint->GetType());
-            if ($this->m_ClientEndpoint->GetInstance() != 0) {
-                $callerID->set_instance($this->m_ClientEndpoint->GetInstance());
+                $callerID = new ProtoEndpoint();
+                $callerID->set_type($this->m_ClientEndpoint->GetType());
+                if ($this->m_ClientEndpoint->GetInstance() != 0) {
+                    $callerID->set_instance($this->m_ClientEndpoint->GetInstance());
+                }
+                if ($this->m_ClientEndpoint->GetToken() != 0) {
+                    $callerID->set_token($this->m_ClientEndpoint->GetToken());
+                }
+
+                $endpointID = new ProtoEndpoint();
+                $endpointID->set_type($this->m_ServerEndpoint->GetType());
+                if ($this->m_ServerEndpoint->GetInstance() != 0) {
+                    $endpointID->set_instance($this->m_ServerEndpoint->GetInstance());
+                }
+                if ($this->m_ServerEndpoint->GetToken() != 0) {
+                    $endpointID->set_token($this->m_ServerEndpoint->GetToken());
+                }
+
+                $header->set_caller_id($callerID);
+                $header->set_endpoint_id($endpointID);
+                $header->set_method_instance($rpcID);
+
+                $data = $header->SerializeToString();
+
+                $len = strlen($data);
+                $stream->WriteUInt32($len);
+                $stream->WriteRaw($data, $len);
+                //$this->hexdump( "[header::out]", $data, $len  );
             }
-            if ($this->m_ClientEndpoint->GetToken() != 0) {
-                $callerID->set_token($this->m_ClientEndpoint->GetToken());
+            else {
+                die("CreateBinaryStream::Illegal endpoint type!");
             }
-
-            $endpointID = new ProtoEndpoint();
-            $endpointID->set_type($this->m_ServerEndpoint->GetType());
-            if ($this->m_ServerEndpoint->GetInstance() != 0) {
-                $endpointID->set_instance($this->m_ServerEndpoint->GetInstance());
-            }
-            if ($this->m_ServerEndpoint->GetToken() != 0) {
-                $endpointID->set_token($this->m_ServerEndpoint->GetToken());
-            }
-
-            $header->set_caller_id($callerID);
-            $header->set_endpoint_id($endpointID);
-            $header->set_method_instance($rpcID);
-
-            $data = $header->SerializeToString();
-
-            $len = strlen($data);
-            $stream->WriteUInt32($len);
-            $stream->WriteRaw($data, $len);
-            //$this->hexdump( "[header::out]", $data, $len  );
-        }
-        else
-        {
-            die("CreateBinaryStream::Illegal endpoint type!");
         }
         return $stream;
     }
@@ -229,15 +234,13 @@ class ServerConnection
         $data = "";
         $rlen = $len;
 
-        while ($rlen > 0)
-        {
+        while ($rlen > 0) {
             if (($tmp = socket_read($this->m_Socket, $rlen)) === false) {
                 if (!is_resource($this->m_Socket)) {
                     $this->Disconnect("Socket read error");
                     die("Read error: $last_error\n");
                 }
-                else
-                {
+                else {
                     printf("Read error: %s\n", socket_strerror(socket_last_error($this->m_Socket)));
                     return null;
                 }
@@ -250,8 +253,7 @@ class ServerConnection
                 if (!is_resource($this->m_Socket)) {
                     die("Read error: Too many EOF errors, disconnecting.\n");
                 }
-                else
-                {
+                else {
                     return null;
                 }
             }
@@ -278,8 +280,7 @@ class ServerConnection
             echo $prefix . " Length : " . $len . "\n";
         }
 
-        for ($j = 0; $j < $rows; $j++)
-        {
+        for ($j = 0; $j < $rows; $j++) {
             echo $prefix . " ";
 
             $j1 = $j * 20;
@@ -287,11 +288,10 @@ class ServerConnection
 
             $strRow = "";
 
-            for ($i = $j1; $i < $j2; $i++)
-            {
+            for ($i = $j1; $i < $j2; $i++) {
                 if ($i < $len) {
                     $temparray = unpack("C", (string)$data[$i + $offset]);
-                    $byte      = array_pop($temparray);
+                    $byte = array_pop($temparray);
 
                     //if ( $byte < 256 ){ echo "0"; }
                     if ($byte < 16) {
@@ -303,13 +303,11 @@ class ServerConnection
                     if ($byte > 32 && $byte < 123) {
                         $strRow = $strRow . $data[$i];
                     }
-                    else
-                    {
+                    else {
                         $strRow = $strRow . ".";
                     }
                 }
-                else
-                {
+                else {
                     echo "-- ";
                     $strRow .= "-";
                 }
@@ -327,68 +325,67 @@ class ServerConnection
     function displayConanError($errorcode)
     {
         $err = "Unknown";
-        switch ($errorcode)
-        {
-            case 0:
-                $err = "Login OK";
-            case 1:
-                $err = "Login timed out";
-                break;
-            case 2:
-                $err = "Dimension is down";
-                break;
-            case 3:
-                $err = "Too many characters logged in";
-                break;
-            case 4:
-                $err = "Invalid characterslot";
-                break;
-            case 5:
-                $err = "No gameservers available for this dimension";
-                break;
-            case 6:
-                $err = "Character not available";
-                break;
-            case 7:
-                $err = "Broken character";
-                break;
-            case 8:
-                $err = "Playfield shutting down";
-                break;
+        switch ($errorcode) {
+        case 0:
+            $err = "Login OK";
+        case 1:
+            $err = "Login timed out";
+            break;
+        case 2:
+            $err = "Dimension is down";
+            break;
+        case 3:
+            $err = "Too many characters logged in";
+            break;
+        case 4:
+            $err = "Invalid characterslot";
+            break;
+        case 5:
+            $err = "No gameservers available for this dimension";
+            break;
+        case 6:
+            $err = "Character not available";
+            break;
+        case 7:
+            $err = "Broken character";
+            break;
+        case 8:
+            $err = "Playfield shutting down";
+            break;
 
-            case 9:
-                $err = "Playfield full";
-                break;
-            case 10:
-                $err = "Dimension full";
-                break;
-            case 11:
-                $err = "Unable to log in";
-                break;
-            case 12:
-                $err = "System Error";
-                break;
-            case 13:
-                $err = "Account banned";
-                break;
-            case 14:
-                $err = "Authentication failed";
-                break;
-            case 19:
-                $err = "Another character is already logged in";
-                break;
-            case 23:
-                $err = "Account frozen";
-                break;
-            case 25:
-                $err = "Wrong universe version";
-                break;
-            case 30:
-                $err = "Login timed out";
-                break;
-            case 33:
-                $err = "Access denied to this dimension";
-                break;
+        case 9:
+            $err = "Playfield full";
+            break;
+        case 10:
+            $err = "Dimension full";
+            break;
+        case 11:
+            $err = "Unable to log in";
+            break;
+        case 12:
+            $err = "System Error";
+            break;
+        case 13:
+            $err = "Account banned";
+            break;
+        case 14:
+            $err = "Authentication failed";
+            break;
+        case 19:
+            $err = "Another character is already logged in";
+            break;
+        case 23:
+            $err = "Account frozen";
+            break;
+        case 25:
+            $err = "Wrong universe version";
+            break;
+        case 30:
+            $err = "Login timed out";
+            break;
+        case 33:
+            $err = "Access denied to this dimension";
+            break;
         }
 
         return $err;

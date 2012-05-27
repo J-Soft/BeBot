@@ -38,10 +38,10 @@ class PBFixedInt extends PBScalar
 
         // Write a UInt32
         $packedData = pack("N", $this->value);
-        $tmp1       = $packedData[0];
-        $tmp2       = $packedData[1];
-        $tmp3       = $packedData[2];
-        $tmp4       = $packedData[3];
+        $tmp1 = $packedData[0];
+        $tmp2 = $packedData[1];
+        $tmp3 = $packedData[2];
+        $tmp4 = $packedData[3];
         $string .= $tmp4 . $tmp3 . $tmp2 . $tmp1;
 
         //$value = $this->base128->set_value($this->value);

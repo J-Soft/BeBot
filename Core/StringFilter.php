@@ -49,10 +49,12 @@ class stringfilter_core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         // Create Table
-        $this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("string_filter", "true") . "
+        $this->bot->db->query(
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("string_filter", "true") . "
 			(search varchar(255) NOT NULL,
 				new VARCHAR(255) NOT NULL DEFAULT '**bleep**',
-				PRIMARY KEY (search))");
+				PRIMARY KEY (search))"
+        );
         $this->register_module("stringfilter");
         $this->register_event("connect");
         $this->stringlist = array();
@@ -73,15 +75,16 @@ class stringfilter_core extends BasePassiveModule
 
     function output_filter($text)
     { // Start function output_filter()
-        foreach ($this->stringlist as $search => $new)
-        {
+        foreach ($this->stringlist as $search => $new) {
             $text = preg_replace("/" . $search . "/i", $new, $text);
             // $text = str_ireplace($search, $new, $text); // str_ireplace is php5+
         }
         if ($this->bot->core("settings")->get("Filter", "Funmode") != "off") {
             echo "\nCaling funmode()!\n";
-            $text = $this->funmode($text, $this->bot->core("settings")
-                ->get("Filter", "Funmode"));
+            $text = $this->funmode(
+                $text, $this->bot->core("settings")
+                    ->get("Filter", "Funmode")
+            );
         }
         return $text;
     } // End function output_filter()
@@ -92,8 +95,7 @@ class stringfilter_core extends BasePassiveModule
     */
     function input_filter($text)
     { // Start function input_filter()
-        foreach ($this->stringlist as $search => $new)
-        {
+        foreach ($this->stringlist as $search => $new) {
             $text = preg_replace("/" . stripslashes($search) . "/i", stripslashes($new), $text);
             // $text = str_ireplace($search, $new, $text); // str_ireplace is php5+
         }
@@ -107,15 +109,13 @@ class stringfilter_core extends BasePassiveModule
     function get_strings($update = FALSE)
     { // Start function get_strings()
         if ($update) {
-            $sql    = "SELECT * FROM #___string_filter";
+            $sql = "SELECT * FROM #___string_filter";
             $result = $this->bot->db->select($sql, MYSQL_ASSOC);
             if (empty($result)) {
                 return FALSE;
             }
-            else
-            {
-                foreach ($result as $info)
-                {
+            else {
+                foreach ($result as $info) {
                     $this->stringlist[$info["search"]] = $info["new"];
                 }
                 unset($result);
@@ -138,8 +138,7 @@ class stringfilter_core extends BasePassiveModule
             $new = mysql_real_escape_string(strtolower($new));
             $sql = "INSERT INTO #___string_filter (search, new) VALUES ('" . $search . "', '" . $new . "')";
         }
-        else
-        {
+        else {
             $sql = "INSERT INTO #___string_filter (search) VALUES ('" . $search . "')";
             $new = "**bleep**";
         }
@@ -157,8 +156,7 @@ class stringfilter_core extends BasePassiveModule
             $this->bot->db->query($sql);
             return "Removed " . $search . " from the filtered string list.";
         }
-        else
-        {
+        else {
             $this->error->set($search . " is not on the filtered string list.");
             return $this->error;
         }
@@ -170,30 +168,29 @@ class stringfilter_core extends BasePassiveModule
     function funmode($text, $filter)
     { // Start function funmode()
         $filter = strtolower($filter);
-        switch ($filter)
-        {
-            case "rot13":
-                return $this->bot->core("funfilters")->rot13($text);
-                break;
-            case "chef":
-                return $this->bot->core("funfilters")->chef($text);
-                break;
-            case "eleet":
-                return $this->bot->core("funfilters")->eleet($text);
-                break;
-            case "fudd":
-                return $this->bot->core("funfilters")->fudd($text);
-                break;
-            case "pirate":
-                return $this->bot->core("funfilters")->pirate($text);
-                break;
-            case "nofont":
-                return $this->bot->core("funfilters")->nofont($text);
-                break;
-            default:
-                $this->bot->log("FILTER", "ERROR", $filter . " is not a valid fun mode.");
-                return $text;
-                break;
+        switch ($filter) {
+        case "rot13":
+            return $this->bot->core("funfilters")->rot13($text);
+            break;
+        case "chef":
+            return $this->bot->core("funfilters")->chef($text);
+            break;
+        case "eleet":
+            return $this->bot->core("funfilters")->eleet($text);
+            break;
+        case "fudd":
+            return $this->bot->core("funfilters")->fudd($text);
+            break;
+        case "pirate":
+            return $this->bot->core("funfilters")->pirate($text);
+            break;
+        case "nofont":
+            return $this->bot->core("funfilters")->nofont($text);
+            break;
+        default:
+            $this->bot->log("FILTER", "ERROR", $filter . " is not a valid fun mode.");
+            return $text;
+            break;
         }
     } // End function funmode()
 } // End of Class

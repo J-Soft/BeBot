@@ -47,13 +47,15 @@ class PlayerNotes_Core extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("player_notes", "false") . "
+        $this->bot->db->query(
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("player_notes", "false") . "
 			(pnid INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				player VARCHAR(30) NOT NULL,
 				author VARCHAR(30) NOT NULL,
 				note VARCHAR(255) NOT NULL,
 				class TINYINT NOT NULL DEFAULT 0,
-				timestamp INT UNSIGNED NOT NULL)");
+				timestamp INT UNSIGNED NOT NULL)"
+        );
         $this->register_module("player_notes");
         $this->update_schema();
     }
@@ -66,18 +68,17 @@ class PlayerNotes_Core extends BasePassiveModule
     { // Start function add()
         $author = ucfirst(strtolower($author));
         $player = ucfirst(strtolower($player));
-        $class  = strtolower($class);
+        $class = strtolower($class);
         if (!is_numeric($class)) {
-            switch ($class)
-            {
-                case "admin":
-                    $class = 2;
-                    break;
-                case "ban":
-                    $class = 1;
-                    break;
-                default:
-                    $class = 0;
+            switch ($class) {
+            case "admin":
+                $class = 2;
+                break;
+            case "ban":
+                $class = 1;
+                break;
+            default:
+                $class = 0;
             }
         }
         if ($class > 3) {
@@ -86,20 +87,19 @@ class PlayerNotes_Core extends BasePassiveModule
         if (strlen($note) > 255) {
             $note = substr($note, 0, 254);
         }
-        $note   = mysql_real_escape_string($note);
+        $note = mysql_real_escape_string($note);
         $author = mysql_real_escape_string($author);
         $player = mysql_real_escape_string($player);
-        $sql    = "INSERT INTO #___player_notes (player, author, note, class, timestamp) ";
+        $sql = "INSERT INTO #___player_notes (player, author, note, class, timestamp) ";
         $sql .= "VALUES ('$player', '$author', '$note', $class, " . time() . ")";
         $result = $this->bot->db->query($sql);
         if ($result !== false) {
-            $sql            = "SELECT pnid FROM #___player_notes WHERE player = '" . $player . "' ORDER BY pnid DESC LIMIT 1";
-            $result         = $this->bot->db->select($sql);
+            $sql = "SELECT pnid FROM #___player_notes WHERE player = '" . $player . "' ORDER BY pnid DESC LIMIT 1";
+            $result = $this->bot->db->select($sql);
             $return["pnid"] = $result[0][0];
             return ("Successfully added &quot;" . $note . "&quot; note to " . $player . " as note id " . $return["pnid"]);
         }
-        else
-        {
+        else {
             $this->error->set("An unknown error occurred. Check your bot console for more information.");
             return ($this->error);
         }
@@ -110,13 +110,12 @@ class PlayerNotes_Core extends BasePassiveModule
     */
     function del($pnid)
     { // Start function del()
-        $sql    = "DELETE FROM #___player_notes WHERE pnid = " . $pnid;
+        $sql = "DELETE FROM #___player_notes WHERE pnid = " . $pnid;
         $result = $this->bot->db->returnQuery($sql);
         if ($result) {
             return ("Deleted player note $pnid");
         }
-        else
-        {
+        else {
             $this->error->set("Could not delete player note " . $pnid . ". No note with that ID could be found.");
             return ($this->error);
         }
@@ -131,9 +130,9 @@ class PlayerNotes_Core extends BasePassiveModule
             $this->error->set("Only integers can be player note ID numbers.");
             return ($this->error);
         }
-        $what     = mysql_real_escape_string($what);
+        $what = mysql_real_escape_string($what);
         $newvalue = mysql_real_escape_string($newvalue);
-        $sql      = "UPDATE #___player_notes SET " . $what . " = " . $newvalue . " WHERE pnid = " . $pnid;
+        $sql = "UPDATE #___player_notes SET " . $what . " = " . $newvalue . " WHERE pnid = " . $pnid;
         if (!$this->bot->db->query($sql)) {
             $this->error->set("There was a MySQL error when updating '$what' to '$newvalue'.");
             return ($this->error);
@@ -146,10 +145,10 @@ class PlayerNotes_Core extends BasePassiveModule
     */
     function get_notes($name, $player = "All", $pnid = "all", $order = "ASC")
     { // Start function get_notes()
-        $name   = ucfirst(strtolower($name)); // Name of person requesting notes.
+        $name = ucfirst(strtolower($name)); // Name of person requesting notes.
         $player = ucfirst(strtolower($player)); // Notes attached to this player.
-        $sql    = "SELECT * FROM #___player_notes";
-        $where  = "WHERE";
+        $sql = "SELECT * FROM #___player_notes";
+        $where = "WHERE";
         if ($player != "All") {
             $sql .= " " . $where . " player = '" . $player . "'";
             $where = "AND";
@@ -180,19 +179,24 @@ class PlayerNotes_Core extends BasePassiveModule
         if ($this->bot->core("settings")
             ->exists('Playernotes', 'Schema_version')
         ) {
-            $this->bot->db->set_version("player_notes", $this->bot
-                ->core("settings")->get('Playernotes', 'Schema_version'));
+            $this->bot->db->set_version(
+                "player_notes", $this->bot
+                    ->core("settings")->get('Playernotes', 'Schema_version')
+            );
             $this->bot->core("settings")->del('Playernotes', 'Schema_version');
         }
-        switch ($this->bot->db->get_version('player_notes'))
-        {
-            case 1:
-                // Rename timestmp column to timestamp.
-                $this->bot->db->update_table("player_notes", array("timestmp",
-                                                                   "timestamp"), "change", "ALTER TABLE #___player_notes CHANGE timestmp timestamp INTEGER");
-            case 2:
-                // Change player column to VARCHAR(30) NOT NULL
-                $this->bot->db->update_table("player_notes", "player", "alter", "ALTER TABLE #___player_notes CHANGE player player VARCHAR(30) NOT NULL");
+        switch ($this->bot->db->get_version('player_notes')) {
+        case 1:
+            // Rename timestmp column to timestamp.
+            $this->bot->db->update_table(
+                "player_notes", array(
+                    "timestmp",
+                    "timestamp"
+                ), "change", "ALTER TABLE #___player_notes CHANGE timestmp timestamp INTEGER"
+            );
+        case 2:
+            // Change player column to VARCHAR(30) NOT NULL
+            $this->bot->db->update_table("player_notes", "player", "alter", "ALTER TABLE #___player_notes CHANGE player player VARCHAR(30) NOT NULL");
         }
         $this->bot->db->set_version('player_notes', 3);
     }

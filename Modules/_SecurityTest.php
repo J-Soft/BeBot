@@ -56,33 +56,30 @@ class SecurityTest extends BaseActiveModule
     */
     function command_handler($name, $msg, $source)
     { // Start function handler()
-        $vars    = explode(' ', strtolower($msg));
+        $vars = explode(' ', strtolower($msg));
         $command = $vars[0];
-        switch ($command)
-        {
-            case "securitytest":
-                switch ($vars[1])
-                {
-                    case "cache":
-                        if (isset($vars[2])) {
-                            return $this->show_cache($vars[2]);
-                        }
-                        else
-                        {
-                            return $this->show_cache();
-                        }
-                        break;
-                    case "whoami":
-                        return $this->whoami($name);
-                        break;
-                    case "whois":
-                        return $this->whois($vars[2]);
-                    default:
-                        return "Pick a test: cache, whoami, whois";
+        switch ($command) {
+        case "securitytest":
+            switch ($vars[1]) {
+            case "cache":
+                if (isset($vars[2])) {
+                    return $this->show_cache($vars[2]);
+                }
+                else {
+                    return $this->show_cache();
                 }
                 break;
+            case "whoami":
+                return $this->whoami($name);
+                break;
+            case "whois":
+                return $this->whois($vars[2]);
             default:
-                $this->bot->send_tell($name, "Broken plugin, received unhandled command: $command");
+                return "Pick a test: cache, whoami, whois";
+            }
+            break;
+        default:
+            $this->bot->send_tell($name, "Broken plugin, received unhandled command: $command");
         }
     } // End function handler()
 
@@ -97,26 +94,22 @@ class SecurityTest extends BaseActiveModule
             print_r($this->bot->core("security")->cache['members']);
             return "Security Members Cache Array dumped to console.";
         }
-        elseif ($what == "guest" || $what == "guests")
-        {
+        elseif ($what == "guest" || $what == "guests") {
             print_r("Guests Cache:\n");
             print_r($this->bot->core("security")->cache['guests']);
             return "Security Guests Cache Array dumped to console.";
         }
-        elseif ($what == "banned" || $what == "ban")
-        {
+        elseif ($what == "banned" || $what == "ban") {
             print_r("Banned Cache:\n");
             print_r($this->bot->core("security")->cache['banned']);
             return "Security Banned Cache Array dumped to console.";
         }
-        elseif ($what == "org" || $what == "ranks" || $what == "orgranks")
-        {
+        elseif ($what == "org" || $what == "ranks" || $what == "orgranks") {
             print_r("OrgRanks Cache:\n");
             print_r($this->bot->core("security")->cache['orgranks']);
             return "Security OrgRanks Cache Array dumped to console.";
         }
-        elseif ($what == "group" || $what == "groups")
-        {
+        elseif ($what == "group" || $what == "groups") {
             print_r("Groups Cache:\n");
             print_r($this->bot->core("security")->cache['groups']);
             return "Security Groups Cache Array dumped to console.";
@@ -134,14 +127,13 @@ class SecurityTest extends BaseActiveModule
     */
     function whoami($name)
     { // Start function whoami
-        $groups  = $this->bot->core("security")->get_groups($name);
-        $access  = $this->bot->core("security")->get_access_level($name);
-        $access  = $this->get_access_name($access);
+        $groups = $this->bot->core("security")->get_groups($name);
+        $access = $this->bot->core("security")->get_access_level($name);
+        $access = $this->get_access_name($access);
         $message = "Your access level is " . $access;
         if ($groups != -1) {
             $groupmsg = " You are a member of the following security groups: ";
-            foreach ($groups as $group)
-            {
+            foreach ($groups as $group) {
                 $groupmsg .= $group['name'] . " ";
             }
         }
@@ -150,15 +142,14 @@ class SecurityTest extends BaseActiveModule
 
     function whois($name)
     { // Start function whois()
-        $name    = ucfirst(strtolower($name));
-        $groups  = $this->bot->core("security")->get_groups($name);
-        $access  = $this->bot->core("security")->get_access_level($name);
-        $access  = $this->get_access_name($access);
+        $name = ucfirst(strtolower($name));
+        $groups = $this->bot->core("security")->get_groups($name);
+        $access = $this->bot->core("security")->get_access_level($name);
+        $access = $this->get_access_name($access);
         $message = $name . "'s highest access level is " . $access;
         if ($groups != -1) {
             $groupmsg = $name . " is a member of the following security groups: ";
-            foreach ($groups as $group)
-            {
+            foreach ($groups as $group) {
                 $groupmsg .= $group['name'] . " ";
             }
         }
@@ -167,35 +158,34 @@ class SecurityTest extends BaseActiveModule
 
     function get_access_name($access)
     { // Start function get_access_name()
-        switch ($access)
-        { // Start switch
-            case 256:
-                $access = "Owner";
-                break;
-            case 255:
-                $access = "SuperAdmin";
-                break;
-            case 192:
-                $access = "Admin";
-                break;
-            case 128:
-                $access = "Leader";
-                break;
-            case 2:
-                $access = "Member";
-                break;
-            case 1:
-                $access = "Guest";
-                break;
-            case 0:
-                $access = "Anonymous";
-                break;
-            case -1:
-                $access = "Banned";
-                break;
-            default:
-                $access = "Unknown (" . $access . ")";
-                break;
+        switch ($access) { // Start switch
+        case 256:
+            $access = "Owner";
+            break;
+        case 255:
+            $access = "SuperAdmin";
+            break;
+        case 192:
+            $access = "Admin";
+            break;
+        case 128:
+            $access = "Leader";
+            break;
+        case 2:
+            $access = "Member";
+            break;
+        case 1:
+            $access = "Guest";
+            break;
+        case 0:
+            $access = "Anonymous";
+            break;
+        case -1:
+            $access = "Banned";
+            break;
+        default:
+            $access = "Unknown (" . $access . ")";
+            break;
         } // End switch
         return $access;
     } // End function get_access_name()

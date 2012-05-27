@@ -41,8 +41,17 @@ class ShortCuts_Core extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("shortcuts", "false") . " (id INT NOT NULL AUTO_INCREMENT UNIQUE, " . " shortcut VARCHAR(20) NOT NULL PRIMARY KEY, " . " long_desc VARCHAR(255) NOT NULL UNIQUE)");
-        $this->bot->db->query("INSERT IGNORE INTO #___shortcuts (`shortcut`, `long_desc`) VALUES " . "('Pres', 'President'), ('Gen', 'General'), ('SC', 'Squad Commander'), ('UC', 'Unit Commander'), " . "('UL', 'Unit Leader'), ('UM', 'Unit Member'), ('App', 'Applicant'), ('Dir', 'Director'), ('BM', 'Board Member'), " . "('Exec', 'Executive'), ('Mem', 'Member'), ('Adv', 'Advisor'), ('Vet', 'Veteran'), ('Mon', 'Monarch'), " . "('Coun', 'Counsel'), ('Fol', 'Follower'), ('Anar', 'Anarchist'), ('Lord', 'Lord'), ('Knght', 'Knight'), " . "('Vas', 'Vassal '), ('Peas', 'Peasant')");
+        $this->bot->db->query(
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("shortcuts", "false") . " (id INT NOT NULL AUTO_INCREMENT UNIQUE, "
+                . " shortcut VARCHAR(20) NOT NULL PRIMARY KEY, " . " long_desc VARCHAR(255) NOT NULL UNIQUE)"
+        );
+        $this->bot->db->query(
+            "INSERT IGNORE INTO #___shortcuts (`shortcut`, `long_desc`) VALUES "
+                . "('Pres', 'President'), ('Gen', 'General'), ('SC', 'Squad Commander'), ('UC', 'Unit Commander'), "
+                . "('UL', 'Unit Leader'), ('UM', 'Unit Member'), ('App', 'Applicant'), ('Dir', 'Director'), ('BM', 'Board Member'), "
+                . "('Exec', 'Executive'), ('Mem', 'Member'), ('Adv', 'Advisor'), ('Vet', 'Veteran'), ('Mon', 'Monarch'), "
+                . "('Coun', 'Counsel'), ('Fol', 'Follower'), ('Anar', 'Anarchist'), ('Lord', 'Lord'), ('Knght', 'Knight'), " . "('Vas', 'Vassal '), ('Peas', 'Peasant')"
+        );
         $this->register_module("shortcuts");
         $this->register_event("cron", "1hour");
         $this->create_caches();
@@ -53,15 +62,14 @@ class ShortCuts_Core extends BasePassiveModule
     function create_caches()
     {
         $this->short = array();
-        $this->long  = array();
-        $ret         = $this->bot->db->select("SELECT shortcut, long_desc FROM #___shortcuts");
+        $this->long = array();
+        $ret = $this->bot->db->select("SELECT shortcut, long_desc FROM #___shortcuts");
         if (!empty($ret)) {
-            foreach ($ret as $pair)
-            {
-                $pair[0]                           = stripslashes($pair[0]);
-                $pair[1]                           = stripslashes($pair[1]);
+            foreach ($ret as $pair) {
+                $pair[0] = stripslashes($pair[0]);
+                $pair[1] = stripslashes($pair[1]);
                 $this->short[strtolower($pair[1])] = $pair[0];
-                $this->long[strtolower($pair[0])]  = $pair[1];
+                $this->long[strtolower($pair[0])] = $pair[1];
             }
         }
     }

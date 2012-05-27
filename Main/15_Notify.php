@@ -48,10 +48,9 @@ class Notify_Core extends BasePassiveModule
     function update_cache()
     {
         $this->cache = array();
-        $notifylist  = $this->bot->db->select("SELECT nickname FROM #___users WHERE notify = 1");
+        $notifylist = $this->bot->db->select("SELECT nickname FROM #___users WHERE notify = 1");
         if (!empty($notifylist)) {
-            foreach ($notifylist as $user)
-            {
+            foreach ($notifylist as $user) {
                 $this->cache[ucfirst(strtolower($user[0]))] = TRUE;
             }
         }
@@ -66,7 +65,7 @@ class Notify_Core extends BasePassiveModule
 
     function add($source, $user)
     {
-        $id   = $this->bot->core('player')->id($user);
+        $id = $this->bot->core('player')->id($user);
         $user = ucfirst(strtolower($user));
         if ($id == 0) {
             $this->error->set($user . " is no valid character name!");
@@ -78,8 +77,7 @@ class Notify_Core extends BasePassiveModule
             // Need to add $user to users table as anonymous and silent
             $this->bot->core("user")->add($source, $user, 0, 0, 1);
         }
-        else
-        {
+        else {
             // Check if already on notify
             if ($usr[0][0] == 1) {
                 $this->error->set($user . " is already on the notify list!");
@@ -97,7 +95,7 @@ class Notify_Core extends BasePassiveModule
 
     function del($user)
     {
-        $id   = $this->bot->core('player')->id($user);
+        $id = $this->bot->core('player')->id($user);
         $user = ucfirst(strtolower($user));
         if ($id == 0) {
             $this->error->set($user . " is no valid character name!");
@@ -125,32 +123,28 @@ class Notify_Core extends BasePassiveModule
 
     function list_cache()
     {
-        $count       = 0;
+        $count = 0;
         $notify_list = $this->cache;
         asort($notify_list);
-        foreach ($notify_list as $key => $value)
-        {
+        foreach ($notify_list as $key => $value) {
             $notify_db = $this->bot->db->select("SELECT notify FROM #___users WHERE nickname = '" . $key . "'");
             $msg .= $key;
             if ($value == 1) {
                 $msg .= " [##green##Cache##end##]";
             }
-            else
-            {
+            else {
                 $msg .= " [##red##Cache##end##]";
             }
             if ($notify_db[0][0] == 1) {
                 $msg .= "[##green##DB##end##]";
             }
-            else
-            {
+            else {
                 $msg .= "[##red##DB##end##]";
             }
             if ($notify_db[0][0] != $value) {
                 $msg .= " ##yellow##MISMATCH##end##\n";
             }
-            else
-            {
+            else {
                 $msg .= "\n";
             }
             $count++;

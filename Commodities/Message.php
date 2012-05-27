@@ -39,8 +39,8 @@ class message
 
     function __construct($source, $sender, $message)
     {
-        $this->source  = $source;
-        $this->sender  = $sender;
+        $this->source = $source;
+        $this->sender = $sender;
         $this->message = $message;
     }
 
@@ -51,8 +51,7 @@ class message
             $this->destination[] = $destination;
             return true;
         }
-        else
-        {
+        else {
             return false;
         }
     }

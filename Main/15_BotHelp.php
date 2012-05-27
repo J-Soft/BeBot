@@ -53,9 +53,9 @@ class BotHelp_Core extends BaseActiveModule
         $this->register_module("help");
         $this->register_command("all", "help", "GUEST");
 
-        $this->help['description']               = "The bot help system.";
+        $this->help['description'] = "The bot help system.";
         $this->help['command']['help [command]'] = "Shows help on [command]. If no argument is given shows the help menu";
-        $this->help['notes']                     = "No notes";
+        $this->help['notes'] = "No notes";
     }
 
 
@@ -71,18 +71,16 @@ class BotHelp_Core extends BaseActiveModule
         if (!isset($vars[1])) {
             return ($this->show_help_menu($name, 'source', $origin));
         }
-        else
-        {
-            switch ($vars[1])
-            {
-                case 'tell':
-                case 'gc':
-                case 'pgmsg':
-                    return ($this->show_help_menu($name, $vars[1]));
-                    break;
-                default:
-                    return ($this->show_help($name, $vars[1]));
-                    break;
+        else {
+            switch ($vars[1]) {
+            case 'tell':
+            case 'gc':
+            case 'pgmsg':
+                return ($this->show_help_menu($name, $vars[1]));
+                break;
+            default:
+                return ($this->show_help($name, $vars[1]));
+                break;
             }
         }
     }
@@ -90,27 +88,25 @@ class BotHelp_Core extends BaseActiveModule
 
     function show_help_menu($name, $section = 'source', $origin = FALSE)
     {
-        switch ($section)
-        {
-            case 'source':
-                switch ($origin)
-                {
-                    case 'tell':
-                        $window = $this->get_commands($name, 'tell');
-                        break;
-                    case 'gc':
-                        $window = $this->get_commands($name, 'gc');
-                        break;
-                    case 'pgmsg':
-                        $window = $this->get_commands($name, 'pgmsg');
-                        break;
-                }
-                return ($this->bot->core("tools")->make_blob('Help', $window));
+        switch ($section) {
+        case 'source':
+            switch ($origin) {
+            case 'tell':
+                $window = $this->get_commands($name, 'tell');
                 break;
-            default:
-                $window = $this->get_commands($name, $section);
-                return ($this->bot->core("tools")->make_blob('Help', $window));
+            case 'gc':
+                $window = $this->get_commands($name, 'gc');
                 break;
+            case 'pgmsg':
+                $window = $this->get_commands($name, 'pgmsg');
+                break;
+            }
+            return ($this->bot->core("tools")->make_blob('Help', $window));
+            break;
+        default:
+            $window = $this->get_commands($name, $section);
+            return ($this->bot->core("tools")->make_blob('Help', $window));
+            break;
         }
     }
 
@@ -121,9 +117,11 @@ class BotHelp_Core extends BaseActiveModule
     function get_commands($name, $channel)
     {
         $channel = strtolower($channel);
-        $lvl     = $this->bot->core("security")->get_access_name($this->bot
-            ->core("security")->get_access_level($name));
-        $window  = ":: BeBot Help ::\n\n" . $this->help_cache[$channel][$lvl];
+        $lvl = $this->bot->core("security")->get_access_name(
+            $this->bot
+                ->core("security")->get_access_level($name)
+        );
+        $window = ":: BeBot Help ::\n\n" . $this->help_cache[$channel][$lvl];
         return $window;
     }
 
@@ -138,47 +136,45 @@ class BotHelp_Core extends BaseActiveModule
 
     function make_help_blobs($channel)
     {
-        $channel                    = strtolower($channel);
+        $channel = strtolower($channel);
         $this->help_cache[$channel] = array();
-        foreach ($this->bot->core("access_control")->get_access_levels() as
-                 $lvl)
-        {
+        foreach (
+            $this->bot->core("access_control")->get_access_levels() as
+            $lvl
+        ) {
             $this->help_cache[$channel][$lvl] = "";
         }
         unset($this->help_cache[$channel]["DISABLED"]);
         unset($this->help_cache[$channel]["DELETED"]);
 
         ksort($this->bot->commands[$channel]);
-        foreach ($this->bot->commands[$channel] as $command => $module)
-        {
+        foreach ($this->bot->commands[$channel] as $command => $module) {
             if (is_array($module->help)) {
                 $cmdstr = $this->bot->core("tools")
-                              ->chatcmd("help " . $command, $command) . " ";
+                    ->chatcmd("help " . $command, $command) . " ";
             }
-            else
-            {
+            else {
                 $cmdstr = $command . " ";
             }
             switch ($this->bot->core("access_control")
-                ->get_min_access_level($command, $channel))
-            {
-                case ANONYMOUS:
-                    $this->help_cache[$channel]['ANONYMOUS'] .= $cmdstr;
-                case GUEST:
-                    $this->help_cache[$channel]['GUEST'] .= $cmdstr;
-                case MEMBER:
-                    $this->help_cache[$channel]['MEMBER'] .= $cmdstr;
-                case LEADER:
-                    $this->help_cache[$channel]['LEADER'] .= $cmdstr;
-                case ADMIN:
-                    $this->help_cache[$channel]['ADMIN'] .= $cmdstr;
-                case SUPERADMIN:
-                    $this->help_cache[$channel]['SUPERADMIN'] .= $cmdstr;
-                case OWNER:
-                    $this->help_cache[$channel]['OWNER'] .= $cmdstr;
-                    break;
-                default:
-                    break;
+                ->get_min_access_level($command, $channel)) {
+            case ANONYMOUS:
+                $this->help_cache[$channel]['ANONYMOUS'] .= $cmdstr;
+            case GUEST:
+                $this->help_cache[$channel]['GUEST'] .= $cmdstr;
+            case MEMBER:
+                $this->help_cache[$channel]['MEMBER'] .= $cmdstr;
+            case LEADER:
+                $this->help_cache[$channel]['LEADER'] .= $cmdstr;
+            case ADMIN:
+                $this->help_cache[$channel]['ADMIN'] .= $cmdstr;
+            case SUPERADMIN:
+                $this->help_cache[$channel]['SUPERADMIN'] .= $cmdstr;
+            case OWNER:
+                $this->help_cache[$channel]['OWNER'] .= $cmdstr;
+                break;
+            default:
+                break;
             }
             unset($cmdstr);
         }
@@ -192,20 +188,16 @@ class BotHelp_Core extends BaseActiveModule
         ) {
             return ("##highlight##$command##end## does not exist or you do not have access to it.");
         }
-        elseif (!empty($this->bot->commands['tell'][$command]))
-        {
+        elseif (!empty($this->bot->commands['tell'][$command])) {
             $com = $this->bot->commands['tell'][$command];
         }
-        elseif (!empty($this->bot->commands['gc'][$command]))
-        {
+        elseif (!empty($this->bot->commands['gc'][$command])) {
             $com = $this->bot->commands['gc'][$command];
         }
-        elseif (!empty($this->bot->commands['pgmsg'][$command]))
-        {
+        elseif (!empty($this->bot->commands['pgmsg'][$command])) {
             $com = $this->bot->commands['pgmsg'][$command];
         }
-        else
-        {
+        else {
             return ("##highlight##$command##end## does not exist or you do not have access to it.");
         }
         $window = "##blob_title## ::::: HELP ON " . strtoupper($command) . " :::::##end##<br><br>";
@@ -213,17 +205,15 @@ class BotHelp_Core extends BaseActiveModule
             $help = $com->help;
             $window .= '##highlight##' . $help['description'] . '##end##<br><br>';
             $module_commands = array();
-            foreach ($help['command'] as $key => $value)
-            {
+            foreach ($help['command'] as $key => $value) {
                 // Only show help for the specific command, not all help for module!
                 $parts = explode(' ', $key, 2);
                 if (strcasecmp($command, $parts[0]) == 0) {
-                    $key   = str_replace('<', '&lt;', $key);
+                    $key = str_replace('<', '&lt;', $key);
                     $value = str_replace('<', '&lt;', $value);
                     $window .= " ##highlight##<pre>$key##end## - ##blob_text##$value##end##<br>";
                 }
-                else
-                {
+                else {
                     if ($this->bot->core("access_control")
                         ->check_for_access($name, $parts[0])
                     ) {
@@ -239,8 +229,7 @@ class BotHelp_Core extends BaseActiveModule
                 $window .= implode(" ", $module_commands);
             }
         }
-        else
-        {
+        else {
             $window .= '##error##No Help Found##end##';
         }
         return ('help on ' . $this->bot->core("tools")

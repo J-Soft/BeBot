@@ -41,15 +41,17 @@ class Quotes extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'quotes', 'MEMBER');
-        $this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("quotes", "false") . "
-			(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, quote BLOB, contributor VARCHAR(15))");
-        $this->help['description']                = 'Immortalize your friends and enemies.';
-        $this->help['command']['quotes']          = "Display a random quote from the database.";
-        $this->help['command']['quotes #']        = "Display quote number # from the database.";
+        $this->bot->db->query(
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("quotes", "false") . "
+			(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, quote BLOB, contributor VARCHAR(15))"
+        );
+        $this->help['description'] = 'Immortalize your friends and enemies.';
+        $this->help['command']['quotes'] = "Display a random quote from the database.";
+        $this->help['command']['quotes #'] = "Display quote number # from the database.";
         $this->help['command']['quotes add text'] = "Add text to the quotes databases.";
-        $this->help['command']['quotes rem #']    = "Remove quote number # from the database.";
+        $this->help['command']['quotes rem #'] = "Remove quote number # from the database.";
         $this->help['command']['quotes remove #'] = "Remove quote number # from the database.";
-        $this->help['command']['quotes del #']    = "Remove quote number # from the database.";
+        $this->help['command']['quotes del #'] = "Remove quote number # from the database.";
         $this->help['command']['quotes delete #'] = "Remove quote number # from the database.";
     }
 
@@ -63,26 +65,29 @@ class Quotes extends BaseActiveModule
                 $this->bot->send_irc("", "", $msg);
             }
         }
-        else if (preg_match("/^quotes add (.+)$/i", $msg, $info)) {
-            $msg = $this->add_quote($info[1], $name);
-            $this->bot->send_output($name, $msg, $origin);
-            if ($origin == 'gc') {
-                $this->bot->send_irc("", "", $msg);
+        else {
+            if (preg_match("/^quotes add (.+)$/i", $msg, $info)) {
+                $msg = $this->add_quote($info[1], $name);
+                $this->bot->send_output($name, $msg, $origin);
+                if ($origin == 'gc') {
+                    $this->bot->send_irc("", "", $msg);
+                }
             }
-        }
-        else if (preg_match("/^quotes (remove|del|rem|delete) ([0-9]+)$/i", $msg, $info)) {
-            $msg = $this->del_quote($info[2], $name);
-            $this->bot->send_output($name, $msg, $origin);
-            if ($origin == 'gc') {
-                $this->bot->send_irc("", "", $this->del_quote($info[2]));
-            }
-        }
-        else
-        {
-            $msg = $this->send_quote(-1);
-            $this->bot->send_output($name, $msg, $origin);
-            if ($origin == 'gc') {
-                $this->bot->send_irc("", "", $msg);
+            else {
+                if (preg_match("/^quotes (remove|del|rem|delete) ([0-9]+)$/i", $msg, $info)) {
+                    $msg = $this->del_quote($info[2], $name);
+                    $this->bot->send_output($name, $msg, $origin);
+                    if ($origin == 'gc') {
+                        $this->bot->send_irc("", "", $this->del_quote($info[2]));
+                    }
+                }
+                else {
+                    $msg = $this->send_quote(-1);
+                    $this->bot->send_output($name, $msg, $origin);
+                    if ($origin == 'gc') {
+                        $this->bot->send_irc("", "", $msg);
+                    }
+                }
             }
         }
     }
@@ -91,7 +96,7 @@ class Quotes extends BaseActiveModule
     function add_quote($strquote, $name)
     {
         $this->bot->db->query("INSERT INTO #___quotes (quote, contributor) VALUES ('" . addslashes($strquote) . "', '" . $name . "')");
-        $num    = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
+        $num = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
         $strmsg = "Thank you, your quote has been added as id #" . $num[0][0];
         return $strmsg;
     }
@@ -104,8 +109,7 @@ class Quotes extends BaseActiveModule
             $this->bot->db->query("DELETE FROM #___quotes WHERE id=" . $qnum);
             return "Quote removed.";
         }
-        else
-        {
+        else {
             $num = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
             return "Quote with id of " . $qnum . " not found. (Highest quote ID is " . $num[0][0] . ".)";
         }
@@ -116,33 +120,29 @@ class Quotes extends BaseActiveModule
     {
         $strquote = "";
         if ($qnum == -1) {
-            $num    = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
+            $num = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
             $result = $this->bot->db->select("SELECT * FROM #___quotes");
             if (!empty($result)) {
                 $found = false;
-                while ($found == false)
-                {
+                while ($found == false) {
                     $row = $this->bot->core("tools")->my_rand(0, $num[0][0]);
                     if (!empty($result[$row][0])) {
                         $strquote = "#" . $result[$row][0] . " - " . $result[$row][1] . " [Contributed by: " . $result[$row][2] . "]";
-                        $found    = true;
+                        $found = true;
                     }
                 }
             }
-            else
-            {
+            else {
                 $strquote = "No quotes exist. Add some!";
             }
         }
-        else
-        {
+        else {
             $result = $this->bot->db->select("SELECT * FROM #___quotes WHERE id=" . $qnum);
             if (!empty($result)) {
                 $strquote = "#" . $result[0][0] . " - " . $result[0][1] . " [Contributed by: " . $result[0][2] . "]";
             }
-            else
-            {
-                $num      = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
+            else {
+                $num = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
                 $strquote = "Quote with id of " . $qnum . " not found. (Highest quote ID is " . $num[0][0] . ".)";
             }
         }
@@ -153,21 +153,19 @@ class Quotes extends BaseActiveModule
     function search_quote($qtext)
     {
         $strquote = "";
-        $num      = $this->bot->db->select("SELECT id FROM #___quotes WHERE quote LIKE '" . $qtext . "'");
-        $result   = $this->bot->db->select("SELECT * FROM #___quotes");
+        $num = $this->bot->db->select("SELECT id FROM #___quotes WHERE quote LIKE '" . $qtext . "'");
+        $result = $this->bot->db->select("SELECT * FROM #___quotes");
         if ($num[0][0] > 0) {
             $found = false;
-            while ($found == false)
-            {
+            while ($found == false) {
                 $row = $this->bot->core("tools")->my_rand(0, $num[0][0]);
                 if (!empty($result[$row][0])) {
                     $strquote = "#" . $result[$row][0] . " - " . $result[$row][1] . " [Contributed by: " . $result[$row][2] . "]";
-                    $found    = true;
+                    $found = true;
                 }
             }
         }
-        else
-        {
+        else {
             $strquote = "No quotes found!";
         }
         return $strquote;

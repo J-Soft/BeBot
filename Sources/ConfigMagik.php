@@ -51,8 +51,10 @@ class ConfigMagik
      * @return void Returns nothing, like any other constructor-method ��] .
      */
     /*	function __construct(&$bot, $path=null, $synchronize=false, $process_sections=true)*/
-    function __construct($path = null, $synchronize = false,
-                         $process_sections = true)
+    function __construct(
+        $path = null, $synchronize = false,
+        $process_sections = true
+    )
     {
         /*		parent::__construct($bot, get_class($this));
 
@@ -63,11 +65,13 @@ class ConfigMagik
     }
 
 
-    public function get_instance($bothandle, $path = null, $synchronize = false,
-                                 $process_sections = true)
+    public function get_instance(
+        $bothandle, $path = null, $synchronize = false,
+        $process_sections = true
+    )
     {
         if (!isset(self::$instance[$bothandle])) {
-            $class                      = __CLASS__;
+            $class = __CLASS__;
             self::$instance[$bothandle] = new $class($path, $synchronize, $process_sections);
         }
         return self::$instance[$bothandle];
@@ -81,8 +85,10 @@ class ConfigMagik
      * @param  synchronize      Maintain file sychronization.
      * @param  process_sections Process sections (false if there are no sections in the ini.
      */
-    function create_ini($path = null, $synchronize = false,
-                        $process_sections = true)
+    function create_ini(
+        $path = null, $synchronize = false,
+        $process_sections = true
+    )
     {
         // check whether to enable processing-sections or not
         if (isset($process_sections)) {
@@ -104,13 +110,11 @@ class ConfigMagik
                     array_push($this->ERRORS, $err);
                     die($err);
                 }
-                else
-                {
+                else {
                     fclose($fp_new);
                 }
             }
-            else
-            {
+            else {
                 // try to load and parse ini-file at specified path
                 $loaded = $this->load($path);
                 if (!$loaded) {
@@ -138,8 +142,7 @@ class ConfigMagik
         if ($section) {
             $this->PROCESS_SECTIONS = true;
         }
-        else
-        {
+        else {
             $this->PROCESS_SECTIONS = false;
         }
         // get requested value
@@ -147,16 +150,16 @@ class ConfigMagik
             if (isset($this->VARS[$section][$key])) {
                 $value = $this->VARS[$section][$key];
             }
-            else if (isset($this->VARS[$key])) {
-                $value = $this->VARS[$key];
-            }
-            else
-            {
-                return null;
+            else {
+                if (isset($this->VARS[$key])) {
+                    $value = $this->VARS[$key];
+                }
+                else {
+                    return null;
+                }
             }
         }
-        else
-        {
+        else {
             $value = $this->VARS[$key];
         }
         // if value was not found (false), return NULL (FIX: 11/08/2004 BennyZaminga)
@@ -195,8 +198,7 @@ class ConfigMagik
         if ($this->PROCESS_SECTIONS) {
             $this->VARS[$section][$key] = $value;
         }
-        else
-        {
+        else {
             $this->VARS[$key] = $value;
         }
         // synchronize memory with file when enabled
@@ -235,8 +237,7 @@ class ConfigMagik
             array_splice($this->VARS[$section], $pos, 1);
             return true;
         }
-        else
-        {
+        else {
             // look if given key exists
             if (in_array($key, array_keys($this->VARS)) === false) {
                 $err = "ConfigMagik::removeKey() - Could not find key('$key'), nothing was removed.";
@@ -301,8 +302,7 @@ class ConfigMagik
             echo $err;
             return false;
         }
-        elseif ($path == null)
-        {
+        elseif ($path == null) {
             // no path was specified, fall back to class-var
             $path = $this->PATH;
         }
@@ -342,19 +342,15 @@ class ConfigMagik
         $content .= "; Last modified: " . date('d M Y H:i s') . "\n";
         // check if there are sections to process
         if ($this->PROCESS_SECTIONS) {
-            foreach ($this->VARS as $key => $elem)
-            {
+            foreach ($this->VARS as $key => $elem) {
                 $content .= "[" . $key . "]\n";
-                foreach ($elem as $key2 => $elem2)
-                {
+                foreach ($elem as $key2 => $elem2) {
                     $content .= $key2 . " = \"" . $elem2 . "\"\n";
                 }
             }
         }
-        else
-        {
-            foreach ($this->VARS as $key => $elem)
-            {
+        else {
+            foreach ($this->VARS as $key => $elem) {
                 $content .= $key . " = \"" . $elem . "\"\n";
             }
         }
@@ -373,8 +369,7 @@ class ConfigMagik
             array_push($this->ERRORS, $err);
             return false;
         }
-        else
-        {
+        else {
             // push a message onto error-stack
             $err = "ConfigMagik::save() - Sucessfully saved to file('$path').";
             array_push($this->ERRORS, $err);
@@ -407,22 +402,19 @@ class ConfigMagik
             $out .= ob_get_clean();
             return $out;
         }
-        elseif (strtoupper($output_type) === 'HTML')
-        {
+        elseif (strtoupper($output_type) === 'HTML') {
             // render object as HTML
             $out = "<table style='background:#FFEECC;border:1px solid black;' width=60%>\n";
             if ($this->PROCESS_SECTIONS) {
                 // render with sections
                 $out .= "\t<tr><th style='border:1px solid white;'>Section</th><th style='border:1px solid white;'>Key</th><th style='border:1px solid white;'>Value</th></tr>\n";
-                $sections     = $this->listSections();
+                $sections = $this->listSections();
                 $num_sections = 0;
-                $num_keys     = 0;
-                foreach ($sections as $section)
-                {
+                $num_keys = 0;
+                foreach ($sections as $section) {
                     $out .= "\t<tr><td style='border:1px solid white;' colspan=3>$section</td></tr>\n";
                     $keys = $this->listKeys($section);
-                    foreach ($keys as $key)
-                    {
+                    foreach ($keys as $key) {
                         $val = $this->get($key, $section);
                         $out .= "\t<tr><td>&nbsp;</td><td style='border:1px solid maroon;'>$key</td><td style='border:1px solid brown;'>$val</td></tr>\n";
                         $num_keys++;
@@ -432,14 +424,12 @@ class ConfigMagik
                 // summary of table (with sections)
                 $out .= "\t<tr><td style='border:1px solid white;' colspan=3 align=right><code>There are <b>$num_keys keys</b> in <b>$num_sections sections</b>.</code></td></tr>\n";
             }
-            else
-            {
+            else {
                 // render without sections
-                $keys     = $this->listKeys();
+                $keys = $this->listKeys();
                 $num_keys = 0;
                 $out .= "\t<tr><th style='border:1px solid white;'>Key</th><th style='border:1px solid white;'>Value</th></tr>\n";
-                foreach ($keys as $key)
-                {
+                foreach ($keys as $key) {
                     $val = $this->get($key);
                     $out .= "\t<tr><td style='border:1px solid maroon;'>$key</td><td style='border:1px solid brown;'>$val</td></tr>\n";
                     $num_keys++;
@@ -474,17 +464,15 @@ class ConfigMagik
             }
             // list all keys in given section
             $list = array();
-            $all  = array_keys($this->VARS[$section]);
-            foreach ($all as $possible_key)
-            {
+            $all = array_keys($this->VARS[$section]);
+            foreach ($all as $possible_key) {
                 if (!is_array($this->VARS[$possible_key])) {
                     array_push($list, $possible_key);
                 }
             }
             return $list;
         }
-        else
-        {
+        else {
             // list all keys (section-less)
             return array_keys($this->VARS);
         }
@@ -503,8 +491,7 @@ class ConfigMagik
         $list = array();
         // separate sections from normal keys
         $all = array_keys($this->VARS);
-        foreach ($all as $possible_section)
-        {
+        foreach ($all as $possible_section) {
             if (is_array($this->VARS[$possible_section])) {
                 array_push($list, $possible_section);
             }

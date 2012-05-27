@@ -23,8 +23,7 @@ class PBInputStringReader extends PBInputReader
     public function next($is_string = false)
     {
         $package = '';
-        while (true)
-        {
+        while (true) {
             if ($this->pointer >= $this->length) {
                 return false;
             }
@@ -43,11 +42,10 @@ class PBInputStringReader extends PBInputReader
                 // now fill to eight with 00
                 $package .= $value;
             }
-            else
-            {
+            else {
                 // now fill to length of eight with 0
                 $value = substr('00000000', 0, 8 - strlen($value) % 8) . $value;
-                $ret   = $this->base128->get_value($package . $value);
+                $ret = $this->base128->get_value($package . $value);
                 return $ret;
             }
         }
