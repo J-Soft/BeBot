@@ -50,7 +50,7 @@ class OnlineDisplay extends BaseActiveModule
         // Register for logon notifies
         $this->register_event("logon_notify");
         $this->register_event("pgjoin");
-        if (strtolower(AOCHAT_GAME) == "ao") {
+        if ($this->bot->game == "ao") {
             $cp = "profession";
             $this->cp = "profession";
             $mode = "Fancy";
@@ -71,7 +71,7 @@ class OnlineDisplay extends BaseActiveModule
             "Online", "Showall", "LEADER", "Security Access Level required to See all Online (" . $this->bot->commpre . "online all).", "OWNER;SUPERADMIN;ADMIN;LEADER;MEMBER"
         );
         if ($this->bot->guildbot) {
-            $altmode = true;
+            $altmode = TRUE;
             $charinfo = "rank";
             if ($this->bot->core("settings")->get("Online", "Otherbots") != ""
             ) {
@@ -82,7 +82,7 @@ class OnlineDisplay extends BaseActiveModule
             }
         }
         else {
-            $altmode = false;
+            $altmode = FALSE;
             $charinfo = "org";
             $guildtext = "members online";
         }
@@ -126,7 +126,7 @@ class OnlineDisplay extends BaseActiveModule
     }
 
 
-    function notify($user, $startup = false)
+    function notify($user, $startup = FALSE)
     {
         if (!$startup
             && $this->bot->core("settings")
@@ -185,7 +185,7 @@ class OnlineDisplay extends BaseActiveModule
     /*
     Makes the message.
     */
-    function online_msg($param, $what, $name = False)
+    function online_msg($param, $what, $name = FALSE)
     {
         if ($param == "all") {
             if ($this->bot->core("security")->check_access(
@@ -237,9 +237,7 @@ class OnlineDisplay extends BaseActiveModule
                 $msg .= "##highlight##" . $other[0] . "##end## Other Online ";
             }
         }
-        if (($what == "both")
-            || ($what == "pgroup") && strtolower(AOCHAT_GAME) == "ao"
-        ) {
+        if (($what == "both") || ($what == "pgroup") && $this->bot->game == "ao") {
             $online .= $this->bot->core("colors")
                 ->colorize(
                 "online_title", "::: " . $pgroup[0] . " " . $this->bot
@@ -258,8 +256,7 @@ class OnlineDisplay extends BaseActiveModule
                     ->core("settings")
                     ->exists("irc", "connected")
                     && $this->bot
-                        ->core("settings")
-                        ->get("irc", "connected")))
+                        ->core("settings")->get("irc", "connected")))
         ) {
             $irclist = $this->irc_online_list();
             $online .= "\n" . $this->bot->core("colors")
@@ -286,7 +283,7 @@ class OnlineDisplay extends BaseActiveModule
     function online_list($channel, $like, $lvl = FALSE)
     {
         $andlvl = "";
-        if (strtolower(AOCHAT_GAME) == "ao") {
+        if ($this->bot->game == "ao") {
             $ex1 = "defender_rank_id DESC, ";
             $ex2 = ", defender_rank_id";
         }
@@ -313,7 +310,7 @@ class OnlineDisplay extends BaseActiveModule
                 ->get("Online", "Mode")
         ) == "fancy"
         ) {
-            if (strtolower(AOCHAT_GAME) == "aoc") {
+            if ($this->bot->game == "aoc") {
                 $profgfx["Barbarian"] = "16308";
                 $profgfx["Guardian"] = "84203";
                 $profgfx["Conqueror"] = "16252";
@@ -447,7 +444,7 @@ class OnlineDisplay extends BaseActiveModule
                 else {
                     $player[3] = stripslashes($player[3]);
                 }
-                if (strtolower(AOCHAT_GAME) == "ao") {
+                if ($this->bot->game == "ao") {
                     if (strtolower(
                         $this->bot->core("settings")
                             ->get("Online", "Charinfo")
@@ -478,7 +475,7 @@ class OnlineDisplay extends BaseActiveModule
                 }
                 $online_list .= $this->bot->core("colors")
                     ->colorize("online_characters", " - Lvl " . $player[1]);
-                if (strtolower(AOCHAT_GAME) == "ao") {
+                if ($this->bot->game == "ao") {
                     $online_list .= "/" . $player[5];
                 }
                 $online_list .= $this->bot->core("colors")
@@ -566,7 +563,7 @@ class OnlineDisplay extends BaseActiveModule
             "SELECT count(DISTINCT t1.nickname) FROM " . $this->bot
                 ->core("online")->full_tablename() . " WHERE t2.level = 220"
         );
-        if (strtolower(AOCHAT_GAME) == "ao") {
+        if ($this->bot->game == "ao") {
             $ex1 = ", defender_rank_id";
         }
         $online = $this->bot->db->select(
@@ -589,7 +586,7 @@ class OnlineDisplay extends BaseActiveModule
             ->colorize("online_characters", "Players (220): ") . $count5[0][0] . "\n\n";
         if (!empty($online)) {
             foreach ($online as $player) {
-                if (strtolower(AOCHAT_GAME) == "ao") {
+                if ($this->bot->game == "ao") {
                     $ex2 = " (" . $player[4] . ")";
                 }
                 $msg .= $this->bot->core("colors")

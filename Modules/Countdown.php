@@ -87,7 +87,7 @@ class Countdown extends BaseActiveModule
     function command_handler($name, $msg, $origin)
     {
         $ret = $this->bot->core("timer")
-            ->add_timer(false, "countdown", 6, $name . " " . $origin, "internal", 0, "Countdown");
+            ->add_timer(FALSE, "countdown", 6, $name . " " . $origin, "internal", 0, "Countdown");
         return "Countdown started!";
     }
 }

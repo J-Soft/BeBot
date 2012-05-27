@@ -57,7 +57,7 @@ class statistics extends BasePassiveModule
         );
         $this->register_module("statistics");
         $this->bot->core("settings")
-            ->create('Statistics', "Enabled", False, "Capture Statistics?");
+            ->create('Statistics', "Enabled", FALSE, "Capture Statistics?");
     }
 
 

@@ -89,7 +89,7 @@ class VhItems extends BaseActiveModule
                 }
                 $result = $this->bot->core("tools")->get_site($url, 1);
                 //Again I do not see why we're looking for mysql_real_escape_string
-                if (strstr($result, 'mysql_real_escape_string') !== false) {
+                if (strstr($result, 'mysql_real_escape_string') !== FALSE) {
                     return ("received garbled reply from vhabot!");
                 }
                 return $result;

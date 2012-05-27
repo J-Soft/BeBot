@@ -78,7 +78,7 @@ class Roster_Core extends BasePassiveModule
         $this->bot->core("settings")
             ->create("Members", "Update", TRUE, "Should the roster be updated automaticly?");
         $this->bot->core("settings")
-            ->create("Members", "QuietUpdate", false, "Do roster update quietly without spamming the guild channel?");
+            ->create("Members", "QuietUpdate", FALSE, "Do roster update quietly without spamming the guild channel?");
         $this->startup = TRUE;
         $this->running = FALSE;
     }
@@ -265,7 +265,7 @@ class Roster_Core extends BasePassiveModule
     }
 
 
-    function update_guild($force = false)
+    function update_guild($force = FALSE)
     {
         /*** FIXME: This is not the right place to tell people that the bot went online!
         if ($this->startup && ! $force)
@@ -276,7 +276,7 @@ class Roster_Core extends BasePassiveModule
          */
         $this->lastrun = $this->bot->core("settings")
             ->get("members", "LastRosterUpdate");
-        if (($this->lastrun + 21600) >= time() && $force == false) {
+        if (($this->lastrun + 21600) >= time() && $force == FALSE) {
             $this->bot->log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
             return;
         }
@@ -292,7 +292,7 @@ class Roster_Core extends BasePassiveModule
             $this->bot->send_gc("##normal##Roster update starting ::: System busy##end##");
         }
         // Get the guild roster
-        if (strtolower(AOCHAT_GAME) == "ao") {
+        if ($this->bot->game == "ao") {
             $dimension = $this->bot->dimension;
             switch (strtolower($dimension)) {
             case "testlive":
@@ -313,7 +313,7 @@ class Roster_Core extends BasePassiveModule
         /*
         Only run the update if the XML returns more than one member, otherwise we skip the update.
         */
-        if (count($members) > 1 || strtolower(AOCHAT_GAME) == "aoc") {
+        if (count($members) > 1 || $this->bot->game == "aoc") {
             $buddies = $this->bot->aoc->buddies;
             $this->added = 0;
             $this->removed = 0;
@@ -325,17 +325,12 @@ class Roster_Core extends BasePassiveModule
                 }
             }
             unset($db_members_sql);
-            if (strtolower(AOCHAT_GAME) == "ao") {
+            if ($this->bot->game == "ao") {
                 /*
                 Go through all members and make sure we are up to date.
                 */
                 foreach ($members as $member) {
-                    $db_member = null;
-
-                    if (isset($db_members[$member["nickname"]])) {
-                        $db_member = $db_members[$member["nickname"]];
-                    }
-
+                    $db_member = $db_members[$member["nickname"]];
                     /*
                     If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
                     its a new member we havent picked up for some reason.
@@ -469,8 +464,8 @@ class Roster_Core extends BasePassiveModule
                     Make sure we have an entry in the whois cache for the character.
                     */
                     $whois = $this->bot->core("whois")
-                        ->lookup($member[1], false, true);
-                    if (strtolower(AOCHAT_GAME) == "ao") {
+                        ->lookup($member[1], FALSE, TRUE);
+                    if ($this->bot->game == "ao") {
                         /*
                         Catch deleted characters.
                         */
@@ -558,13 +553,13 @@ class Roster_Core extends BasePassiveModule
             }
             $this->bot->core("settings")
                 ->save("members", "LastRosterUpdate", time());
-            $this->bot->log("ROSTER", "UPDATE", "Roster update complete. $msg", true);
+            $this->bot->log("ROSTER", "UPDATE", "Roster update complete. $msg", TRUE);
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_gc("##normal##Roster update completed. $msg ##end##");
             }
         }
         else {
-            $this->bot->log("ROSTER", "UPDATE", "Roster update failed. Funcom XML returned 0 members.", true);
+            $this->bot->log("ROSTER", "UPDATE", "Roster update failed. Funcom XML returned 0 members.", TRUE);
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_gc("##normal##Roster update failed! Funcom XML returned 0 members ##end##");
             }
@@ -574,7 +569,7 @@ class Roster_Core extends BasePassiveModule
     }
 
 
-    function update_raid($force = false)
+    function update_raid($force = FALSE)
     {
         if ($this->running) {
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
@@ -592,7 +587,7 @@ class Roster_Core extends BasePassiveModule
          */
         $this->lastrun = $this->bot->core("settings")
             ->get("members", "LastRosterUpdate");
-        if (($this->lastrun + (60 * 60 * 6)) >= time() && $force == false) {
+        if (($this->lastrun + (60 * 60 * 6)) >= time() && $force == FALSE) {
             $this->bot->log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
         }
         else {
@@ -645,7 +640,7 @@ class Roster_Core extends BasePassiveModule
                             Make sure we have an entry in the whois cache for the character.
                             */
                             $this->bot->core("whois")
-                                ->lookup($member[1], false, true);
+                                ->lookup($member[1], FALSE, TRUE);
                             if ($member[3] == 1) {
                                 /*
                                 Make sure all on characters on notify list are in buddy list
@@ -660,7 +655,7 @@ class Roster_Core extends BasePassiveModule
                     }
                 }
             }
-            $this->bot->log("CRON", "ROSTER", "Done updating roster. Removed " . $this->removed . " members of which " . $this->rerolled . " was rerolled characters.", true);
+            $this->bot->log("CRON", "ROSTER", "Done updating roster. Removed " . $this->removed . " members of which " . $this->rerolled . " was rerolled characters.", TRUE);
             $this->bot->log("CRON", "ROSTER", "Cleaning buddylist.");
             /*
             cycle through anything still on our buddylist
@@ -716,11 +711,8 @@ class Roster_Core extends BasePassiveModule
             ->get("Members", "Roster") == "XML"
             || $this->bot
                 ->core("settings")
-                ->get(
-                "Members",
-                "Roster"
-            ) == "Fallback")
-            && strtolower(AOCHAT_GAME) == "ao"
+                ->get("Members", "Roster") == "Fallback")
+            && $this->bot->game == "ao"
         ) {
             // Get the guild roster
             $i = 0;

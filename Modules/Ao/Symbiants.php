@@ -39,19 +39,19 @@ class Symb_sql extends BaseActiveModule
 {
     private $slots
         = array(
-            'ocular' => 'eye',
-            'brain' => 'head',
-            'ear' => 'ear',
-            'right arm' => 'rarm',
-            'chest' => 'chest',
-            'left arm' => 'larm',
+            'ocular'      => 'eye',
+            'brain'       => 'head',
+            'ear'         => 'ear',
+            'right arm'   => 'rarm',
+            'chest'       => 'chest',
+            'left arm'    => 'larm',
             'right wrist' => 'rwrist',
-            'waist' => 'waist',
-            'left wrist' => 'lwrist',
-            'right hand' => 'rhand',
-            'thigh' => 'legs',
-            'left hand' => 'lhand',
-            'feet' => 'feet'
+            'waist'       => 'waist',
+            'left wrist'  => 'lwrist',
+            'right hand'  => 'rhand',
+            'thigh'       => 'legs',
+            'left hand'   => 'lhand',
+            'feet'        => 'feet'
         );
 
 
@@ -86,7 +86,7 @@ class Symb_sql extends BaseActiveModule
         Switch ($this->bot->db->get_version("symbiants")) {
         case 1:
         case 2:
-            $filename = "./Extras/Symbiants/Symbiants.sql";
+            $filename = "./extra/symbiants/symbiants.sql";
             $handle = fopen($filename, "r");
             $query = fread($handle, filesize($filename));
             fclose($handle);
@@ -119,10 +119,10 @@ class Symb_sql extends BaseActiveModule
 
     function symb($args)
     {
-        $query_ql = false; //quality level in query format
-        $query_slot = false; //slots in query format
-        $query_unit = false; //unit in query format
-        $query_name = false; //Name of symbiant in query format
+        $query_ql = FALSE; //quality level in query format
+        $query_slot = FALSE; //slots in query format
+        $query_unit = FALSE; //unit in query format
+        $query_name = FALSE; //Name of symbiant in query format
         $prof_units = array();
         //Condition args.
         //Lower case everything so we know what we're working with.
@@ -163,7 +163,7 @@ class Symb_sql extends BaseActiveModule
             ) {
                 if (!in_array($arg, $prof_units)) {
                     $prof_units[] = $arg;
-                    if ($query_unit === false) {
+                    if ($query_unit === FALSE) {
                         $query_unit = "unit = '$arg'";
                         $readable_units = "$arg";
                     }
@@ -175,7 +175,7 @@ class Symb_sql extends BaseActiveModule
             }
             //Check if $arg is a slot
             elseif ($slot_match = array_search($arg, $this->slots)) {
-                if ($query_slot === false) {
+                if ($query_slot === FALSE) {
                     $query_slot = "slot = '{$this->slots[$slot_match]}'";
                     $readable_slot = $slot_match;
                 }
@@ -186,7 +186,7 @@ class Symb_sql extends BaseActiveModule
             }
             //Check if $arg is a number and thus a QL
             elseif (is_numeric($arg)) {
-                if ($query_ql === false) {
+                if ($query_ql === FALSE) {
                     $query_ql = "ql = $arg";
                     $readable_ql = "$arg";
                 }
@@ -206,7 +206,7 @@ class Symb_sql extends BaseActiveModule
                     $low = $pql[2];
                     $high = $pql[1];
                 }
-                if ($query_ql === false) {
+                if ($query_ql === FALSE) {
                     $query_ql = " (ql >= $low AND ql <= $high)";
                     $readable_ql = "between $low and $high";
                 }
@@ -217,7 +217,7 @@ class Symb_sql extends BaseActiveModule
             }
             //Assume that $arg is name since it's none of the above
             else {
-                if ($query_name === false) {
+                if ($query_name === FALSE) {
                     $query_name = "t1.name like '%$arg%'";
                     $readable_name = "'$arg'";
                 }
@@ -243,22 +243,22 @@ class Symb_sql extends BaseActiveModule
         }
         $readable_output .= "------------------------------------------\n\n";
         //Build a query
-        if ($query_ql !== false) {
+        if ($query_ql !== FALSE) {
             $where_string = "($query_ql)";
         }
-        if ($query_slot !== false) {
+        if ($query_slot !== FALSE) {
             if (!empty($where_string)) {
                 $where_string .= ' and ';
             }
             $where_string .= "($query_slot)";
         }
-        if ($query_unit !== false) {
+        if ($query_unit !== FALSE) {
             if (!empty($where_string)) {
                 $where_string .= ' and ';
             }
             $where_string .= "($query_unit)";
         }
-        if ($query_name !== false) {
+        if ($query_name !== FALSE) {
             if (!empty($where_string)) {
                 $where_string .= ' and ';
             }

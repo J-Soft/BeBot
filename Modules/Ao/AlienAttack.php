@@ -108,7 +108,7 @@ class AlienAttack extends BaseActiveModule
         $this->bot->core("settings")
             ->create("AlienAttack", "Channel", "gc", "Into which channel should any output about alien attacks and city changes be send?", "gc;pgmsg;both");
         $this->bot->core("settings")
-            ->create("AlienAttack", "PublicTimer", false, "Should a public timer in addition to the periodic spam be created on cloak up and down?");
+            ->create("AlienAttack", "PublicTimer", FALSE, "Should a public timer in addition to the periodic spam be created on cloak up and down?");
         $this->bot->core("settings")
             ->create("AlienAttack", "CloakReminder", TRUE, "Should the bot send a reminder every 15mins if the cloak is still disabled?");
         $this->spam = FALSE;
@@ -149,7 +149,7 @@ class AlienAttack extends BaseActiveModule
                     ->get("AlienAttack", "CloakReminder")
                 ) {
                     $this->timerid = $this->bot->core("timer")
-                        ->add_timer(false, "city", 60 * 15, " cloakr", "internal", 60 * 15, "CityCloakReminder");
+                        ->add_timer(FALSE, "city", 60 * 15, " cloakr", "internal", 60 * 15, "CityCloakReminder");
                 }
             }
         }
@@ -228,7 +228,7 @@ class AlienAttack extends BaseActiveModule
                 $avilsec = 0;
                 $status = "enable";
                 $status2 = "disable";
-                $ttchange = true;
+                $ttchange = TRUE;
             }
             else {
                 $avilmin = date("i", 3600 - (time() - $result[0][0]));
@@ -242,10 +242,10 @@ class AlienAttack extends BaseActiveModule
                     $status2 = "enable";
                 }
                 if ($result[0][0] > (time() - 3600)) {
-                    $ttchange = true;
+                    $ttchange = TRUE;
                 }
                 else {
-                    $ttchange = false;
+                    $ttchange = FALSE;
                 }
             }
             $state = "The cloaking device is ##highlight##" . $status . "d##end##.";
@@ -272,106 +272,110 @@ class AlienAttack extends BaseActiveModule
             if (preg_match("/Your radar station is picking up alien activity in the area surrounding your city./i", $msg)) {
                 $this->bot->send_output("", "Alien attack incoming! Beware!", $channel);
             }
-            else if (preg_match("/Your city in (.+) has been targeted by hostile forces./i", $msg, $info)) {
-                $action = "attack";
-                $zone = $info[1];
-                $this->bot->send_output("", "Our city in " . $zone . " is about to be under attack! 0MGZ RUN!!!!", $channel);
-            }
-            else if (preg_match("/(.+) turned the cloaking device in your city off./i", $msg, $info)) {
-                $action = "off";
-                $player = $info[1];
-                $setting = $this->bot->core("settings")
-                    ->get('AlienAttack', 'Spam');
-                if ($setting == "gc" || $setting == "both") {
-                    $this->bot->core("timer")
-                        ->add_timer(false, "city", 1860, $player . " spam", "internal", 0, "CityWarningSpam");
-                }
-                $this->spam = TRUE;
-                $this->bot->core("timer")
-                    ->add_timer(false, "city", 60 * 60 + 1, $player . " cloak", "internal", 0, "CityWarning");
-                $this->delete_cloak_reminder();
-                if ($this->bot->core("settings")
-                    ->get("AlienAttack", "PublicTimer")
-                ) {
-                    $this->bot->core("timer")
-                        ->add_timer(
-                        false, $player, 60 * 60 + 1, $this->bot
-                        ->core("shortcuts")
-                        ->get_short($this->bot->guildname) . "'s cloak can be enabled again", "gc", 0, "CityWarning"
-                    );
-                }
-                $this->bot->send_output("", "##highlight##" . $player . "##end## turned the cloaking device in our city ##highlight##off##end##!", $channel);
-            }
             else {
-                if (preg_match("/(.+) turned the cloaking device in your city on./i", $msg, $info)) {
-                    $action = "on";
-                    $player = $info[1];
-                    $this->delete_cloak_reminder();
-                    $this->bot->core("timer")
-                        ->add_timer(false, "city", 60 * 60 + 1, $player . " cloakready", "internal", 0, "CityCloakReady");
-                    if ($this->bot->core("settings")
-                        ->get("AlienAttack", "PublicTimer")
-                    ) {
-                        $this->bot->core("timer")
-                            ->add_timer(
-                            false, $player, 60 * 60 + 1, $this->bot
-                            ->core("shortcuts")
-                            ->get_short($this->bot->guildname) . "'s cloak can be disabled again", "gc", 0, "CityWarning"
-                        );
-                    }
-                    $this->bot->send_output("", "##highlight##" . $player . "##end## turned the cloaking device in our city back ##highlight##on##end##!", $channel);
+                if (preg_match("/Your city in (.+) has been targeted by hostile forces./i", $msg, $info)) {
+                    $action = "attack";
+                    $zone = $info[1];
+                    $this->bot->send_output("", "Our city in " . $zone . " is about to be under attack! 0MGZ RUN!!!!", $channel);
                 }
                 else {
-                    if (preg_match("/(.+) initiated removal of the organization headquarters in (.+)/i", $msg, $info)) {
-                        $action = "HQ";
+                    if (preg_match("/(.+) turned the cloaking device in your city off./i", $msg, $info)) {
+                        $action = "off";
                         $player = $info[1];
-                        $zone = $info[2];
-                        $this->bot->send_output(
-                            "",
-                            "##highlight##" . $player . "##end## is removeing our HQ in ##highlight##" . $zone
-                                . "##end##! Our city... will.. *sobs* ...be destroyed!! *starts crying*",
-                            $channel
-                        );
-                    }
-                    else {
-                        if (preg_match("/(.+) removed the organization headquarters in (.+)/i", $msg, $info)) {
-                            $action = "HQ removed";
-                            $player = $info[1];
-                            $zone = $info[2];
-                            $this->bot->send_output(
-                                "",
-                                "##highlight##" . $player . "##end## has removed our HQ in ##highlight##" . $zone
-                                    . "##end##! We are now homeless street urchin people!! *crys even harder*",
-                                $channel
+                        $setting = $this->bot->core("settings")
+                            ->get('AlienAttack', 'Spam');
+                        if ($setting == "gc" || $setting == "both") {
+                            $this->bot->core("timer")
+                                ->add_timer(FALSE, "city", 1860, $player . " spam", "internal", 0, "CityWarningSpam");
+                        }
+                        $this->spam = TRUE;
+                        $this->bot->core("timer")
+                            ->add_timer(FALSE, "city", 60 * 60 + 1, $player . " cloak", "internal", 0, "CityWarning");
+                        $this->delete_cloak_reminder();
+                        if ($this->bot->core("settings")
+                            ->get("AlienAttack", "PublicTimer")
+                        ) {
+                            $this->bot->core("timer")
+                                ->add_timer(
+                                FALSE, $player, 60 * 60 + 1, $this->bot
+                                ->core("shortcuts")
+                                ->get_short($this->bot->guildname) . "'s cloak can be enabled again", "gc", 0, "CityWarning"
                             );
                         }
+                        $this->bot->send_output("", "##highlight##" . $player . "##end## turned the cloaking device in our city ##highlight##off##end##!", $channel);
+                    }
+                    else {
+                        if (preg_match("/(.+) turned the cloaking device in your city on./i", $msg, $info)) {
+                            $action = "on";
+                            $player = $info[1];
+                            $this->delete_cloak_reminder();
+                            $this->bot->core("timer")
+                                ->add_timer(FALSE, "city", 60 * 60 + 1, $player . " cloakready", "internal", 0, "CityCloakReady");
+                            if ($this->bot->core("settings")
+                                ->get("AlienAttack", "PublicTimer")
+                            ) {
+                                $this->bot->core("timer")
+                                    ->add_timer(
+                                    FALSE, $player, 60 * 60 + 1, $this->bot
+                                    ->core("shortcuts")
+                                    ->get_short($this->bot->guildname) . "'s cloak can be disabled again", "gc", 0, "CityWarning"
+                                );
+                            }
+                            $this->bot->send_output("", "##highlight##" . $player . "##end## turned the cloaking device in our city back ##highlight##on##end##!", $channel);
+                        }
                         else {
-                            if (preg_match("/(.+) initiated removal of a (.+) in (.+)/i", $msg, $info)) {
-                                $action = $info[2] . " removal initiated";
+                            if (preg_match("/(.+) initiated removal of the organization headquarters in (.+)/i", $msg, $info)) {
+                                $action = "HQ";
                                 $player = $info[1];
-                                $zone = $info[3];
+                                $zone = $info[2];
                                 $this->bot->send_output(
-                                    "", "##highlight##" . $player . "##end## is removing a " . $info[2] . " at our city in ##highlight##" . $zone . "##end##.", $channel
+                                    "",
+                                    "##highlight##" . $player . "##end## is removeing our HQ in ##highlight##" . $zone
+                                        . "##end##! Our city... will.. *sobs* ...be destroyed!! *starts crying*",
+                                    $channel
                                 );
                             }
                             else {
-                                if (preg_match("/(.+) removed a (.+) in (.+)/i", $msg, $info)) {
-                                    $action = $info[2] . " removed";
+                                if (preg_match("/(.+) removed the organization headquarters in (.+)/i", $msg, $info)) {
+                                    $action = "HQ removed";
                                     $player = $info[1];
-                                    $zone = $info[3];
+                                    $zone = $info[2];
                                     $this->bot->send_output(
-                                        "", "##highlight##" . $player . "##end## removed a " . $info[2] . " at our city in ##highlight##" . $zone . "##end##.", $channel
+                                        "",
+                                        "##highlight##" . $player . "##end## has removed our HQ in ##highlight##" . $zone
+                                            . "##end##! We are now homeless street urchin people!! *crys even harder*",
+                                        $channel
                                     );
                                 }
                                 else {
-                                    if (preg_match("/^The upkeep for your organization housing has not been paid./i", $msg)) {
-                                        $action = "payment";
-                                        $player = "";
+                                    if (preg_match("/(.+) initiated removal of a (.+) in (.+)/i", $msg, $info)) {
+                                        $action = $info[2] . " removal initiated";
+                                        $player = $info[1];
+                                        $zone = $info[3];
+                                        $this->bot->send_output(
+                                            "", "##highlight##" . $player . "##end## is removing a " . $info[2] . " at our city in ##highlight##" . $zone . "##end##.", $channel
+                                        );
                                     }
                                     else {
-                                        $action = "unknown";
-                                        $player = $msg;
-                                        //$this -> bot -> send_output("", "Something wierd is going on, and I don't know what it is!", $channel);
+                                        if (preg_match("/(.+) removed a (.+) in (.+)/i", $msg, $info)) {
+                                            $action = $info[2] . " removed";
+                                            $player = $info[1];
+                                            $zone = $info[3];
+                                            $this->bot->send_output(
+                                                "", "##highlight##" . $player . "##end## removed a " . $info[2] . " at our city in ##highlight##" . $zone . "##end##.", $channel
+                                            );
+                                        }
+                                        else {
+                                            if (preg_match("/^The upkeep for your organization housing has not been paid./i", $msg)) {
+                                                $action = "payment";
+                                                $player = "";
+                                            }
+                                            else {
+                                                $action = "unknown";
+                                                $player = $msg;
+                                                //$this -> bot -> send_output("", "Something wierd is going on, and I don't know what it is!", $channel);
+                                            }
+                                        }
                                     }
                                 }
                             }

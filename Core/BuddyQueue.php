@@ -1,6 +1,6 @@
 <?php
 /*
-* BuddyQueue.php - Queue plugin to prevent flooding
+* Buddy_Queue.php - Queue plugin to prevent flooding
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax

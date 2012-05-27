@@ -375,7 +375,7 @@ class Relay extends BaseActiveModule
                         ->core("settings")
                         ->get('Relay', 'Org') == "Relaybots")
             ) {
-                $this->relay_to_bot($relaystring, true, false, $type);
+                $this->relay_to_bot($relaystring, TRUE, FALSE, $type);
             }
         }
     }
@@ -384,7 +384,7 @@ class Relay extends BaseActiveModule
     // Relays $msg without any further modifications to other bot(s).
     // If $chat is true $msg will be relayed as chat with added "<pre>gcr " prefix.
     // If $chat is false $msg will be relayed as it is without any addon, this can be used to relay commands to the other bot(s).
-    function relay_to_bot($msg, $chat = true, $alt = FALSE, $type = "notchat")
+    function relay_to_bot($msg, $chat = TRUE, $alt = FALSE, $type = "notchat")
     {
         $type = strtolower($type);
         if ($alt) {
@@ -422,7 +422,7 @@ class Relay extends BaseActiveModule
             ) {
                 $this->bot->send_tell(
                     $this->bot->core("settings")
-                        ->get('Relay', 'Relay'), $prefix . $msg, 0, false, TRUE, $color
+                        ->get('Relay', 'Relay'), $prefix . $msg, 0, FALSE, TRUE, $color
                 );
             }
             elseif (strtolower(
@@ -834,8 +834,8 @@ class Relay extends BaseActiveModule
         }
         $key = $this->bot->core("settings")->get("Relay", "Key");
         $return = array(
-            'hmac' => NULL,
-            'iv' => NULL,
+            'hmac'      => NULL,
+            'iv'        => NULL,
             'encrypted' => NULL
         );
         $decrypted_string = trim($string);

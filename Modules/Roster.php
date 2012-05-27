@@ -42,7 +42,7 @@ class Roster_Handler extends BaseActiveModule
         $this->register_command("all", "guest", "ADMIN");
         $this->register_command("all", "rosterupdate", "ADMIN");
         $this->register_command("all", "buddylist", "ADMIN");
-        if (strtolower(AOCHAT_GAME) == "ao") {
+        if ($this->bot->game == "ao") {
             $this->register_event("cron", "1hour");
         }
         $this->help['description'] = 'Handles member roster commands.';
@@ -74,7 +74,7 @@ class Roster_Handler extends BaseActiveModule
     */
     function command_handler($source, $msg, $type)
     {
-        $return = false;
+        $return = FALSE;
         /*
         This should really be moved to the bot core.. but until i get the time to modify every single module... :\
         */
@@ -134,13 +134,13 @@ class Roster_Handler extends BaseActiveModule
             }
         case 'rosterupdate':
             if ($this->bot->guildbot) {
-                $this->output($source, "Starting roster update.");
-                $this->bot->core("roster_core")->update_guild(true);
+                $this->output_destination($source, "Starting roster update.");
+                $this->bot->core("roster_core")->update_guild(TRUE);
                 return FALSE;
             }
             else {
-                $this->output($source, "Starting roster update.");
-                $this->bot->core("roster_core")->update_raid(true);
+                $this->output_destination($source, "Starting roster update.");
+                $this->bot->core("roster_core")->update_raid(TRUE);
                 return FALSE;
             }
             break;
@@ -223,7 +223,7 @@ class Roster_Handler extends BaseActiveModule
     {
         $blob = "";
         $total = 0;
-        if (strtolower(AOCHAT_GAME) == "aoc") {
+        if ($this->bot->game == "aoc") {
             $cp = "class";
         }
         else {
@@ -307,7 +307,7 @@ class Roster_Handler extends BaseActiveModule
             || $buddy_count - $notify_count >= $this->bot
                 ->core("settings")->get("Roster", "Buddylistupdate")
         ) {
-            $force = true;
+            $force = TRUE;
             if ($this->bot->guildbot) {
                 $this->bot->core("roster_core")->update_guild($force);
             }

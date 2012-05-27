@@ -80,9 +80,9 @@ class CharacterServerConnection extends ServerConnection
     {
         if (parent::Connect()) {
             $this->SendAuthentication();
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -123,7 +123,7 @@ class CharacterServerConnection extends ServerConnection
     {
         do {
             $stream = parent::HandlePackets();
-            if ($stream == null) {
+            if ($stream == NULL) {
                 continue;
             }
             $rpcID = parent::GetRpcID($stream);
@@ -186,10 +186,10 @@ class CharacterServerConnection extends ServerConnection
                     $stream->ReadString(); // ?? Blob MD5
 
                     $this->m_Parent->chars[] = array(
-                        "id" => $characterID,
-                        "name" => $characterName,
-                        "level" => $level,
-                        "online" => $loginState,
+                        "id"       => $characterID,
+                        "name"     => $characterName,
+                        "level"    => $level,
+                        "online"   => $loginState,
                         "language" => $language
                     );
 
@@ -210,7 +210,7 @@ class CharacterServerConnection extends ServerConnection
                             echo "[" . $this->m_LogName . "] Character : ID = " . $e["id"] . ", Name = '" . $e["name"] . "'\n";
                         }
                     }
-                    return false;
+                    return FALSE;
                 }
                 break;
                 }
@@ -218,7 +218,7 @@ class CharacterServerConnection extends ServerConnection
             case RPC_TERRITORY_ERROR:
                 {
                 trigger_error("RPC_UNIVERSE_ERROR: Error while authenticating to territory [Err:" . $this->displayConanError($packet->args[0]) . "]", E_USER_WARNING);
-                return false;
+                return FALSE;
                 }
 
             case RPC_TERRITORY_RECEIVED_CHATSERVER:
@@ -231,7 +231,7 @@ class CharacterServerConnection extends ServerConnection
 
                 $this->m_ChatServerAddress = long2ip($chatserverIP);
                 echo("[" . $this->m_LogName . "] Received chat server address [ $this->m_ChatServerAddress:$this->m_ChatServerPort ]\n");
-                return true;
+                return TRUE;
                 }
                 break;
 
@@ -261,9 +261,9 @@ class CharacterServerConnection extends ServerConnection
             }
 
         }
-        while (true);
+        while (TRUE);
 
-        return true;
+        return TRUE;
     }
 }
 

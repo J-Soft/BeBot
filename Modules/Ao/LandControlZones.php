@@ -87,7 +87,7 @@ class LandControlZones extends BaseActiveModule
                 "ALTER IGNORE TABLE #___land_control_zones ADD zoneid INT(11) DEFAULT NULL"
             );
             $this->bot->db->query("truncate table #___land_control_zones");
-            $filename = "./Extras/TableData/LcZones.sql";
+            $filename = "./extra/table_data/lc_zones.sql";
             $handle = fopen($filename, "r");
             $query = fread($handle, filesize($filename));
             fclose($handle);
@@ -124,7 +124,7 @@ class LandControlZones extends BaseActiveModule
         elseif (preg_match("/^lc$/i", $msg, $info)) {
             return $this->show_lc("--all--");
         }
-        return false;
+        return FALSE;
     }
 
 

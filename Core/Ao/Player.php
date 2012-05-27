@@ -32,20 +32,20 @@
 class Player
 {
     //Game spesific variables
-    private $uid = false;
-    private $uname = false; //aka nickname
-    private $firstname = false;
-    private $lastname = false;
-    private $breed = false;
-    private $gender = false;
-    private $level = false;
-    private $profession = false;
-    private $ai_level = false;
-    private $organization = false;
-    private $org_rank = false;
+    private $uid = FALSE;
+    private $uname = FALSE; //aka nickname
+    private $firstname = FALSE;
+    private $lastname = FALSE;
+    private $breed = FALSE;
+    private $gender = FALSE;
+    private $level = FALSE;
+    private $profession = FALSE;
+    private $ai_level = FALSE;
+    private $organization = FALSE;
+    private $org_rank = FALSE;
     //Bot spesific variables
-    private $accesslevel = false;
-    private $user_level = false;
+    private $accesslevel = FALSE;
+    private $user_level = FALSE;
     private $preferences = array();
 
 
@@ -109,7 +109,7 @@ class Player
             if ($this->uid instanceof BotError) {
                 //The uid could not be resolved.
                 $this->error = $this->uid;
-                $this->uid = false;
+                $this->uid = FALSE;
                 return $this->error;
             }
         }

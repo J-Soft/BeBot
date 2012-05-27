@@ -1,6 +1,6 @@
 <?php
 /*
-* ModuleCatcher.php - Collects information about Modules available to the bot.
+* ModuleCatcher.php - Collects information about modules available to the bot.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -60,8 +60,8 @@ class ModuleCatcher_Core extends BasePassiveModule
     */
     function connect()
     { // Start function connect()
-        // Load up Core-Modules
-        $folder = dir("./Core/");
+        // Load up core-modules
+        $folder = dir("./core/");
         while ($mod = $folder->read()) {
             if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                 $value = $this->bot->core("ini")->get($mod, "Core");
@@ -70,9 +70,9 @@ class ModuleCatcher_Core extends BasePassiveModule
                 }
             }
         }
-        // Load up game Core-Modules
-        if (is_dir("./Core/" . AOCHAT_GAME . "/")) {
-            $folder = dir("./Core/" . AOCHAT_GAME . "/");
+        // Load up game core-modules
+        if (is_dir("./core/" . $this->bot->game . "/")) {
+            $folder = dir("./core/" . $this->bot->game . "/");
             while ($mod = $folder->read()) {
                 if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                     $value = $this->bot->core("ini")->get($mod, "Core");
@@ -82,9 +82,9 @@ class ModuleCatcher_Core extends BasePassiveModule
                 }
             }
         }
-        // Load up all Custom Core-Modules if the directory exists
-        if (is_dir("./Custom/Core")) {
-            $folder = dir("./Custom/Core/");
+        // Load up all custom core-modules if the directory exists
+        if (is_dir("./custom/core")) {
+            $folder = dir("./custom/core/");
             while ($mod = $folder->read()) {
                 if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                     $value = $this->bot->core("ini")->get($mod, "Custom_Core");
@@ -95,7 +95,7 @@ class ModuleCatcher_Core extends BasePassiveModule
                 }
             }
         }
-        // Load up the Core Modules in the $core_directories config entry
+        // Load up the core modules in the $core_directories config entry
         $core_dirs = explode(",", $this->core_directories);
         foreach ($core_dirs as $core_dir) {
             $core_dir = trim($core_dir);
@@ -114,8 +114,8 @@ class ModuleCatcher_Core extends BasePassiveModule
                 }
             }
         }
-        // Load up all Modules
-        $folder = dir("./Modules/");
+        // Load up all modules
+        $folder = dir("./modules/");
         while ($mod = $folder->read()) {
             if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                 $value = $this->bot->core("ini")->get($mod, "Modules");
@@ -124,9 +124,9 @@ class ModuleCatcher_Core extends BasePassiveModule
                 }
             }
         }
-        // Load up all game Modules
-        if (is_dir("./Modules/" . AOCHAT_GAME . "/")) {
-            $folder = dir("./Modules/" . AOCHAT_GAME . "/");
+        // Load up all game modules
+        if (is_dir("./modules/" . $this->bot->game . "/")) {
+            $folder = dir("./modules/" . $this->bot->game . "/");
             while ($mod = $folder->read()) {
                 if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                     $value = $this->bot->core("ini")->get($mod, "Modules");
@@ -136,9 +136,9 @@ class ModuleCatcher_Core extends BasePassiveModule
                 }
             }
         }
-        // Load up all Custom Modules if the directoy exists
-        if (is_dir("./Custom/Modules")) {
-            $folder = dir("./Custom/Modules/");
+        // Load up all custom modules if the directoy exists
+        if (is_dir("./custom/modules")) {
+            $folder = dir("./custom/modules/");
             while ($mod = $folder->read()) {
                 if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                     $value = $this->bot->core("ini")
@@ -150,7 +150,7 @@ class ModuleCatcher_Core extends BasePassiveModule
                 }
             }
         }
-        // Load up the Modules in the $module_directories config entry
+        // Load up the modules in the $module_directories config entry
         $mod_dirs = explode(",", $this->module_directories);
         foreach ($mod_dirs as $mod_dir) {
             $mod_dir = trim($mod_dir);

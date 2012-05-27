@@ -93,7 +93,7 @@ class PlayerNotes_Core extends BasePassiveModule
         $sql = "INSERT INTO #___player_notes (player, author, note, class, timestamp) ";
         $sql .= "VALUES ('$player', '$author', '$note', $class, " . time() . ")";
         $result = $this->bot->db->query($sql);
-        if ($result !== false) {
+        if ($result !== FALSE) {
             $sql = "SELECT pnid FROM #___player_notes WHERE player = '" . $player . "' ORDER BY pnid DESC LIMIT 1";
             $result = $this->bot->db->select($sql);
             $return["pnid"] = $result[0][0];
@@ -165,7 +165,7 @@ class PlayerNotes_Core extends BasePassiveModule
         $sql .= " ORDER BY pnid " . $order;
         $result = $this->bot->db->select($sql, MYSQL_ASSOC);
         if (empty($result)) {
-            $this->error->set("No notes found for '$player'", false);
+            $this->error->set("No notes found for '$player'", FALSE);
             return ($this->error);
         }
         return $result;

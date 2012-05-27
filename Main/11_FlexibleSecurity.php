@@ -65,12 +65,12 @@ class FlexibleSecurity_Core extends BasePassiveModule
         $this->register_event("cron", "6hour");
         $this->cache = array();
         $this->querynames = array(
-            'level' => 'level',
+            'level'      => 'level',
             'profession' => 'profession',
-            'faction' => 'faction',
-            'rank_id' => 'org_rank_id',
-            'org_id' => 'org_id',
-            'at_id' => 'defender_rank_id'
+            'faction'    => 'faction',
+            'rank_id'    => 'org_rank_id',
+            'org_id'     => 'org_id',
+            'at_id'      => 'defender_rank_id'
         );
         $this->update_table();
         $this->enabled = FALSE;
@@ -99,7 +99,8 @@ class FlexibleSecurity_Core extends BasePassiveModule
                 "security_flexible", "id", "add", "ALTER IGNORE TABLE #___security_flexible ADD `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST"
             );
             $this->bot->db->update_table(
-                "security_flexible", "condition", "modify", "ALTER IGNORE TABLE #___security_flexible CHANGE `condition` `op` ENUM( '=', '<', '<=', '>', '>=', '!=', '&&', '||' )"
+                "security_flexible", "condition", "modify",
+                "ALTER IGNORE TABLE #___security_flexible CHANGE `condition` `op` ENUM( '=', '<', '<=', '>', '>=', '!=', '&&', '||' )"
             );
         }
         $this->bot->db->set_version("security_flexible", 2);

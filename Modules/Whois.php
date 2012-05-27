@@ -103,21 +103,21 @@ class Whois extends BaseActiveModule
     function whois_player($source, $name, $origin)
     {
         $name = ucfirst(strtolower($name));
-        if (strtolower(AOCHAT_GAME) == "aoc") {
+        if ($this->bot->game == "aoc") {
             $this->name[$name] = $source;
             $this->origin[$name] = $origin;
         }
         $who = $this->bot->core("whois")->lookup($name);
         if (!$who || ($who instanceof BotError)) {
-            return false;
+            return FALSE;
         }
-        if (strtolower(AOCHAT_GAME) == "aoc") {
+        if ($this->bot->game == "aoc") {
             unset($this->name[$name]);
             unset($this->origin[$name]);
         }
         $result = "##whois_name##" . $who["nickname"] . "##end## is a level ";
         $result .= "##whois_level##" . $who["level"] . "##end##";
-        if (strtolower(AOCHAT_GAME) == "ao") {
+        if ($this->bot->game == "ao") {
             $result .= "/##whois_alienlevel##" . $who["at_id"] . "##end## " . $who["breed"];
         }
         $result .= " ##whois_profession##";
@@ -128,7 +128,7 @@ class Whois extends BaseActiveModule
         else {
             $result .= $who["profession"];
         }
-        if (strtolower(AOCHAT_GAME) == "ao") {
+        if ($this->bot->game == "ao") {
             $result .= "##end##, ";
         }
         if (!empty($who["rank"])) {
@@ -150,7 +150,7 @@ class Whois extends BaseActiveModule
             }
             $result .= "##end##, ";
         }
-        if (strtolower(AOCHAT_GAME) == "ao") {
+        if ($this->bot->game == "ao") {
             $result .= "##" . $who["faction"] . "##" . $who["faction"] . "##end##";
         }
         if ($this->bot->core("settings")->get("whois", "banned")) {

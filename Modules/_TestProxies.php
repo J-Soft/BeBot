@@ -54,7 +54,7 @@ class testproxy extends BaseActiveModule
         foreach ($this->bot->proxy_server_address as $proxy) {
             $result = $this->bot->core("tools")
                 ->get_site_data($url, $strip_headers, $server_timeout, $read_timeout, $proxy);
-            if ($result["error"] == true || $result["error"] == 1) {
+            if ($result["error"] == TRUE || $result["error"] == 1) {
                 $status = "Failed\n" . $result["errordesc"];
             }
             else {

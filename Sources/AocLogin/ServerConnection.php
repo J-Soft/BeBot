@@ -53,19 +53,19 @@ class ServerConnection
         $this->m_Socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if (!is_resource($this->m_Socket)) {
             echo("[" . $this->m_LogName . "] Could not create a socket\n");
-            return false;
+            return FALSE;
         }
 
-        if (@socket_connect($this->m_Socket, $this->m_ServerAddress, $this->m_ServerPort) === false) {
+        if (@socket_connect($this->m_Socket, $this->m_ServerAddress, $this->m_ServerPort) === FALSE) {
             socket_close($this->m_Socket);
             $this->m_Socket = NULL;
             echo("[" . $this->m_LogName . "] Could not connect to " . $this->m_ServerAddress . ":" . $this->m_ServerPort . "\n");
-            return false;
+            return FALSE;
         }
 
         echo("[" . $this->m_LogName . "] Connected to " . $this->m_ServerAddress . ":" . $this->m_ServerPort . "\n");
 
-        return true;
+        return TRUE;
     }
 
 
@@ -99,8 +99,8 @@ class ServerConnection
     {
         // Read the header
         $headerStream = $this->ReadNetworkData(4);
-        if ($headerStream == null) {
-            return null;
+        if ($headerStream == NULL) {
+            return NULL;
         }
         $packetsize = $headerStream->ReadUInt32();
 
@@ -140,7 +140,7 @@ class ServerConnection
 
                 $rpcID = $header->method_instance();
 
-                if (isset($rpcID) == false) {
+                if (isset($rpcID) == FALSE) {
                     $rpcID = -1;
                 }
             }
@@ -235,14 +235,14 @@ class ServerConnection
         $rlen = $len;
 
         while ($rlen > 0) {
-            if (($tmp = socket_read($this->m_Socket, $rlen)) === false) {
+            if (($tmp = socket_read($this->m_Socket, $rlen)) === FALSE) {
                 if (!is_resource($this->m_Socket)) {
                     $this->Disconnect("Socket read error");
                     die("Read error: $last_error\n");
                 }
                 else {
                     printf("Read error: %s\n", socket_strerror(socket_last_error($this->m_Socket)));
-                    return null;
+                    return NULL;
                 }
             }
 
@@ -254,7 +254,7 @@ class ServerConnection
                     die("Read error: Too many EOF errors, disconnecting.\n");
                 }
                 else {
-                    return null;
+                    return NULL;
                 }
             }
 

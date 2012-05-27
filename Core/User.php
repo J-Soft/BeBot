@@ -65,7 +65,7 @@ class User_Core extends BasePassiveModule
     */
     function add($source, $name, $id = FALSE, $user_level, $silent = 0)
     {
-        $change_level = false;
+        $change_level = FALSE;
         $name = ucfirst(strtolower($name));
         // Check if we have been passed a name at all
         if (empty($name)) {
@@ -95,7 +95,7 @@ class User_Core extends BasePassiveModule
             }
             else {
                 if (($result[0][1] != $user_level && $user_level > 0)) {
-                    $change_level = true;
+                    $change_level = TRUE;
                 }
                 else {
                     $this->error->set("##highlight##" . $result[0][0] . "##end## is already a member.");
@@ -127,12 +127,12 @@ class User_Core extends BasePassiveModule
                 return $this->error;
             }
         }
-        if (strtolower(AOCHAT_GAME) == "ao") {
+        if ($this->bot->game == "ao") {
             // Add the user to the whois cache.
             // If we are just adding the user to the whois cache, why do any error checking here if we are not going to actually use the data for anything?
             // When adding a new alt that has just been created there will not be any whois data to lookup anyways.
             $this->bot->core("whois")->lookup($name);
-            /*			$members = $this->bot->Core("whois")->lookup($name);
+            /*			$members = $this->bot->core("whois")->lookup($name);
                 if ($members instanceof BotError)
                 {
                     $this->bot->log("USER", "ERROR", "Could not lookup $name whois.");
@@ -302,48 +302,52 @@ class User_Core extends BasePassiveModule
             return $this->error;
         }
         //Make sure we are not trying to delete a banned member.
-        else if ($result[0][1] == -1) {
-            $this->error->set("##highlight##" . $name . "##end## is banned and cannot be deleted.");
-            return $this->error;
-        }
         else {
-            if ($new_id = $this->bot->core("player")->id($name)) {
-                // Make sure we have a sane userid to work with to determine if the user exsists.
-                if ($id == 0) {
-                    $id = $result[0][0];
-                }
-                // Check if we are dealing with a rerolled character, if thats the case we need to handle it specially since we don't physically delete characters.
-                else if ($id != $new_id) {
-                    $reroll = 1;
-                }
+            if ($result[0][1] == -1) {
+                $this->error->set("##highlight##" . $name . "##end## is banned and cannot be deleted.");
+                return $this->error;
             }
             else {
-                $deleted = 1;
-            }
-            // The character
-            if ($reroll == 1 || $deleted == 1) {
-                $this->bot->db->query("DELETE FROM #___users WHERE nickname = '" . $name . "'");
-            }
-            else {
-                $this->bot->db->query("DELETE FROM #___users WHERE char_id = " . $id);
-                $this->bot->core("chat")->buddy_remove($id);
-            }
-            if ($deleted != 1 && $rerolled != 1 && $silent == 0) {
-                $this->bot->send_tell($name, "##highlight##" . $source . "##end## has removed you from the bot.");
-            }
-            // Make sure the security cache is up-to-date:
-            if ($result[0][2] > 0) {
-                if ($result[0][2] == 1) {
-                    $cache = 'guests';
+                if ($new_id = $this->bot->core("player")->id($name)) {
+                    // Make sure we have a sane userid to work with to determine if the user exsists.
+                    if ($id == 0) {
+                        $id = $result[0][0];
+                    }
+                    // Check if we are dealing with a rerolled character, if thats the case we need to handle it specially since we don't physically delete characters.
+                    else {
+                        if ($id != $new_id) {
+                            $reroll = 1;
+                        }
+                    }
                 }
                 else {
-                    $cache = 'members';
+                    $deleted = 1;
                 }
-                $this->bot->core("security")->cache_mgr("rem", $cache, $name);
+                // The character
+                if ($reroll == 1 || $deleted == 1) {
+                    $this->bot->db->query("DELETE FROM #___users WHERE nickname = '" . $name . "'");
+                }
+                else {
+                    $this->bot->db->query("DELETE FROM #___users WHERE char_id = " . $id);
+                    $this->bot->core("chat")->buddy_remove($id);
+                }
+                if ($deleted != 1 && $rerolled != 1 && $silent == 0) {
+                    $this->bot->send_tell($name, "##highlight##" . $source . "##end## has removed you from the bot.");
+                }
+                // Make sure the security cache is up-to-date:
+                if ($result[0][2] > 0) {
+                    if ($result[0][2] == 1) {
+                        $cache = 'guests';
+                    }
+                    else {
+                        $cache = 'members';
+                    }
+                    $this->bot->core("security")->cache_mgr("rem", $cache, $name);
+                }
+                $this->bot->core("online")->logoff($name);
+                $this->bot->core("notify")->update_cache();
+                return "##highlight##" . $name . "##end## has been erased from member list.";
             }
-            $this->bot->core("online")->logoff($name);
-            $this->bot->core("notify")->update_cache();
-            return "##highlight##" . $name . "##end## has been erased from member list.";
         }
     }
 

@@ -123,12 +123,12 @@ class Quotes extends BaseActiveModule
             $num = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
             $result = $this->bot->db->select("SELECT * FROM #___quotes");
             if (!empty($result)) {
-                $found = false;
-                while ($found == false) {
+                $found = FALSE;
+                while ($found == FALSE) {
                     $row = $this->bot->core("tools")->my_rand(0, $num[0][0]);
                     if (!empty($result[$row][0])) {
                         $strquote = "#" . $result[$row][0] . " - " . $result[$row][1] . " [Contributed by: " . $result[$row][2] . "]";
-                        $found = true;
+                        $found = TRUE;
                     }
                 }
             }
@@ -156,12 +156,12 @@ class Quotes extends BaseActiveModule
         $num = $this->bot->db->select("SELECT id FROM #___quotes WHERE quote LIKE '" . $qtext . "'");
         $result = $this->bot->db->select("SELECT * FROM #___quotes");
         if ($num[0][0] > 0) {
-            $found = false;
-            while ($found == false) {
+            $found = FALSE;
+            while ($found == FALSE) {
                 $row = $this->bot->core("tools")->my_rand(0, $num[0][0]);
                 if (!empty($result[$row][0])) {
                     $strquote = "#" . $result[$row][0] . " - " . $result[$row][1] . " [Contributed by: " . $result[$row][2] . "]";
-                    $found = true;
+                    $found = TRUE;
                 }
             }
         }

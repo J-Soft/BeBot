@@ -143,7 +143,7 @@ class ping extends BaseActiveModule
         case 3:
             return "chat.d3.funcom.com";
         default:
-            return false;
+            return FALSE;
         }
     }
 }

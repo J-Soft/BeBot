@@ -127,7 +127,7 @@ class Whois_Core extends BasePassiveModule
         $this->bot->core("settings")
             ->create('Whois', 'LookupOrder', 'funcom_auno', 'Which order should we use to look up players information?', 'funcom_auno;auno_funcom;funcom_only;auno_only');
         $this->bot->core("settings")
-            ->create('Whois', "Debug", False, "Show debug information (such as Character ID, Org ID, etc)");
+            ->create('Whois', "Debug", FALSE, "Show debug information (such as Character ID, Org ID, etc)");
         $this->update_table();
     }
 
@@ -275,7 +275,7 @@ class Whois_Core extends BasePassiveModule
      *
      * @return The WHO array, or false, or BotError
      */
-    function lookup($name, $noupdate = false, $nowait = false)
+    function lookup($name, $noupdate = FALSE, $nowait = FALSE)
     {
         if ($this->bot->core("settings")->get("Statistics", "Enabled")) {
             $this->bot->core("statistics")

@@ -83,9 +83,9 @@ class Log extends BaseActiveModule
     /*
     Starts a Log
     */
-    function show_log($category = false)
+    function show_log($category = FALSE)
     {
-        if ($category === false) {
+        if ($category === FALSE) {
             $results = $this->bot->db->select("SELECT DISTINCT first FROM #___log_message ORDER BY first");
             $inside .= $this->bot->core("tools")
                 ->chatcmd(

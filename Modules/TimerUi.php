@@ -137,7 +137,7 @@ class TimerGUI extends BaseActiveModule
                 return $this->update_timer_setting($info[1], $info[2]);
             }
         default:
-            return false;
+            return FALSE;
         }
     }
 
@@ -155,7 +155,7 @@ class TimerGUI extends BaseActiveModule
                 ->get("Timer", "MinRepeatInterval") . "##end## seconds!";
         }
         $this->bot->core("timer")
-            ->add_timer(false, $owner, $duration, $name, $channel, $repeat, $class);
+            ->add_timer(FALSE, $owner, $duration, $name, $channel, $repeat, $class);
         $msg = "Timer ##highlight##" . $name . " ##end##with ##highlight##" . $this->bot
             ->core("time")
             ->format_seconds($duration) . " ##end##runtime started!";
@@ -210,7 +210,7 @@ class TimerGUI extends BaseActiveModule
 
     function rem_timer($name, $id)
     {
-        return $this->bot->core("timer")->del_timer($name, $id, false);
+        return $this->bot->core("timer")->del_timer($name, $id, FALSE);
     }
 
 

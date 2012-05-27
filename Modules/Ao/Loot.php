@@ -92,7 +92,7 @@ class Rolls extends BaseActiveModule
             }
             else {
                 if (preg_match("/^add ([0-9]+)/i", $msg, $info)) {
-                    $this->add($name, $info[1], false);
+                    $this->add($name, $info[1], FALSE);
                 }
                 else {
                     if (preg_match("/^list/i", $msg)) {
@@ -155,7 +155,7 @@ class Rolls extends BaseActiveModule
             $this->addmsg = "##loot_highlight##" . $name . "##end## removed from all slots.";
         }
         else {
-            $present = false;
+            $present = FALSE;
             if ($this->loot[$slot]) {
                 if ($this->bot->core("settings")
                     ->get('Loot', 'Roll') == "SINGLE"
@@ -166,11 +166,11 @@ class Rolls extends BaseActiveModule
                         foreach ($list as $playerslot => $player) {
                             if ($player == $name) {
                                 unset($this->loot[$sslot][$player]);
-                                $present = true;
+                                $present = TRUE;
                             }
                         }
                     }
-                    if ($present == true) {
+                    if ($present == TRUE) {
                         $this->addmsg = "##loot_highlight##" . $name . "##end## changed to slot##loot_highlight## #" . $slot . "##end##";
                     }
                     else {
@@ -193,12 +193,12 @@ class Rolls extends BaseActiveModule
 
     function loot($msg, $name)
     {
-        $notyet = true;
+        $notyet = TRUE;
         for ($i = 1; $i <= $this->count; $i++) {
             if ($msg == $this->loot[$i]['item']) {
                 $this->loot[$i]['num']++;
                 $num = $this->loot[$i]['num'];
-                $notyet = false;
+                $notyet = FALSE;
                 $numslot = $i;
             }
         }
@@ -272,12 +272,12 @@ class Rolls extends BaseActiveModule
         else {
             $this->count = 0;
             foreach ($this->leftovers as $item) {
-                $notyet = true;
+                $notyet = TRUE;
                 for ($i = 1; $i <= $this->count; $i++) {
                     if ($item == $this->loot[$i][item]) {
                         $this->loot[$i][num]++;
                         $num = $this->loot[$i][num];
-                        $notyet = false;
+                        $notyet = FALSE;
                         $numslot = $i;
                     }
                 }

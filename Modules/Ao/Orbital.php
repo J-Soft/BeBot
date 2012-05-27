@@ -59,7 +59,7 @@ class Orbital extends BasePassiveModule
         if (preg_match('/Blammo! (.+) has launched an orbital attack!/i', $msg, $info)) {
             $this->bot->core("timer")
                 ->add_timer(
-                false, $info[1], 60 * 15 + 1, "One type of orbital strike is ready again for " . $this->bot
+                FALSE, $info[1], 60 * 15 + 1, "One type of orbital strike is ready again for " . $this->bot
                 ->core("shortcuts")
                 ->get_short($this->bot->guildname), "gc", 0, "OrbitalWarning"
             );

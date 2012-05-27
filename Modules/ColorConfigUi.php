@@ -85,7 +85,7 @@ class ColorConfig extends BaseActiveModule
         elseif (preg_match("/^theme import ([a-z01-9_-]+)$/i", $msg, $info)) {
             return $this->import_schemes($info[1]);
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -106,7 +106,7 @@ class ColorConfig extends BaseActiveModule
 
 
     /*
-    Shows the existing Modules with color settings:
+    Shows the existing modules with color settings:
     */
     function color_menu()
     {
@@ -192,7 +192,7 @@ class ColorConfig extends BaseActiveModule
     function show_themes()
     {
         $blob = "##blob_title##Themes available##end##\n";
-        $folder = dir("./Themes/");
+        $folder = dir("./themes/");
         while ($themefile = $folder->read()) {
             if (!is_dir($themefile) && preg_match("/(.*)\.colors\.xml$/i", $themefile, $info)) {
                 if (strcasecmp(
@@ -229,7 +229,7 @@ class ColorConfig extends BaseActiveModule
     function show_scheme_files()
     {
         $blob = "##blob_title##Scheme files available##end##\n";
-        $folder = dir("./Themes/");
+        $folder = dir("./themes/");
         while ($schemefile = $folder->read()) {
             if (!is_dir($schemefile) && preg_match("/(.*)\.scheme\.xml$/i", $schemefile, $info)) {
                 $blob .= "\n" . $this->bot->core("tools")

@@ -32,7 +32,7 @@
 *  USA
 */
 /*
-* This class offers a couple of functions to all other Modules to handle timed events:
+* This class offers a couple of functions to all other modules to handle timed events:
 * - add_timer($relaying, $owner, $duration, $name, $channel, $repeat, $class = "")
 *	$relaying is a boolean that has to be true if the timer is created over some relay, to avoid relay loops
 *	$owner is the nickname of the owner of the timer
@@ -171,7 +171,7 @@ class Timer_Core extends BasePassiveModule
         $this->update_next_timer();
         $this->modules = array();
         // Lock down timer checking until we are connected to the chatserver:
-        $this->checking = true;
+        $this->checking = TRUE;
         $classid = $this->create_timer_class('Standard', 'Standard timer class with default notifications.');
         $nextid = $this->create_timer_class_entry($classid, -1, 10, 'Timer', 'has 10 seconds left');
         $nextid = $this->create_timer_class_entry($classid, $nextid, 30, 'Timer', 'has 30 seconds left');
@@ -232,7 +232,7 @@ class Timer_Core extends BasePassiveModule
     function connect()
     {
         // Unlock timers after connect:
-        $this->checking = false;
+        $this->checking = FALSE;
     }
 
 
@@ -257,7 +257,7 @@ class Timer_Core extends BasePassiveModule
             return;
         }
         // Lock function:
-        $this->checking = true;
+        $this->checking = TRUE;
         // Get all timers ending now as well as all notifications to do now
         $timers = $this->get_all_timer_notifications($thistime);
         if (!empty($timers)) {
@@ -327,7 +327,7 @@ class Timer_Core extends BasePassiveModule
         }
         $this->update_next_timer();
         // Unlock function:
-        $this->checking = false;
+        $this->checking = FALSE;
     }
 
 
@@ -386,14 +386,14 @@ class Timer_Core extends BasePassiveModule
         ) {
             $msg = "<pre>relaytimer class:" . $class . " endtime:" . $endtime . " owner:" . $owner . " repeat:" . $repeat;
             $msg .= " channel:" . $channel . " name:" . $name;
-            $this->bot->core("relay")->relay_to_bot($msg, false);
+            $this->bot->core("relay")->relay_to_bot($msg, FALSE);
         }
         $this->update_next_timer();
         return $timerid[0][0];
     }
 
 
-    function del_timer($deleter, $id, $silent = true)
+    function del_timer($deleter, $id, $silent = TRUE)
     {
         $deleter = ucfirst(strtolower($deleter));
         $deltimer = $this->bot->db->select("SELECT owner, name FROM #___timer WHERE id = " . $id);
@@ -401,23 +401,23 @@ class Timer_Core extends BasePassiveModule
             $this->error->set("Invalid timer ID!");
             return $this->error;
         }
-        $dodelete = false;
-        $admin = false;
+        $dodelete = FALSE;
+        $admin = FALSE;
         if (ucfirst(strtolower($deltimer[0][0])) == $deleter) {
-            $dodelete = true;
+            $dodelete = TRUE;
         }
         elseif ($this->bot->core("alts")->main($deleter) == $this->bot
             ->core("alts")->main($deltimer[0][0])
         ) {
-            $dodelete = true;
+            $dodelete = TRUE;
         }
         elseif ($this->bot->core("security")->check_access(
             $deleter, $this->bot
                 ->core("settings")->get("Timer", "DeleteRank")
         )
         ) {
-            $dodelete = true;
-            $admin = true;
+            $dodelete = TRUE;
+            $admin = TRUE;
         }
         if (!$dodelete) {
             $this->error->set("You are not allowed to delete this timer!");
@@ -569,7 +569,7 @@ class Timer_Core extends BasePassiveModule
         if (isset($this->modules[strtolower($modulename)])) {
             $this->modules[strtolower($modulename)] = NULL;
             unset($this->modules[strtolower($modulename)]);
-            return false;
+            return FALSE;
         }
         return "Invalid modulename $modulename or timer callback not registered!";
     }
@@ -626,9 +626,9 @@ class Timer_Core extends BasePassiveModule
             $class_id = $this->get_class_id($new_class_name);
             $this->bot->db->query("UPDATE #___timer_class_settings SET current_class = " . $class_id . " WHERE id = " . $class_setting[0]['id']);
             $this->settings_cache[strtolower(mysql_real_escape_string($name))] = $class_id;
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 

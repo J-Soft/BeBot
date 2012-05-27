@@ -186,10 +186,10 @@ class Is extends BaseActiveModule
                         }
                     }
                     //Check if all alts of this toon has been checked.
-                    $complete = true;
+                    $complete = TRUE;
                     foreach ($targets as $player => $status) {
                         if (!in_array($player, $this->special_entries) && $status !== 'Online' && $status !== 'Offline') {
-                            $complete = false;
+                            $complete = FALSE;
                         }
                     }
                     if ($complete) {

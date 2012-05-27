@@ -50,7 +50,7 @@ class AOChatWrapper_Core extends BasePassiveModule
 
 
     /*
-    This is a wrapper function for Aoc->get_uid() that checks the whois cache if Aoc->get_uid() fails
+    This is a wrapper function for aoc->get_uid() that checks the whois cache if aoc->get_uid() fails
     */
     function get_uid($user)
     {
@@ -63,7 +63,7 @@ class AOChatWrapper_Core extends BasePassiveModule
 
 
     /*
-    This is a wrapper function for Aoc->get_uname() that checks the whois cache if Aoc->get_uname() failes
+    This is a wrapper function for aoc->get_uname() that checks the whois cache if aoc->get_uname() failes
     */
     function get_uname($user)
     {
@@ -78,7 +78,7 @@ class AOChatWrapper_Core extends BasePassiveModule
     /* Buddies */
     function buddy_add($user, $que = TRUE)
     {
-        $add = true;
+        $add = TRUE;
         if (is_numeric($user)) {
             $uid = $user;
         }
@@ -120,7 +120,7 @@ class AOChatWrapper_Core extends BasePassiveModule
                         "BUDDY", "BUDDY-ADD", $this->bot
                             ->core('player')->name($uid)
                     );
-                    return true;
+                    return TRUE;
                 }
                 else {
                     $return = $this->bot->core("buddy_queue")
@@ -129,7 +129,7 @@ class AOChatWrapper_Core extends BasePassiveModule
                 }
             }
             else {
-                return false;
+                return FALSE;
             }
         }
     }
@@ -137,19 +137,19 @@ class AOChatWrapper_Core extends BasePassiveModule
 
     function buddy_remove($user)
     {
-        $add = false;
+        $add = FALSE;
         if (empty($user)
             || ($uid = $this->bot->core('player')
-                ->id($user)) === false
+                ->id($user)) === FALSE
         ) {
-            return false;
+            return FALSE;
         }
         else {
             if (($this->bot->aoc->buddy_exists($uid))) {
                 if ($this->bot->core("buddy_queue")->check_queue()) {
                     $this->bot->aoc->buddy_remove($uid);
                     $this->bot->log("BUDDY", "BUDDY-DEL", $this->get_uname($uid));
-                    return true;
+                    return TRUE;
                 }
                 else {
                     $return = $this->bot->core("buddy_queue")
@@ -158,7 +158,7 @@ class AOChatWrapper_Core extends BasePassiveModule
                 }
             }
             else {
-                return false;
+                return FALSE;
             }
         }
     }
@@ -182,7 +182,7 @@ class AOChatWrapper_Core extends BasePassiveModule
     function pgroup_join($group)
     {
         if ($group == NULL) {
-            return false;
+            return FALSE;
         }
         $this->bot->log("PGRP", "ACCEPT", "Accepting Invite for Private Group [" . $group . "]");
         return $this->bot->aoc->privategroup_join($group);
@@ -195,7 +195,7 @@ class AOChatWrapper_Core extends BasePassiveModule
     function pgroup_leave($group)
     {
         if ($group == NULL) {
-            return false;
+            return FALSE;
         }
         $this->bot->log("PGRP", "LEAVE", "Leaving Private Group [" . $group . "]");
         return $this->bot->aoc->privategroup_leave($group);

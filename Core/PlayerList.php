@@ -43,13 +43,13 @@ class PlayerList extends BasePassiveModule
         //$dispatcher = Event_Dispatcher2::getInstance();
         //$dispatcher->addObserver(array($this , 'signal_handle'), 'onPlayerName');
         $this->bot->dispatcher->connect(
-            'Core.on_player_name', array(
+            'core.on_player_name', array(
                 $this,
                 'signal_handle'
             )
         );
         $this->bot->dispatcher->connect(
-            'Core.on_player_id', array(
+            'core.on_player_id', array(
                 $this,
                 'signal_handle'
             )
@@ -63,7 +63,7 @@ class PlayerList extends BasePassiveModule
         //list ($uid, $uname) = $data->message;
 
         /*
-        echo "Debug Core.on_player_name and on_player_id ";
+        echo "Debug core.on_player_name and on_player_id ";
         var_dump($data['id']);
         echo " " . $data['name'];
         echo "\n";
@@ -75,7 +75,7 @@ class PlayerList extends BasePassiveModule
             echo "Was NOT added due to invalid userID\n";
         }
 
-        return true;
+        return TRUE;
     }
 
 
@@ -90,11 +90,11 @@ class PlayerList extends BasePassiveModule
         }
 
         $this->namecache[$name] = array(
-            'id' => $id,
+            'id'     => $id,
             'expire' => time() + 21600
         );
         $this->uidcache[$id] = array(
-            'name' => $name,
+            'name'   => $name,
             'expire' => time() + 21600
         );
     }
@@ -104,7 +104,7 @@ class PlayerList extends BasePassiveModule
     {
         if ($uname instanceof BotError) {
 
-            $this->bot->log("DEBUG", "PlayerList", "FIXME: Core/PlayerList.php function id recieving BotError as " . $uname . "\nError is: " . $uname->get() . "\n");
+            $this->bot->log("DEBUG", "PlayerList", "FIXME: core/PlayerList.php function id recieving BotError as " . $uname . "\nError is: " . $uname->get() . "\n");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
             return $uname;
         }
@@ -216,7 +216,7 @@ class PlayerList extends BasePassiveModule
 
     public function exists($user)
     {
-        $return = false;
+        $return = FALSE;
         if (empty($user)) {
             $this->error->set("exist() called with empty string.");
             $this->bot->log("DEBUG", "PlayerList", "exist() called with empty string.");

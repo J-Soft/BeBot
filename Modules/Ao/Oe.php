@@ -56,7 +56,7 @@ class Oe extends BaseActiveModule
         else {
             $this->bot->send_help($name);
         }
-        return false;
+        return FALSE;
     }
 
 

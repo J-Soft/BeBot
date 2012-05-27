@@ -53,7 +53,7 @@ class Queue_Core extends BasePassiveModule
     */
     function __construct(&$bot)
     {
-        parent::__construct(&$bot, get_class($this));
+        parent::__construct($bot, get_class($this));
 
         $this->register_module("queue");
         $this->register_event("cron", "1sec");
@@ -141,9 +141,9 @@ class Queue_Core extends BasePassiveModule
         $this->set_queue($name);
         if (($this->queue_left[$name] >= 1) && empty($this->queue[$name]) && empty($this->queue_low[$name])) {
             $this->queue_left[$name] -= 1;
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 

@@ -36,48 +36,48 @@ class PB extends BaseActiveModule
 {
     private $slots
         = array(
-            'ocullar' => 'eye',
-            'brain' => 'head',
-            'right arm' => 'rarm',
-            'left arm' => 'larm',
+            'ocullar'     => 'eye',
+            'brain'       => 'head',
+            'right arm'   => 'rarm',
+            'left arm'    => 'larm',
             'right wrist' => 'rwrist',
-            'left wrist' => 'lwrist',
-            'right hand' => 'rhand',
-            'thigh' => 'legs',
-            'left hand' => 'lhand'
+            'left wrist'  => 'lwrist',
+            'right hand'  => 'rhand',
+            'thigh'       => 'legs',
+            'left hand'   => 'lhand'
         );
     private $profs
         = array(
-            'adventurer' => 'adv',
-            'agent' => 'agent',
-            'bureaucrat' => 'crat',
-            'doctor' => 'doc',
-            'enforcer' => 'enf',
-            'engineer' => 'eng',
-            'fixer' => 'fixer',
-            'keeper' => 'keeper',
-            'martial artist' => 'ma',
-            'meta-physicist' => 'mp',
+            'adventurer'      => 'adv',
+            'agent'           => 'agent',
+            'bureaucrat'      => 'crat',
+            'doctor'          => 'doc',
+            'enforcer'        => 'enf',
+            'engineer'        => 'eng',
+            'fixer'           => 'fixer',
+            'keeper'          => 'keeper',
+            'martial artist'  => 'ma',
+            'meta-physicist'  => 'mp',
             'nano-technician' => 'nt',
-            'soldier' => 'sol',
-            'trader' => 'trader'
+            'soldier'         => 'sol',
+            'trader'          => 'trader'
         );
     private $units
         = array(
-            'adv' => array(
+            'adv'    => array(
                 'infantry',
                 'artillery',
                 'support'
             ),
-            'agent' => array('artillery'),
-            'crat' => array(
+            'agent'  => array('artillery'),
+            'crat'   => array(
                 'control',
                 'extermination'
             ),
-            'doc' => array('support'),
-            'enf' => array('infantry'),
-            'eng' => array('control'),
-            'fixer' => array(
+            'doc'    => array('support'),
+            'enf'    => array('infantry'),
+            'eng'    => array('control'),
+            'fixer'  => array(
                 'artillery',
                 'support'
             ),
@@ -85,17 +85,17 @@ class PB extends BaseActiveModule
                 'infantry',
                 'support'
             ),
-            'ma' => array(
+            'ma'     => array(
                 'infantry',
                 'support'
             ),
-            'mp' => array(
+            'mp'     => array(
                 'control',
                 'extermination',
                 'support'
             ),
-            'nt' => array('extermination'),
-            'sol' => array('artillery'),
+            'nt'     => array('extermination'),
+            'sol'    => array('artillery'),
             'trader' => array(
                 'artillery',
                 'control',
@@ -129,23 +129,23 @@ class PB extends BaseActiveModule
 Switch($this -> bot -> db -> get_version("symbiants"))
 {
 case 1:
-    $filename = "./Extras/Symbiants/Symbiants.sql";
-    $handle = fopen($filename, "r");
-    $query = fread($handle, filesize($filename));
-    fclose($handle);
-    $query = explode(";
+$filename = "./extra/symbiants/symbiants.sql";
+$handle = fopen($filename, "r");
+$query = fread($handle, filesize($filename));
+fclose($handle);
+$query = explode(";
 ", $query);
-    foreach($query as $q)
-    {
-        $this -> bot -> db -> query($q);
-    }
+foreach($query as $q)
+{
+    $this -> bot -> db -> query($q);
+}
 }
 $this -> bot -> db -> set_version("symbiants", 2); */
         $this->bot->db->define_tablename("pocketbosses", "false");
         Switch ($this->bot->db->get_version("pocketbosses")) {
         case 1:
         case 2:
-            $filename = "./Extras/Symbiants/PocketBosses.sql";
+            $filename = "./extra/symbiants/pocketbosses.sql";
             $handle = fopen($filename, "r");
             $query = fread($handle, filesize($filename));
             fclose($handle);
@@ -276,7 +276,7 @@ $this -> bot -> db -> set_version("symbiants", 2); */
     function SearchPB($search)
     {
         $boss = $this->best_match($search);
-        if ($boss === false) {
+        if ($boss === FALSE) {
             return ("I found no pocket boss like '$search'");
         }
         $query = "SELECT ID, name, level, Playfield, Place, pattern_mobs FROM #___pocketbosses WHERE name LIKE '$boss'";
@@ -304,7 +304,7 @@ $this -> bot -> db -> set_version("symbiants", 2); */
         $query = "SELECT Playfield, name FROM #___pocketbosses ORDER BY Playfield, level, name";
         $bosslist = $this->bot->db->select($query);
         $window = "##blob_title## :::  Pocket Bosses  :::##end####blob_text##\n";
-        $area = false;
+        $area = FALSE;
         foreach ($bosslist as $boss) {
             if ($boss[0] !== $area) {
                 $area = $boss[0];

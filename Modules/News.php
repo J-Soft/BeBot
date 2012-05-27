@@ -92,7 +92,7 @@ class News extends BaseActiveModule
     }
 
 
-    function notify($name, $startup = false)
+    function notify($name, $startup = FALSE)
     {
         if (!$startup) {
             switch ($this->bot->core("prefs")->get($name, "News", "Logonspam")) {
@@ -256,7 +256,7 @@ class News extends BaseActiveModule
         $query = "SELECT name, news from #___news WHERE type = '2' ORDER BY time DESC LIMIT 1";
         $news = $this->bot->db->select($query, MYSQL_ASSOC);
         if (empty($news)) {
-            return false;
+            return FALSE;
         }
         else {
             $news = $news[0]['name'] . ':##highlight## ' . $news[0]['news'] . "##end##\n";

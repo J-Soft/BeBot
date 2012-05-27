@@ -159,7 +159,7 @@ class AFK extends BaseActiveModule
 
     function msg_check($name, $group, $msg)
     {
-        $found = false;
+        $found = FALSE;
         foreach ($this->afk as $key => $value) {
             if (preg_match("/$key\b/i", $msg)) {
                 $this->afkmsgs[$key][] = array(
@@ -213,14 +213,14 @@ class AFK extends BaseActiveModule
     }
 
 
-    function gone($name, $msg = false)
+    function gone($name, $msg = FALSE)
     {
         if (empty($msg)) {
             $msg = "Away from keyboard";
         }
         $this->afk[$name] = array(
             'time' => time(),
-            'msg' => $msg
+            'msg'  => $msg
         );
         // Add Aliases to AFK list
         $main = $this->bot->core("alts")->main($name);
@@ -259,10 +259,10 @@ class AFK extends BaseActiveModule
     function acheck($name)
     {
         if (isset($this->afk[$name])) {
-            return true;
+            return TRUE;
         }
         else {
-            return false;
+            return FALSE;
         }
     }
 
@@ -274,7 +274,7 @@ class AFK extends BaseActiveModule
             if ($this->acheck($name)) {
                 $this->back($name);
                 $msgs = $this->msgs($name);
-                if (strtolower(AOCHAT_GAME) == "ao") {
+                if ($this->bot->game == "ao") {
                     $this->bot->send_tell($name, "you have been set as back. " . $msgs . "");
                 }
             }
@@ -284,7 +284,7 @@ class AFK extends BaseActiveModule
                 if (!$this->acheck($name)) {
                     $this->gone($name);
                     $msgs = $this->msgs($name);
-                    if (strtolower(AOCHAT_GAME) == "ao") {
+                    if ($this->bot->game == "ao") {
                         $this->bot->send_tell($name, "you have been set as AFK. " . $msgs . "");
                     }
                 }

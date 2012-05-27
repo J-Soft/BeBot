@@ -47,7 +47,7 @@ class BasePassiveModule
     }
 
 
-    protected function register_event($event, $target = false)
+    protected function register_event($event, $target = FALSE)
     {
         $ret = $this->bot->register_event($event, $target, $this);
         if ($ret) {
@@ -56,7 +56,7 @@ class BasePassiveModule
     }
 
 
-    protected function unregister_event($event, $target = false)
+    protected function unregister_event($event, $target = FALSE)
     {
         $ret = $this->bot->unregister_event($event, $target, $this);
         if ($ret) {
@@ -82,9 +82,9 @@ class BasePassiveModule
     }
 
 
-    protected function output($name, $msg, $channel = false)
+    protected function output_destination($name, $msg, $channel = FALSE)
     {
-        if ($channel !== false) {
+        if ($channel !== FALSE) {
             if ($channel & SAME) {
                 if ($channel & $this->source) {
                     $channel -= SAME;

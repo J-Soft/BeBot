@@ -137,12 +137,12 @@ class Mail extends BaseActiveModule
     }
 
 
-    function notify($name, $startup = false)
+    function notify($name, $startup = FALSE)
     {
         //Notify people that are logging on if they've got new mail
         if ((!$startup)
             && ($this->bot->core("prefs")
-                ->get($name, "Mail", "Logon_notification") == true)
+                ->get($name, "Mail", "Logon_notification") == TRUE)
         ) {
             $mailbox = $this->bot->core("alts")->main($name);
             $no_of_messages = $this->new_mail_count($mailbox);
@@ -192,12 +192,12 @@ class Mail extends BaseActiveModule
                 //Make the "unread" header if it hasn't been made already and there is unread mail
                 if (($message['is_read'] == '0') && (empty($unread_header))) {
                     $window .= "--- Unread messages ---<br>";
-                    $unread_header = true;
+                    $unread_header = TRUE;
                 }
                 //Make the "read" header if it hasn't been made already and there is unread mail
                 if (($message['is_read'] == '1') && (empty($read_header))) {
                     $window .= "<br>--- Read messages ---<br>";
-                    $read_header = true;
+                    $read_header = TRUE;
                 }
                 //Only show the 20-23 first characters of the message in the list.
                 if (strlen($message['message']) > 23) {

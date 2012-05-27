@@ -497,126 +497,130 @@ class Security_Core extends BaseActiveModule
                     return FALSE; // FIXME: Nothing returned?
                 }
             }
-            else if (preg_match("/^admin group add (.+?) (.+)$/i", $msg, $info)) {
-                if ($this->check_access(
-                    $source, $this->bot
-                        ->core("settings")->get('Security', 'Addgroupmember')
-                )
-                ) {
-                    return $this->add_group($info[1], $info[2], $source);
-                }
-                else {
-                    $this->error->set(
-                        "Only " . strtoupper(
-                            $this->bot
-                                ->core("settings")
-                                ->get('Security', 'Addgroup')
-                        ) . "s and above can add groups."
-                    );
-                    return $this->error;
-                }
-            }
-            else if (preg_match("/^admin group add ([a-zA-Z0-9]+)$/i", $msg, $info)) {
-                if ($this->check_access(
-                    $source, $this->bot
-                        ->core("settings")->get('Security', 'Addgroupmember')
-                )
-                ) {
-                    return $this->add_group($info[1], " ", $source); // No group description
-                }
-                else {
-                    $this->error->set(
-                        "Only " . strtoupper(
-                            $this->bot
-                                ->core("settings")
-                                ->get('Security', 'Addgroup')
-                        ) . "s and above can add groups."
-                    );
-                    return $this->error;
-                }
-            }
             else {
-                if (preg_match("/^admin group (remove|rem|del) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
+                if (preg_match("/^admin group add (.+?) (.+)$/i", $msg, $info)) {
                     if ($this->check_access(
                         $source, $this->bot
-                            ->core("settings")->get('Security', 'Delgroup')
+                            ->core("settings")->get('Security', 'Addgroupmember')
                     )
                     ) {
-                        return $this->del_group($info[2], $source);
+                        return $this->add_group($info[1], $info[2], $source);
                     }
                     else {
                         $this->error->set(
                             "Only " . strtoupper(
                                 $this->bot
                                     ->core("settings")
-                                    ->get('Security', 'Delgroup')
-                            ) . "s and above can delete groups."
+                                    ->get('Security', 'Addgroup')
+                            ) . "s and above can add groups."
                         );
                         return $this->error;
                     }
                 }
                 else {
-                    if (preg_match("/^admin add ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
+                    if (preg_match("/^admin group add ([a-zA-Z0-9]+)$/i", $msg, $info)) {
                         if ($this->check_access(
                             $source, $this->bot
                                 ->core("settings")->get('Security', 'Addgroupmember')
                         )
                         ) {
-                            return $this->add_group_member($info[2], $info[1], $source);
+                            return $this->add_group($info[1], " ", $source); // No group description
                         }
                         else {
                             $this->error->set(
                                 "Only " . strtoupper(
                                     $this->bot
                                         ->core("settings")
-                                        ->get('Security', 'Addgroupmember')
-                                ) . "s and above and add group members."
+                                        ->get('Security', 'Addgroup')
+                                ) . "s and above can add groups."
                             );
-                            return ($this->error);
+                            return $this->error;
                         }
                     }
                     else {
-                        if (preg_match("/^admin (remove|rem|del) ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
+                        if (preg_match("/^admin group (remove|rem|del) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
                             if ($this->check_access(
                                 $source, $this->bot
-                                    ->core("settings")->get('Security', 'Remgroupmember')
+                                    ->core("settings")->get('Security', 'Delgroup')
                             )
                             ) {
-                                return $this->rem_group_member($info[3], $info[2], $source);
+                                return $this->del_group($info[2], $source);
                             }
                             else {
                                 $this->error->set(
                                     "Only " . strtoupper(
                                         $this->bot
                                             ->core("settings")
-                                            ->get('Security', 'Remgroupmember')
-                                    ) . "s and above can remove group members."
+                                            ->get('Security', 'Delgroup')
+                                    ) . "s and above can delete groups."
                                 );
                                 return $this->error;
                             }
                         }
                         else {
-                            if (preg_match("/^admin (remove|rem|del) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
+                            if (preg_match("/^admin add ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
                                 if ($this->check_access(
                                     $source, $this->bot
-                                        ->core("settings")->get('Security', 'Deluser')
+                                        ->core("settings")->get('Security', 'Addgroupmember')
                                 )
                                 ) {
-                                    return $this->del_user($source, $info[2]);
+                                    return $this->add_group_member($info[2], $info[1], $source);
                                 }
                                 else {
                                     $this->error->set(
                                         "Only " . strtoupper(
                                             $this->bot
                                                 ->core("settings")
-                                                ->get('Security', 'Deluser')
-                                        ) . "s and above can delete users."
+                                                ->get('Security', 'Addgroupmember')
+                                        ) . "s and above and add group members."
                                     );
-                                    return $this->error;
+                                    return ($this->error);
                                 }
                             }
                             else {
-                                return $this->bot->send_help($source);
+                                if (preg_match("/^admin (remove|rem|del) ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
+                                    if ($this->check_access(
+                                        $source, $this->bot
+                                            ->core("settings")->get('Security', 'Remgroupmember')
+                                    )
+                                    ) {
+                                        return $this->rem_group_member($info[3], $info[2], $source);
+                                    }
+                                    else {
+                                        $this->error->set(
+                                            "Only " . strtoupper(
+                                                $this->bot
+                                                    ->core("settings")
+                                                    ->get('Security', 'Remgroupmember')
+                                            ) . "s and above can remove group members."
+                                        );
+                                        return $this->error;
+                                    }
+                                }
+                                else {
+                                    if (preg_match("/^admin (remove|rem|del) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
+                                        if ($this->check_access(
+                                            $source, $this->bot
+                                                ->core("settings")->get('Security', 'Deluser')
+                                        )
+                                        ) {
+                                            return $this->del_user($source, $info[2]);
+                                        }
+                                        else {
+                                            $this->error->set(
+                                                "Only " . strtoupper(
+                                                    $this->bot
+                                                        ->core("settings")
+                                                        ->get('Security', 'Deluser')
+                                                ) . "s and above can delete users."
+                                            );
+                                            return $this->error;
+                                        }
+                                    }
+                                    else {
+                                        return $this->bot->send_help($source);
+                                    }
+                                }
                             }
                         }
                     }
@@ -672,9 +676,9 @@ class Security_Core extends BaseActiveModule
         $gid = $result[0][0];
         unset($result);
         $tmp = array(
-            "gid" => $gid,
-            "name" => $groupname,
-            "description" => $description,
+            "gid"          => $gid,
+            "name"         => $groupname,
+            "description"  => $description,
             "access_level" => 0
         );
         $tmp['members'] = array();
@@ -815,7 +819,7 @@ class Security_Core extends BaseActiveModule
         }
 
         // Get whois data & check for errors.
-        if (strtolower(AOCHAT_GAME) == "ao") {
+        if ($this->bot->game == "ao") {
             $who = $this->bot->core("whois")->lookup($target);
             if ($who instanceof BotError) {
                 return $who;
@@ -1283,7 +1287,7 @@ class Security_Core extends BaseActiveModule
             }
             else {
                 $tmp = array(
-                    'gid' => $groupid,
+                    'gid'  => $groupid,
                     'name' => $this->cache['groups'][$groupid]['name']
                 );
                 $this->cache_mgr("add", "groups", $tmp, $newacl);
@@ -1383,7 +1387,7 @@ class Security_Core extends BaseActiveModule
                 ->core("online")->in_chat($player)
         ) {
             $highestlevel = 1;
-            $this->cache['online'][$player] = true;
+            $this->cache['online'][$player] = TRUE;
         }
         if (isset($this->cache['members'][$player])) {
             $highestlevel = 2;
@@ -1536,14 +1540,14 @@ class Security_Core extends BaseActiveModule
         $alts = $this->bot->core("alts")->get_alts($main);
 
         // Check main and alts for owner or config file defined superadmins
-        $foundSA = false;
+        $foundSA = FALSE;
         if ($main == $this->owner) {
             $this->cache['mains'][$main] = 256;
             return 256;
         }
         if (isset($this->super_admin[$main])) {
             $this->cache['mains'][$main] = 255;
-            $foundSA = true;
+            $foundSA = TRUE;
         }
         if (!empty($alts)) {
             foreach ($alts as $alt) {
@@ -1553,7 +1557,7 @@ class Security_Core extends BaseActiveModule
                 }
                 if (isset($this->super_admin[$main])) {
                     $this->cache['mains'][$main] = 255;
-                    $foundSA = true;
+                    $foundSA = TRUE;
                 }
             }
         }
@@ -2032,7 +2036,7 @@ class Security_Core extends BaseActiveModule
         if ($this->bot->core("settings")
             ->get('Security', 'Orggov') instanceof BotError
         ) {
-            return false; // If the setting is still missing, we can't do anything about it.
+            return FALSE; // If the setting is still missing, we can't do anything about it.
         }
         if ($this->bot->core("settings")
             ->get('Security', 'Orggov') == "Unknown"

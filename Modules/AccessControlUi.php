@@ -49,22 +49,22 @@ class AccessControlGUI extends BaseActiveModule
             ->get_access_levels();
         $this->access_shorts = array(
             'AN' => 'ANONYMOUS',
-            'G' => 'GUEST',
-            'M' => 'MEMBER',
-            'L' => 'LEADER',
-            'A' => 'ADMIN',
+            'G'  => 'GUEST',
+            'M'  => 'MEMBER',
+            'L'  => 'LEADER',
+            'A'  => 'ADMIN',
             'SA' => 'SUPERADMIN',
-            'O' => 'OWNER',
-            'D' => 'DISABLED'
+            'O'  => 'OWNER',
+            'D'  => 'DISABLED'
         );
         $this->shortcuts = array();
         foreach ($this->access_shorts as $short => $long) {
             $this->shortcuts[$long] = $short;
         }
         $this->channels = array(
-            "gc" => "##green##",
+            "gc"    => "##green##",
             "pgmsg" => "##white##",
-            "tell" => "##seablue##"
+            "tell"  => "##seablue##"
         );
         /*
         Create default access right for "commands" by SUPERADMIN if it is not set or set to DISABLED. You always want to be able to change the rights!
@@ -470,7 +470,7 @@ class AccessControlGUI extends BaseActiveModule
     function channel_lock($channel, $lock)
     {
         $channel = strtolower($channel);
-        $lock = $lock === true;
+        $lock = $lock === TRUE;
         $msg = "##error##Error!##end##";
         if ($channel == "gc") {
             $this->bot->core("settings")

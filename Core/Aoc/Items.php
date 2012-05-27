@@ -70,7 +70,7 @@ class Items_Core extends BasePassiveModule
     /*
     Creates a text blob.  Alternate uses ' instead of ".
     */
-    function make_item($item, $alternate = false)
+    function make_item($item, $alternate = FALSE)
     {
         if (empty($item)) {
             return '';
@@ -90,9 +90,9 @@ class Items_Core extends BasePassiveModule
     function is_item($item)
     {
         if (1 > preg_match('/' . $this->itemPattern . '/i', $item)) {
-            return false;
+            return FALSE;
         }
-        return true;
+        return TRUE;
     }
 
 
@@ -128,7 +128,7 @@ class Items_Core extends BasePassiveModule
         $url .= '&id=' . $words;
         $result = $this->bot->core("tools")->get_site($url, 1);
         //A comment explaining the logic of this check would be appreciated! Why are we looking for mysql_real_escape_string here?
-        if (strstr($result, 'mysql_real_escape_string') !== false) {
+        if (strstr($result, 'mysql_real_escape_string') !== FALSE) {
             return ("Error in query to database");
         }
         return $result;

@@ -173,7 +173,7 @@ class BinaryStream
         $len = $this->ReadUInt16();
         if ($this->m_ReadPtr + $len > $this->m_DataLen) {
             echo("[BinaryStream][ReadString] " . $str . " [pos:" . ($this->m_ReadPtr) . "] invalid length :" . $len . " since it will read outside of buffer.\n");
-            return null;
+            return NULL;
         }
 
         $str = substr($this->m_Data, $this->m_ReadPtr, $len);
@@ -192,7 +192,7 @@ class BinaryStream
     {
         if ($this->m_ReadPtr + $len > $this->m_DataLen) {
             echo("[BinaryStream][ReadRaw] " . $str . " [pos:" . ($this->m_ReadPtr) . "] invalid length :" . $len . " since it will read outside of buffer.\n");
-            return null;
+            return NULL;
         }
 
         $str = substr($this->m_Data, $this->m_ReadPtr, $len);

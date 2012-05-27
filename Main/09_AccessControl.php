@@ -210,7 +210,7 @@ class AccessControl_Core extends BasePassiveModule
     {
         // If disabled or delted, return false, as no access is allowed
         if (in_array($this->access_cache[strtolower($command)][strtolower($subcommand)][strtolower($channel)], $this->deny_levels)) {
-            return false;
+            return FALSE;
         }
         else {
             // Otherwise check access level of $user vs the minlevel of $command, $subcommand in $channel:
@@ -234,7 +234,7 @@ class AccessControl_Core extends BasePassiveModule
             return FALSE;
         }
         $subcommand = strpos($msg, " ");
-        if ($subcommand === false) {
+        if ($subcommand === FALSE) {
             // No subcommand, check if special "only command" entry exists, otherwise fall back on
             // general entry for command if that exists.
             if (isset($this->access_cache[strtolower($command)]['$'][strtolower($channel)])) {
@@ -245,7 +245,7 @@ class AccessControl_Core extends BasePassiveModule
                 return $this->do_check($user, $command, '*', $channel);
             }
             // No entry for command at all, deny access:
-            return false;
+            return FALSE;
         }
         else {
             // Possible subcommand, extract it and check for entry:
@@ -273,7 +273,7 @@ class AccessControl_Core extends BasePassiveModule
                 return $this->do_check($user, $command, '*', $channel);
             }
             // No fitting entry exists, deny access:
-            return false;
+            return FALSE;
         }
     }
 
@@ -452,20 +452,20 @@ class AccessControl_Core extends BasePassiveModule
         $count = 0;
         $countsub = 0;
         $cshort = array(
-            "tell" => "t",
-            "gc" => "g",
-            "pgmsg" => "p",
+            "tell"     => "t",
+            "gc"       => "g",
+            "pgmsg"    => "p",
             "extpgmsg" => "e"
         );
         $lshort = array(
-            "ANONYMOUS" => "AN",
-            "GUEST" => "G",
-            "MEMBER" => "M",
-            "LEADER" => "L",
-            "ADMIN" => "A",
+            "ANONYMOUS"  => "AN",
+            "GUEST"      => "G",
+            "MEMBER"     => "M",
+            "LEADER"     => "L",
+            "ADMIN"      => "A",
             "SUPERADMIN" => "SA",
-            "OWNER" => "O",
-            "DISABLED" => "D"
+            "OWNER"      => "O",
+            "DISABLED"   => "D"
         );
         foreach ($this->access_cache as $command => $value) {
             unset($subs);
@@ -530,13 +530,13 @@ class AccessControl_Core extends BasePassiveModule
         );
         $llong = array(
             'AN' => 'ANONYMOUS',
-            'G' => 'GUEST',
-            'M' => 'MEMBER',
-            'L' => 'LEADER',
-            'A' => 'ADMIN',
+            'G'  => 'GUEST',
+            'M'  => 'MEMBER',
+            'L'  => 'LEADER',
+            'A'  => 'ADMIN',
             'SA' => 'SUPERADMIN',
-            'O' => 'OWNER',
-            'D' => 'DISABLED'
+            'O'  => 'OWNER',
+            'D'  => 'DISABLED'
         );
         $results = $this->bot->db->select("SELECT commands FROM #___access_control_saves WHERE name = '" . mysql_real_escape_string($name) . "'");
         if (!empty($results)) {
@@ -631,7 +631,7 @@ class AccessControl_Core extends BasePassiveModule
         $command = strtolower($command);
         $minlevel = $this->get_min_access_level($command);
         if ($minlevel == OWNER + 1) {
-            return false;
+            return FALSE;
         }
         return $this->bot->core("security")->check_access($name, $minlevel);
     }
@@ -673,7 +673,7 @@ class AccessControl_Core extends BasePassiveModule
             return OWNER + 1;
         }
         $subcommand = strpos($msg, " ");
-        if ($subcommand === false) {
+        if ($subcommand === FALSE) {
             // No subcommand, check if special "only command" entry exists, otherwise fall back on
             // general entry for command if that exists.
             if (isset($this->access_cache[strtolower($command)]['$'][strtolower($channel)])) {

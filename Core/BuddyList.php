@@ -42,9 +42,9 @@ class BuddyList extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         $this->register_module('buddy');
 
-        if (strtolower(AOCHAT_GAME) == "aoc") {
+        if ($this->bot->game == "aoc") {
             $this->bot->dispatcher->connect(
-                'Core.on_buddy_onoff', array(
+                'core.on_buddy_onoff', array(
                     $this,
                     'buddy_aoc'
                 )
@@ -52,7 +52,7 @@ class BuddyList extends BasePassiveModule
         }
         else {
             $this->bot->dispatcher->connect(
-                'Core.on_buddy_onoff', array(
+                'core.on_buddy_onoff', array(
                     $this,
                     'buddy_ao'
                 )
@@ -102,7 +102,7 @@ class BuddyList extends BasePassiveModule
         $end = "";
         if (!$member) {
             $end = " (not on notify)";
-            // Using Aoc -> buddy_remove() here is an exception, all the checks in chat -> buddy_remove() aren't needed!
+            // Using aoc -> buddy_remove() here is an exception, all the checks in chat -> buddy_remove() aren't needed!
             $this->bot->aoc->buddy_remove($user);
         }
         else {
@@ -131,7 +131,7 @@ class BuddyList extends BasePassiveModule
     {
         // Get the users current state
         $old_who = $this->bot->core("Whois")
-            ->lookup($user, true); // $noupdate MUST be true to avoid adding buddy recursively
+            ->lookup($user, TRUE); // $noupdate MUST be true to avoid adding buddy recursively
         if (array_key_exists($user, $this->buddy_status)) {
             $old_buddy_status = $this->buddy_status[$user];
         }
@@ -255,7 +255,7 @@ class BuddyList extends BasePassiveModule
         }
         else {
             $end = " (not on notify)";
-            // Using Aoc -> buddy_remove() here is an exception, all the checks in chat -> buddy_remove() aren't needed!
+            // Using aoc -> buddy_remove() here is an exception, all the checks in chat -> buddy_remove() aren't needed!
             $this->bot->aoc->buddy_remove($user);
         }
         foreach ($current_statuses as $status) {

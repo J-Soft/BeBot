@@ -68,7 +68,7 @@ class sfEventDispatcher
     public function disconnect($name, $listener)
     {
         if (!isset($this->listeners[$name])) {
-            return false;
+            return FALSE;
         }
 
         foreach ($this->listeners[$name] as $i => $callable) {
@@ -107,7 +107,7 @@ class sfEventDispatcher
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             if (call_user_func($listener, $event)) {
-                $event->setProcessed(true);
+                $event->setProcessed(TRUE);
                 break;
             }
         }

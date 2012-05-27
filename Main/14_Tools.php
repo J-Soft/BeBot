@@ -61,7 +61,7 @@ class tools extends BasePassiveModule
         case 'o':
         case 'gu':
         case '3':
-            if (strtolower(AOCHAT_GAME) == "aoc") {
+            if ($this->bot->game == "aoc") {
                 $chatcmd = "gu <pre>";
             }
             else {
@@ -154,7 +154,7 @@ class tools extends BasePassiveModule
         /* Create a TCP/IP socket. */
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         // Check to see if the socket failed to create.
-        if ($socket === false) {
+        if ($socket === FALSE) {
             $this->error->set("Failed to create socket. Error was: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
@@ -167,7 +167,7 @@ class tools extends BasePassiveModule
 
         socket_set_option(
             $socket, SOL_SOCKET, SO_RCVTIMEO, array(
-                "sec" => $read_timeout,
+                "sec"  => $read_timeout,
                 "usec" => 0
             )
         );
@@ -175,7 +175,7 @@ class tools extends BasePassiveModule
         $connect_result = @socket_connect($socket, $address, $service_port);
 
         // Make sure we have a connection
-        if ($connect_result === false) {
+        if ($connect_result === FALSE) {
             $this->error->set("Failed to connect to server " . $address . ":" . $service_port . " (" . $url . ") Error was: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
@@ -190,24 +190,24 @@ class tools extends BasePassiveModule
         $in .= "User-Agent:" . $this->useragent . "\r\n\r\n";
         $write_result = @socket_write($socket, $in, strlen($in));
         // Make sure we wrote to the server okay.
-        if ($write_result === false) {
+        if ($write_result === FALSE) {
             $this->error->set("Failed to write to server: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
         $return["content"] = "";
         $read_result = @socket_read($socket, 2048);
-        while ($read_result != "" && $read_result !== false) {
+        while ($read_result != "" && $read_result !== FALSE) {
             $return .= $read_result;
             $read_result = @socket_read($socket, 2048);
         }
         // Make sure we got a response back from the server.
-        if ($read_result === false) {
+        if ($read_result === FALSE) {
             $this->error->set("Failed to read response: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
         $close_result = @socket_close($socket);
         // Make sure we closed our socket properly.  Open sockets are bad!
-        if ($close_result === false) {
+        if ($close_result === FALSE) {
             $this->error->set("Failed to close socket: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
@@ -249,7 +249,7 @@ class tools extends BasePassiveModule
         // CURLOPT_SSL_VERIFYHOST may also need to be TRUE or FALSE if
         // CURLOPT_SSL_VERIFYPEER is disabled (it defaults to 2 - check the existence of a
         // common name and also verify that it matches the hostname provided)
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         // Optional: Return the result instead of printing it
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         // Specify a timeout
@@ -280,7 +280,6 @@ class tools extends BasePassiveModule
         $tmp = explode("<" . $tag . ">", $xml);
         if (!isset($tmp[1])) {
             $tmp[1] = "";
-            echo "Debug: xml: $xml tag: $tag\n";
         }
         $tmp = explode("</" . $tag . ">", $tmp[1]);
         return $tmp[0];
@@ -356,9 +355,9 @@ class tools extends BasePassiveModule
         $pattern = '|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
         preg_match($pattern, $item, $parts);
         if (empty($parts)) {
-            return false;
+            return FALSE;
         }
-        return true;
+        return TRUE;
     }
 
 
@@ -394,7 +393,7 @@ class tools extends BasePassiveModule
     Returns BotError on failure
     Returns ucfirst(strtolower($name)) if the player exists.
     */
-    function validate_player($name, $check_exists = true)
+    function validate_player($name, $check_exists = TRUE)
     {
         $name = trim(ucfirst(strtolower($name)));
         if (strlen($name) < 3 || strlen($name) > 14) {

@@ -40,7 +40,7 @@ abstract class PBMessage
     var $wired_type = 2;
 
     // the value of a class
-    var $value = null;
+    var $value = NULL;
 
     // modus byte or string parse (byte for productive string for better reading and debuging)
     // 1 = byte, 2 = String
@@ -60,7 +60,7 @@ abstract class PBMessage
     /**
      * Constructor - initialize base128 class
      */
-    public function __construct($reader = null)
+    public function __construct($reader = NULL)
     {
         $this->reader = $reader;
         $this->value = $this;
@@ -113,7 +113,7 @@ abstract class PBMessage
                 }
             }
             else {
-                if ($this->values[$index] != null) {
+                if ($this->values[$index] != NULL) {
                     // wired and type
                     $newstring = '';
                     $newstring .= $this->values[$index]->SerializeToString($index);
@@ -181,7 +181,7 @@ abstract class PBMessage
         $_begin = $this->reader->get_pointer();
         while ($this->reader->get_pointer() - $_begin < $length) {
             $next = $this->reader->next();
-            if ($next === false) {
+            if ($next === FALSE) {
                 break;
             }
 
@@ -301,8 +301,8 @@ abstract class PBMessage
      */
     protected function _get_value($index)
     {
-        if ($this->values[$index] == null) {
-            return null;
+        if ($this->values[$index] == NULL) {
+            return NULL;
         }
         return $this->values[$index]->value;
     }
@@ -350,13 +350,13 @@ abstract class PBMessage
      *
      * @return String - the return string from the request to the url
      */
-    public function Send($url, &$class = null)
+    public function Send($url, &$class = NULL)
     {
         $ch = curl_init();
         $this->_d_string = '';
 
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
         curl_setopt(
             $ch, CURLOPT_WRITEFUNCTION, array(
                 $this,
@@ -366,7 +366,7 @@ abstract class PBMessage
         curl_setopt($ch, CURLOPT_POSTFIELDS, 'message=' . urlencode($this->SerializeToString()));
         $result = curl_exec($ch);
 
-        if ($class != null) {
+        if ($class != NULL) {
             $class->parseFromString($this->_d_string);
         }
         return $this->_d_string;

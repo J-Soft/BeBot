@@ -1,6 +1,6 @@
 <?php
 /*
-* GUI to enable and disable Modules. Changes only have effect on restarts of the bot though.
+* GUI to enable and disable modules. Changes only have effect on restarts of the bot though.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -64,13 +64,13 @@ class ModuleControlGUI extends BaseActiveModule
         }
         else {
             $this->bot->send_help($name);
-            return false;
+            return FALSE;
         }
     }
 
 
     /*
-    Lists all module directories and available Modules:
+    Lists all module directories and available modules:
     */
     function show_stuff()
     {

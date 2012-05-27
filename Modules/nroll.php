@@ -71,7 +71,7 @@ class Nroll extends BaseActiveModule
         if (preg_match("/^nroll (.+)$/i", $msg, $info)) {
             $options_str = $info[1];
             $options = array();
-            if (strpos($options_str, ",") === false) {
+            if (strpos($options_str, ",") === FALSE) {
                 $options = split(" ", $options_str);
             }
             else {

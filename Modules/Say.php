@@ -80,12 +80,12 @@ class Say extends BaseActiveModule
                         ->core("settings")->get("Say", "OutputChannel")
                 );
             }
-            return false;
+            return FALSE;
         case "whosaidthat":
             return $this->whosaidthat();
         }
         $this->bot->send_help($name);
-        return false;
+        return FALSE;
     } // End function handler()
 
     function saythis($name, $message)

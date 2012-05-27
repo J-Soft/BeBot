@@ -58,7 +58,7 @@ class Target extends BaseActiveModule
     function command_handler($name, $msg, $origin)
     {
         $this->call_target($name, $msg);
-        return false;
+        return FALSE;
     }
 
 

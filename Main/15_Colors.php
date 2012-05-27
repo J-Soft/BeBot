@@ -262,7 +262,7 @@ class Colors_Core extends BasePassiveModule
     // Read scheme file in, update all schemes in the bot with new information out of the file
     function read_scheme_file($filename)
     {
-        $theme_dir = "./Themes/";
+        $theme_dir = "./themes/";
         // Make sure filename is valid
         if (!preg_match("/^([a-z01-9-_]+)$/i", $filename)) {
             $this->error->set("Illegal filename for scheme file! The filename must only contain letters, numbers, - and _!");
@@ -290,7 +290,7 @@ class Colors_Core extends BasePassiveModule
     // Creates a scheme file containing all schemes in the bot table
     function create_scheme_file($filename, $name)
     {
-        $theme_dir = "./Themes/";
+        $theme_dir = "./themes/";
         // Make sure filename is valid
         if (!preg_match("/^([a-z01-9-_]+)$/i", $filename)) {
             $this->error->set("Illegal filename for scheme file! The filename must only contain letters, numbers, - and _!");
@@ -367,7 +367,7 @@ class Colors_Core extends BasePassiveModule
     // Reads the selected theme file. If the file doesn't exist it creates one with default colors
     function read_theme()
     {
-        $theme_dir = "./Themes/";
+        $theme_dir = "./themes/";
         // Security check, theme filename HAS to be all letters or numbers, otherwise dying here for security reasons!
         if (!preg_match(
             "/^([a-z01-9-_]+)$/i", $this->bot->core("settings")
@@ -432,7 +432,7 @@ class Colors_Core extends BasePassiveModule
         $this->color_tags = array();
         // Parse theme file
         $this->read_theme();
-        // Create color tags for Themes
+        // Create color tags for themes
         $theme_strings = array();
         foreach ($this->theme as $color => $colorcode) {
             $this->color_tags["##" . strtolower($color) . "##"] = "<font color=" . $colorcode . ">";
@@ -484,7 +484,7 @@ class Colors_Core extends BasePassiveModule
             $this->create_color_cache();
         }
         // No replacing if no tags can be in the text
-        if (strpos($text, "##") === false) {
+        if (strpos($text, "##") === FALSE) {
             return $text;
         }
         // Go ahead and replace all tags

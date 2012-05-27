@@ -17,19 +17,19 @@ class PBParser
         = array(
             'double',
             'float',
-            'int32' => 'PBInt',
-            'int64' => 'PBInt',
-            'uint32' => 'PBInt',
+            'int32'   => 'PBInt',
+            'int64'   => 'PBInt',
+            'uint32'  => 'PBInt',
             'uint64',
-            'sint32' => 'PBSignedInt',
-            'sint64' => 'PBSignedInt',
+            'sint32'  => 'PBSignedInt',
+            'sint64'  => 'PBSignedInt',
             'fixed32' => 'PBFixedInt',
             'fixed64',
             'sfixed32',
             'sfixed64',
-            'bool' => 'PBBool',
-            'string' => 'PBString',
-            'bytes' => 'PBString'
+            'bool'    => 'PBBool',
+            'string'  => 'PBString',
+            'bytes'   => 'PBString'
         );
 
 
@@ -231,7 +231,7 @@ class PBParser
                 $classtype = $this->scalar_types[$classtype];
             }
             else {
-                if ((strpos($classtype, '_') === false)) {
+                if ((strpos($classtype, '_') === FALSE)) {
                     $classtype = str_replace('.', '_', $field['value']['namespace']);
                 }
             }
@@ -302,8 +302,8 @@ class PBParser
                     $content = trim(substr($string, $offset['begin'] + 1, $offset['end'] - $offset['begin'] - 2));
                     // now adding all to myarray
                     $this->m_types[] = array(
-                        'name' => trim($path . '.' . $name, '.'),
-                        'type' => 'enum',
+                        'name'  => trim($path . '.' . $name, '.'),
+                        'type'  => 'enum',
                         'value' => $this->_parse_enum($content)
                     );
                     // removing it from string
@@ -316,7 +316,7 @@ class PBParser
                         throw new Exception('Proto file missformed');
                     }
                     $myarray[] = array(
-                        'type' => 'field',
+                        'type'  => 'field',
                         'value' => $this->_parse_field($matches[0][0], $myarray, $path)
                     );
                     $string = trim(substr($string, $matches[0][1] + strlen($matches[0][0])));
@@ -326,8 +326,8 @@ class PBParser
 
         // now adding myarray to array
         $this->m_types[] = array(
-            'name' => $path,
-            'type' => 'message',
+            'name'  => $path,
+            'type'  => 'message',
             'value' => $myarray
         );
     }
@@ -361,27 +361,27 @@ class PBParser
 
         // parse all modifier
         $content = trim(trim(trim($content), ';'));
-        $typeset = false;
+        $typeset = FALSE;
         while (strlen($content) > 0) {
-            $matches = $this->_next($content, true);
+            $matches = $this->_next($content, TRUE);
             $name = $matches[0][0];
             if (strtolower($name) == 'optional') {
-                $myarray['optional'] = true;
+                $myarray['optional'] = TRUE;
             }
             else {
                 if (strtolower($name) == 'required') {
-                    $myarray['required'] = true;
+                    $myarray['required'] = TRUE;
                 }
                 else {
                     if (strtolower($name) == 'repeated') {
-                        $myarray['repeated'] = true;
+                        $myarray['repeated'] = TRUE;
                     }
                     else {
-                        if ($typeset == false) {
+                        if ($typeset == FALSE) {
                             $type = $this->_check_type($name, $array, $path);
                             $myarray['type'] = $type[0];
                             $myarray['namespace'] = $type[1];
-                            $typeset = true;
+                            $typeset = TRUE;
                         }
                         else {
                             $myarray['name'] = $name;
@@ -473,7 +473,7 @@ class PBParser
     /**
      * Gets the next String
      */
-    private function _next($string, $reg = false)
+    private function _next($string, $reg = FALSE)
     {
         $match = preg_match('/([^\s^\{}]*)/', $string, $matches, PREG_OFFSET_CAPTURE);
         if (!$match) {
@@ -501,10 +501,10 @@ class PBParser
     {
         $offset_begin = strpos($string, $char);
 
-        if ($offset_begin === false) {
+        if ($offset_begin === FALSE) {
             return array(
                 'begin' => -1,
-                'end' => -1
+                'end'   => -1
             );
         }
 
@@ -514,12 +514,12 @@ class PBParser
             // now search after the end nested { }
             $offset_open = strpos($string, $char, $_offset);
             $offset_close = strpos($string, $charend, $_offset);
-            if ($offset_open < $offset_close && !($offset_open === false)) {
+            if ($offset_open < $offset_close && !($offset_open === FALSE)) {
                 $_offset = $offset_open + 1;
                 $_offset_number++;
             }
             else {
-                if (!($offset_close === false)) {
+                if (!($offset_close === FALSE)) {
                     $_offset = $offset_close + 1;
                     $_offset_number--;
                 }
@@ -535,7 +535,7 @@ class PBParser
 
         return array(
             'begin' => $offset_begin,
-            'end' => $_offset
+            'end'   => $_offset
         );
     }
 

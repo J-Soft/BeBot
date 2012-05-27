@@ -113,7 +113,7 @@ class AutoInv extends BaseActiveModule
     {
         $userlevel = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '$name'", MYSQL_ASSOC);
         if (empty($userlevel)) {
-            return false;
+            return FALSE;
         }
         $userlevel = $userlevel[0]['user_level'];
         switch ($userlevel) {
@@ -128,7 +128,7 @@ class AutoInv extends BaseActiveModule
                         ->get("Members", "AutoInviteGroup")
                 ) == 'both'
             ) {
-                return true;
+                return TRUE;
             }
             break;
         default:
@@ -142,15 +142,15 @@ class AutoInv extends BaseActiveModule
                         ->get("Members", "AutoInviteGroup")
                 ) == 'both'
             ) {
-                return true;
+                return TRUE;
             }
             break;
         }
-        return false;
+        return FALSE;
     }
 
 
-    function notify($user, $startup = false)
+    function notify($user, $startup = FALSE)
     {
         if ($startup) // dont invite because of a bot restart, they will get invited if they were in PG before restart anyway
         {

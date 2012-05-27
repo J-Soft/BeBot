@@ -156,28 +156,28 @@ class MassMsg extends BaseActiveModule
                         ->in_chat($recipient)
                 ) {
                     $status[$recipient]['sent'] = FALSE;
-                    $status[$recipient]['pg'] = true;
+                    $status[$recipient]['pg'] = TRUE;
                 }
                 else {
                     $this->bot->send_tell($recipient, $message, 0, FALSE, TRUE, FALSE);
-                    $status[$recipient]['sent'] = true;
+                    $status[$recipient]['sent'] = TRUE;
                 }
             }
             else {
-                $status[$recipient]['sent'] = false;
+                $status[$recipient]['sent'] = FALSE;
             }
             //If type is an invite and they want invites, they will receive both a message and an invite regardless of receive_message setting
             if ($type == 'Invite') {
                 if ($massinv) {
                     if ($this->bot->core("online")->in_chat($recipient)) {
                         $status[$recipient]['sent'] = FALSE;
-                        $status[$recipient]['pg'] = true;
+                        $status[$recipient]['pg'] = TRUE;
                     }
                     else {
                         //Check if they've already gotten the tell so we don't spam unneccessarily.
                         if (!$status[$recipient]['sent']) {
                             $this->bot->send_tell($recipient, $message, 0, FALSE, TRUE, FALSE);
-                            $status[$recipient]['sent'] = true;
+                            $status[$recipient]['sent'] = TRUE;
                         }
                         if ($this->bot->core("queue")->check_queue("invite")) {
                             $this->bot->core('chat')->pgroup_invite($recipient);
@@ -186,11 +186,11 @@ class MassMsg extends BaseActiveModule
                             $this->bot->core("queue")
                                 ->into_queue("invite", $recipient);
                         }
-                        $status[$recipient]['invited'] = true;
+                        $status[$recipient]['invited'] = TRUE;
                     }
                 }
                 else {
-                    $status[$recipient]['invited'] = false;
+                    $status[$recipient]['invited'] = FALSE;
                 }
             }
         }

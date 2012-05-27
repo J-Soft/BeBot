@@ -81,7 +81,7 @@ class PlayerNotes_UI extends BaseActiveModule
         Default:
             return $this->show_notes($name, $com['sub']);
         }
-        return false;
+        return FALSE;
     } // End function handler()
 
     function add_note($author, $msg, $admin = FALSE)

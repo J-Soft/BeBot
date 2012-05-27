@@ -1,6 +1,6 @@
 <?php
 /*
-* Mysql.php - MySQL interaction
+* MySQL.php - MySQL interaction
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -42,7 +42,7 @@ class MySQL
     public static $instance;
 
 
-    public function get_instance($bothandle)
+    public static function get_instance($bothandle)
     {
         $bot = Bot::get_instance($bothandle);
         if (!isset(self::$instance[$bothandle])) {
@@ -65,14 +65,14 @@ class MySQL
         /*
         Load up config
         */
-        $botname_mysql_conf = "Conf/" . $this->botname . ".MySQL.conf";
+        $botname_mysql_conf = "conf/" . $this->botname . ".MySQL.conf";
         if (file_exists($botname_mysql_conf)) {
             include $botname_mysql_conf;
             $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from " . $botname_mysql_conf, FALSE);
         }
         else {
-            include "Conf/MySQL.conf";
-            $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from Conf/MySQL.conf", FALSE);
+            include "conf/MySQL.conf";
+            $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from conf/MySQL.conf", FALSE);
         }
         $this->USER = $user;
         $this->PASS = $pass;
@@ -95,7 +95,7 @@ class MySQL
         if ($nounderscore) {
             $this->underscore = "";
         }
-        $this->connect(true);
+        $this->connect(TRUE);
         /*
         Make sure we have the master table for tablenames that the bot cannot function without.
         */
@@ -105,7 +105,7 @@ class MySQL
         );
         $this->query("CREATE TABLE IF NOT EXISTS table_versions (internal_name VARCHAR(255) NOT NULL PRIMARY KEY, schemaversion INT(3) NOT NULL DEFAULT 1)");
         $this->update_master_table();
-        return true;
+        return TRUE;
     }
 
 
@@ -137,21 +137,21 @@ class MySQL
     }
 
 
-    function connect($initial = false)
+    function connect($initial = FALSE)
     {
         if ($initial) {
             $this->bot->log("MYSQL", "START", "Establishing MySQL database connection....");
         }
         $conn = @mysql_connect($this->SERVER, $this->USER, $this->PASS);
         if (!$conn) {
-            $this->error("Cannot connect to the database server!", $initial, false);
-            return false;
+            $this->error("Cannot connect to the database server!", $initial, FALSE);
+            return FALSE;
         }
         if (!mysql_select_db($this->DBASE, $conn)) {
-            $this->error("Database not found or insufficient priviledges!", $initial, false);
-            return false;
+            $this->error("Database not found or insufficient priviledges!", $initial, FALSE);
+            return FALSE;
         }
-        if ($initial == true) {
+        if ($initial == TRUE) {
             $this->bot->log("MYSQL", "START", "MySQL database connection test successfull.");
         }
         $this->CONN = $conn;
@@ -167,7 +167,7 @@ class MySQL
     }
 
 
-    function error($text, $fatal = false, $connected = true)
+    function error($text, $fatal = FALSE, $connected = TRUE)
     {
         $msg = mysql_error();
         $this->error_count++;
@@ -175,7 +175,7 @@ class MySQL
         $this->bot->log("MySQL", "ERROR", $msg, $connected);
         // If this error is occuring while we are trying to first connect to the database when starting
         // rthe bot its a fatal error.
-        if ($fatal == true) {
+        if ($fatal == TRUE) {
             $this->bot->log("MySQL", "ERROR", "A fatal database error has occurred. Shutting down.", $connected);
             exit();
         }
@@ -190,10 +190,10 @@ class MySQL
         $result = mysql_query($sql, $this->CONN);
         if (!$result) {
             $this->error($sql);
-            return false;
+            return FALSE;
         }
         if (empty($result)) {
-            return false;
+            return FALSE;
         }
         while ($row = mysql_fetch_array($result, $result_form)) {
             $data[] = $row;
@@ -210,10 +210,10 @@ class MySQL
         $return = mysql_query($sql, $this->CONN);
         if (!$return) {
             $this->error($sql);
-            return false;
+            return FALSE;
         }
         else {
-            return true;
+            return TRUE;
         }
     }
 
@@ -224,7 +224,7 @@ class MySQL
         $sql = $this->add_prefix($sql);
         $result = mysql_query($sql, $this->CONN);
         if (!$result) {
-            return false;
+            return FALSE;
         }
         else {
             return $result;
@@ -239,10 +239,10 @@ class MySQL
         $result = mysql_query("DROP TABLE " . $sql, $this->CONN);
         if (!$return) {
             $this->error($sql);
-            return false;
+            return FALSE;
         }
         else {
-            return true;
+            return TRUE;
         }
     }
 
@@ -322,7 +322,7 @@ class MySQL
             // no entry existing, create one:
             $tablename = '';
             $prefix = '';
-            if (((strtolower($use_prefix) == 'true') || ($use_prefix === true)) && !empty($this->table_prefix)) {
+            if (((strtolower($use_prefix) == 'true') || ($use_prefix === TRUE)) && !empty($this->table_prefix)) {
                 $prefix = $this->table_prefix;
                 $tablename = $prefix . $this->underscore . $table;
                 $use_prefix = 'true';

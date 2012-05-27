@@ -30,7 +30,7 @@
 *  USA
 */
 ///////////////////////////////////
-// CraftClasses.php 1.2 for BeBot
+// craftclasses.php 1.2 for BeBot
 ///////////////////////////////////
 // (c) Copyright 2008 by Allan Noer
 // All Rights Reserved
@@ -119,7 +119,7 @@ class craftclasses extends BaseActiveModule
             if (empty($options[0]) || empty($options[1])) {
                 $output = "You MUST set both craft classes at the same time.";
             }
-            elseif ((array_search($options[0], $craftclass) !== false) && (array_search($options[1], $craftclass) !== false)) {
+            elseif ((array_search($options[0], $craftclass) !== FALSE) && (array_search($options[1], $craftclass) !== FALSE)) {
                 $this->bot->db->query(
                     'INSERT INTO #___craftingclass (name,class1,class2) VALUES("' . $name . '","' . $options[0] . '","' . $options[1]
                         . '") ON DUPLICATE KEY UPDATE class1=values(class1), class2=values(class2)'
@@ -146,7 +146,7 @@ class craftclasses extends BaseActiveModule
     }
 
 
-    function notify($name, $startup = false)
+    function notify($name, $startup = FALSE)
     {
         if ($this->bot->core("settings")
             ->get("Craftclasses", "Remind")

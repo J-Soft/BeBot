@@ -72,7 +72,7 @@ class Preferences_GUI extends BaseActiveModule
             //Show a spesific preference
             switch ($com['module']) {
             case '':
-                //Show all Modules
+                //Show all modules
                 return ($this->bot->core('prefs')->show_modules($name));
                 break;
             default:

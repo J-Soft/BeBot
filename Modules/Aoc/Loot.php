@@ -49,20 +49,20 @@ class Rolls extends BaseActiveModule
         $this->count = 0;
         $this->register_command(
             "gc", "loot", "ANONYMOUS", array(
-                "add" => "ANONYMOUS",
-                "rem" => "ANONYMOUS",
-                "list" => "ANONYMOUS",
-                "clear" => "ADMIN",
+                "add"    => "ANONYMOUS",
+                "rem"    => "ANONYMOUS",
+                "list"   => "ANONYMOUS",
+                "clear"  => "ADMIN",
                 "result" => "ADMIN",
                 "reroll" => "ADMIN"
             )
         );
         $this->register_command(
             "tell", "loot", "ANONYMOUS", array(
-                "add" => "ANONYMOUS",
-                "rem" => "ANONYMOUS",
-                "list" => "ANONYMOUS",
-                "clear" => "ADMIN",
+                "add"    => "ANONYMOUS",
+                "rem"    => "ANONYMOUS",
+                "list"   => "ANONYMOUS",
+                "clear"  => "ADMIN",
                 "result" => "ADMIN",
                 "reroll" => "ADMIN"
             )
@@ -111,7 +111,7 @@ class Rolls extends BaseActiveModule
             $this->rlist();
             break;
         case 'add':
-            $this->add($name, $com['args'], false);
+            $this->add($name, $com['args'], FALSE);
             break;
         case 'reroll':
             $this->reroll($name);
@@ -151,7 +151,7 @@ class Rolls extends BaseActiveModule
             $this->addmsg = "##loot_highlight##" . $name . "##end## removed from all slots.";
         }
         else {
-            $present = false;
+            $present = FALSE;
             if ($this->loot[$slot]) {
                 if ($this->bot->core("settings")
                     ->get('Loot', 'Roll') == "SINGLE"
@@ -162,11 +162,11 @@ class Rolls extends BaseActiveModule
                         foreach ($list as $playerslot => $player) {
                             if ($player == $name) {
                                 unset($this->loot[$sslot][$player]);
-                                $present = true;
+                                $present = TRUE;
                             }
                         }
                     }
-                    if ($present == true) {
+                    if ($present == TRUE) {
                         $this->addmsg = "##loot_highlight##" . $name . "##end## changed to slot##loot_highlight## #" . $slot . "##end##";
                     }
                     else {
@@ -189,12 +189,12 @@ class Rolls extends BaseActiveModule
 
     function loot($msg, $name)
     {
-        $notyet = true;
+        $notyet = TRUE;
         for ($i = 1; $i <= $this->count; $i++) {
             if ($msg == $this->loot[$i]['item']) {
                 $this->loot[$i]['num']++;
                 $num = $this->loot[$i]['num'];
-                $notyet = false;
+                $notyet = FALSE;
                 $numslot = $i;
             }
         }
@@ -268,12 +268,12 @@ class Rolls extends BaseActiveModule
         else {
             $this->count = 0;
             foreach ($this->leftovers as $item) {
-                $notyet = true;
+                $notyet = TRUE;
                 for ($i = 1; $i <= $this->count; $i++) {
                     if ($item == $this->loot[$i][item]) {
                         $this->loot[$i][num]++;
                         $num = $this->loot[$i][num];
-                        $notyet = false;
+                        $notyet = FALSE;
                         $numslot = $i;
                     }
                 }

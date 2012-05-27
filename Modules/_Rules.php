@@ -60,11 +60,11 @@ class Rules extends BaseActiveModule
     function make_rules()
     {
         $content = "<font color=CCInfoHeadline> :::: RULES ::::</font>\n\n";
-        if (file_exists("./Text/" . $this->bot->botname . "_rules.txt")) {
-            $content .= implode("", file("./Text/" . $this->bot->botname . "_rules.txt"));
+        if (file_exists("./txt/" . $this->bot->botname . "_rules.txt")) {
+            $content .= implode("", file("./txt/" . $this->bot->botname . "_rules.txt"));
         }
-        elseif (file_exists("./Text/Rules.txt")) {
-            $content .= implode("", file("./Text/Rules.txt"));
+        elseif (file_exists("./txt/rules.txt")) {
+            $content .= implode("", file("./txt/rules.txt"));
         }
         return "<botname>'s Rules :: " . $this->bot->core("tools")
             ->make_blob("click to view", $content);

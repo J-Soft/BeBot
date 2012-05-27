@@ -121,7 +121,7 @@ class Logon extends BaseActiveModule
         elseif (preg_match("/^logon$/i", $msg, $info)) {
             return $this->set_msg($name, '');
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -196,7 +196,7 @@ class Logon extends BaseActiveModule
                                     $res .= " (";
                                 }
                                 $res .= "Lvl ##logon_level##" . $result["level"] . "##end##";
-                                if (strtolower(AOCHAT_GAME) == "ao") {
+                                if ($this->bot->game == "ao") {
                                     $res .= "/##logon_ailevel##" . $result["at_id"] . "##end## " . $result["faction"] . " " . $result["profession"];
                                     if ($result["org"] != '') {
                                         $res .= ", ##logon_organization##" . $result["rank"] . " of " . $result["org"] . "##end##";

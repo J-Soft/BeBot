@@ -1,6 +1,6 @@
 <?php
 /*
-* Irc.php - IRC Relay.
+* IRC.php - IRC Relay.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -34,7 +34,7 @@
 /*
 Add a "_" at the beginning of the file (_IRC.php) if you do not want it to be loaded.
 */
-include_once ('Sources/SmartIRC/SmartIRC.php');
+include_once ('Sources/SmartIRC.php');
 $irc = new IRC($bot);
 /*
 The Class itself...
@@ -126,7 +126,7 @@ class IRC extends BaseActiveModule
         $this->bot->core("colors")->define_scheme("Irc", "Text", "normal");
         $this->bot->core("colors")->define_scheme("Irc", "User", "normal");
         $this->bot->core("colors")->define_scheme("Irc", "Group", "normal");
-        $this->irc = null;
+        $this->irc = NULL;
         $this->last_log["st"] = time();
         $this->bot->core("timer")->register_callback("IRC", $this);
         $this->spam[0] = array(
@@ -230,14 +230,14 @@ class IRC extends BaseActiveModule
     function send_irc($prefix, $name, $msg)
     {
         if (!$this->bot->core("settings")->get("irc", "connected")) {
-            return false;
+            return FALSE;
         }
         $msg = $this->strip_formatting($msg);
         // If msg is too long to be relayed drop it:
         if (strlen($msg) > $this->bot->core("settings")
             ->get("Irc", "Maxrelaysize")
         ) {
-            return false;
+            return FALSE;
         }
         $ircmsg = "";
         if ($prefix != "") {
@@ -252,7 +252,7 @@ class IRC extends BaseActiveModule
             SMARTIRC_TYPE_CHANNEL, $this->bot->core("settings")
                 ->get("Irc", "Channel"), $ircmsg
         );
-        return true;
+        return TRUE;
     }
 
 
@@ -263,7 +263,7 @@ class IRC extends BaseActiveModule
     {
         $msg = str_replace("&gt;", ">", $msg);
         $msg = str_replace("&lt;", "<", $msg);
-        if (($this->irc != null)
+        if (($this->irc != NULL)
             && ((strtolower(
                 $this->bot->core("settings")
                     ->get("Irc", "Chat")
@@ -305,7 +305,7 @@ class IRC extends BaseActiveModule
     {
         $msg = str_replace("&gt;", ">", $msg);
         $msg = str_replace("&lt;", "<", $msg);
-        if (($this->irc != null)
+        if (($this->irc != NULL)
             && ((strtolower(
                 $this->bot->core("settings")
                     ->get("Irc", "Chat")
@@ -346,7 +346,7 @@ class IRC extends BaseActiveModule
     */
     function cron()
     {
-        if (($this->irc != null) && (!$this->irc->_rawreceive())) {
+        if (($this->irc != NULL) && (!$this->irc->_rawreceive())) {
             $this->irc_disconnect();
             $this->bot->send_gc("IRC connection lost...");
             $this->spam[1][$this->spam[0][1] + 1] = time();
@@ -380,7 +380,7 @@ class IRC extends BaseActiveModule
                 }
             }
             $this->bot->core("timer")
-                ->add_timer(true, "IRC", 30, "IRC-Connect", "internal", 0, "None");
+                ->add_timer(TRUE, "IRC", 30, "IRC-Connect", "internal", 0, "None");
         }
     }
 
@@ -494,7 +494,7 @@ class IRC extends BaseActiveModule
     function change_server($new)
     {
         $this->bot->core("settings")->save("Irc", "Server", $new);
-        if ($this->irc == null) {
+        if ($this->irc == NULL) {
             return "Server has been changed to ##highlight##$new##end##.";
         }
         else {
@@ -509,7 +509,7 @@ class IRC extends BaseActiveModule
     function change_port($new)
     {
         $this->bot->core("settings")->save("Irc", "Port", $new);
-        if ($this->irc == null) {
+        if ($this->irc == NULL) {
             return "Port has been changed to ##highlight##$new##end##.";
         }
         else {
@@ -528,7 +528,7 @@ class IRC extends BaseActiveModule
             $new = '#' . $new;
         }
         $this->bot->core("settings")->save("Irc", "Channel", $new);
-        if ($this->irc == null) {
+        if ($this->irc == NULL) {
             return "Channel has been changed to ##highlight##$new##end##.";
         }
         else {
@@ -553,7 +553,7 @@ class IRC extends BaseActiveModule
     function change_nick($new)
     {
         $this->bot->core("settings")->save("Irc", "Nick", $new);
-        if ($this->irc == null) {
+        if ($this->irc == NULL) {
             return "Nick has been changed to ##highlight##$new##end##.";
         }
         else {
@@ -616,7 +616,7 @@ class IRC extends BaseActiveModule
             $stmp = TRUE;
         }
         $this->bot->core("settings")->save("Irc", "Reconnect", $stmp);
-        if ($this->irc != null) {
+        if ($this->irc != NULL) {
             $this->irc->setAutoReconnect($tmp);
         }
         return "Reconnect has been switched " . $new . ".";
@@ -756,9 +756,9 @@ class IRC extends BaseActiveModule
     */
     function irc_disconnect()
     {
-        if ($this->irc != null) {
+        if ($this->irc != NULL) {
             $this->irc->disconnect();
-            $this->irc = null;
+            $this->irc = NULL;
             $this->unregister_event("cron", "1sec");
             $this->bot->core("settings")->save("irc", "connected", FALSE);
             $this->bot->db->query("UPDATE #___online SET status_gc = 0 WHERE botname = '" . $this->bot->botname . " - IRC'");
@@ -1046,7 +1046,7 @@ class IRC extends BaseActiveModule
             if (!empty($who["lastname"]) && ($who["lastname"] != "Unknown")) {
                 $result .= " " . $who["lastname"];
             }
-            if (strtolower(AOCHAT_GAME) == "ao") {
+            if ($this->bot->game == "ao") {
                 $result .= " is a level " . $who["level"] . " " . $at . "" . $who["gender"] . " " . $who["breed"] . " ";
                 $result .= $who["profession"] . ", " . $who["faction"];
             }

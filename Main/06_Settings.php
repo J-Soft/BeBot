@@ -169,7 +169,7 @@ class Settings_Core extends BasePassiveModule
     } // End function get()
 
     /*
-    Retrives all of a Modules settings from the database.
+    Retrives all of a modules settings from the database.
     */
     function get_all($module)
     { // Start function get_all()
@@ -510,7 +510,7 @@ class Settings_Core extends BasePassiveModule
                 return $this->error;
             }
         }
-        return true; // No errors found if we get this far.
+        return TRUE; // No errors found if we get this far.
     } // End function check_data()
 
     /*
@@ -692,7 +692,7 @@ class Settings_Core extends BasePassiveModule
             return "$module_name has the setting $setting of the module $module already registered!";
         }
         $this->callbacks[strtolower($module)][strtolower($setting)][$module_name] = &$reg_module;
-        return false;
+        return FALSE;
     }
 
 
@@ -704,7 +704,7 @@ class Settings_Core extends BasePassiveModule
         }
         $this->callbacks[strtolower($module)][strtolower($setting)][$module_name] = NULL;
         unset($this->callbacks[strtolower($module)][strtolower($setting)][$module_name]);
-        return false;
+        return FALSE;
     }
 } // End of Class
 ?>

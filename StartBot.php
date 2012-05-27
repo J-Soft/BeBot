@@ -82,9 +82,9 @@ $systemcommand = $php_bin . $php_args . " " . $main_php;
 if ($argc > 1) {
     $systemcommand .= " " . $argv[1];
 }
-while (true) {
+while (TRUE) {
     if ($pw) {
-        $fp = fopen('./Conf/pw', 'w');
+        $fp = fopen('./conf/pw', 'w');
         fwrite($fp, $pw);
         fclose($fp);
     }

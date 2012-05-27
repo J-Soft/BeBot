@@ -72,7 +72,7 @@ class SetConf extends BaseActiveModule
     } // End function process_command()
 
     /*
-    Retruns a click window with the setting Modules.
+    Retruns a click window with the setting modules.
     */
     function show_all_modules()
     { // Start function show_all_modules()

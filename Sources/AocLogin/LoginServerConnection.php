@@ -91,9 +91,9 @@ class LoginServerConnection extends ServerConnection
     {
         if (parent::Connect()) {
             $this->SendAuthentication();
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -142,7 +142,7 @@ class LoginServerConnection extends ServerConnection
     {
         do {
             $stream = parent::HandlePackets();
-            if ($stream == null) {
+            if ($stream == NULL) {
                 continue;
             }
             $rpcID = parent::GetRpcID($stream);
@@ -166,22 +166,22 @@ class LoginServerConnection extends ServerConnection
 
                 if ($authStatus != 1) {
                     echo("[" . $this->m_LogName . "] Failed to authenticate [auth:$authStatus] \n");
-                    return false;
+                    return FALSE;
                 }
 
                 if ($loginStatus != 0) {
                     echo("[" . $this->m_LogName . "] Failed to log in [login error:$loginStatus] : " . parent::displayConanError($loginStatus) . "\n");
-                    return false;
+                    return FALSE;
                 }
 
                 // Split the server address up from address:port
                 if (strlen($tmAddress) != 0) {
                     list($this->m_CharacterServerAddress, $this->m_CharacterServerPort) = split(":", $tmAddress);
                     echo "[" . $this->m_LogName . "] Received character server address [ " . $this->m_CharacterServerAddress . ":" . $this->m_CharacterServerPort . " ]\n";
-                    return true;
+                    return TRUE;
                 }
                 echo("[" . $this->m_LogName . "] Failed to receive the character server address\n");
-                return false;
+                return FALSE;
                 }
 
             case RPC_UNIVERSE_INTERNAL_ERROR:
@@ -189,21 +189,21 @@ class LoginServerConnection extends ServerConnection
                 trigger_error("RPC_UNIVERSE_INTERNAL_ERROR: Internal error", E_USER_WARNING);
                 $this->Disconnect("Internal error");
                 }
-                return false;
+                return FALSE;
 
             case RPC_UNIVERSE_ERROR:
                 {
                 //trigger_error("RPC_UNIVERSE_ERROR: Error while authenticating to universe [Err:".$this->displayConanError($packet->args[0])."]",E_USER_WARNING);
                 $this->Disconnect("Universe Error");
                 }
-                return false;
+                return FALSE;
 
             case RPC_UNIVERSE_SETREGION:
                 break;
 
             case -1:
                 trigger_error("RPC_LOGINSERVER_ERROR: Error while reading message header [Err:Unknown RPC ID]", E_USER_WARNING);
-                return false;
+                return FALSE;
 
             default:
                 echo("[" . $this->m_LogName . "] Unhandled RPC : $rpcID\n");
@@ -211,9 +211,9 @@ class LoginServerConnection extends ServerConnection
             }
 
         }
-        while (true);
+        while (TRUE);
 
-        return true;
+        return TRUE;
     }
 }
 

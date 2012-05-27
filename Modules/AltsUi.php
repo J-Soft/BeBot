@@ -125,7 +125,7 @@ class Alts extends BaseActiveModule
         default:
             return "Broken plugin, received unhandled command: $command";
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -143,7 +143,7 @@ class Alts extends BaseActiveModule
 
         $alts = $this->bot->core("alts")->show_alt($name);
 
-        if (strtolower(AOCHAT_GAME) == "aoc") {
+        if ($this->bot->game == "aoc") {
             $retstr = "{$whois['nickname']} ({$whois['level']} / {$whois['class']}) - ";
         }
         else {

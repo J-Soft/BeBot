@@ -62,7 +62,7 @@ class History extends BaseActiveModule
                 return "No name specified";
             }
         }
-        return false;
+        return FALSE;
     }
 
 

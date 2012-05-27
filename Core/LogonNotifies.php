@@ -1,6 +1,6 @@
 <?php
 /*
-* LogonNotifies.php - Notifies registered Modules when members log on.
+* Logon_Notifies.php - Notifies registered modules when members log on.
 * This notify is send after a configurable delay to avoid spamming right at logon.
 *
 * Written by Alreadythere (RK2).
@@ -35,16 +35,16 @@
 *  USA
 */
 /*
- * Global storing for delaying notifies of Modules on logon.
+ * Global storing for delaying notifies of modules on logon.
  * This module offers the storing backend as well as the buddy tracking.
  * The notification delay can be set by a global setting.
  *
  * Modules need to register themself for callbacks when a buddy has to be notified.
- * Only guests and members are handled in this module. All registering Modules must have
+ * Only guests and members are handled in this module. All registering modules must have
  * have a function notify($nickname, $startup) handling all module dependant stuff.
  * The $nickname is the name of the character that logged on, $startup is a boolean defining
  * if the Bot still is in the startup phase or not anymore. This can be used to remove spamming
- * of some things on bot restarts, useful for Modules that only should do something if a
+ * of some things on bot restarts, useful for modules that only should do something if a
  * character logs in for real, instead of the possibly false logons on bot startup.
  */
 $logon_notifies_core = new Logon_Notifies_Core($bot);
@@ -132,10 +132,10 @@ class Logon_Notifies_Core extends BasePassiveModule
         }
         $thistime = time();
         if ($thistime >= $this->startup) {
-            $starting = false;
+            $starting = FALSE;
         }
         else {
-            $starting = true;
+            $starting = TRUE;
         }
         foreach ($this->notifies as $user => $time) {
             if ($time <= $thistime) {

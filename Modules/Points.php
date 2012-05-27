@@ -78,12 +78,12 @@ class Points extends BaseActiveModule
         $this->help['command']['points top'] = "Shows the 25 biggest point accounts.";
         $this->register_command(
             "all", "points", "GUEST", array(
-                "add" => "SUPERADMIN",
-                "del" => "SUPERADMIN",
-                "rem" => "SUPERADMIN",
+                "add"      => "SUPERADMIN",
+                "del"      => "SUPERADMIN",
+                "rem"      => "SUPERADMIN",
                 "transfer" => "SUPERADMIN",
-                "tomain" => "SUPERADMIN",
-                "all" => "SUPERADMIN"
+                "tomain"   => "SUPERADMIN",
+                "all"      => "SUPERADMIN"
             )
         );
         $this->register_module("points");
@@ -179,7 +179,7 @@ class Points extends BaseActiveModule
         case 'logs':
             Return $this->view_log($name, $msg[2], $msg[3]);
         case '':
-            $this->show_points($name, false);
+            $this->show_points($name, FALSE);
             Break;
         Default:
             $this->show_points($name, $msg[1]);

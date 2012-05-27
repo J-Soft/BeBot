@@ -89,7 +89,7 @@ class Whois_Core extends BasePassiveModule
             "1;2;3;4;5"
         );
         $this->bot->core("settings")
-            ->create('Whois', "Debug", False, "Show debug information (such as Character ID, Org ID, etc)");
+            ->create('Whois', "Debug", FALSE, "Show debug information (such as Character ID, Org ID, etc)");
         $this->update_table();
     }
 
@@ -104,10 +104,12 @@ class Whois_Core extends BasePassiveModule
             //was an update for a setting which isnt used in AoC
         case 2:
             $this->bot->db->update_table(
-                "whois", "class1", "modify", "ALTER IGNORE TABLE #___whois modify `class1` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
+                "whois", "class1", "modify",
+                "ALTER IGNORE TABLE #___whois modify `class1` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
             );
             $this->bot->db->update_table(
-                "whois", "class2", "modify", "ALTER IGNORE TABLE #___whois modify `class2` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
+                "whois", "class2", "modify",
+                "ALTER IGNORE TABLE #___whois modify `class2` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
             );
         case 3:
             $this->bot->db->update_table("whois", "id", "alter", "ALTER TABLE #___whois CHANGE `id` BIGINT NOT NULL");
@@ -266,7 +268,7 @@ class Whois_Core extends BasePassiveModule
      *
      * @return The WHO array, or false, or BotError
      */
-    function lookup($name, $noupdate = false, $nowait = false)
+    function lookup($name, $noupdate = FALSE, $nowait = FALSE)
     {
         if ($this->bot->core("settings")->get("Statistics", "Enabled")) {
             $this->bot->core("statistics")
@@ -329,7 +331,7 @@ class Whois_Core extends BasePassiveModule
         */
         if ($noupdate) {
             if (empty($lookup)) {
-                return false;
+                return FALSE;
             }
             else {
                 // return outdated info because the caller didn't want us to update it
@@ -341,11 +343,11 @@ class Whois_Core extends BasePassiveModule
         // and retrieve the info when the buddy() function gets called.
         $this->bot->core("chat")->buddy_add($uid);
         if ($nowait) {
-            return false;
+            return FALSE;
         }
         else {
             $this->bot->aoc->wait_for_buddy_add($uid);
-            return $this->lookup($name, true);
+            return $this->lookup($name, TRUE);
         }
     }
 

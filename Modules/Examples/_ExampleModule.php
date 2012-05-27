@@ -110,7 +110,7 @@ class ClassName extends BaseActiveModule
         /*
             Create settings for this module. The settings contains seven parts
             'module' is the module or settings group in which the setting should be placed
-            'setting' is the name of the setting as referred to by the Modules
+            'setting' is the name of the setting as referred to by the modules
             'default' is the default value of the module
             'description of setting' is a description of what the setting is for. This is used in the settings interface.
             'option1;option2;option3' are the availible options for the setting.
@@ -120,7 +120,7 @@ class ClassName extends BaseActiveModule
         /*
             Create preferences for this module. The preferences contains six parts
             'module' is the module or preference group in which the preference should be placed
-            'name' is the name of the preference as referred to by the Modules
+            'name' is the name of the preference as referred to by the modules
             'description' is a description of the preference. This is used in the preference interface
             'default' is the default value of the preference.
             'option1;option2' is a semicolon (;) separated list of possible options

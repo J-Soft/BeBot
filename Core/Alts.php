@@ -63,9 +63,9 @@ class Alts_Core extends BasePassiveModule
         $this->bot->core("settings")
             ->create('Alts', "Output", "Fancy", "How would you like your alts list", "Fancy;Old");
         $this->bot->core("settings")
-            ->create('Alts', "Detail", True, "Show level and profession in the alts list");
+            ->create('Alts', "Detail", TRUE, "Show level and profession in the alts list");
         $this->bot->core("settings")
-            ->create('Alts', "LastSeen", True, "Show the time we last saw an alt if they are offline");
+            ->create('Alts', "LastSeen", TRUE, "Show the time we last saw an alt if they are offline");
         $this->bot->core("settings")
             ->create('Alts', "Confirmation", FALSE, "Does the Alt have to Confirm him Self as an Alt after being Added?");
         $this->bot->core("settings")
@@ -183,11 +183,11 @@ class Alts_Core extends BasePassiveModule
         $main = $this->main($who);
         $alts = $this->get_alts($main);
         if (empty($alts)) {
-            $ret['alts'] = false;
+            $ret['alts'] = FALSE;
             $ret['list'] = "";
         }
         else {
-            $ret['alts'] = true;
+            $ret['alts'] = TRUE;
             $ret['list'] = $this->make_alt_blob($main, ucfirst(strtolower($who)), $alts, $returntype);
         }
         return $ret;
@@ -241,10 +241,10 @@ class Alts_Core extends BasePassiveModule
                 array_unshift($alts, $main);
             }
             if (empty($alts)) {
-                $ret['alts'] = false;
+                $ret['alts'] = FALSE;
             }
             else {
-                $ret['alts'] = true;
+                $ret['alts'] = TRUE;
             }
             $ret['list'] = $this->make_info_blob($whois, $main, $alts, $returntype);
             return $ret;
@@ -281,7 +281,7 @@ class Alts_Core extends BasePassiveModule
                         }
                         if (!empty($whoisalt['level'])) {
                             $window .= "\n##normal## - (##highlight##" . $whoisalt['level'] . "##end##";
-                            if (strtolower(AOCHAT_GAME) == "ao") {
+                            if ($this->bot->game == "ao") {
                                 $window .= "/##lime##" . $whoisalt['at_id'] . "##end##";
                             }
                             $window .= " " . $whoisalt['profession'] . ")##end##";
@@ -325,7 +325,7 @@ class Alts_Core extends BasePassiveModule
     /*
     Show mains/alts
     You should use this function when calling your alts list
-    This way you ensure that the formatting is the same across all Modules
+    This way you ensure that the formatting is the same across all modules
     */
     function show_alt($who, $returntype = 0)
     {

@@ -92,7 +92,7 @@ abstract class BaseActiveModule extends BasePassiveModule
                 }
             }
             else {
-                //Say something useful for Modules not registering commands properly.
+                //Say something useful for modules not registering commands properly.
                 $old_module = $this->bot->get_command_handler($channel, $command);
                 $this->error->set(
                     "Duplicate command definition! The command '$command' for channel '$channel'"
@@ -144,15 +144,15 @@ abstract class BaseActiveModule extends BasePassiveModule
     // This function aids in parsing the command.
     protected function parse_com(
         $command, $pattern
-    = array(
-        'com',
-        'sub',
-        'args'
-    )
+        = array(
+            'com',
+            'sub',
+            'args'
+        )
     )
     {
         //preg_match for items and insert a replacement.
-        if (strtolower(AOCHAT_GAME) == "aoc") {
+        if ($this->bot->game == "aoc") {
             $search_pattern = '/' . $this->bot->core('items')->itemPattern . '/i';
         }
         else {
@@ -189,13 +189,13 @@ abstract class BaseActiveModule extends BasePassiveModule
      *************************************************************************/
     public function reply($name, $msg)
     {
-        if ($msg != false) {
+        if ($msg != FALSE) {
             if ($msg instanceof BotError) {
                 //We got an error. Return the error message.
                 $this->reply($name, $msg->message());
             }
             else {
-                $this->output($name, "##normal##$msg##end##", SAME);
+                $this->output_destination($name, "##normal##$msg##end##", SAME);
             }
         }
     }
@@ -206,7 +206,7 @@ abstract class BaseActiveModule extends BasePassiveModule
         $this->source = TELL;
         $this->error->reset();
         $reply = $this->command_handler($name, $msg, "tell");
-        if (($reply !== false) && ($reply !== '')) {
+        if (($reply !== FALSE) && ($reply !== '')) {
             $this->reply($name, $reply);
         }
     }
@@ -217,7 +217,7 @@ abstract class BaseActiveModule extends BasePassiveModule
         $this->source = GC;
         $this->error->reset();
         $reply = $this->command_handler($name, $msg, "gc");
-        if (($reply !== false) && ($reply !== '')) {
+        if (($reply !== FALSE) && ($reply !== '')) {
             $this->reply($name, $reply);
         }
     }
@@ -228,7 +228,7 @@ abstract class BaseActiveModule extends BasePassiveModule
         $this->source = PG;
         $this->error->reset();
         $reply = $this->command_handler($name, $msg, "pgmsg");
-        if (($reply !== false) && ($reply !== '')) {
+        if (($reply !== FALSE) && ($reply !== '')) {
             $this->reply($name, $reply);
         }
     }

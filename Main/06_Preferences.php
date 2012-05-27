@@ -184,7 +184,7 @@ class Preferences_core extends BasePassiveModule
     }
 
 
-    function get($name, $module = false, $setting = false)
+    function get($name, $module = FALSE, $setting = FALSE)
     {
         //Check if $name is already a uid.
         if (is_numeric($name)) {
@@ -193,12 +193,12 @@ class Preferences_core extends BasePassiveModule
         else {
             $uid = $this->bot->core('player')->id($name);
         }
-        if ($module == false && $setting == false) {
+        if ($module == FALSE && $setting == FALSE) {
             //We're fetching a list of all preferences for a user
             $prefs = array_merge($this->cache['def'], (array)$this->cache[$uid]);
             return ($prefs);
         }
-        if ($module != false && $setting == false) {
+        if ($module != FALSE && $setting == FALSE) {
             //We're fetching a list of all preferences for a given module
             $prefs = array_merge($this->cache['def'][strtolower($module)], (array)$this->cache[$uid][strtolower($module)]);
             return ($prefs);

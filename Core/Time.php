@@ -71,7 +71,7 @@ class Time_Core extends BaseActiveModule
     function show_time()
     { // Start function show_time()
         $output = "It is currently " . gmdate("H:i:s F j,");
-        if (strtolower(AOCHAT_GAME) == "ao") {
+        if ($this->bot->game == "ao") {
             $output .= " " . $this->ao_year() . " Rubi-Ka Universal Time. ";
             $e1 = " from Uncle Pumpkin-head";
             $e2 = "Leet";

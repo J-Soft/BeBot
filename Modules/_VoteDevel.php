@@ -289,7 +289,7 @@ class Vote extends BaseActiveModule
     function set_time($name, $vote_no, $time)
     {
         $timestamp = strtotime($time);
-        if (($timestamp === false) or ($timestamp === -1)) {
+        if (($timestamp === FALSE) or ($timestamp === -1)) {
             return "Illegal time: $time";
         }
         else {
@@ -298,9 +298,9 @@ class Vote extends BaseActiveModule
     }
 
 
-    function restrict_vote($name, $vote_no, $level = false)
+    function restrict_vote($name, $vote_no, $level = FALSE)
     {
-        if ($level === false) {
+        if ($level === FALSE) {
             //Show a list of ranks as listed in $this -> bot -> core("security") -> cache[orgranks] and guest, member, leader. admin.
         }
         else {
@@ -391,9 +391,9 @@ class Vote extends BaseActiveModule
     }
 
 
-    function vote_interface($name, $vote = false)
+    function vote_interface($name, $vote = FALSE)
     {
-        if ($vote === false) {
+        if ($vote === FALSE) {
             //Get the highest rank of this players toons
             //List all active votes that the person can vote on
             $rank = 2;
@@ -423,7 +423,7 @@ class Vote extends BaseActiveModule
         }
         else {
             //Check that the vote is started.
-            if (true) {
+            if (TRUE) {
                 //Check that the player hasn't voted on this vote.
                 //list options for vote $vote
                 $query = " SELECT id, description FROM #___votes WHERE id=$vote UNION SELECT id, description FROM #___vote_options WHERE vote_id=$vote";

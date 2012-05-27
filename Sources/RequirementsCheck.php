@@ -63,7 +63,7 @@ if (!extension_loaded("mysql")) {
         die("MySQL support required to run this bot");
     }
 }
-//From AoChat.php
+//From AOChat.php
 // The minimum required PHP version to run.
 if ((float)phpversion() < 5.2) {
     die("AOChat class needs PHP version >= 5.2.0 to work.\n");
