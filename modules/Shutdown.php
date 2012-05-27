@@ -43,12 +43,12 @@ class Shutdown extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->register_command("tell", "shutdown", "SUPERADMIN");
         $this->register_command("tell", "restart", "SUPERADMIN");
-        $this->help['description']         = 'Handles bot shut down and restart..';
+        $this->help['description'] = 'Handles bot shut down and restart..';
         $this->help['command']['shutdown'] = "Shuts down the bot.";
-        $this->help['command']['restart']  = "Restarts the bot.";
-        $this->help['notes']               = "If the bot is started in debug mode input _might_ be required in the console for the bot to restart.";
+        $this->help['command']['restart'] = "Restarts the bot.";
+        $this->help['notes'] = "If the bot is started in debug mode input _might_ be required in the console for the bot to restart.";
         $this->bot->core("settings")
-            ->create("Shutdown", "QuietShutdown", false, "Do shutdown/restart quietly without spamming the guild channel?");
+            ->create("Shutdown", "QuietShutdown", FALSE, "Do shutdown/restart quietly without spamming the guild channel?");
     }
 
 
@@ -62,18 +62,17 @@ class Shutdown extends BaseActiveModule
             Return;
         }
         $msg = explode(" ", $msg, 2);
-        Switch ($msg[0])
-        {
-            case 'shutdown':
-                $this->stop($name, "has been shutdown.", $msg[1]);
-                Break;
-            case 'restart':
-                $this->stop($name, "is restarting.", $msg[1]);
-                Break;
-            Default:
-                return "##error##Error: Shutdown Module received Unknown Command ##highlight##$msg[0]##end####end##";
+        Switch ($msg[0]) {
+        case 'shutdown':
+            $this->stop($name, "has been shutdown.", $msg[1]);
+            Break;
+        case 'restart':
+            $this->stop($name, "is restarting.", $msg[1]);
+            Break;
+        Default:
+            return "##error##Error: Shutdown Module received Unknown Command ##highlight##$msg[0]##end####end##";
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -88,8 +87,10 @@ class Shutdown extends BaseActiveModule
             $this->bot->send_pgroup("The bot " . $text . $why);
         }
         $this->bot->send_tell($name, "The bot " . $text);
-        $this->crontime = array(time() + 2,
-                                "The bot " . $text);
+        $this->crontime = array(
+            time() + 2,
+            "The bot " . $text
+        );
         $this->register_event("cron", "1sec");
     }
 

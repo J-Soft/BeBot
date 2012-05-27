@@ -53,10 +53,9 @@ class AutoUserAdd extends BasePassiveModule
             ->create("Autouseradd", "Notify", TRUE, "Should the User be Notified that he was added to the Bot?");
         // Fill checked array with current members, we won't need to readd them:
         $this->checked = array();
-        $mems          = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level = 2", MYSQL_ASSOC);
+        $mems = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level = 2", MYSQL_ASSOC);
         if (!empty($mems)) {
-            foreach ($mems as $mem)
-            {
+            foreach ($mems as $mem) {
                 $this->checked[$mem['nickname']] = TRUE;
             }
         }
@@ -77,14 +76,13 @@ class AutoUserAdd extends BasePassiveModule
         // Add all characters when they are noticed in chat the first time:
         if (!isset($this->checked[$name])) {
             $this->checked[$name] = TRUE;
-            $result               = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '" . $name . "'");
+            $result = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '" . $name . "'");
             if (!empty($result)) {
                 if ($result[0][0] != 2) {
                     $this->add_user($name);
                 }
             }
-            else
-            {
+            else {
                 $this->add_user($name);
             }
         }
@@ -96,15 +94,13 @@ class AutoUserAdd extends BasePassiveModule
         if ($this->bot->core("settings")->get("Autouseradd", "Notify")) {
             $silent = 0;
         }
-        else
-        {
+        else {
             $silent = 1;
         }
         $this->bot->core("user")
             ->add($this->bot->botname, $name, 0, MEMBER, $silent);
         if (!empty($this->hooks)) {
-            foreach ($this->hooks as $hook)
-            {
+            foreach ($this->hooks as $hook) {
                 $hook->new_user($name);
             }
         }

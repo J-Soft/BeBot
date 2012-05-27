@@ -58,22 +58,24 @@ class PrivGroup extends BaseActiveModule
         $this->register_event("pgjoin");
         $this->register_event("pgleave");
         if ($this->bot->guildbot) {
-            $joindef  = "gc";
+            $joindef = "gc";
             $leavedef = "gc";
         }
-        else
-        {
-            $joindef  = "pgmsg";
+        else {
+            $joindef = "pgmsg";
             $leavedef = "none";
         }
-        $longjoin  = "Which chat channels should be notified about joins to the private chat channel?";
+        $longjoin = "Which chat channels should be notified about joins to the private chat channel?";
         $longleave = "Which chat channels should be notified about leave to the private chat channel?";
         $this->bot->core("settings")
             ->create("PrivGroup", "EchoJoin", $joindef, $longjoin, "none;pgmsg;gc;both");
         $this->bot->core("settings")
             ->create("PrivGroup", "EchoLeave", $leavedef, $longleave, "none;pgmsg;gc;both");
         $this->bot->core("settings")
-            ->create("PrivGroup", "JoinString", "#!NICKNAME!# (#!LEVEL!#/#!AT_ID!# ##~!FACTION!~##~!FACTION!~##end## #!PROFESSION!#, #!ORG!#) has joined #!BOTNAME!#", "Formating string for join notifications.", "", TRUE);
+            ->create(
+            "PrivGroup", "JoinString", "#!NICKNAME!# (#!LEVEL!#/#!AT_ID!# ##~!FACTION!~##~!FACTION!~##end## #!PROFESSION!#, #!ORG!#) has joined #!BOTNAME!#",
+            "Formating string for join notifications.", "", TRUE
+        );
         $this->bot->core("settings")
             ->create("PrivGroup", "LeaveString", "#!NICKNAME!# has left #!BOTNAME!#", "Formating string for leave notifications.", "", TRUE);
         $this->bot->core("settings")
@@ -84,17 +86,17 @@ class PrivGroup extends BaseActiveModule
         unset($longleave);
         unset($joindef);
         unset($leavedef);
-        $this->help['description']                  = 'Module to handle the privat group.';
-        $this->help['command']['join']              = "Join the private group of the bot.";
-        $this->help['command']['chat']              = "Join the private group of the bot.";
-        $this->help['command']['invite']            = "Join the private group of the bot.";
-        $this->help['command']['invite <name>']     = "Invite <name> to join the private group of the bot.";
-        $this->help['command']['leave']             = "Leave the private group of the bot.";
-        $this->help['command']['kick']              = "Leave the private group of the bot.";
-        $this->help['command']['kick <name>']       = "Kick <name> from the private group of the bot.";
+        $this->help['description'] = 'Module to handle the privat group.';
+        $this->help['command']['join'] = "Join the private group of the bot.";
+        $this->help['command']['chat'] = "Join the private group of the bot.";
+        $this->help['command']['invite'] = "Join the private group of the bot.";
+        $this->help['command']['invite <name>'] = "Invite <name> to join the private group of the bot.";
+        $this->help['command']['leave'] = "Leave the private group of the bot.";
+        $this->help['command']['kick'] = "Leave the private group of the bot.";
+        $this->help['command']['kick <name>'] = "Kick <name> from the private group of the bot.";
         $this->help['command']['inviteuser <name>'] = "Invites <name> to the private group of the bot.";
-        $this->help['command']['kickuser <name>']   = "Kicks <name> from the private group of the bot.";
-        $this->help['command']['kickall']           = "Completely empties the private group of the bot.";
+        $this->help['command']['kickuser <name>'] = "Kicks <name> from the private group of the bot.";
+        $this->help['command']['kickall'] = "Completely empties the private group of the bot.";
     }
 
 
@@ -102,36 +104,45 @@ class PrivGroup extends BaseActiveModule
     {
         if (preg_match("/^join/i", $msg) || preg_match("/^invite$/i", $msg) || preg_match("/^chat/i", $msg)) {
             if ($this->bot->core("settings")->get("Privgroup", "Deactivated")) {
-                $this->bot->send_output($name, $this->bot->core("settings")
-                    ->get("Privgroup", "Deactivatedtext"), $chan);
+                $this->bot->send_output(
+                    $name, $this->bot->core("settings")
+                        ->get("Privgroup", "Deactivatedtext"), $chan
+                );
             }
-            else
-            {
+            else {
                 $this->bot->core("chat")->pgroup_invite($name);
             }
         }
-        else if (preg_match("/^leave/i", $msg) || preg_match("/^kick$/i", $msg)) {
-            $this->bot->core("chat")->pgroup_kick($name);
-        }
-        else if (preg_match("/^invite (.+)$/i", $msg, $info)) {
-            if ($this->bot->core("settings")->get("Privgroup", "Deactivated")) {
-                $this->bot->send_output($name, $this->bot->core("settings")
-                    ->get("Privgroup", "Deactivatedtext"), $chan);
+        else {
+            if (preg_match("/^leave/i", $msg) || preg_match("/^kick$/i", $msg)) {
+                $this->bot->core("chat")->pgroup_kick($name);
             }
-            else
-            {
-                $this->invite($name, $chan, $info[1]);
+            else {
+                if (preg_match("/^invite (.+)$/i", $msg, $info)) {
+                    if ($this->bot->core("settings")->get("Privgroup", "Deactivated")) {
+                        $this->bot->send_output(
+                            $name, $this->bot->core("settings")
+                                ->get("Privgroup", "Deactivatedtext"), $chan
+                        );
+                    }
+                    else {
+                        $this->invite($name, $chan, $info[1]);
+                    }
+                }
+                else {
+                    if (preg_match("/^kick (.+)$/i", $msg, $info)) {
+                        $this->kick_user($name, $chan, $info[1]);
+                    }
+                    else {
+                        if (preg_match("/^kickall$/i", $msg, $info)) {
+                            $this->kick_all($name, $chan);
+                        }
+                        else {
+                            $this->bot->send_help($name);
+                        }
+                    }
+                }
             }
-        }
-        else if (preg_match("/^kick (.+)$/i", $msg, $info)) {
-            $this->kick_user($name, $chan, $info[1]);
-        }
-        else if (preg_match("/^kickall$/i", $msg, $info)) {
-            $this->kick_all($name, $chan);
-        }
-        else
-        {
-            $this->bot->send_help($name);
         }
         return FALSE;
     }
@@ -147,22 +158,25 @@ class PrivGroup extends BaseActiveModule
             $pmsg = " (" . $who[1] . ")";
         }
         $who = ucfirst(strtolower($who[0]));
-        $id  = $this->bot->core('player')->id($who);
+        $id = $this->bot->core('player')->id($who);
         if ($this->bot->botname == $who) {
             $msg = "You cannot invite the bot to its own chat group";
         }
-        else if ($this->bot->core("online")->in_chat($who)) {
-            $msg = "##highlight##" . $who . "##end## is already in the bot!";
-        }
-        else if (!($id instanceof BotError) && ($id > 1)) {
-            // We can simply invite, the access control has handled the rights
-            $this->bot->core("chat")->pgroup_invite($who);
-            $this->bot->send_tell($who, "You have been invited to the privategroup by " . $from . "." . $pmsg);
-            $msg = "##highlight##" . $who . "##end## has been invited.";
-        }
-        else
-        {
-            $msg = "Player ##highlight##" . $who . "##end## does not exist.";
+        else {
+            if ($this->bot->core("online")->in_chat($who)) {
+                $msg = "##highlight##" . $who . "##end## is already in the bot!";
+            }
+            else {
+                if (!($id instanceof BotError) && ($id > 1)) {
+                    // We can simply invite, the access control has handled the rights
+                    $this->bot->core("chat")->pgroup_invite($who);
+                    $this->bot->send_tell($who, "You have been invited to the privategroup by " . $from . "." . $pmsg);
+                    $msg = "##highlight##" . $who . "##end## has been invited.";
+                }
+                else {
+                    $msg = "Player ##highlight##" . $who . "##end## does not exist.";
+                }
+            }
         }
         $this->bot->send_output($from, $msg, $type);
     }
@@ -181,9 +195,8 @@ class PrivGroup extends BaseActiveModule
         if ($name == $target) {
             $this->bot->core("chat")->pgroup_kick($name);
         }
-        elseif (!is_null($target))
-        {
-            $name_access   = $this->bot->core("security")
+        elseif (!is_null($target)) {
+            $name_access = $this->bot->core("security")
                 ->get_access_level($name);
             $target_access = $this->bot->core("security")
                 ->get_access_level($target);
@@ -192,13 +205,11 @@ class PrivGroup extends BaseActiveModule
                 $this->bot->send_output($name, $name . " kicked $target from privategroup.", "pgmsg");
                 $this->bot->send_tell($target, $name . " has Kicked you from privategroup." . $pmsg);
             }
-            else
-            {
+            else {
                 $this->bot->send_output($name, "You cannot kick someone with a higher access level than yourself.", "tell");
             }
         }
-        else
-        {
+        else {
             $this->bot->core("chat")->pgroup_kick($name);
         }
     }
@@ -221,28 +232,31 @@ class PrivGroup extends BaseActiveModule
     function pgjoin($name)
     {
         if ($this->bot->core("settings")
-                ->get("Privgroup", "Echojoin") == "none"
+            ->get("Privgroup", "Echojoin") == "none"
         ) {
             return;
         }
         // Parse the string first:
-        $text = $this->parse_text($name, $this->bot->core("settings")
-            ->get("Privgroup", "Joinstring"), "has joined");
-        switch (strtolower($this->bot->core("settings")
-            ->get("Privgroup", "Echojoin")))
-        {
-            case "gc":
-                $this->bot->send_gc($text);
-                break;
-            case "pgmsg":
-                $this->bot->send_pgroup($text);
-                break;
-            case "both":
-                $this->bot->send_pgroup($text);
-                $this->bot->send_gc($text);
-                break;
-            default:
-                break;
+        $text = $this->parse_text(
+            $name, $this->bot->core("settings")
+                ->get("Privgroup", "Joinstring"), "has joined"
+        );
+        switch (strtolower(
+            $this->bot->core("settings")
+                ->get("Privgroup", "Echojoin")
+        )) {
+        case "gc":
+            $this->bot->send_gc($text);
+            break;
+        case "pgmsg":
+            $this->bot->send_pgroup($text);
+            break;
+        case "both":
+            $this->bot->send_pgroup($text);
+            $this->bot->send_gc($text);
+            break;
+        default:
+            break;
         }
     }
 
@@ -250,28 +264,31 @@ class PrivGroup extends BaseActiveModule
     function pgleave($name)
     {
         if ($this->bot->core("settings")
-                ->get("Privgroup", "Echoleave") == "none"
+            ->get("Privgroup", "Echoleave") == "none"
         ) {
             return;
         }
         // Parse the string first:
-        $text = $this->parse_text($name, $this->bot->core("settings")
-            ->get("Privgroup", "Leavestring"), "has left");
-        switch (strtolower($this->bot->core("settings")
-            ->get("Privgroup", "Echoleave")))
-        {
-            case "gc":
-                $this->bot->send_gc($text);
-                break;
-            case "pgmsg":
-                $this->bot->send_pgroup($text);
-                break;
-            case "both":
-                $this->bot->send_pgroup($text);
-                $this->bot->send_gc($text);
-                break;
-            default:
-                break;
+        $text = $this->parse_text(
+            $name, $this->bot->core("settings")
+                ->get("Privgroup", "Leavestring"), "has left"
+        );
+        switch (strtolower(
+            $this->bot->core("settings")
+                ->get("Privgroup", "Echoleave")
+        )) {
+        case "gc":
+            $this->bot->send_gc($text);
+            break;
+        case "pgmsg":
+            $this->bot->send_pgroup($text);
+            break;
+        case "both":
+            $this->bot->send_pgroup($text);
+            $this->bot->send_gc($text);
+            break;
+        default:
+            break;
         }
     }
 
@@ -283,8 +300,7 @@ class PrivGroup extends BaseActiveModule
         if ($info instanceof BotError) {
             return "##highlight##" . $name . " ##end##" . $actionstring . " " . $this->bot->botname;
         }
-        foreach ($info as $key => $value)
-        {
+        foreach ($info as $key => $value) {
             $string = preg_replace("/#!$key!#/i", "##highlight##$value##end##", $string);
             $string = preg_replace("/~!$key!~/i", $value, $string);
         }

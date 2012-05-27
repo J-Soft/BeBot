@@ -48,7 +48,7 @@ class About extends BaseActiveModule
         //Sed default access control levels
         $this->register_command('all', 'about', 'GUEST');
         $this->register_alias('about', 'version');
-        $this->help['description']      = "Shows information about the bot.";
+        $this->help['description'] = "Shows information about the bot.";
         $this->help['command']['about'] = "See description";
     }
 
@@ -58,19 +58,18 @@ class About extends BaseActiveModule
     */
     function command_handler($name, $msg, $origin)
     {
-        $return = false;
+        $return = FALSE;
         /*
         This should really be moved to the bot core.. but until i get the time to modify every single module... :\
         */
-        $vars    = explode(' ', strtolower($msg));
+        $vars = explode(' ', strtolower($msg));
         $command = $vars[0];
-        switch ($command)
-        {
-            case 'about':
-                return $this->about_blob();
-                break;
-            default:
-                return "Broken plugin, received unhandled command: $command";
+        switch ($command) {
+        case 'about':
+            return $this->about_blob();
+            break;
+        default:
+            return "Broken plugin, received unhandled command: $command";
         }
     }
 
@@ -107,9 +106,9 @@ class About extends BaseActiveModule
         $inside .= "And last but not least, the greatest MMORPG community in existence.\n\n";
         $inside .= "##blob_text##Links:##end##\n";
         $inside .= $this->bot->core("tools")
-                       ->chatcmd("http://bebot.shadow-realm.org", "BeBot website and support forums", "start") . "\n";
+            ->chatcmd("http://bebot.shadow-realm.org", "BeBot website and support forums", "start") . "\n";
         $inside .= $this->bot->core("tools")
-                       ->chatcmd("http://bugs.launchpad.net/bebot", "BeBot bugtracker", "start") . "\n";
+            ->chatcmd("http://bugs.launchpad.net/bebot", "BeBot bugtracker", "start") . "\n";
         $return = "$version ::: " . $this->bot->core("tools")
             ->make_blob('More details', $inside);
         return $return;

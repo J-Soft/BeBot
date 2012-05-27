@@ -40,14 +40,14 @@ class BasePassiveModule
     function __construct(&$bot, $module_name)
     {
         //Save reference to bot
-        $this->bot         = &$bot;
+        $this->bot = &$bot;
         $this->module_name = $module_name;
-        $this->link_name   = NULL;
-        $this->error       = new BotError($bot, $module_name);
+        $this->link_name = NULL;
+        $this->error = new BotError($bot, $module_name);
     }
 
 
-    protected function register_event($event, $target = false)
+    protected function register_event($event, $target = FALSE)
     {
         $ret = $this->bot->register_event($event, $target, $this);
         if ($ret) {
@@ -56,7 +56,7 @@ class BasePassiveModule
     }
 
 
-    protected function unregister_event($event, $target = false)
+    protected function unregister_event($event, $target = FALSE)
     {
         $ret = $this->bot->unregister_event($event, $target, $this);
         if ($ret) {
@@ -82,21 +82,19 @@ class BasePassiveModule
     }
 
 
-    protected function output_destination($name, $msg, $channel = false)
+    protected function output_destination($name, $msg, $channel = FALSE)
     {
-        if ($channel !== false) {
+        if ($channel !== FALSE) {
             if ($channel & SAME) {
                 if ($channel & $this->source) {
                     $channel -= SAME;
                 }
-                else
-                {
+                else {
                     $channel += $this->source;
                 }
             }
         }
-        else
-        {
+        else {
             $channel += $this->source;
         }
         if ($channel & TELL) {
@@ -119,14 +117,13 @@ class BasePassiveModule
 
     public function __call($name, $args)
     {
-        foreach ($args as $i => $arg)
-        {
+        foreach ($args as $i => $arg) {
             if (is_object($arg)) {
                 $args[$i] = "::object::";
             }
         }
         $args = implode(', ', $args);
-        $msg  = "Undefined function $name($args)!";
+        $msg = "Undefined function $name($args)!";
         $this->error->set($msg);
         return $this->error->message();
     }

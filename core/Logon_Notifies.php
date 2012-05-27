@@ -61,10 +61,10 @@ class Logon_Notifies_Core extends BasePassiveModule
         $this->register_event("buddy");
         $this->register_event("connect");
         $this->register_event("cron", "2sec");
-        $this->modules      = array();
+        $this->modules = array();
         $this->cron_running = 0;
-        $this->notifies     = array();
-        $this->waiting      = FALSE;
+        $this->notifies = array();
+        $this->waiting = FALSE;
         $this->bot->core("settings")
             ->create("Logon_Notifies", "Notify_Delay", 5, "How many seconds should be waited after logon of a buddy till any notifies are sent to him?", "0;1;2;3;4;5;10;15;30");
         $this->bot->core("settings")
@@ -92,14 +92,17 @@ class Logon_Notifies_Core extends BasePassiveModule
 
     function buddy($name, $msg)
     {
-        if ($msg == 1 && $this->bot->core("settings")
-            ->get("Logon_notifies", "Enabled") && $this->bot->core("security")
-            ->check_access($name, "GUEST") && $this->bot->core("notify")
-            ->check($name)
+        if ($msg == 1
+            && $this->bot->core("settings")
+                ->get("Logon_notifies", "Enabled")
+            && $this->bot->core("security")
+                ->check_access($name, "GUEST")
+            && $this->bot->core("notify")
+                ->check($name)
         ) {
             $this->notifies[$name] = time() + $this->bot->core("settings")
                 ->get("Logon_notifies", "Notify_delay");
-            $this->waiting         = TRUE;
+            $this->waiting = TRUE;
         }
     }
 
@@ -117,30 +120,26 @@ class Logon_Notifies_Core extends BasePassiveModule
             return;
         }
         if (empty($this->notifies)) {
-            $this->waiting      = FALSE;
+            $this->waiting = FALSE;
             $this->cron_running = 0;
             return;
         }
         if ($this->cron_running == 0) {
             $this->cron_running = 1;
         }
-        else
-        {
+        else {
             return;
         }
         $thistime = time();
         if ($thistime >= $this->startup) {
-            $starting = false;
+            $starting = FALSE;
         }
-        else
-        {
-            $starting = true;
+        else {
+            $starting = TRUE;
         }
-        foreach ($this->notifies as $user => $time)
-        {
+        foreach ($this->notifies as $user => $time) {
             if ($time <= $thistime) {
-                foreach ($this->modules as $module)
-                {
+                foreach ($this->modules as $module) {
                     if ($module != NULL) {
                         $module->notify($user, $starting);
                     }

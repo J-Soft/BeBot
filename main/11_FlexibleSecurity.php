@@ -52,22 +52,26 @@ class FlexibleSecurity_Core extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("security_flexible", "true") . " (
+        $this->bot->db->query(
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("security_flexible", "true") . " (
 					id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 					gid INT(10) unsigned NOT NULL,
 					field ENUM('join', 'level', 'profession', 'faction', 'rank_id', 'org_id', 'at_id'),
 					op ENUM('=', '<', '<=', '>', '>=', '!=', '&&', '||'),
 					compareto VARCHAR(100) NOT NULL DEFAULT ''
-				)");
+				)"
+        );
         $this->register_module("flexible_security");
         $this->register_event("cron", "6hour");
-        $this->cache      = array();
-        $this->querynames = array('level'      => 'level',
-                                  'profession' => 'profession',
-                                  'faction'    => 'faction',
-                                  'rank_id'    => 'org_rank_id',
-                                  'org_id'     => 'org_id',
-                                  'at_id'      => 'defender_rank_id');
+        $this->cache = array();
+        $this->querynames = array(
+            'level'      => 'level',
+            'profession' => 'profession',
+            'faction'    => 'faction',
+            'rank_id'    => 'org_rank_id',
+            'org_id'     => 'org_id',
+            'at_id'      => 'defender_rank_id'
+        );
         $this->update_table();
         $this->enabled = FALSE;
         $this->check_enable();
@@ -79,19 +83,25 @@ class FlexibleSecurity_Core extends BasePassiveModule
         if ($this->bot->core("settings")
             ->exists("FlexibleSecurity", "SchemaVersion")
         ) {
-            $this->bot->db->set_version("security_flexible", $this->bot
-                ->core("settings")->get("FlexibleSecurity", "SchemaVersion"));
+            $this->bot->db->set_version(
+                "security_flexible", $this->bot
+                    ->core("settings")->get("FlexibleSecurity", "SchemaVersion")
+            );
             $this->bot->core("settings")
                 ->del("FlexibleSecurity", "SchemaVersion");
         }
         if ($this->bot->db->get_version("security_flexible" == 2)) {
             return;
         }
-        switch ($this->bot->db->get_version("security_flexible"))
-        {
-            case 1:
-                $this->bot->db->update_table("security_flexible", "id", "add", "ALTER IGNORE TABLE #___security_flexible ADD `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
-                $this->bot->db->update_table("security_flexible", "condition", "modify", "ALTER IGNORE TABLE #___security_flexible CHANGE `condition` `op` ENUM( '=', '<', '<=', '>', '>=', '!=', '&&', '||' )");
+        switch ($this->bot->db->get_version("security_flexible")) {
+        case 1:
+            $this->bot->db->update_table(
+                "security_flexible", "id", "add", "ALTER IGNORE TABLE #___security_flexible ADD `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST"
+            );
+            $this->bot->db->update_table(
+                "security_flexible", "condition", "modify",
+                "ALTER IGNORE TABLE #___security_flexible CHANGE `condition` `op` ENUM( '=', '<', '<=', '>', '>=', '!=', '&&', '||' )"
+            );
         }
         $this->bot->db->set_version("security_flexible", 2);
     }
@@ -117,7 +127,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
 
     function check_enable()
     {
-        $result        = $this->bot->db->select("SELECT * FROM #___security_flexible WHERE field = 'join'");
+        $result = $this->bot->db->select("SELECT * FROM #___security_flexible WHERE field = 'join'");
         $this->enabled = !empty($result);
     }
 
@@ -139,7 +149,10 @@ class FlexibleSecurity_Core extends BasePassiveModule
             return $highest;
         }
         // Not in cache, get all flexible security groups with a higher access level then $highest (no sense to check for lower)
-        $groups = $this->bot->db->select("SELECT t1.gid, t1.access_level, t2.op FROM #___security_groups AS t1," . " #___security_flexible AS t2 WHERE t1.access_level > " . $highest . " AND t1.gid = t2.gid" . " AND t2.field = 'join' ORDER BY access_level DESC");
+        $groups = $this->bot->db->select(
+            "SELECT t1.gid, t1.access_level, t2.op FROM #___security_groups AS t1," . " #___security_flexible AS t2 WHERE t1.access_level > " . $highest . " AND t1.gid = t2.gid"
+                . " AND t2.field = 'join' ORDER BY access_level DESC"
+        );
         // No groups with higher access level? just return $highest again
         if (empty($groups)) {
             return $highest;
@@ -147,15 +160,13 @@ class FlexibleSecurity_Core extends BasePassiveModule
         // Do a whois lookup on the character to be certain he is in the cache
         $this->bot->core("whois")->lookup($player);
         // Go through the groups in descending order of access levels
-        foreach ($groups as $group)
-        {
+        foreach ($groups as $group) {
             $gid = $group[0];
             $acl = $group[1];
             if ($group[2] == '||') {
                 $groupkind = 'OR';
             }
-            else
-            {
+            else {
                 $groupkind = 'AND';
             }
             // Now get the other fields of the rules
@@ -163,26 +174,23 @@ class FlexibleSecurity_Core extends BasePassiveModule
             // if we got rules build the query string
             if (!empty($rules)) {
                 $wherestring = "";
-                $rulecount   = count($rules);
-                $count       = 0;
-                foreach ($rules as $rule)
-                {
+                $rulecount = count($rules);
+                $count = 0;
+                foreach ($rules as $rule) {
                     $count++;
                     // handle faction = all or faction != all cases
                     if (strtolower($rule[0]) == 'faction' && strtolower($rule[2]) == 'all') {
                         if ($rule[1] == '=') {
                             $op = "OR";
                         }
-                        else
-                        {
+                        else {
                             $op = "AND";
                         }
                         $wherestring .= " (faction " . $rule[1] . " 'omni' " . $op . " faction ";
                         $wherestring .= $rule[1] . " 'clan' " . $op . " faction " . $rule[1];
                         $wherestring .= " 'neutral') ";
                     }
-                    else
-                    {
+                    else {
                         $wherestring .= " " . $this->querynames[$rule[0]] . " " . $rule[1];
                         $wherestring .= " '" . $rule[2] . "'";
                     }

@@ -39,20 +39,22 @@ class CharacterServerConnection extends ServerConnection
     private $m_GuildServerCookie;
 
 
-    public function CharacterServerConnection($parent, $accountID,
-                                              $characterName, $loginCookie,
-                                              $serverAddress, $serverPort,
-                                              $loginType)
+    public function CharacterServerConnection(
+        $parent, $accountID,
+        $characterName, $loginCookie,
+        $serverAddress, $serverPort,
+        $loginType
+    )
     {
         $clientEndpoint = new Endpoints(0x7D155738, "PlayerInterface", $accountID, 0);
         $serverEndpoint = new Endpoints(0x82F20484, "PlayerAgent", 0, 0);
 
         parent::ServerConnection("Conan Char Server ", $serverAddress, $serverPort, $clientEndpoint, $serverEndpoint, $loginType);
 
-        $this->m_Parent        = $parent;
-        $this->m_AccountID     = $accountID;
+        $this->m_Parent = $parent;
+        $this->m_AccountID = $accountID;
         $this->m_CharacterName = $characterName;
-        $this->m_LoginCookie   = $loginCookie;
+        $this->m_LoginCookie = $loginCookie;
     }
 
 
@@ -78,9 +80,9 @@ class CharacterServerConnection extends ServerConnection
     {
         if (parent::Connect()) {
             $this->SendAuthentication();
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -98,7 +100,7 @@ class CharacterServerConnection extends ServerConnection
 
     public function LoginCharacter($characterID, $language)
     {
-        $this->m_CharacterID       = $characterID;
+        $this->m_CharacterID = $characterID;
         $this->m_CharacterLanguage = $language;
 
         $stream = parent::CreateBinaryStream(RPC_TERRITORY_LOGINCHARACTER);
@@ -119,152 +121,149 @@ class CharacterServerConnection extends ServerConnection
 
     public function HandlePackets()
     {
-        do
-        {
+        do {
             $stream = parent::HandlePackets();
-            if ($stream == null) {
+            if ($stream == NULL) {
                 continue;
             }
             $rpcID = parent::GetRpcID($stream);
 
-            switch ($rpcID)
-            {
-                case RPC_TERRITORY_INITACK:
-                    {
-                    $status = $stream->ReadUInt32();
+            switch ($rpcID) {
+            case RPC_TERRITORY_INITACK:
+                {
+                $status = $stream->ReadUInt32();
 
-                    $outStream = parent::CreateBinaryStream(RPC_TERRITORY_STARTUP);
-                    $outStream->WriteString("");
-                    parent::EncryptAndSend($outStream, RPC_TERRITORY_STARTUP);
+                $outStream = parent::CreateBinaryStream(RPC_TERRITORY_STARTUP);
+                $outStream->WriteString("");
+                parent::EncryptAndSend($outStream, RPC_TERRITORY_STARTUP);
+                }
+                break;
+
+            case RPC_TERRITORY_CHECKSUMMAP:
+                {
+                $outStream = parent::CreateBinaryStream(RPC_TERRITORY_SENDCHECKSUMMAP);
+                $outStream->WriteUInt32(1009);
+                parent::EncryptAndSend($outStream, RPC_TERRITORY_SENDCHECKSUMMAP);
+                }
+                break;
+
+            case RPC_TERRITORY_RECEIVEDCHARSETTINGS:
+                {
+                $outStream = parent::CreateBinaryStream(RPC_TERRITORY_SENDCHARSETTINGS);
+                $outStream->WriteUInt32(1009);
+                parent::EncryptAndSend($outStream, RPC_TERRITORY_SENDCHARSETTINGS);
+                }
+                break;
+
+            case RPC_TERRITORY_CHARACTERLIST:
+                {
+                $login = 0;
+                $playerid = $stream->ReadUInt32();
+                $characters = $stream->ReadVecSize();
+
+                // Prepare an array of all characters returned
+                for ($i = 0; $i < $characters; $i++) {
+                    $stream->ReadUInt32(); // characterID
+                    $stream->ReadUInt32(); // playerID
+
+                    $characterID = $stream->ReadUInt32();
+                    $characterName = $stream->ReadString();
+                    $dimensionID = $stream->ReadUInt32();
+                    $loginState = $stream->ReadUInt32();
+                    $date = $stream->ReadString();
+                    $stream->ReadUInt32(); // PlayTime
+                    $stream->ReadUInt32(); // Playfield
+                    $level = $stream->ReadUInt32(); // Level
+                    $stream->ReadUInt32(); // Class
+                    $stream->ReadUInt32(); // ?? State
+                    $stream->ReadUInt32(); // ?? Login1
+                    $stream->ReadUInt32(); // ?? Login2
+                    $stream->ReadUInt32(); // Gender
+                    $stream->ReadUInt32(); // Race
+                    $language = $stream->ReadString();
+                    $blocked = $stream->ReadUInt32();
+                    $stream->ReadUInt32(); // ?? Offline levels
+                    $stream->ReadString(); // ?? Blob MD5
+
+                    $this->m_Parent->chars[] = array(
+                        "id"       => $characterID,
+                        "name"     => $characterName,
+                        "level"    => $level,
+                        "online"   => $loginState,
+                        "language" => $language
+                    );
+
+                    // If we find the matching character, log him in.
+                    // We don't care if we only fill the array up with characters up til this point
+                    if ($characterName == $this->m_CharacterName) {
+                        $login = $characterID;
+                        $this->LoginCharacter($characterID, $language);
+                        break;
                     }
-                    break;
-
-                case RPC_TERRITORY_CHECKSUMMAP:
-                    {
-                    $outStream = parent::CreateBinaryStream(RPC_TERRITORY_SENDCHECKSUMMAP);
-                    $outStream->WriteUInt32(1009);
-                    parent::EncryptAndSend($outStream, RPC_TERRITORY_SENDCHECKSUMMAP);
-                    }
-                    break;
-
-                case RPC_TERRITORY_RECEIVEDCHARSETTINGS:
-                    {
-                    $outStream = parent::CreateBinaryStream(RPC_TERRITORY_SENDCHARSETTINGS);
-                    $outStream->WriteUInt32(1009);
-                    parent::EncryptAndSend($outStream, RPC_TERRITORY_SENDCHARSETTINGS);
-                    }
-                    break;
-
-                case RPC_TERRITORY_CHARACTERLIST:
-                    {
-                    $login      = 0;
-                    $playerid   = $stream->ReadUInt32();
-                    $characters = $stream->ReadVecSize();
-
-                    // Prepare an array of all characters returned
-                    for ($i = 0; $i < $characters; $i++)
-                    {
-                        $stream->ReadUInt32(); // characterID
-                        $stream->ReadUInt32(); // playerID
-
-                        $characterID   = $stream->ReadUInt32();
-                        $characterName = $stream->ReadString();
-                        $dimensionID   = $stream->ReadUInt32();
-                        $loginState    = $stream->ReadUInt32();
-                        $date          = $stream->ReadString();
-                        $stream->ReadUInt32(); // PlayTime
-                        $stream->ReadUInt32(); // Playfield
-                        $level = $stream->ReadUInt32(); // Level
-                        $stream->ReadUInt32(); // Class
-                        $stream->ReadUInt32(); // ?? State
-                        $stream->ReadUInt32(); // ?? Login1
-                        $stream->ReadUInt32(); // ?? Login2
-                        $stream->ReadUInt32(); // Gender
-                        $stream->ReadUInt32(); // Race
-                        $language = $stream->ReadString();
-                        $blocked  = $stream->ReadUInt32();
-                        $stream->ReadUInt32(); // ?? Offline levels
-                        $stream->ReadString(); // ?? Blob MD5
-
-                        $this->m_Parent->chars[] = array(
-                            "id"       => $characterID,
-                            "name"     => $characterName,
-                            "level"    => $level,
-                            "online"   => $loginState,
-                            "language" => $language);
-
-                        // If we find the matching character, log him in.
-                        // We don't care if we only fill the array up with characters up til this point
-                        if ($characterName == $this->m_CharacterName) {
-                            $login = $characterID;
-                            $this->LoginCharacter($characterID, $language);
-                            break;
+                }
+                // We have no character to log in with
+                // this is a fatal error. Dump all characters so that we can see if this is fubar
+                if ($login == 0) {
+                    echo "Did not find the bot '$this->m_CharacterName' from the $characters characters on account\n";
+                    if ($characters > 0) {
+                        foreach ($this->chars as $e) {
+                            echo "[" . $this->m_LogName . "] Character : ID = " . $e["id"] . ", Name = '" . $e["name"] . "'\n";
                         }
                     }
-                    // We have no character to log in with
-                    // this is a fatal error. Dump all characters so that we can see if this is fubar
-                    if ($login == 0) {
-                        echo "Did not find the bot '$this->m_CharacterName' from the $characters characters on account\n";
-                        if ($characters > 0) {
-                            foreach ($this->chars as $e)
-                            {
-                                echo "[" . $this->m_LogName . "] Character : ID = " . $e["id"] . ", Name = '" . $e["name"] . "'\n";
-                            }
-                        }
-                        return false;
-                    }
-                    break;
-                    }
+                    return FALSE;
+                }
+                break;
+                }
 
-                case RPC_TERRITORY_ERROR:
-                    {
-                    trigger_error("RPC_UNIVERSE_ERROR: Error while authenticating to territory [Err:" . $this->displayConanError($packet->args[0]) . "]", E_USER_WARNING);
-                    return false;
-                    }
+            case RPC_TERRITORY_ERROR:
+                {
+                trigger_error("RPC_UNIVERSE_ERROR: Error while authenticating to territory [Err:" . $this->displayConanError($packet->args[0]) . "]", E_USER_WARNING);
+                return FALSE;
+                }
 
-                case RPC_TERRITORY_RECEIVED_CHATSERVER:
-                    {
-                    $chatserverIP             = $stream->ReadUInt32();
-                    $this->m_ChatServerPort   = $stream->ReadUInt16();
-                    $this->m_ChatServerCookie = $stream->ReadUInt32();
-                    $characterType            = $stream->ReadUInt32();
-                    $characterID              = $stream->ReadUInt32();
+            case RPC_TERRITORY_RECEIVED_CHATSERVER:
+                {
+                $chatserverIP = $stream->ReadUInt32();
+                $this->m_ChatServerPort = $stream->ReadUInt16();
+                $this->m_ChatServerCookie = $stream->ReadUInt32();
+                $characterType = $stream->ReadUInt32();
+                $characterID = $stream->ReadUInt32();
 
-                    $this->m_ChatServerAddress = long2ip($chatserverIP);
-                    echo("[" . $this->m_LogName . "] Received chat server address [ $this->m_ChatServerAddress:$this->m_ChatServerPort ]\n");
-                    return true;
-                    }
-                    break;
+                $this->m_ChatServerAddress = long2ip($chatserverIP);
+                echo("[" . $this->m_LogName . "] Received chat server address [ $this->m_ChatServerAddress:$this->m_ChatServerPort ]\n");
+                return TRUE;
+                }
+                break;
 
-                case RPC_TERRITORY_RECEIVED_GUILDSERVER:
-                    {
-                    $guildserverIP             = $stream->ReadUInt32();
-                    $this->m_GuildServerPort   = $stream->ReadUInt16();
-                    $this->m_GuildServerCookie = $stream->ReadUInt32();
-                    $characterType             = $stream->ReadUInt32();
-                    $characterID               = $stream->ReadUInt32();
+            case RPC_TERRITORY_RECEIVED_GUILDSERVER:
+                {
+                $guildserverIP = $stream->ReadUInt32();
+                $this->m_GuildServerPort = $stream->ReadUInt16();
+                $this->m_GuildServerCookie = $stream->ReadUInt32();
+                $characterType = $stream->ReadUInt32();
+                $characterID = $stream->ReadUInt32();
 
-                    $this->m_GuildServerAddress = long2ip($guildserverIP);
-                    echo("[" . $this->m_LogName . "] Received guild server address [ $this->m_GuildServerAddress:$this->m_GuildServerPort ]\n");
-                    }
-                    break;
+                $this->m_GuildServerAddress = long2ip($guildserverIP);
+                echo("[" . $this->m_LogName . "] Received guild server address [ $this->m_GuildServerAddress:$this->m_GuildServerPort ]\n");
+                }
+                break;
 
                 // Ignore these messages
-                case RPC_TERRITORY_SETUPCOMPLETE:
-                case RPC_TERRITORY_DIMENSIONLIST:
-                case 0x206B6EE5:
-                case 0x15F7AF22:
-                    break;
+            case RPC_TERRITORY_SETUPCOMPLETE:
+            case RPC_TERRITORY_DIMENSIONLIST:
+            case 0x206B6EE5:
+            case 0x15F7AF22:
+                break;
 
-                default:
-                    echo("[" . $this->m_LogName . "] Unhandled RPC : $rpcID\n");
-                    break;
+            default:
+                echo("[" . $this->m_LogName . "] Unhandled RPC : $rpcID\n");
+                break;
             }
 
         }
-        while (true);
+        while (TRUE);
 
-        return true;
+        return TRUE;
     }
 }
 

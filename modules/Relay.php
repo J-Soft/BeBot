@@ -59,12 +59,14 @@ class Relay extends BaseActiveModule
         $this->register_event("pgleave");
         $this->bot->core('prefs')
             ->create('AutoInv', 'receive_auto_invite', 'Automatic invites to private group should be?', 'Off', 'Off;On');
-        $this->bot->db->query("CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("relay", "false") . "
+        $this->bot->db->query(
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("relay", "false") . "
                (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 						botname VARCHAR(20),
         	 			type VARCHAR(30),
 						time INT,
-        				msg TEXT)");
+        				msg TEXT)"
+        );
         $this->bot->core("settings")
             ->create('Relay', 'Priv', 'Both', 'Where should private group relay to', 'Both;Guildchat;Relaybots;None');
         $this->bot->core("settings")
@@ -74,13 +76,20 @@ class Relay extends BaseActiveModule
         $this->bot->core("settings")
             ->create('Relay', 'Relay', '', 'What is the name of the bot that we are using as a relay?');
         $this->bot->core("settings")
-            ->create('Relay', 'AutoinviteRelayGroup', '', 'RELAYBOT: What is the name of the groups that all bots will be in for invites to the relay bot? (Leave empty to invite all bots on the roster)');
+            ->create(
+            'Relay', 'AutoinviteRelayGroup', '',
+            'RELAYBOT: What is the name of the groups that all bots will be in for invites to the relay bot? (Leave empty to invite all bots on the roster)'
+        );
         $this->bot->core("settings")
             ->create('Relay', 'Status', FALSE, 'Relay should be');
         $this->bot->core("settings")
             ->create('Relay', 'Autoinvite', FALSE, 'RELAYBOT: Autoinvite bots to the relay group');
         $this->bot->core("settings")
-            ->create('Relay', 'Type', 'Tells', 'How should we relay, via a private group or via tells?  Tells is not the recommended method of handling relays, is slower, and less reliable, and can only be used between two bots.  See the help for <pre>gcr for more information.', 'Pgroup;Tells;DB');
+            ->create(
+            'Relay', 'Type', 'Tells',
+            'How should we relay, via a private group or via tells?  Tells is not the recommended method of handling relays, is slower, and less reliable, and can only be used between two bots.  See the help for <pre>gcr for more information.',
+            'Pgroup;Tells;DB'
+        );
         $this->bot->core("settings")
             ->create("Relay", "StrictNameCheck", TRUE, "Has the name of the sender of tells with <pre>gcr commands to be an exact match with the name of the relay bot?");
         $this->bot->core("settings")
@@ -96,7 +105,10 @@ class Relay extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Relay", "Ignore", "", "Who should be ignored on incoming Relay? use ; to split eg mike;bob");
         $this->bot->core("settings")
-            ->create('Relay', 'TypeTag', FALSE, 'Should Bot Send a Special Tag to Say What Type of Message its Relaying, Note (Other Bots are Required to Have a Module that Supports This Feature)');
+            ->create(
+            'Relay', 'TypeTag', FALSE,
+            'Should Bot Send a Special Tag to Say What Type of Message its Relaying, Note (Other Bots are Required to Have a Module that Supports This Feature)'
+        );
         $this->bot->core("settings")
             ->create("Relay", 'ShowMain', FALSE, "Should we display the name of the characters main when relaying?");
         $this->bot->core("settings")
@@ -106,24 +118,24 @@ class Relay extends BaseActiveModule
         $this->bot->core("colors")->define_scheme("relay", "message", "normal");
         $this->bot->core("colors")
             ->define_scheme("relay", "mainname", "normal");
-        $this->help['description']              = "Plugin to enable relay between guilds and private groups.";
+        $this->help['description'] = "Plugin to enable relay between guilds and private groups.";
         $this->help['command']['gcr <message>'] = "Has the bot say a message (useful for testing or other purposes).";
-        $this->help['notes']                    = "How to use a private group relay:<BR><BR>Step 1<BR>Create a new bot to use as the relay.  Add the bots that will be using the relay as members.  Configure the relaybot to autoinvite the bots that will be using it.  (It is highly recommended to disable nearly all plugins on the relaybot.  As you are only using it for relaying purposes, there should be no reason why anyone needs access to it other than the bots and yourself.)<BR><BR>Step 2<BR>Install the Relay.php plugin onto the bots that will be using the relay.  Make sure to disable GuildRelay_GUILD.php and Relay_GUILD.php as this will conflict with them.<BR><BR>Step 3<BR>Give the bots that will be relaying the correct access level and permissions to use <pre>gcr. (So if Bot1 is relaying to Bot2 via Relay1, Bot1 needs access to <pre>gcr on Bot2 via pgmsg, and vice versa.)<BR><BR>Step 4<BR>Restart the bots if you haven't already, and configure your settings to your specifications.<BR><BR>Step 5<BR>Enjoy lightning quick relay messages, and less bot lag (due to no longer queueing the relay messages via /tell).";
+        $this->help['notes']
+            = "How to use a private group relay:<BR><BR>Step 1<BR>Create a new bot to use as the relay.  Add the bots that will be using the relay as members.  Configure the relaybot to autoinvite the bots that will be using it.  (It is highly recommended to disable nearly all plugins on the relaybot.  As you are only using it for relaying purposes, there should be no reason why anyone needs access to it other than the bots and yourself.)<BR><BR>Step 2<BR>Install the Relay.php plugin onto the bots that will be using the relay.  Make sure to disable GuildRelay_GUILD.php and Relay_GUILD.php as this will conflict with them.<BR><BR>Step 3<BR>Give the bots that will be relaying the correct access level and permissions to use <pre>gcr. (So if Bot1 is relaying to Bot2 via Relay1, Bot1 needs access to <pre>gcr on Bot2 via pgmsg, and vice versa.)<BR><BR>Step 4<BR>Restart the bots if you haven't already, and configure your settings to your specifications.<BR><BR>Step 5<BR>Enjoy lightning quick relay messages, and less bot lag (due to no longer queueing the relay messages via /tell).";
         $this->update();
         $this->db_relay = FALSE;
         $this->lastsent = 0;
-        $this->monbuds  = FALSE;
+        $this->monbuds = FALSE;
     }
 
 
     function update()
     {
-        switch ($this->bot->db->get_version("relay"))
-        {
-            case 1:
-                $this->bot->core("settings")
-                    ->update("Relay", "Type", "defaultoptions", "Pgroup;Tells;DB");
-            Default:
+        switch ($this->bot->db->get_version("relay")) {
+        case 1:
+            $this->bot->core("settings")
+                ->update("Relay", "Type", "defaultoptions", "Pgroup;Tells;DB");
+        Default:
         }
         $this->bot->db->set_version("relay", 2);
     }
@@ -131,8 +143,10 @@ class Relay extends BaseActiveModule
 
     function pginvite($group)
     {
-        if (strtolower($this->bot->core("settings")
-            ->get('Relay', 'Relay')) == strtolower($group)
+        if (strtolower(
+            $this->bot->core("settings")
+                ->get('Relay', 'Relay')
+        ) == strtolower($group)
         ) {
             $this->bot->core("chat")->pgroup_join($group);
         }
@@ -164,32 +178,43 @@ class Relay extends BaseActiveModule
     */
     function tell($name, $msg)
     {
-        $input = $this->parse_com($msg, array('com',
-                                              'args'));
+        $input = $this->parse_com(
+            $msg, array(
+                'com',
+                'args'
+            )
+        );
         if (strtolower($input['com']) == 'gcrc') {
             $this->inc_com($name, $input['args'], "tell");
         }
-        elseif (strtolower($input['com']) == 'gcr' && $this->bot
-            ->core("settings")->get('Relay', 'Status') && (($this->bot
-                                                                ->core("settings")
-                                                                ->get("Relay", "Strictnamecheck") && strtolower($this->bot
-            ->core("settings")
-            ->get("Relay", "Relay")) == strtolower($name)) || !($this->bot
-            ->core("settings")->get("Relay", "Strictnamecheck")))
-        )
-        {
+        elseif (strtolower($input['com']) == 'gcr'
+            && $this->bot
+                ->core("settings")->get('Relay', 'Status')
+            && (($this->bot
+                ->core("settings")
+                ->get("Relay", "Strictnamecheck")
+                && strtolower(
+                    $this->bot
+                        ->core("settings")
+                        ->get("Relay", "Relay")
+                ) == strtolower($name))
+                || !($this->bot
+                    ->core("settings")->get("Relay", "Strictnamecheck")))
+        ) {
             $txt = $input['args'];
             if ($this->bot->core("settings")
-                    ->get('Relay', 'Inc') == "Both" || $this->bot
-                                                           ->core("settings")
-                                                           ->get('Relay', 'Inc') == "Guildchat"
+                ->get('Relay', 'Inc') == "Both"
+                || $this->bot
+                    ->core("settings")
+                    ->get('Relay', 'Inc') == "Guildchat"
             ) {
                 $this->bot->send_gc($txt);
             }
             if ($this->bot->core("settings")
-                    ->get('Relay', 'Inc') == "Both" || $this->bot
-                                                           ->core("settings")
-                                                           ->get('Relay', 'Inc') == "Privgroup"
+                ->get('Relay', 'Inc') == "Both"
+                || $this->bot
+                    ->core("settings")
+                    ->get('Relay', 'Inc') == "Privgroup"
             ) {
                 $this->bot->send_pgroup($txt);
             }
@@ -200,48 +225,53 @@ class Relay extends BaseActiveModule
 
     function extpgmsg($pgroup, $name, $msg, $db = FALSE)
     {
-        $input = $this->parse_com($msg, array('com',
-                                              'args'));
+        $input = $this->parse_com(
+            $msg, array(
+                'com',
+                'args'
+            )
+        );
         if (strtolower($input['com']) == 'gcrc') {
             $this->inc_com($name, $input['args'], "extpg");
         }
-        elseif (strtolower($input['com']) == 'gcr' && $this->bot
-            ->core("settings")
-            ->get('Relay', 'Status') && ($db || strtolower($this->bot
-            ->core("settings")->get('Relay', 'Relay')) == strtolower($pgroup))
-        )
-        {
+        elseif (strtolower($input['com']) == 'gcr'
+            && $this->bot
+                ->core("settings")
+                ->get('Relay', 'Status')
+            && ($db
+                || strtolower(
+                    $this->bot
+                        ->core("settings")->get('Relay', 'Relay')
+                ) == strtolower($pgroup))
+        ) {
             $txt = $input['args'];
             $txt = explode(" ", $txt, 2);
             if ($txt[0] == '&$enc$&') {
                 $txt = $this->dec($txt[1]);
             }
-            else
-            {
+            else {
                 $txt = implode(" ", $txt);
             }
-            Switch ($this->bot->core("settings")->get('Relay', 'Orgnameon'))
-            {
-                case 'Both':
-                    $type = "FALSE";
-                    Break;
-                case 'Guildchat':
-                    $type = "notchat";
-                    Break;
-                case 'NotGuildChat':
-                    $type = "chat";
-                    Break;
-                case 'None':
-                    $type = "(chat|notchat)";
-                    Break;
+            Switch ($this->bot->core("settings")->get('Relay', 'Orgnameon')) {
+            case 'Both':
+                $type = "FALSE";
+                Break;
+            case 'Guildchat':
+                $type = "notchat";
+                Break;
+            case 'NotGuildChat':
+                $type = "chat";
+                Break;
+            case 'None':
+                $type = "(chat|notchat)";
+                Break;
             }
-            $txt    = preg_replace("/(.+)#&%" . $type . "%&#/U", "", $txt);
-            $txt    = str_replace("#&%chat%&#", "", $txt);
-            $txt    = str_replace("#&%notchat%&#", "", $txt);
+            $txt = preg_replace("/(.+)#&%" . $type . "%&#/U", "", $txt);
+            $txt = str_replace("#&%chat%&#", "", $txt);
+            $txt = str_replace("#&%notchat%&#", "", $txt);
             $ignore = $this->bot->core("settings")->get('Relay', 'Ignore');
             $ignore = explode(";", $ignore);
-            foreach ($ignore as $k => $ig)
-            {
+            foreach ($ignore as $k => $ig) {
                 $ignore[$k] = ucfirst(strtolower(trim($ig)));
             }
             $ignore = implode("|", $ignore);
@@ -251,16 +281,18 @@ class Relay extends BaseActiveModule
                 Return;
             }
             if ($this->bot->core("settings")
-                    ->get('Relay', 'Inc') == "Both" || $this->bot
-                                                           ->core("settings")
-                                                           ->get('Relay', 'Inc') == "Guildchat"
+                ->get('Relay', 'Inc') == "Both"
+                || $this->bot
+                    ->core("settings")
+                    ->get('Relay', 'Inc') == "Guildchat"
             ) {
                 $this->bot->send_gc($txt);
             }
             if ($this->bot->core("settings")
-                    ->get('Relay', 'Inc') == "Both" || $this->bot
-                                                           ->core("settings")
-                                                           ->get('Relay', 'Inc') == "Privgroup"
+                ->get('Relay', 'Inc') == "Both"
+                || $this->bot
+                    ->core("settings")
+                    ->get('Relay', 'Inc') == "Privgroup"
             ) {
                 $this->bot->send_pgroup($txt);
             }
@@ -271,8 +303,10 @@ class Relay extends BaseActiveModule
 
     function extprivgroup($group, $name, $msg)
     {
-        if (strtolower($this->bot->core("settings")
-            ->get('Relay', 'Relay')) == strtolower($name)
+        if (strtolower(
+            $this->bot->core("settings")
+                ->get('Relay', 'Relay')
+        ) == strtolower($name)
         ) {
             $msg2 = explode(" ", $msg, 2);
             if (strtolower($msg2[0]) == "relaymsg") {
@@ -285,8 +319,7 @@ class Relay extends BaseActiveModule
         }
         $prefixs = str_replace(" ", "", $prefixs);
         $prefixs = explode(";", $prefixs);
-        foreach ($prefixs as $pre)
-        {
+        foreach ($prefixs as $pre) {
             if ($msg[0] == $pre) {
                 $found = TRUE;
             }
@@ -316,7 +349,7 @@ class Relay extends BaseActiveModule
         if ($this->bot->core("settings")->get('Relay', 'Status')) {
             $namestr = "";
             $mainstr = "";
-            $main    = "";
+            $main = "";
             if ($name != "0") {
                 $namestr = $this->get_namestring($name);
             }
@@ -326,20 +359,23 @@ class Relay extends BaseActiveModule
             }
             $relaystring .= $namestr . "##relay_message##" . $msg . " ##end##";
             if ($this->bot->core("settings")
-                    ->get('Relay', 'Org') == "Both" || $this->bot
-                                                           ->core("settings")
-                                                           ->get('Relay', 'Org') == "Privgroup"
+                ->get('Relay', 'Org') == "Both"
+                || $this->bot
+                    ->core("settings")
+                    ->get('Relay', 'Org') == "Privgroup"
             ) {
                 $this->bot->send_pgroup($relaystring);
             }
             if ($this->bot->core("settings")
-                    ->get("Relay", "Relay") != '' && ($this->bot
-                                                          ->core("settings")
-                                                          ->get('Relay', 'Org') == "Both" || $this->bot
-                                                                                                 ->core("settings")
-                                                                                                 ->get('Relay', 'Org') == "Relaybots")
+                ->get("Relay", "Relay") != ''
+                && ($this->bot
+                    ->core("settings")
+                    ->get('Relay', 'Org') == "Both"
+                    || $this->bot
+                        ->core("settings")
+                        ->get('Relay', 'Org') == "Relaybots")
             ) {
-                $this->relay_to_bot($relaystring, true, false, $type);
+                $this->relay_to_bot($relaystring, TRUE, FALSE, $type);
             }
         }
     }
@@ -348,62 +384,74 @@ class Relay extends BaseActiveModule
     // Relays $msg without any further modifications to other bot(s).
     // If $chat is true $msg will be relayed as chat with added "<pre>gcr " prefix.
     // If $chat is false $msg will be relayed as it is without any addon, this can be used to relay commands to the other bot(s).
-    function relay_to_bot($msg, $chat = true, $alt = FALSE, $type = "notchat")
+    function relay_to_bot($msg, $chat = TRUE, $alt = FALSE, $type = "notchat")
     {
         $type = strtolower($type);
         if ($alt) {
             $prefix = "<pre>$alt ";
         }
-        elseif ($chat)
-        {
+        elseif ($chat) {
             $prefix = "<pre>gcr ";
             if ($this->bot->core("settings")->get('Relay', 'TypeTag')) {
-                $msg = str_replace("[##relay_channel##" . $this->bot
+                $msg = str_replace(
+                    "[##relay_channel##" . $this->bot
+                        ->core("settings")
+                        ->get('Relay', 'Gcname') . "##end##] ", "[##relay_channel##" . $this->bot
                     ->core("settings")
-                    ->get('Relay', 'Gcname') . "##end##] ", "[##relay_channel##" . $this->bot
-                    ->core("settings")
-                    ->get('Relay', 'Gcname') . "##end##] #&%" . $type . "%&#", $msg);
+                    ->get('Relay', 'Gcname') . "##end##] #&%" . $type . "%&#", $msg
+                );
             }
         }
-        else
-        {
+        else {
             $prefix = "";
         }
-        if ($this->bot->core("settings")->get('Relay', 'Status') && ($this->bot
-                                                                         ->core("settings")
-                                                                         ->get("Relay", "Relay") != '' || strtoupper($this->bot
-            ->core("settings")->get("Relay", "Type")) == "DB")
+        if ($this->bot->core("settings")->get('Relay', 'Status')
+            && ($this->bot
+                ->core("settings")
+                ->get("Relay", "Relay") != ''
+                || strtoupper(
+                    $this->bot
+                        ->core("settings")->get("Relay", "Type")
+                ) == "DB")
         ) {
             $color = $this->bot->core("settings")->get('Relay', 'Color');
-            if (strtolower($this->bot->core("settings")
-                ->get('Relay', 'Type')) == "tells"
+            if (strtolower(
+                $this->bot->core("settings")
+                    ->get('Relay', 'Type')
+            ) == "tells"
             ) {
-                $this->bot->send_tell($this->bot->core("settings")
-                    ->get('Relay', 'Relay'), $prefix . $msg, 0, false, TRUE, $color);
+                $this->bot->send_tell(
+                    $this->bot->core("settings")
+                        ->get('Relay', 'Relay'), $prefix . $msg, 0, FALSE, TRUE, $color
+                );
             }
-            elseif (strtolower($this->bot->core("settings")
-                ->get('Relay', 'Type')) == "pgroup"
-            )
-            {
-                if (!$alt && $this->bot->core("settings")
-                    ->get('Relay', 'Encrypt')
+            elseif (strtolower(
+                $this->bot->core("settings")
+                    ->get('Relay', 'Type')
+            ) == "pgroup"
+            ) {
+                if (!$alt
+                    && $this->bot->core("settings")
+                        ->get('Relay', 'Encrypt')
                 ) {
                     $msg = $this->enc($msg);
                     $msg = '&$enc$& ' . $msg;
                 }
-                $this->bot->send_pgroup($prefix . $msg, $this->bot
-                    ->core("settings")->get('Relay', 'Relay'), TRUE, $color);
+                $this->bot->send_pgroup(
+                    $prefix . $msg, $this->bot
+                        ->core("settings")->get('Relay', 'Relay'), TRUE, $color
+                );
             }
-            else
-            {
+            else {
                 if ($alt) {
                     $prefix = $alt;
                 }
-                else
-                {
+                else {
                     $prefix = "gcr";
                 }
-                $this->bot->db->query("INSERT INTO #___relay (time, type, botname, msg) VALUES (" . time() . ", '$prefix', '" . $this->bot->botname . "', '" . mysql_real_escape_string($msg) . "')");
+                $this->bot->db->query(
+                    "INSERT INTO #___relay (time, type, botname, msg) VALUES (" . time() . ", '$prefix', '" . $this->bot->botname . "', '" . mysql_real_escape_string($msg) . "')"
+                );
             }
         }
     }
@@ -432,18 +480,21 @@ class Relay extends BaseActiveModule
             $relaystring = "[##relay_channel##" . $this->bot->core("settings")
                 ->get('Relay', 'Pgname') . "##end##] " . $namestr . "##relay_message##" . $msg . " ##end##";
             if ($this->bot->core("settings")
-                    ->get('Relay', 'Priv') == "Both" || $this->bot
-                                                            ->core("settings")
-                                                            ->get('Relay', 'Priv') == "Guildchat"
+                ->get('Relay', 'Priv') == "Both"
+                || $this->bot
+                    ->core("settings")
+                    ->get('Relay', 'Priv') == "Guildchat"
             ) {
                 $this->bot->send_gc($relaystring);
             }
             if ($this->bot->core("settings")
-                    ->get("Relay", "Relay") != '' && ($this->bot
-                                                          ->core("settings")
-                                                          ->get('Relay', 'Priv') == "Both" || $this->bot
-                                                                                                  ->core("settings")
-                                                                                                  ->get('Relay', 'Priv') == "Relaybots")
+                ->get("Relay", "Relay") != ''
+                && ($this->bot
+                    ->core("settings")
+                    ->get('Relay', 'Priv') == "Both"
+                    || $this->bot
+                        ->core("settings")
+                        ->get('Relay', 'Priv') == "Relaybots")
             ) {
                 $this->relay_to_bot($relaystring);
             }
@@ -462,7 +513,7 @@ class Relay extends BaseActiveModule
                 $this->bot->core("settings")
                     ->create('Relay', 'Gcname', $this->bot->guildname, 'What name should we show when we relay from guild chat?');
                 $this->guildnameset = TRUE;
-                $this->monbuds      = TRUE;
+                $this->monbuds = TRUE;
                 $this->extpgjoin(FALSE, FALSE, TRUE);
                 $this->relay_to_bot("onlinereq", FALSE, "gcrc");
             }
@@ -474,11 +525,12 @@ class Relay extends BaseActiveModule
                     if (!empty($security_groups_gid)) {
                         if ($security_groups_gid[0][0]) {
                             $relayedbots_gid = $security_groups_gid[0][0];
-                            $thisbotname     = $this->bot->botname;
-                            $invitelist      = $this->bot->db->select("SELECT ol.nickname,ol.status_pg,ol.botname,sm.gid,sm.name FROM #___online AS ol LEFT JOIN #___security_members AS sm ON ol.nickname = sm.name WHERE sm.gid = $relayedbots_gid AND ol.status_pg = 0 AND ol.botname = \"$thisbotname\"");
+                            $thisbotname = $this->bot->botname;
+                            $invitelist = $this->bot->db->select(
+                                "SELECT ol.nickname,ol.status_pg,ol.botname,sm.gid,sm.name FROM #___online AS ol LEFT JOIN #___security_members AS sm ON ol.nickname = sm.name WHERE sm.gid = $relayedbots_gid AND ol.status_pg = 0 AND ol.botname = \"$thisbotname\""
+                            );
                             if ($invitelist[0]) {
-                                foreach ($invitelist as $inviteme)
-                                {
+                                foreach ($invitelist as $inviteme) {
                                     $this->bot->core("chat")
                                         ->pgroup_invite($inviteme[0]);
                                     echo " NOTICE: Inviting " . $inviteme[0] . " to the bot\n";
@@ -486,19 +538,16 @@ class Relay extends BaseActiveModule
                             }
                         }
                     }
-                    else
-                    {
+                    else {
                         echo " Error: Relay Module is Unable to find Security group \"$security_group\"\n";
                     }
                 }
-                else
-                {
+                else {
                     $members = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level >= 1");
                     if (!empty($members)) {
-                        foreach ($members as $member)
-                        {
+                        foreach ($members as $member) {
                             if ($this->bot->core('prefs')
-                                    ->get($member[0], 'AutoInv', 'receive_auto_invite') == 'On'
+                                ->get($member[0], 'AutoInv', 'receive_auto_invite') == 'On'
                             ) {
                                 $this->bot->core("chat")
                                     ->pgroup_invite($member[0]);
@@ -511,20 +560,19 @@ class Relay extends BaseActiveModule
                 $this->bot->db->query("DELETE FROM #___relay WHERE time < " . $old);
             }
         }
-        elseif ($cron == 2)
-        {
-            if (strtoupper($this->bot->core("settings")
-                ->get("Relay", "Type")) == "DB"
+        elseif ($cron == 2) {
+            if (strtoupper(
+                $this->bot->core("settings")
+                    ->get("Relay", "Type")
+            ) == "DB"
             ) {
                 $result = $this->bot->db->select("SELECT id, type, botname, msg FROM #___relay WHERE id > " . $this->lastsent . " ORDER BY id ASC");
                 if (!empty($result)) {
-                    foreach ($result as $res)
-                    {
+                    foreach ($result as $res) {
                         if (strtolower($res[1]) == "gcrc" && $this->db_relay) {
                             $this->inc_com($name, $res[3], "db");
                         }
-                        elseif (strtolower($res[1]) == "gcr" && $this->db_relay)
-                        {
+                        elseif (strtolower($res[1]) == "gcr" && $this->db_relay) {
                             if (ucfirst(strtolower($res[2])) != $this->bot->botname) // make sure we are not doing our own command
                             {
                                 if ($this->bot->core("access_control")
@@ -539,8 +587,7 @@ class Relay extends BaseActiveModule
                 }
                 $this->db_relay = TRUE;
             }
-            else
-            {
+            else {
                 $this->db_relay = FALSE;
             }
         }
@@ -556,11 +603,12 @@ class Relay extends BaseActiveModule
                 $security_groups_gid = $this->bot->db->select("SELECT gid,name FROM #___security_groups WHERE name = '$security_group'");
                 if ($security_groups_gid[0][0]) {
                     $relayedbots_gid = $security_groups_gid[0][0];
-                    $thisbotname     = $this->bot->botname;
-                    $invitelist      = $this->bot->db->select("SELECT ol.nickname,ol.status_pg,ol.botname,sm.gid,sm.name FROM online AS ol LEFT JOIN #___security_members AS sm ON ol.nickname = sm.name WHERE sm.gid = $relayedbots_gid AND ol.status_pg = 0 AND ol.botname = \"$thisbotname\"");
+                    $thisbotname = $this->bot->botname;
+                    $invitelist = $this->bot->db->select(
+                        "SELECT ol.nickname,ol.status_pg,ol.botname,sm.gid,sm.name FROM online AS ol LEFT JOIN #___security_members AS sm ON ol.nickname = sm.name WHERE sm.gid = $relayedbots_gid AND ol.status_pg = 0 AND ol.botname = \"$thisbotname\""
+                    );
                     if ($invitelist[0]) {
-                        foreach ($invitelist as $inviteme)
-                        {
+                        foreach ($invitelist as $inviteme) {
                             $this->bot->core("chat")
                                 ->pgroup_invite($inviteme[0]);
                             echo " NOTICE: Inviting " . $inviteme[0] . " to the bot\n";
@@ -568,14 +616,12 @@ class Relay extends BaseActiveModule
                     }
                 }
             }
-            else
-            {
+            else {
                 $members = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level > 0");
                 if (!empty($members)) {
-                    foreach ($members as $member)
-                    {
+                    foreach ($members as $member) {
                         if ($this->bot->core('prefs')
-                                ->get($member[0], 'AutoInv', 'receive_auto_invite') == 'On'
+                            ->get($member[0], 'AutoInv', 'receive_auto_invite') == 'On'
                         ) {
                             $this->bot->core("chat")->pgroup_invite($member[0]);
                             echo "Inviting " . $member[0] . " to the bot\n";
@@ -596,8 +642,7 @@ class Relay extends BaseActiveModule
                     if (!empty($level)) {
                         $level = $level[0][0];
                     }
-                    else
-                    {
+                    else {
                         $level = 0;
                     }
                     $msg = "buddy $msg $name gc $level";
@@ -613,7 +658,7 @@ class Relay extends BaseActiveModule
                 if (!empty($security_groups_gid)) {
                     if ($security_groups_gid[0][0]) {
                         $relayedbots_gid = $security_groups_gid[0][0];
-                        $gids            = $this->bot->core("security")
+                        $gids = $this->bot->core("security")
                             ->get_groups($name);
                         if ($gids && is_array($gids)) {
                             $gids = array_flip($gids);
@@ -624,17 +669,15 @@ class Relay extends BaseActiveModule
                         }
                     }
                 }
-                else
-                {
+                else {
                     echo " Error: Relay Module is Unable to find Security group \"$security_group\"\n";
                 }
             }
-            else
-            {
+            else {
                 $members = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level >= 1 AND nickname = '$name'");
                 if (!empty($members)) {
                     if ($this->bot->core('prefs')
-                            ->get($name, 'AutoInv', 'receive_auto_invite') == 'On'
+                        ->get($name, 'AutoInv', 'receive_auto_invite') == 'On'
                     ) {
                         $this->bot->core("chat")->pgroup_invite($name);
                         echo "Inviting " . $name . " to the bot\n";
@@ -652,17 +695,21 @@ class Relay extends BaseActiveModule
             Return;
         }
         if ($this->bot->core("settings")
-                ->get('Relay', 'Status') && ($cron || strtolower($this->bot
-            ->core("settings")->get('Relay', 'Relay')) == strtolower($pgname))
+            ->get('Relay', 'Status')
+            && ($cron
+                || strtolower(
+                    $this->bot
+                        ->core("settings")->get('Relay', 'Relay')
+                ) == strtolower($pgname))
         ) {
-            $online = $this->bot->db->select("SELECT nickname, status_gc, status_pg, level FROM #___online WHERE (status_gc = 1 OR status_pg = 1) AND botname = '" . $this->bot->botname . "' ORDER BY nickname");
+            $online = $this->bot->db->select(
+                "SELECT nickname, status_gc, status_pg, level FROM #___online WHERE (status_gc = 1 OR status_pg = 1) AND botname = '" . $this->bot->botname . "' ORDER BY nickname"
+            );
             if (empty($online)) {
                 $online = "";
             }
-            else
-            {
-                foreach ($online as $on)
-                {
+            else {
+                foreach ($online as $on) {
                     $level = $on[3];
                     if ($on[1] == 1) {
                         $onmsg .= $on[0] . ",gc,$level;";
@@ -705,58 +752,55 @@ class Relay extends BaseActiveModule
     function inc_com($name, $msg, $source)
     {
         $msg = explode(" ", $msg);
-        Switch ($msg[0])
-        {
-            case 'online':
-                $sql = "UPDATE #___online SET status_gc = '0', status_pg = '0' WHERE botname = '" . $name . "'";
+        Switch ($msg[0]) {
+        case 'online':
+            $sql = "UPDATE #___online SET status_gc = '0', status_pg = '0' WHERE botname = '" . $name . "'";
+            $this->bot->db->query($sql);
+            if ($msg[1] == "" || !$msg[1]) {
+                Return;
+            }
+            $online = explode(";", $msg[1]);
+            if (!empty($online)) {
+                foreach ($online as $on) {
+                    $on = explode(",", $on);
+                    $this->inc_com($name, "buddy 1 $on[0] $on[1] $on[2]", $source);
+                }
+            }
+            Break;
+        case 'onlinereq':
+            $this->extpgjoin(FALSE, FALSE, TRUE);
+            Break;
+        case 'buddy':
+            $name = ucfirst(strtolower($name));
+            $nickname = ucfirst(strtolower($msg[2]));
+            $where = strtolower($msg[3]);
+            $newstatus = $msg[1];
+            if ($where != "pg" && !is_numeric($msg[4])) {
+                echo "Invalid Level ($msg[4]) for $msg[2]\n";
+                $msg[4] = 0;
+            }
+            switch ($where) {
+            case "gc":
+                $column = "status_gc";
+                $leveln = ", level";
+                $level = ", " . $msg[4];
+                $levele = ", level = " . $msg[4];
+                break;
+            case "pg":
+                $column = "status_pg";
+                $level = "";
+                break;
+            default:
+                $column = FALSE;
+                break;
+            }
+            if ($column) {
+                $sql = "INSERT INTO #___online (nickname, botname, " . $column . ", " . $column . "_changetime" . $leveln . ") ";
+                $sql .= "VALUES ('" . $nickname . "', '" . $name . "', '" . $newstatus . "', '" . time() . "'" . $level . ") ";
+                $sql .= "ON DUPLICATE KEY UPDATE " . $column . " = '" . $newstatus . "', " . $column . "_changetime = '" . time() . "'" . $levele;
                 $this->bot->db->query($sql);
-                if ($msg[1] == "" || !$msg[1]) {
-                    Return;
-                }
-                $online = explode(";", $msg[1]);
-                if (!empty($online)) {
-                    foreach ($online as $on)
-                    {
-                        $on = explode(",", $on);
-                        $this->inc_com($name, "buddy 1 $on[0] $on[1] $on[2]", $source);
-                    }
-                }
-                Break;
-            case 'onlinereq':
-                $this->extpgjoin(FALSE, FALSE, TRUE);
-                Break;
-            case 'buddy':
-                $name      = ucfirst(strtolower($name));
-                $nickname  = ucfirst(strtolower($msg[2]));
-                $where     = strtolower($msg[3]);
-                $newstatus = $msg[1];
-                if ($where != "pg" && !is_numeric($msg[4])) {
-                    echo "Invalid Level ($msg[4]) for $msg[2]\n";
-                    $msg[4] = 0;
-                }
-                switch ($where)
-                {
-                    case "gc":
-                        $column = "status_gc";
-                        $leveln = ", level";
-                        $level  = ", " . $msg[4];
-                        $levele = ", level = " . $msg[4];
-                        break;
-                    case "pg":
-                        $column = "status_pg";
-                        $level  = "";
-                        break;
-                    default:
-                        $column = FALSE;
-                        break;
-                }
-                if ($column) {
-                    $sql = "INSERT INTO #___online (nickname, botname, " . $column . ", " . $column . "_changetime" . $leveln . ") ";
-                    $sql .= "VALUES ('" . $nickname . "', '" . $name . "', '" . $newstatus . "', '" . time() . "'" . $level . ") ";
-                    $sql .= "ON DUPLICATE KEY UPDATE " . $column . " = '" . $newstatus . "', " . $column . "_changetime = '" . time() . "'" . $levele;
-                    $this->bot->db->query($sql);
-                }
-                Break;
+            }
+            Break;
         }
     }
 
@@ -767,8 +811,7 @@ class Relay extends BaseActiveModule
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                 $module = 'mcrypt.dll';
             }
-            else
-            {
+            else {
                 $module = 'mcrypt.so';
             }
             if (!dl($module)) {
@@ -782,18 +825,19 @@ class Relay extends BaseActiveModule
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                 $module = 'mhash.dll';
             }
-            else
-            {
+            else {
                 $module = 'mhash.so';
             }
             if (!dl($module)) {
                 return ("Relay Encription Requires the mhash PHP extension.");
             }
         }
-        $key              = $this->bot->core("settings")->get("Relay", "Key");
-        $return           = array('hmac'      => NULL,
-                                  'iv'        => NULL,
-                                  'encrypted' => NULL);
+        $key = $this->bot->core("settings")->get("Relay", "Key");
+        $return = array(
+            'hmac'      => NULL,
+            'iv'        => NULL,
+            'encrypted' => NULL
+        );
         $decrypted_string = trim($string);
         // Encryption Algorithm
         $cipher_alg = MCRYPT_RIJNDAEL_128;
@@ -804,7 +848,7 @@ class Relay extends BaseActiveModule
         // Encrypt $string
         $encrypted_string = mcrypt_encrypt($cipher_alg, $key, $decrypted_string, MCRYPT_MODE_CBC, $iv);
         // Convert binary data to hex strings.
-        $iv               = bin2hex($iv);
+        $iv = bin2hex($iv);
         $encrypted_string = bin2hex($encrypted_string);
         // Generate HMAC to authenticate/validate data.
         $hmac = bin2hex(mhash(MHASH_MD5, $iv . $encrypted_string, $key));
@@ -819,14 +863,13 @@ class Relay extends BaseActiveModule
 
     function dec($txt)
     {
-        $txt  = explode(" ", $txt);
-        $key  = $this->bot->core("settings")->get("Relay", "Key");
+        $txt = explode(" ", $txt);
+        $key = $this->bot->core("settings")->get("Relay", "Key");
         $data = $this->verify_rec_data($txt[0], $txt[1], $txt[2], $key);
         if ($data['error']) {
             return ($data['errormsg']);
         }
-        else
-        {
+        else {
             return ($this->decrypt_data($data['iv'], $data['ciphrtxt'], $key));
         }
     }
@@ -839,7 +882,7 @@ class Relay extends BaseActiveModule
         //$encrypted_string = hex2bin($encrypted_string);
         $ciphrtxt = pack("H*", $ciphrtxt);
         // Encryption Algorithm
-        $cipher_alg       = MCRYPT_RIJNDAEL_128;
+        $cipher_alg = MCRYPT_RIJNDAEL_128;
         $decrypted_string = mcrypt_decrypt($cipher_alg, $key, $ciphrtxt, MCRYPT_MODE_CBC, $iv);
         // For some reason there is always some junk on the string until it gets timmed.
         $decrypted_string = trim($decrypted_string);
@@ -865,35 +908,44 @@ class Relay extends BaseActiveModule
         if (!preg_match("/^[0-9A-Fa-f].+$/", $rec_string)) {
             return ("Invalid String, Expected Hex Characters only.");
         }
-        else if (!preg_match("/^[0-9A-Fa-f].+$/", $rec_hmac)) {
-            return ("Invalid HMAC, Expected Hex Characters only.");
-        }
-        else if (!preg_match("/^[0-9A-Fa-f].+$/", $rec_iv)) {
-            return ("Invalid IV, Expected Hex Characters only.");
-        }
-        else if (strlen($rec_iv) != 32) {
-            return ("Invalid IV Length.");
-        }
-        else if (strlen($rec_string) < 32 && strlen($rec_string) <= 1024) {
-            return ("Invalid String Length.");
-        }
-        else if (strlen($rec_iv) <= 32 && strlen($rec_iv) >= 255) {
-            return ("Invalid HMAC Length.");
+        else {
+            if (!preg_match("/^[0-9A-Fa-f].+$/", $rec_hmac)) {
+                return ("Invalid HMAC, Expected Hex Characters only.");
+            }
+            else {
+                if (!preg_match("/^[0-9A-Fa-f].+$/", $rec_iv)) {
+                    return ("Invalid IV, Expected Hex Characters only.");
+                }
+                else {
+                    if (strlen($rec_iv) != 32) {
+                        return ("Invalid IV Length.");
+                    }
+                    else {
+                        if (strlen($rec_string) < 32 && strlen($rec_string) <= 1024) {
+                            return ("Invalid String Length.");
+                        }
+                        else {
+                            if (strlen($rec_iv) <= 32 && strlen($rec_iv) >= 255) {
+                                return ("Invalid HMAC Length.");
+                            }
+                        }
+                    }
+                }
+            }
         }
         $chk_hmac = bin2hex(mhash(MHASH_MD5, $rec_iv . $rec_string, $key));
-        $return   = array();
+        $return = array();
         if ($rec_hmac !== $chk_hmac) {
-            $return['error']    = TRUE;
+            $return['error'] = TRUE;
             $return['errormsg'] = "Failed to Decript Message from Relay";
             //print_r("\nReciv: ".$rec_hmac."\n");
             //print_r("\nCheck: ".$chk_hmac."\n");
         }
-        else
-        {
-            $return['error']    = FALSE;
+        else {
+            $return['error'] = FALSE;
             $return['errormsg'] = "";
-            $return['iv']       = $rec_iv;
-            $return['hmac']     = $rec_hmac;
+            $return['iv'] = $rec_iv;
+            $return['hmac'] = $rec_hmac;
             $return['ciphrtxt'] = $rec_string;
         }
         return $return;

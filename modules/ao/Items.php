@@ -50,9 +50,9 @@ class VhItems extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'items', 'GUEST');
-        $this->help['description']                  = 'Searches the central database for information about an item.';
+        $this->help['description'] = 'Searches the central database for information about an item.';
         $this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";
-        $this->help['notes']                        = "This module uses the Xyphos Items Database .";
+        $this->help['notes'] = "This module uses the Xyphos Items Database .";
     }
 
 
@@ -67,9 +67,8 @@ class VhItems extends BaseActiveModule
                     unset($parts[0]);
                     $search = implode(' ', $parts);
                 }
-                else
-                {
-                    $ql     = 0;
+                else {
+                    $ql = 0;
                     $search = $words;
                 }
                 $url = $this->server;
@@ -90,18 +89,16 @@ class VhItems extends BaseActiveModule
                 }
                 $result = $this->bot->core("tools")->get_site($url, 1);
                 //Again I do not see why we're looking for mysql_real_escape_string
-                if (strstr($result, 'mysql_real_escape_string') !== false) {
+                if (strstr($result, 'mysql_real_escape_string') !== FALSE) {
                     return ("received garbled reply from vhabot!");
                 }
                 return $result;
             }
-            else
-            {
+            else {
                 return "Usage: items [quality] [item]";
             }
         }
-        else
-        {
+        else {
             $this->bot->send_help($name);
         }
     }

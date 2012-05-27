@@ -53,16 +53,15 @@ class Items_Core extends BasePassiveModule
     {
         $items = array();
         $count = preg_match_all('/' . $this->itemPattern . '/i', $itemText, $matches, PREG_SET_ORDER);
-        foreach ($matches as $match)
-        {
-            $item['lowid']   = $match[2];
-            $item['highid']  = $match[3];
-            $item['ql']      = $match[4];
-            $item['lowcrc']  = $match[5];
+        foreach ($matches as $match) {
+            $item['lowid'] = $match[2];
+            $item['highid'] = $match[3];
+            $item['ql'] = $match[4];
+            $item['lowcrc'] = $match[5];
             $item['highcrc'] = $match[6];
-            $item['colour']  = $match[7];
-            $item['name']    = $match[8];
-            $items[]         = $item;
+            $item['colour'] = $match[7];
+            $item['name'] = $match[8];
+            $items[] = $item;
         }
         return $items;
     }
@@ -71,17 +70,18 @@ class Items_Core extends BasePassiveModule
     /*
     Creates a text blob.  Alternate uses ' instead of ".
     */
-    function make_item($item, $alternate = false)
+    function make_item($item, $alternate = FALSE)
     {
         if (empty($item)) {
             return '';
         }
         if ($alternate) {
-            return '<a style="text-decoration:none" href="itemref://' . $item['lowid'] . '/' . $item['highid'] . '/' . $item['ql'] . '/' . $item['lowcrc'] . '/' . $item['highcrc'] . '"><font color=#' . $item['colour'] . '>[' . $item['name'] . ']</font></a>';
+            return '<a style="text-decoration:none" href="itemref://' . $item['lowid'] . '/' . $item['highid'] . '/' . $item['ql'] . '/' . $item['lowcrc'] . '/' . $item['highcrc']
+                . '"><font color=#' . $item['colour'] . '>[' . $item['name'] . ']</font></a>';
         }
-        else
-        {
-            return "<a style='text-decoration:none' href='itemref://" . $item['lowid'] . "/" . $item['highid'] . "/" . $item['ql'] . "/" . $item['lowcrc'] . "/" . $item['highcrc'] . "'><font color=#" . $item['colour'] . ">[" . $item['name'] . "]</font></a>";
+        else {
+            return "<a style='text-decoration:none' href='itemref://" . $item['lowid'] . "/" . $item['highid'] . "/" . $item['ql'] . "/" . $item['lowcrc'] . "/" . $item['highcrc']
+                . "'><font color=#" . $item['colour'] . ">[" . $item['name'] . "]</font></a>";
         }
     }
 
@@ -90,9 +90,9 @@ class Items_Core extends BasePassiveModule
     function is_item($item)
     {
         if (1 > preg_match('/' . $this->itemPattern . '/i', $item)) {
-            return false;
+            return FALSE;
         }
-        return true;
+        return TRUE;
     }
 
 
@@ -101,8 +101,11 @@ class Items_Core extends BasePassiveModule
         if (empty($item)) {
             return -1;
         }
-        $checksum = md5('aocitems' + $item['lowid'] + $item['highid'] + $item['ql'] + $item['lowcrc'] + $item['highcrc'] + $item['colour'] + $item['itemname'] + $this->bot->dimension + $this->bot->guild + $name);
-        $url      = $this->server . "botsubmit/v3/";
+        $checksum = md5(
+            'aocitems' + $item['lowid'] + $item['highid'] + $item['ql'] + $item['lowcrc'] + $item['highcrc'] + $item['colour'] + $item['itemname'] + $this->bot->dimension
+                + $this->bot->guild + $name
+        );
+        $url = $this->server . "botsubmit/v3/";
         $url .= '?lowid=' . urlencode($item['lowid']);
         $url .= '&highid=' . urlencode($item['highid']);
         $url .= '&ql=' . urlencode($item['ql']);
@@ -125,7 +128,7 @@ class Items_Core extends BasePassiveModule
         $url .= '&id=' . $words;
         $result = $this->bot->core("tools")->get_site($url, 1);
         //A comment explaining the logic of this check would be appreciated! Why are we looking for mysql_real_escape_string here?
-        if (strstr($result, 'mysql_real_escape_string') !== false) {
+        if (strstr($result, 'mysql_real_escape_string') !== FALSE) {
             return ("Error in query to database");
         }
         return $result;

@@ -136,11 +136,11 @@ class ClassName extends BaseActiveModule
                 'command1 <keyword>' is what the command does when given the <keyword>
             'notes' are notes that are useful to know.
         */
-        $this->help['description']                           = 'Description of the module';
-        $this->help['command']['command1']                   = "What does command1 do without any keywords";
-        $this->help['command']['command1 <keyword>']         = "What does command1 do with keyword";
+        $this->help['description'] = 'Description of the module';
+        $this->help['command']['command1'] = "What does command1 do without any keywords";
+        $this->help['command']['command1 <keyword>'] = "What does command1 do with keyword";
         $this->help['command']['command2 <keyword> [param]'] = "What does command2 do with <keyword> and the optional [param]";
-        $this->help['notes']                                 = "Notes for the help goes in here.";
+        $this->help['notes'] = "Notes for the help goes in here.";
     }
 
 
@@ -156,21 +156,24 @@ class ClassName extends BaseActiveModule
         $this->error->reset();
         //The default is to split the command to com, sub and args. If you want to split it some other way change the pattern for it
         //parse_com() returns an array where the pattern is the keys and the values are split out from $msg
-        $com     = $this->parse_com($msg, array('com',
-                                                'sub',
-                                                'args'));
+        $com = $this->parse_com(
+            $msg, array(
+                'com',
+                'sub',
+                'args'
+            )
+        );
         $command = $vars[0];
-        switch ($com['com'])
-        {
-            case 'command1':
-                return ($this->somefunction($name, $com));
-                break;
-            case 'command2':
-                return ($this->someotherfunction($name, $com));
-            default:
-                // Just a safety net to allow you to catch errors where a module has registered  a command, but fails to actually do anything about it
-                $this->error->set("Broken plugin, received unhandled command: $command");
-                return ($this->error->message());
+        switch ($com['com']) {
+        case 'command1':
+            return ($this->somefunction($name, $com));
+            break;
+        case 'command2':
+            return ($this->someotherfunction($name, $com));
+        default:
+            // Just a safety net to allow you to catch errors where a module has registered  a command, but fails to actually do anything about it
+            $this->error->set("Broken plugin, received unhandled command: $command");
+            return ($this->error->message());
         }
     }
 

@@ -47,36 +47,39 @@ class AccessControlGUI extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->access_levels = $this->bot->core("access_control")
             ->get_access_levels();
-        $this->access_shorts = array('AN' => 'ANONYMOUS',
-                                     'G'  => 'GUEST',
-                                     'M'  => 'MEMBER',
-                                     'L'  => 'LEADER',
-                                     'A'  => 'ADMIN',
-                                     'SA' => 'SUPERADMIN',
-                                     'O'  => 'OWNER',
-                                     'D'  => 'DISABLED');
-        $this->shortcuts     = array();
-        foreach ($this->access_shorts as $short => $long)
-        {
+        $this->access_shorts = array(
+            'AN' => 'ANONYMOUS',
+            'G'  => 'GUEST',
+            'M'  => 'MEMBER',
+            'L'  => 'LEADER',
+            'A'  => 'ADMIN',
+            'SA' => 'SUPERADMIN',
+            'O'  => 'OWNER',
+            'D'  => 'DISABLED'
+        );
+        $this->shortcuts = array();
+        foreach ($this->access_shorts as $short => $long) {
             $this->shortcuts[$long] = $short;
         }
-        $this->channels = array("gc"    => "##green##",
-                                "pgmsg" => "##white##",
-                                "tell"  => "##seablue##");
+        $this->channels = array(
+            "gc"    => "##green##",
+            "pgmsg" => "##white##",
+            "tell"  => "##seablue##"
+        );
         /*
         Create default access right for "commands" by SUPERADMIN if it is not set or set to DISABLED. You always want to be able to change the rights!
         */
         if ($this->bot->core("access_control")
-                ->get_min_access_level("commands") == OWNER + 1
+            ->get_min_access_level("commands") == OWNER + 1
         ) {
             $this->bot->core("access_control")
                 ->update_access("commands", "tell", "OWNER");
         }
         $this->register_command("all", "channel", "SUPERADMIN");
         $this->register_command("all", "commands", "SUPERADMIN");
-        $this->help['description']                                 = "Allows you to set access controls for all commands in any channel.";
-        $this->help['command']['commands']                         = "Shows the GUI for setting access controls";
-        $this->help['command']['channel']                          = "Shows the current lock status for commands in guild chat and private chat group.";
+        $this->help['description'] = "Allows you to set access controls for all commands in any channel.";
+        $this->help['command']['commands'] = "Shows the GUI for setting access controls";
+        $this->help['command']['channel'] = "Shows the current lock status for commands in guild chat and private chat group.";
         $this->help['command']['channel [lock|unlock] [gc|pgmsg]'] = "Locks or unlocks access to commands in guild chat or private chat group.";
     }
 
@@ -89,58 +92,45 @@ class AccessControlGUI extends BaseActiveModule
         if (preg_match("/^commands$/i", $msg)) {
             return $this->show_channels();
         }
-        elseif (preg_match("/^commands (gc|pgmsg|tell|all|extpgmsg)$/i", $msg, $info))
-        {
+        elseif (preg_match("/^commands (gc|pgmsg|tell|all|extpgmsg)$/i", $msg, $info)) {
             return $this->show_levels($name, $info[1]);
         }
-        elseif (preg_match("/^commands subs ([a-z01-9]+)/i", $msg, $info))
-        {
+        elseif (preg_match("/^commands subs ([a-z01-9]+)/i", $msg, $info)) {
             return $this->show_sub_levels($name, $info[1]);
         }
-        elseif (preg_match("/^commands update (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info))
-        {
+        elseif (preg_match("/^commands update (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info)) {
             return $this->update_level($info[1], $info[2], $info[3]);
         }
-        elseif (preg_match("/^commands update (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info))
-        {
+        elseif (preg_match("/^commands update (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info)) {
             return $this->update_level($info[1], $info[2], $info[4], $info[3]);
         }
-        elseif (preg_match("/^commands add (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info))
-        {
+        elseif (preg_match("/^commands add (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info)) {
             return $this->update_level($info[1], $info[2], $info[4], $info[3]);
         }
-        elseif (preg_match("/^commands (del|rem) (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-z01-9]+)$/i", $msg, $info))
-        {
+        elseif (preg_match("/^commands (del|rem) (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-z01-9]+)$/i", $msg, $info)) {
             return $this->update_level($info[2], $info[3], "DELETED", $info[4]);
         }
-        elseif (preg_match("/^commands save (.+?) (.+)$/i", $msg, $info))
-        {
+        elseif (preg_match("/^commands save (.+?) (.+)$/i", $msg, $info)) {
             return $this->save($info[1], $info[2]);
         }
-        elseif (preg_match("/^commands load (.+)$/i", $msg, $info))
-        {
+        elseif (preg_match("/^commands load (.+)$/i", $msg, $info)) {
             return $this->load($info[1]);
         }
-        elseif (preg_match("/^commands saves$/i", $msg, $info))
-        {
+        elseif (preg_match("/^commands saves$/i", $msg, $info)) {
             return $this->saves();
         }
-        elseif (preg_match("/^commands saves (rem|del) (.+)$/i", $msg, $info))
-        {
+        elseif (preg_match("/^commands saves (rem|del) (.+)$/i", $msg, $info)) {
             return $this->del_save($info[2]);
         }
-        elseif (preg_match("/^channel (lock|unlock) (gc|pgmsg)$/i", $msg, $info))
-        {
+        elseif (preg_match("/^channel (lock|unlock) (gc|pgmsg)$/i", $msg, $info)) {
             return $this->channel_lock($info[2], strtolower($info[1]) == "lock");
         }
-        elseif (preg_match("/^channel$/i", $msg, $info))
-        {
+        elseif (preg_match("/^channel$/i", $msg, $info)) {
             return $this->show_channel_locks();
         }
-        else
-        {
+        else {
             return $this->bot->core("tools")
-                       ->chatcmd("http://bebot.shadow-realm.org/wiki/doku.php?id=commands", "Help", "start") . " for <pre>commands";
+                ->chatcmd("http://bebot.shadow-realm.org/wiki/doku.php?id=commands", "Help", "start") . " for <pre>commands";
         }
     }
 
@@ -182,44 +172,41 @@ class AccessControlGUI extends BaseActiveModule
     */
     function show_levels($name, $channel)
     {
-        $title   = "Current access levels for ";
-        $blob    = " ##yellow## ::: ##end## ##ao_infotext##The current access levels for ";
+        $title = "Current access levels for ";
+        $blob = " ##yellow## ::: ##end## ##ao_infotext##The current access levels for ";
         $channel = strtolower($channel);
-        switch ($channel)
-        {
-            case "gc":
-                $blob .= "Guild Chat";
-                $title .= "Guild Chat";
-                break;
-            case "pgmsg":
-                $blob .= "Private Chatgroup";
-                $title .= "Private Chatgroup";
-                break;
-            case "tell":
-                $blob .= "Tells";
-                $title .= "Tells";
-                break;
-            case "extpgmsg":
-                $blob .= "External Chatgroups";
-                $title .= "External Chatgroups";
-                break;
-            case "all":
-                $blob .= "All";
-                $title .= "All";
-                break;
+        switch ($channel) {
+        case "gc":
+            $blob .= "Guild Chat";
+            $title .= "Guild Chat";
+            break;
+        case "pgmsg":
+            $blob .= "Private Chatgroup";
+            $title .= "Private Chatgroup";
+            break;
+        case "tell":
+            $blob .= "Tells";
+            $title .= "Tells";
+            break;
+        case "extpgmsg":
+            $blob .= "External Chatgroups";
+            $title .= "External Chatgroups";
+            break;
+        case "all":
+            $blob .= "All";
+            $title .= "All";
+            break;
         }
         $blob .= " ##yellow## ::: ##end##";
         $blob .= "<br>Click on an access level to change it for that command##end##<br><br>";
         $blob .= "List of shortcuts:";
-        foreach ($this->access_shorts as $key => $val)
-        {
+        foreach ($this->access_shorts as $key => $val) {
             $blob .= "<br>" . $key . " = " . $val;
         }
         $blob .= "<br>";
         if ($channel == "all") {
             $blob .= "<br>Color code for channel information:";
-            foreach ($this->channels as $chan => $color)
-            {
+            foreach ($this->channels as $chan => $color) {
                 $blob .= "<br>" . $color . $chan . "##end##";
             }
             $blob .= "<br>";
@@ -229,8 +216,7 @@ class AccessControlGUI extends BaseActiveModule
                 return "No commands defined in this channel!";
             }
         }
-        else
-        {
+        else {
             if (empty($this->bot->commands["gc"]) && empty($this->bot->commands["pgmsg"]) && empty($this->bot->commands["tell"])) {
                 return "No commands defined!";
             }
@@ -238,38 +224,35 @@ class AccessControlGUI extends BaseActiveModule
         if ($channel !== "all") {
             $sql = "AND channel = '" . $channel . "' ";
         }
-        else
-        {
+        else {
             $sql = "";
         }
-        $result = $this->bot->db->select("SELECT command, subcommand, channel, minlevel FROM #___access_control WHERE minlevel != 'DELETED' " . $sql . "ORDER BY command ASC", MYSQL_ASSOC);
+        $result = $this->bot->db->select(
+            "SELECT command, subcommand, channel, minlevel FROM #___access_control WHERE minlevel != 'DELETED' " . $sql . "ORDER BY command ASC", MYSQL_ASSOC
+        );
         if (empty($result)) {
             if ($channel !== "all") {
                 $chanmsg = " for this channel";
             }
             return "No access levels defined" . $chanmsg . "!";
         }
-        foreach ($result as $right)
-        {
+        foreach ($result as $right) {
             if ($right["subcommand"] !== "*") {
                 $subs[$right["command"]] = TRUE;
             }
-            else
-            {
+            else {
                 $rights[$right["command"]][$right["channel"]] = $right["minlevel"];
             }
         }
         unset($result);
-        foreach ($rights as $command => $right)
-        {
+        foreach ($rights as $command => $right) {
             $isset = FALSE;
             if ($channel !== "all") {
                 if (isset($this->bot->commands[$channel][$command])) {
                     $isset = TRUE;
                 }
             }
-            else
-            {
+            else {
                 if (isset($this->bot->commands['gc'][$command]) || isset($this->bot->commands['pgmsg'][$command]) || isset($this->bot->commands['tell'][$command])) {
                     $isset = TRUE;
                 }
@@ -291,35 +274,34 @@ class AccessControlGUI extends BaseActiveModule
     function show_sub_levels($name, $command)
     {
         $command = strtolower($command);
-        $title   = "Current access levels for " . $command . " Subcommands";
-        $blob    = " ##yellow## ::: ##end## ##ao_infotext##The current access levels for " . $command . " Subcommands";
+        $title = "Current access levels for " . $command . " Subcommands";
+        $blob = " ##yellow## ::: ##end## ##ao_infotext##The current access levels for " . $command . " Subcommands";
         $blob .= " ##yellow## ::: ##end##";
         $blob .= "<br>Click on an access level to change it for that command##end##<br><br>";
         $blob .= "List of shortcuts:";
-        foreach ($this->access_shorts as $key => $val)
-        {
+        foreach ($this->access_shorts as $key => $val) {
             $blob .= "<br>" . $key . " = " . $val;
         }
         $blob .= "<br>";
         if (empty($this->bot->commands['gc'][$command]) && empty($this->bot->commands['pgmsg'][$command]) && empty($this->bot->commands['tell'][$command])) {
             return "command ##highlight##" . $command . "##end## Does not Exist!";
         }
-        $result = $this->bot->db->select("SELECT subcommand, channel, minlevel FROM #___access_control WHERE command = '" . $command . "' AND subcommand != '*' AND minlevel != 'DELETED' ORDER BY subcommand ASC", MYSQL_ASSOC);
+        $result = $this->bot->db->select(
+            "SELECT subcommand, channel, minlevel FROM #___access_control WHERE command = '" . $command
+                . "' AND subcommand != '*' AND minlevel != 'DELETED' ORDER BY subcommand ASC", MYSQL_ASSOC
+        );
         if (empty($result)) {
             return "No Subcommand access levels defined for ##highlight##" . $command . "##end##!";
         }
-        foreach ($result as $right)
-        {
+        foreach ($result as $right) {
             $rights[$right["channel"]][$right["subcommand"]] = array($right["channel"] => $right["minlevel"]);
         }
         unset($result);
-        foreach ($rights as $channel => $value)
-        {
+        foreach ($rights as $channel => $value) {
             // Only show subcommands if the command for this channel exists at all:
             if (isset($this->bot->commands[$channel][$command])) {
                 $blob .= "\n:: " . $channel . " ::\n";
-                foreach ($value as $subcommand => $right)
-                {
+                foreach ($value as $subcommand => $right) {
                     $blob .= "##highlight##{$command} {$subcommand}##end##:" . $this->Make_access_string($command . " " . $subcommand, $right, $channel);
                     $blob .= " [" . $this->bot->core("tools")
                         ->chatcmd("commands del $channel $command $subcommand", "DEL");
@@ -334,33 +316,28 @@ class AccessControlGUI extends BaseActiveModule
     function Make_access_string($command, $current_level, $channel)
     {
         if ($channel == "all") {
-            foreach ($this->channels as $chan => $color)
-            {
+            foreach ($this->channels as $chan => $color) {
                 if (isset($this->bot->commands[$chan][$command]) && isset($current_level[$chan])) {
                     $return .= $color . " [";
                     $return .= $this->shortcuts[$current_level[$chan]] . "]##end##";
                 }
-                else
-                {
+                else {
                     $return .= $color . " [N/A]##end##";
                 }
             }
             $current_level = "";
         }
-        else
-        {
+        else {
             $current_level = $current_level[$channel];
         }
         $return .= " [ ";
         $acsstr = array();
-        foreach ($this->access_levels as $level)
-        {
+        foreach ($this->access_levels as $level) {
             if ($level !== "DELETED") {
                 if ($current_level == $level) {
                     $acsstr[] = $this->shortcuts[$level];
                 }
-                else
-                {
+                else {
                     $acsstr[] = $this->bot->core("tools")
                         ->chatcmd("commands update $channel $command " . $this->shortcuts[$level], $this->shortcuts[$level]);
                 }
@@ -377,9 +354,9 @@ class AccessControlGUI extends BaseActiveModule
     */
     function update_level($channel, $command, $newlevel, $subcommand = FALSE)
     {
-        $channel    = strtolower($channel);
-        $command    = strtolower($command);
-        $newlevel   = strtoupper($newlevel);
+        $channel = strtolower($channel);
+        $command = strtolower($command);
+        $newlevel = strtoupper($newlevel);
         $subcommand = strtolower($subcommand);
         // if strlen = 2 assume it's an shortcut:
         if (strlen($newlevel) <= 2) {
@@ -402,10 +379,10 @@ class AccessControlGUI extends BaseActiveModule
                     ->update($command, $subcommand, "tell", $newlevel);
                 $this->bot->core("access_control")
                     ->update($command, $subcommand, "pgmsg", $newlevel);
-                return "Minimal access level to use##highlight## " . $command . " " . $subcommand . "##end## in##highlight## All Channels##end## set to##highlight## " . $newlevel . "##end##";
+                return "Minimal access level to use##highlight## " . $command . " " . $subcommand . "##end## in##highlight## All Channels##end## set to##highlight## " . $newlevel
+                    . "##end##";
             }
-            else
-            {
+            else {
                 $this->bot->core("access_control")
                     ->update_access($command, "gc", $newlevel);
                 $this->bot->core("access_control")
@@ -418,10 +395,10 @@ class AccessControlGUI extends BaseActiveModule
         if ($subcommand) {
             $this->bot->core("access_control")
                 ->update($command, $subcommand, $channel, $newlevel);
-            return "Minimal access level to use##highlight## " . $command . " " . $subcommand . "##end## in##highlight## " . $channel . "##end## set to##highlight## " . $newlevel . "##end##";
+            return "Minimal access level to use##highlight## " . $command . " " . $subcommand . "##end## in##highlight## " . $channel . "##end## set to##highlight## " . $newlevel
+                . "##end##";
         }
-        else
-        {
+        else {
             $this->bot->core("access_control")
                 ->update_access($command, $channel, $newlevel);
             return "Minimal access level to use##highlight## " . $command . "##end## in##highlight## " . $channel . "##end## set to##highlight## " . $newlevel . "##end##";
@@ -435,8 +412,7 @@ class AccessControlGUI extends BaseActiveModule
         if (!empty($result)) {
             Return ("##error##Error: ##highlight##" . $name . "##end## Already Exists, Please Choose a Different name or Delete old one##end##");
         }
-        else
-        {
+        else {
             $counts = $this->bot->core("access_control")->save($name, $desc);
             Return ("Current Access Control Levels saved as ##highlight##" . $name . "##end##. (" . $counts[0] . " Commands, " . $counts[1] . " SubCommands)");
         }
@@ -449,8 +425,7 @@ class AccessControlGUI extends BaseActiveModule
         if (empty($result)) {
             Return ("##error##Error: ##highlight##" . $name . "##end## does not Exist##end##");
         }
-        else
-        {
+        else {
             $counts = $this->bot->core("access_control")->load($name);
             Return ("##highlight##" . $name . "##end## Access Control Levels loaded. (" . $counts[0] . " Commands, " . $counts[1] . " SubCommands)");
         }
@@ -462,8 +437,7 @@ class AccessControlGUI extends BaseActiveModule
         $result = $this->bot->db->select("SELECT name, description FROM #___access_control_saves");
         if (!empty($result)) {
             $inside = "##blob_title##  :::  Saved Access Control Levels  :::##end##\n";
-            foreach ($result as $list)
-            {
+            foreach ($result as $list) {
                 $inside .= "\nName: ##blob_title##" . $list[0] . "##end##";
                 $inside .= "   " . $this->bot->core("tools")
                     ->chatcmd("commands load " . $list[0], "Load");
@@ -474,8 +448,7 @@ class AccessControlGUI extends BaseActiveModule
             Return ("Saved Access Control Levels ::: " . $this->bot
                 ->core("tools")->make_blob("Click to view", $inside));
         }
-        else
-        {
+        else {
             Return ("No Saved Access Control Levels found");
         }
     }
@@ -487,8 +460,7 @@ class AccessControlGUI extends BaseActiveModule
         if (empty($result)) {
             Return ("##error##Error: ##highlight##" . $name . "##end## does not Exist##end##");
         }
-        else
-        {
+        else {
             $this->bot->db->query("DELETE FROM #___access_control_saves WHERE name = '" . mysql_escape_string($name) . "'");
             Return ("##highlight##" . $name . "##end## Deleted.");
         }
@@ -498,8 +470,8 @@ class AccessControlGUI extends BaseActiveModule
     function channel_lock($channel, $lock)
     {
         $channel = strtolower($channel);
-        $lock    = $lock === true;
-        $msg     = "##error##Error!##end##";
+        $lock = $lock === TRUE;
+        $msg = "##error##Error!##end##";
         if ($channel == "gc") {
             $this->bot->core("settings")
                 ->save("AccessControl", "LockGc", $lock);
@@ -507,21 +479,18 @@ class AccessControlGUI extends BaseActiveModule
             if ($lock) {
                 $msg .= "##red##locked from use##end##!";
             }
-            else
-            {
+            else {
                 $msg .= "##green##free to be used##end##!";
             }
         }
-        elseif ($channel == "pgmsg")
-        {
+        elseif ($channel == "pgmsg") {
             $this->bot->core("settings")
                 ->save("AccessControl", "LockPgroup", $lock);
             $msg = "All commands in##highlight## private group##end## are now ";
             if ($lock) {
                 $msg .= "##red##locked from use##end##!";
             }
-            else
-            {
+            else {
                 $msg .= "##green##free to be used##end##!";
             }
         }
@@ -535,16 +504,14 @@ class AccessControlGUI extends BaseActiveModule
         if ($this->bot->core("settings")->get("AccessControl", "LockGc")) {
             $msg .= "##red##locked##end##. ";
         }
-        else
-        {
+        else {
             $msg .= "##green##unlocked##end##. ";
         }
         $msg .= "Access to commands in##highlight## private group##end## is ";
         if ($this->bot->core("settings")->get("AccessControl", "LockPgroup")) {
             $msg .= "##red##locked##end##.";
         }
-        else
-        {
+        else {
             $msg .= "##green##unlocked##end##.";
         }
         return $msg;

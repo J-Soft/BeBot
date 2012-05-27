@@ -68,11 +68,10 @@ class sfEventDispatcher
     public function disconnect($name, $listener)
     {
         if (!isset($this->listeners[$name])) {
-            return false;
+            return FALSE;
         }
 
-        foreach ($this->listeners[$name] as $i => $callable)
-        {
+        foreach ($this->listeners[$name] as $i => $callable) {
             if ($listener === $callable) {
                 unset($this->listeners[$name][$i]);
             }
@@ -89,8 +88,7 @@ class sfEventDispatcher
      */
     public function notify(sfEvent $event)
     {
-        foreach ($this->getListeners($event->getName()) as $listener)
-        {
+        foreach ($this->getListeners($event->getName()) as $listener) {
             call_user_func($listener, $event);
         }
 
@@ -107,10 +105,9 @@ class sfEventDispatcher
      */
     public function notifyUntil(sfEvent $event)
     {
-        foreach ($this->getListeners($event->getName()) as $listener)
-        {
+        foreach ($this->getListeners($event->getName()) as $listener) {
             if (call_user_func($listener, $event)) {
-                $event->setProcessed(true);
+                $event->setProcessed(TRUE);
                 break;
             }
         }
@@ -129,10 +126,13 @@ class sfEventDispatcher
      */
     public function filter(sfEvent $event, $value)
     {
-        foreach ($this->getListeners($event->getName()) as $listener)
-        {
-            $value = call_user_func_array($listener, array($event,
-                                                           $value));
+        foreach ($this->getListeners($event->getName()) as $listener) {
+            $value = call_user_func_array(
+                $listener, array(
+                    $event,
+                    $value
+                )
+            );
         }
 
         $event->setReturnValue($value);

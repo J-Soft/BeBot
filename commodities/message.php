@@ -39,21 +39,20 @@ class message
 
     function __construct($source, $sender, $message)
     {
-        $this->source  = $source;
-        $this->sender  = $sender;
+        $this->source = $source;
+        $this->sender = $sender;
         $this->message = $message;
     }
 
 
-    function set_destination($destination, $overwrite = false)
+    function set_destination($destination, $overwrite = FALSE)
     {
         if (empty($this->destination)) {
             $this->destination[] = $destination;
-            return true;
+            return TRUE;
         }
-        else
-        {
-            return false;
+        else {
+            return FALSE;
         }
     }
 

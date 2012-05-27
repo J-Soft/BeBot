@@ -29,11 +29,11 @@
 /*class ConfigMagik extends BasePassiveModule*/
 class ConfigMagik
 {
-    var $PATH = null;
+    var $PATH = NULL;
     var $VARS = array();
-    var $SYNCHRONIZE = false;
-    var $PROCESS_SECTIONS = true;
-    var $PROTECTED_MODE = true;
+    var $SYNCHRONIZE = FALSE;
+    var $PROCESS_SECTIONS = TRUE;
+    var $PROTECTED_MODE = TRUE;
     var $ERRORS = array();
     public static $instance = array();
 
@@ -51,8 +51,10 @@ class ConfigMagik
      * @return void Returns nothing, like any other constructor-method ��] .
      */
     /*	function __construct(&$bot, $path=null, $synchronize=false, $process_sections=true)*/
-    function __construct($path = null, $synchronize = false,
-                         $process_sections = true)
+    function __construct(
+        $path = NULL, $synchronize = FALSE,
+        $process_sections = TRUE
+    )
     {
         /*		parent::__construct($bot, get_class($this));
 
@@ -63,11 +65,13 @@ class ConfigMagik
     }
 
 
-    public static function get_instance($bothandle, $path = null, $synchronize = false,
-                                 $process_sections = true)
+    public static function get_instance(
+        $bothandle, $path = NULL, $synchronize = FALSE,
+        $process_sections = TRUE
+    )
     {
         if (!isset(self::$instance[$bothandle])) {
-            $class                      = __CLASS__;
+            $class = __CLASS__;
             self::$instance[$bothandle] = new $class($path, $synchronize, $process_sections);
         }
         return self::$instance[$bothandle];
@@ -81,8 +85,10 @@ class ConfigMagik
      * @param  synchronize      Maintain file sychronization.
      * @param  process_sections Process sections (false if there are no sections in the ini.
      */
-    function create_ini($path = null, $synchronize = false,
-                        $process_sections = true)
+    function create_ini(
+        $path = NULL, $synchronize = FALSE,
+        $process_sections = TRUE
+    )
     {
         // check whether to enable processing-sections or not
         if (isset($process_sections)) {
@@ -93,24 +99,22 @@ class ConfigMagik
             $this->SYNCHRONIZE = $synchronize;
         }
         // if a path was passed and file exists, try to load it
-        if ($path != null) {
+        if ($path != NULL) {
             // set passed path as class-var
             $this->PATH = $path;
             if (!is_file($path)) {
                 // conf-file seems not to exist, try to create an empty new one
-                $fp_new = @fopen($path, 'w', false);
+                $fp_new = @fopen($path, 'w', FALSE);
                 if (!$fp_new) {
                     $err = "ConfigMagik::ConfigMagik() - Could not create new config-file('$path'), error.";
                     array_push($this->ERRORS, $err);
                     die($err);
                 }
-                else
-                {
+                else {
                     fclose($fp_new);
                 }
             }
-            else
-            {
+            else {
                 // try to load and parse ini-file at specified path
                 $loaded = $this->load($path);
                 if (!$loaded) {
@@ -132,36 +136,35 @@ class ConfigMagik
      *                            NOTE:                   An empty directive will always return an empty string.
      *                            Only when directive can not be found, NULL is returned.
      */
-    function get($key = null, $section = null)
+    function get($key = NULL, $section = NULL)
     {
         // if section was passed, change the PROCESS_SECTION-switch (FIX: 11/08/2004 BennyZaminga)
         if ($section) {
-            $this->PROCESS_SECTIONS = true;
+            $this->PROCESS_SECTIONS = TRUE;
         }
-        else
-        {
-            $this->PROCESS_SECTIONS = false;
+        else {
+            $this->PROCESS_SECTIONS = FALSE;
         }
         // get requested value
         if ($this->PROCESS_SECTIONS) {
             if (isset($this->VARS[$section][$key])) {
                 $value = $this->VARS[$section][$key];
             }
-            else if (isset($this->VARS[$key])) {
-                $value = $this->VARS[$key];
-            }
-            else
-            {
-                return null;
+            else {
+                if (isset($this->VARS[$key])) {
+                    $value = $this->VARS[$key];
+                }
+                else {
+                    return NULL;
+                }
             }
         }
-        else
-        {
+        else {
             $value = $this->VARS[$key];
         }
         // if value was not found (false), return NULL (FIX: 11/08/2004 BennyZaminga)
-        if ($value === false) {
-            return null;
+        if ($value === FALSE) {
+            return NULL;
         }
         // return found value
         return $value;
@@ -178,32 +181,31 @@ class ConfigMagik
      *
      * @return bool            Returns TRUE on success, FALSE on failure.
      */
-    function set($key, $value, $section = null)
+    function set($key, $value, $section = NULL)
     {
         // when sections are enabled and user tries to genarate non-sectioned vars,
         // throw an error, this is definitely not allowed.
         if ($this->PROCESS_SECTIONS and !$section) {
             $err = "ConfigMagik::set() - Passed no section when in section-mode, nothing was set.";
             array_push($this->ERRORS, $err);
-            return false;
+            return FALSE;
         }
         // check if section was passed
-        if ($section === true) {
-            $this->PROCESS_SECTIONS = true;
+        if ($section === TRUE) {
+            $this->PROCESS_SECTIONS = TRUE;
         }
         // set key with given value in given section (if enabled)
         if ($this->PROCESS_SECTIONS) {
             $this->VARS[$section][$key] = $value;
         }
-        else
-        {
+        else {
             $this->VARS[$key] = $value;
         }
         // synchronize memory with file when enabled
         if ($this->SYNCHRONIZE) {
             $this->save();
         }
-        return true;
+        return TRUE;
     }
 
 
@@ -215,43 +217,42 @@ class ConfigMagik
      *
      * @return bool            Returns TRUE on success, FALSE on failure.
      */
-    function removeKey($key, $section = null)
+    function removeKey($key, $section = NULL)
     {
         // check if section was passed and it's valid
-        if ($section != null) {
-            if (in_array($section, array_keys($this->VARS)) == false) {
+        if ($section != NULL) {
+            if (in_array($section, array_keys($this->VARS)) == FALSE) {
                 $err = "ConfigMagik::removeKey() - Could not find section('$section'), nothing was removed.";
                 array_push($this->ERRORS, $err);
-                return false;
+                return FALSE;
             }
             // look if given key exists in given section
-            if (in_array($key, array_keys($this->VARS[$section])) === false) {
+            if (in_array($key, array_keys($this->VARS[$section])) === FALSE) {
                 $err = "ConfigMagik::removeKey() - Could not find key('$key'), nothing was removed.";
                 array_push($this->ERRORS, $err);
-                return false;
+                return FALSE;
             }
             // remove key from section
-            $pos = array_search($key, array_keys($this->VARS[$section]), true);
+            $pos = array_search($key, array_keys($this->VARS[$section]), TRUE);
             array_splice($this->VARS[$section], $pos, 1);
-            return true;
+            return TRUE;
         }
-        else
-        {
+        else {
             // look if given key exists
-            if (in_array($key, array_keys($this->VARS)) === false) {
+            if (in_array($key, array_keys($this->VARS)) === FALSE) {
                 $err = "ConfigMagik::removeKey() - Could not find key('$key'), nothing was removed.";
                 array_push($this->ERRORS, $err);
-                return false;
+                return FALSE;
             }
             // remove key (sections disabled)
-            $pos = array_search($key, array_keys($this->VARS), true);
+            $pos = array_search($key, array_keys($this->VARS), TRUE);
             array_splice($this->VARS, $pos, 1);
             // synchronisation-stuff
             if ($this->SYNCHRONIZE) {
                 $this->save();
             }
             // return
-            return true;
+            return TRUE;
         }
     }
 
@@ -266,13 +267,13 @@ class ConfigMagik
     function removeSection($section)
     {
         // check if section exists
-        if (in_array($section, array_keys($this->VARS), true) === false) {
+        if (in_array($section, array_keys($this->VARS), TRUE) === FALSE) {
             $err = "ConfigMagik::removeSection() - Section('$section') could not be found, nothing removed.";
             array_push($this->ERRORS, $err);
-            return false;
+            return FALSE;
         }
         // find position of $section in current config
-        $pos = array_search($section, array_keys($this->VARS), true);
+        $pos = array_search($section, array_keys($this->VARS), TRUE);
         // remove section from current config
         array_splice($this->VARS, $pos, 1);
         // synchronisation-stuff
@@ -280,7 +281,7 @@ class ConfigMagik
             $this->save();
         }
         // return
-        return true;
+        return TRUE;
     }
 
 
@@ -292,17 +293,16 @@ class ConfigMagik
      *
      * @return bool Returns TRUE on success, FALSE on failure.
      */
-    function load($path = null)
+    function load($path = NULL)
     {
         // if path was specified, check if valid else abort
-        if ($path != null and !is_file($path)) {
+        if ($path != NULL and !is_file($path)) {
             $err = "ConfigMagik::load() - Path('$path') is invalid, nothing loaded.";
             array_push($this->ERRORS, $err);
             echo $err;
-            return false;
+            return FALSE;
         }
-        elseif ($path == null)
-        {
+        elseif ($path == NULL) {
             // no path was specified, fall back to class-var
             $path = $this->PATH;
         }
@@ -311,7 +311,7 @@ class ConfigMagik
         * It's robust enough ;-)
         */
         $this->VARS = @parse_ini_file($path, $this->PROCESS_SECTIONS);
-        return true;
+        return TRUE;
     }
 
 
@@ -323,10 +323,10 @@ class ConfigMagik
      *
      * @return bool Returns TRUE on success, FALSE on failure.
      */
-    function save($path = null)
+    function save($path = NULL)
     {
         // if no path was specified, fall back to class-var
-        if ($path == null) {
+        if ($path == NULL) {
             $path = $this->PATH;
         }
         $content = "";
@@ -342,19 +342,15 @@ class ConfigMagik
         $content .= "; Last modified: " . date('d M Y H:i s') . "\n";
         // check if there are sections to process
         if ($this->PROCESS_SECTIONS) {
-            foreach ($this->VARS as $key => $elem)
-            {
+            foreach ($this->VARS as $key => $elem) {
                 $content .= "[" . $key . "]\n";
-                foreach ($elem as $key2 => $elem2)
-                {
+                foreach ($elem as $key2 => $elem2) {
                     $content .= $key2 . " = \"" . $elem2 . "\"\n";
                 }
             }
         }
-        else
-        {
-            foreach ($this->VARS as $key => $elem)
-            {
+        else {
+            foreach ($this->VARS as $key => $elem) {
                 $content .= $key . " = \"" . $elem . "\"\n";
             }
         }
@@ -366,21 +362,20 @@ class ConfigMagik
         if (!$handle = @fopen($path, 'w')) {
             $err = "ConfigMagik::save() - Could not open file('$path') for writing, error.";
             array_push($this->ERRORS, $err);
-            return false;
+            return FALSE;
         }
         if (!fwrite($handle, $content)) {
             $err = "ConfigMagik::save() - Could not write to open file('$path'), error.";
             array_push($this->ERRORS, $err);
-            return false;
+            return FALSE;
         }
-        else
-        {
+        else {
             // push a message onto error-stack
             $err = "ConfigMagik::save() - Sucessfully saved to file('$path').";
             array_push($this->ERRORS, $err);
         }
         fclose($handle);
-        return true;
+        return TRUE;
     }
 
 
@@ -407,22 +402,19 @@ class ConfigMagik
             $out .= ob_get_clean();
             return $out;
         }
-        elseif (strtoupper($output_type) === 'HTML')
-        {
+        elseif (strtoupper($output_type) === 'HTML') {
             // render object as HTML
             $out = "<table style='background:#FFEECC;border:1px solid black;' width=60%>\n";
             if ($this->PROCESS_SECTIONS) {
                 // render with sections
                 $out .= "\t<tr><th style='border:1px solid white;'>Section</th><th style='border:1px solid white;'>Key</th><th style='border:1px solid white;'>Value</th></tr>\n";
-                $sections     = $this->listSections();
+                $sections = $this->listSections();
                 $num_sections = 0;
-                $num_keys     = 0;
-                foreach ($sections as $section)
-                {
+                $num_keys = 0;
+                foreach ($sections as $section) {
                     $out .= "\t<tr><td style='border:1px solid white;' colspan=3>$section</td></tr>\n";
                     $keys = $this->listKeys($section);
-                    foreach ($keys as $key)
-                    {
+                    foreach ($keys as $key) {
                         $val = $this->get($key, $section);
                         $out .= "\t<tr><td>&nbsp;</td><td style='border:1px solid maroon;'>$key</td><td style='border:1px solid brown;'>$val</td></tr>\n";
                         $num_keys++;
@@ -432,14 +424,12 @@ class ConfigMagik
                 // summary of table (with sections)
                 $out .= "\t<tr><td style='border:1px solid white;' colspan=3 align=right><code>There are <b>$num_keys keys</b> in <b>$num_sections sections</b>.</code></td></tr>\n";
             }
-            else
-            {
+            else {
                 // render without sections
-                $keys     = $this->listKeys();
+                $keys = $this->listKeys();
                 $num_keys = 0;
                 $out .= "\t<tr><th style='border:1px solid white;'>Key</th><th style='border:1px solid white;'>Value</th></tr>\n";
-                foreach ($keys as $key)
-                {
+                foreach ($keys as $key) {
                     $val = $this->get($key);
                     $out .= "\t<tr><td style='border:1px solid maroon;'>$key</td><td style='border:1px solid brown;'>$val</td></tr>\n";
                     $num_keys++;
@@ -461,30 +451,28 @@ class ConfigMagik
      *
      * @return array           Returns a numeric array containing the keys as string.
      */
-    function listKeys($section = null)
+    function listKeys($section = NULL)
     {
         // check if section was passed
-        if ($section !== null) {
+        if ($section !== NULL) {
             // check if passed section exists
             $sections = $this->listSections();
-            if (in_array($section, $sections) === false) {
+            if (in_array($section, $sections) === FALSE) {
                 $err = "ConfigMagik::listKeys() - Section('$section') could not be found.";
                 array_push($this->ERRORS, $err);
-                return false;
+                return FALSE;
             }
             // list all keys in given section
             $list = array();
-            $all  = array_keys($this->VARS[$section]);
-            foreach ($all as $possible_key)
-            {
+            $all = array_keys($this->VARS[$section]);
+            foreach ($all as $possible_key) {
                 if (!is_array($this->VARS[$possible_key])) {
                     array_push($list, $possible_key);
                 }
             }
             return $list;
         }
-        else
-        {
+        else {
             // list all keys (section-less)
             return array_keys($this->VARS);
         }
@@ -503,8 +491,7 @@ class ConfigMagik
         $list = array();
         // separate sections from normal keys
         $all = array_keys($this->VARS);
-        foreach ($all as $possible_section)
-        {
+        foreach ($all as $possible_section) {
             if (is_array($this->VARS[$possible_section])) {
                 array_push($list, $possible_section);
             }

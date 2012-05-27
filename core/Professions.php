@@ -46,58 +46,73 @@ class Profession_Core extends BasePassiveModule
         $this->bot->db->query("DROP TABLE IF EXISTS #___professions");
         $this->register_module("professions");
         if ($this->bot->game == "aoc") {
-            $this->cache = array('Barbarian'       => 'barb',
-                                 'Conqueror'       => 'conq',
-                                 'Guardian'        => 'guard',
-                                 'Priest of Mitra' => 'pom',
-                                 'Tempest of Set'  => 'tos',
-                                 'Bear Shaman'     => 'bs',
-                                 'Dark Templar'    => 'dt',
-                                 'Assassin'        => 'ass',
-                                 'Ranger'          => 'rang',
-                                 'Necromancer'     => 'necro',
-                                 'Herald of Xotli' => 'hox',
-                                 'Demonologist'    => 'demo');
+            $this->cache = array(
+                'Barbarian'       => 'barb',
+                'Conqueror'       => 'conq',
+                'Guardian'        => 'guard',
+                'Priest of Mitra' => 'pom',
+                'Tempest of Set'  => 'tos',
+                'Bear Shaman'     => 'bs',
+                'Dark Templar'    => 'dt',
+                'Assassin'        => 'ass',
+                'Ranger'          => 'rang',
+                'Necromancer'     => 'necro',
+                'Herald of Xotli' => 'hox',
+                'Demonologist'    => 'demo'
+            );
         }
-        else
-        {
-            $this->cache = array('Adventurer'      => 'adv',
-                                 'Agent'           => 'agent',
-                                 'Bureaucrat'      => 'crat',
-                                 'Doctor'          => 'doc',
-                                 'Enforcer'        => 'enf',
-                                 'Engineer'        => 'eng',
-                                 'Fixer'           => 'fixer',
-                                 'Keeper'          => 'keeper',
-                                 'Martial Artist'  => 'ma',
-                                 'Meta-Physicist'  => 'mp',
-                                 'Nano-Technician' => 'nt',
-                                 'Shade'           => 'shade',
-                                 'Soldier'         => 'sol',
-                                 'Trader'          => 'trader');
-            $this->units = array('artillery'     => array('Adventurer',
-                                                          'Agent',
-                                                          'Fixer',
-                                                          'Soldier',
-                                                          'Trader'),
-                                 'control'       => array('Bureaucrat',
-                                                          'Engineer',
-                                                          'Meta-Physicist',
-                                                          'Trader'),
-                                 'extermination' => array('Bureaucrat',
-                                                          'Meta-Physicist',
-                                                          'Nano-Technician'),
-                                 'infantry'      => array('Adventurer',
-                                                          'Enforcer',
-                                                          'Keeper',
-                                                          'Martial Artist'),
-                                 'support'       => array('Adventurer',
-                                                          'Doctor',
-                                                          'Fixer',
-                                                          'Keeper',
-                                                          'Martial Artist',
-                                                          'Meta-Physicist',
-                                                          'Trader'));
+        else {
+            $this->cache = array(
+                'Adventurer'      => 'adv',
+                'Agent'           => 'agent',
+                'Bureaucrat'      => 'crat',
+                'Doctor'          => 'doc',
+                'Enforcer'        => 'enf',
+                'Engineer'        => 'eng',
+                'Fixer'           => 'fixer',
+                'Keeper'          => 'keeper',
+                'Martial Artist'  => 'ma',
+                'Meta-Physicist'  => 'mp',
+                'Nano-Technician' => 'nt',
+                'Shade'           => 'shade',
+                'Soldier'         => 'sol',
+                'Trader'          => 'trader'
+            );
+            $this->units = array(
+                'artillery'     => array(
+                    'Adventurer',
+                    'Agent',
+                    'Fixer',
+                    'Soldier',
+                    'Trader'
+                ),
+                'control'       => array(
+                    'Bureaucrat',
+                    'Engineer',
+                    'Meta-Physicist',
+                    'Trader'
+                ),
+                'extermination' => array(
+                    'Bureaucrat',
+                    'Meta-Physicist',
+                    'Nano-Technician'
+                ),
+                'infantry'      => array(
+                    'Adventurer',
+                    'Enforcer',
+                    'Keeper',
+                    'Martial Artist'
+                ),
+                'support'       => array(
+                    'Adventurer',
+                    'Doctor',
+                    'Fixer',
+                    'Keeper',
+                    'Martial Artist',
+                    'Meta-Physicist',
+                    'Trader'
+                )
+            );
         }
     }
 
@@ -116,13 +131,11 @@ class Profession_Core extends BasePassiveModule
             return ($full_name);
         }
         // Or a full name?
-        elseif (isset($lc_cache[$shortcut]))
-        {
+        elseif (isset($lc_cache[$shortcut])) {
             return (array_search($lc_cache[$shortcut], $this->cache));
         }
         // error otherwise
-        else
-        {
+        else {
             $this->error->set("##highlight##'$shortcut'##end## is not a valid profession name or shortcut.");
             return ($this->error);
         }
@@ -141,12 +154,10 @@ class Profession_Core extends BasePassiveModule
             return ($this->cache[$profession]);
         }
         //Check if $profession is a valid shortcut.
-        elseif (in_array($profession, $this->cache))
-        {
+        elseif (in_array($profession, $this->cache)) {
             return ($profession);
         }
-        else
-        {
+        else {
             $this->error->set("'$profession' is not a valid profession name or shortcut.");
             return ($this->error);
         }
@@ -195,8 +206,7 @@ class Profession_Core extends BasePassiveModule
             return $profession;
         }
         $prof_units = array();
-        foreach ($this->units as $unit => $professions_array)
-        {
+        foreach ($this->units as $unit => $professions_array) {
             if (in_array($profession, $professions_array)) {
                 $prof_units[] = $unit;
             }

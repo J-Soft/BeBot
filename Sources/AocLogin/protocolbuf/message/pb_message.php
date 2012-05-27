@@ -22,12 +22,12 @@ require_once(dirname(__FILE__) . '/' . 'reader/pb_input_string_reader.php');
  */
 abstract class PBMessage
 {
-    const WIRED_VARINT           = 0;
-    const WIRED_64BIT            = 1;
+    const WIRED_VARINT = 0;
+    const WIRED_64BIT = 1;
     const WIRED_LENGTH_DELIMITED = 2;
-    const WIRED_START_GROUP      = 3;
-    const WIRED_END_GROUP        = 4;
-    const WIRED_32BIT            = 5;
+    const WIRED_START_GROUP = 3;
+    const WIRED_END_GROUP = 4;
+    const WIRED_32BIT = 5;
 
     var $base128;
 
@@ -40,7 +40,7 @@ abstract class PBMessage
     var $wired_type = 2;
 
     // the value of a class
-    var $value = null;
+    var $value = NULL;
 
     // modus byte or string parse (byte for productive string for better reading and debuging)
     // 1 = byte, 2 = String
@@ -60,10 +60,10 @@ abstract class PBMessage
     /**
      * Constructor - initialize base128 class
      */
-    public function __construct($reader = null)
+    public function __construct($reader = NULL)
     {
-        $this->reader  = $reader;
-        $this->value   = $this;
+        $this->reader = $reader;
+        $this->value = $this;
         $this->base128 = new base128varint(PBMessage::MODUS);
     }
 
@@ -77,10 +77,10 @@ abstract class PBMessage
      */
     public function get_types($number)
     {
-        $binstring      = decbin($number);
-        $types          = array();
-        $low            = substr($binstring, strlen($binstring) - 3, strlen($binstring));
-        $high           = substr($binstring, 0, strlen($binstring) - 3) . '0000';
+        $binstring = decbin($number);
+        $types = array();
+        $low = substr($binstring, strlen($binstring) - 3, strlen($binstring));
+        $high = substr($binstring, 0, strlen($binstring) - 3) . '0000';
         $types['wired'] = bindec($low);
         $types['field'] = bindec($binstring) >> 3;
         return $types;
@@ -102,28 +102,28 @@ abstract class PBMessage
 
         $stringinner = '';
 
-        foreach ($this->fields as $index => $field)
-        {
+        foreach ($this->fields as $index => $field) {
             if (is_array($this->values[$index]) && count($this->values[$index]) > 0) {
                 // make serialization for every array
-                foreach ($this->values[$index] as $array)
-                {
+                foreach ($this->values[$index] as $array) {
                     $newstring = '';
                     $newstring .= $array->SerializeToString($index);
 
                     $stringinner .= $newstring;
                 }
             }
-            else if ($this->values[$index] != null) {
-                // wired and type
-                $newstring = '';
-                $newstring .= $this->values[$index]->SerializeToString($index);
+            else {
+                if ($this->values[$index] != NULL) {
+                    // wired and type
+                    $newstring = '';
+                    $newstring .= $this->values[$index]->SerializeToString($index);
 
-                //PBScalar::hexdump("mess:", $newstring, strlen($newstring) );
+                    //PBScalar::hexdump("mess:", $newstring, strlen($newstring) );
 
-                $stringinner .= $newstring;
-                $alen = strlen($newstring);
-                $blen = strlen($stringinner);
+                    $stringinner .= $newstring;
+                    $alen = strlen($newstring);
+                    $blen = strlen($stringinner);
+                }
             }
         }
 
@@ -179,10 +179,9 @@ abstract class PBMessage
     private function _ParseFromArray($length = 99999999)
     {
         $_begin = $this->reader->get_pointer();
-        while ($this->reader->get_pointer() - $_begin < $length)
-        {
+        while ($this->reader->get_pointer() - $_begin < $length) {
             $next = $this->reader->next();
-            if ($next === false) {
+            if ($next === FALSE) {
                 break;
             }
 
@@ -196,15 +195,18 @@ abstract class PBMessage
                 if ($messtypes['wired'] == PBMessage::WIRED_LENGTH_DELIMITED) {
                     $consume = new PBString($this->reader);
                 }
-                else if ($messtypes['wired'] == PBMessage::WIRED_VARINT) {
-                    $consume = new PBInt($this->reader);
-                }
-                else if ($messtypes['wired'] == PBMessage::WIRED_32BIT) {
-                    $consume = new PBFixedInt($this->reader);
-                }
-                else
-                {
-                    throw new Exception('I dont understand this wired code:' . $messtypes['wired']);
+                else {
+                    if ($messtypes['wired'] == PBMessage::WIRED_VARINT) {
+                        $consume = new PBInt($this->reader);
+                    }
+                    else {
+                        if ($messtypes['wired'] == PBMessage::WIRED_32BIT) {
+                            $consume = new PBFixedInt($this->reader);
+                        }
+                        else {
+                            throw new Exception('I dont understand this wired code:' . $messtypes['wired']);
+                        }
+                    }
                 }
 
                 // perhaps send a warning out
@@ -219,14 +221,13 @@ abstract class PBMessage
             // now array or not
             if (is_array($this->values[$messtypes['field']])) {
                 $this->values[$messtypes['field']][] = new $this->fields[$messtypes['field']]($this->reader);
-                $index                               = count($this->values[$messtypes['field']]) - 1;
+                $index = count($this->values[$messtypes['field']]) - 1;
                 if ($messtypes['wired'] != $this->values[$messtypes['field']][$index]->wired_type) {
                     throw new Exception('Expected type:' . $messtypes['wired'] . ' but had ' . $this->fields[$messtypes['field']]->wired_type);
                 }
                 $this->values[$messtypes['field']][$index]->ParseFromArray();
             }
-            else
-            {
+            else {
                 //echo "Called as value : " . $this->fields[$messtypes['field']] . " : " . $messtypes['wired'] . " ($index)\n";
                 $this->values[$messtypes['field']] = new $this->fields[$messtypes['field']]($this->reader);
                 if ($messtypes['wired'] != $this->values[$messtypes['field']]->wired_type) {
@@ -286,9 +287,8 @@ abstract class PBMessage
         if (gettype($value) == 'object') {
             $this->values[$index] = $value;
         }
-        else
-        {
-            $this->values[$index]        = new $this->fields[$index]();
+        else {
+            $this->values[$index] = new $this->fields[$index]();
             $this->values[$index]->value = $value;
         }
     }
@@ -301,8 +301,8 @@ abstract class PBMessage
      */
     protected function _get_value($index)
     {
-        if ($this->values[$index] == null) {
-            return null;
+        if ($this->values[$index] == NULL) {
+            return NULL;
         }
         return $this->values[$index]->value;
     }
@@ -350,19 +350,23 @@ abstract class PBMessage
      *
      * @return String - the return string from the request to the url
      */
-    public function Send($url, &$class = null)
+    public function Send($url, &$class = NULL)
     {
-        $ch              = curl_init();
+        $ch = curl_init();
         $this->_d_string = '';
 
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_WRITEFUNCTION, array($this,
-                                                      '_save_string'));
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt(
+            $ch, CURLOPT_WRITEFUNCTION, array(
+                $this,
+                '_save_string'
+            )
+        );
         curl_setopt($ch, CURLOPT_POSTFIELDS, 'message=' . urlencode($this->SerializeToString()));
         $result = curl_exec($ch);
 
-        if ($class != null) {
+        if ($class != NULL) {
             $class->parseFromString($this->_d_string);
         }
         return $this->_d_string;
@@ -390,19 +394,16 @@ abstract class PBMessage
         }
         // fields
         if (isset($this->fields)) {
-            foreach ($this->fields as $name => $value)
-            {
+            foreach ($this->fields as $name => $value) {
                 unset($this->$name);
             }
             unset($this->fields);
         }
         // values
         if (isset($this->values)) {
-            foreach ($this->values as $name => $value)
-            {
+            foreach ($this->values as $name => $value) {
                 if (is_array($value)) {
-                    foreach ($value as $name2 => $value2)
-                    {
+                    foreach ($value as $name2 => $value2) {
                         if (is_object($value2) AND method_exists($value2, '__destruct')) {
                             $value2->__destruct();
                         }
@@ -412,8 +413,7 @@ abstract class PBMessage
                         unset($value->$name2);
                     }
                 }
-                else
-                {
+                else {
                     if (is_object($value) AND method_exists($value, '__destruct')) {
                         $value->__destruct();
                     }

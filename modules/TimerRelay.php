@@ -55,21 +55,24 @@ class TimerRelay extends BaseActiveModule
     function command_handler($name, $msg, $origin)
     {
         if ($this->bot->core("settings")
-                ->get('Relay', 'Status') && strtolower($this->bot
-            ->core("settings")->get('Relay', 'Relay')) == strtolower($name)
+            ->get('Relay', 'Status')
+            && strtolower(
+                $this->bot
+                    ->core("settings")->get('Relay', 'Relay')
+            ) == strtolower($name)
         ) {
             if (preg_match("/^relaytimer class:(.*) endtime:(.*) owner:(.*) repeat:(.*) channel:(.*) name:(.*)/$i", $msg, $info)) {
                 $this->add_timer($info[3], $info[2], $info[6], $info[1], $info[4], $info[5]);
             }
         }
-        return false;
+        return FALSE;
     }
 
 
     function add_timer($owner, $endtime, $name, $class, $repeat, $channel)
     {
         $this->bot->core("timer")
-            ->add_timer(true, $owner, $endtime - time(), $name, $channel, $repeat, $class);
+            ->add_timer(TRUE, $owner, $endtime - time(), $name, $channel, $repeat, $class);
     }
 }
 

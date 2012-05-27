@@ -42,9 +42,9 @@ class ModuleControlGUI extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("tell", "modules", "OWNER");
-        $this->help['description']        = "Allows you to enable and disable modules.";
+        $this->help['description'] = "Allows you to enable and disable modules.";
         $this->help['command']['modules'] = "Shows the GUI to enable and disable modules.";
-        $this->help['notes']              = "Changes to the module loading only take effect after a restart of the bot.";
+        $this->help['notes'] = "Changes to the module loading only take effect after a restart of the bot.";
     }
 
 
@@ -56,18 +56,15 @@ class ModuleControlGUI extends BaseActiveModule
         if (preg_match("/^modules$/i", $msg)) {
             return $this->show_stuff();
         }
-        elseif (preg_match("/^modules d ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info))
-        {
+        elseif (preg_match("/^modules d ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info)) {
             return $this->disable($name, $info[1], $info[2]);
         }
-        elseif (preg_match("/^modules e ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info))
-        {
+        elseif (preg_match("/^modules e ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info)) {
             return $this->enable($name, $info[1], $info[2]);
         }
-        else
-        {
+        else {
             $this->bot->send_help($name);
-            return false;
+            return FALSE;
         }
     }
 
@@ -79,13 +76,11 @@ class ModuleControlGUI extends BaseActiveModule
     {
         $sections = $this->bot->core("ini")->listSections();
         natcasesort($sections);
-        foreach ($sections as $section)
-        {
+        foreach ($sections as $section) {
             $blob .= "<font color='yellow'>" . $section . "</font>\n";
             $keys = $this->bot->core("ini")->listKeys($section);
             natcasesort($keys);
-            foreach ($keys as $key)
-            {
+            foreach ($keys as $key) {
                 $value = $this->bot->core("ini")->get($key, $section);
                 if ($value == "TRUE") {
                     $blob .= "-<font color='green'>" . $key;
@@ -94,8 +89,7 @@ class ModuleControlGUI extends BaseActiveModule
                         ->chatcmd("modules d " . $key . " " . $section, "Disable");
                     $blob .= "]";
                 }
-                else
-                {
+                else {
                     $blob .= "-<font color='red'>" . $key;
                     $blob .= "</font> [";
                     $blob .= $this->bot->core("tools")

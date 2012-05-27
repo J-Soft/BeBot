@@ -58,7 +58,7 @@ class Queue_Core extends BasePassiveModule
         $this->register_module("queue");
         $this->register_event("cron", "1sec");
 
-        $this->queue     = array();
+        $this->queue = array();
         $this->queue_low = array();
     }
 
@@ -70,11 +70,11 @@ class Queue_Core extends BasePassiveModule
     */
     function register(&$module, $name, $delay, $max = 0, $filter = TRUE)
     {
-        $name               = strtolower($name);
-        $this->link[$name]  = $module;
+        $name = strtolower($name);
+        $this->link[$name] = $module;
         $this->delay[$name] = $delay;
-        $this->max[$name]   = $max;
-        $this->filter       = (bool)$filter;
+        $this->max[$name] = $max;
+        $this->filter = (bool)$filter;
     }
 
 
@@ -83,12 +83,10 @@ class Queue_Core extends BasePassiveModule
     */
     function cron()
     {
-        foreach ($this->link as $name => $mod)
-        {
+        foreach ($this->link as $name => $mod) {
             if (!empty($this->queue[$name])) {
                 $this->set_queue($name);
-                foreach ($this->queue[$name] as $key => $value)
-                {
+                foreach ($this->queue[$name] as $key => $value) {
                     if ($this->queue_left[$name] >= 1) {
                         $mod->queue($name, $value);
 
@@ -99,8 +97,7 @@ class Queue_Core extends BasePassiveModule
             }
             if (!empty($this->queue_low[$name]) && empty($this->queue[$name])) {
                 $this->set_queue($name);
-                foreach ($this->queue_low[$name] as $key => $value)
-                {
+                foreach ($this->queue_low[$name] as $key => $value) {
                     if ($this->queue_left[$name] >= 1) {
                         $mod->queue($name, $value);
 
@@ -119,13 +116,12 @@ class Queue_Core extends BasePassiveModule
     function set_queue($name)
     {
         $time = time();
-        $add  = ($time - $this->last_call[$name]) / $this->delay[$name];
+        $add = ($time - $this->last_call[$name]) / $this->delay[$name];
         if ($add > 0) {
             if (!isset($this->queue_left[$name])) {
                 $this->queue_left[$name] = $add;
             }
-            else
-            {
+            else {
                 $this->queue_left[$name] += $add;
             }
             $this->last_call[$name] = $time;
@@ -145,9 +141,9 @@ class Queue_Core extends BasePassiveModule
         $this->set_queue($name);
         if (($this->queue_left[$name] >= 1) && empty($this->queue[$name]) && empty($this->queue_low[$name])) {
             $this->queue_left[$name] -= 1;
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -163,8 +159,7 @@ class Queue_Core extends BasePassiveModule
             // (like if 100 people are klicking on a guild info link multiple times).
             // There is no point in sending the same answer back twice in a row.
             if ($this->filter[$name]) {
-                foreach ($this->queue[$name] as $item)
-                {
+                foreach ($this->queue[$name] as $item) {
                     if ($this->bot->core("tools")->compare($info, $item)) {
                         return;
                     }
@@ -172,12 +167,10 @@ class Queue_Core extends BasePassiveModule
             }
             $this->queue[$name][] = $info;
         }
-        else
-        {
+        else {
             // Filter duplicate messages.
             if ($this->filter[$name]) {
-                foreach ($this->queue_low[$name] as $item)
-                {
+                foreach ($this->queue_low[$name] as $item) {
                     if ($this->bot->core("tools")->compare($info, $item)) {
                         return;
                     }

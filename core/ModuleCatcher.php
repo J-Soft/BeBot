@@ -50,7 +50,7 @@ class ModuleCatcher_Core extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         $this->register_module("module_core");
         $this->register_event("connect");
-        $this->core_directories   = $core;
+        $this->core_directories = $core;
         $this->module_directories = $mod;
     }
 
@@ -62,8 +62,7 @@ class ModuleCatcher_Core extends BasePassiveModule
     { // Start function connect()
         // Load up core-modules
         $folder = dir("./core/");
-        while ($mod = $folder->read())
-        {
+        while ($mod = $folder->read()) {
             if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                 $value = $this->bot->core("ini")->get($mod, "Core");
                 if (empty($value)) {
@@ -74,8 +73,7 @@ class ModuleCatcher_Core extends BasePassiveModule
         // Load up game core-modules
         if (is_dir("./core/" . $this->bot->game . "/")) {
             $folder = dir("./core/" . $this->bot->game . "/");
-            while ($mod = $folder->read())
-            {
+            while ($mod = $folder->read()) {
                 if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                     $value = $this->bot->core("ini")->get($mod, "Core");
                     if (empty($value)) {
@@ -87,8 +85,7 @@ class ModuleCatcher_Core extends BasePassiveModule
         // Load up all custom core-modules if the directory exists
         if (is_dir("./custom/core")) {
             $folder = dir("./custom/core/");
-            while ($mod = $folder->read())
-            {
+            while ($mod = $folder->read()) {
                 if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                     $value = $this->bot->core("ini")->get($mod, "Custom_Core");
                     if (empty($value)) {
@@ -100,15 +97,13 @@ class ModuleCatcher_Core extends BasePassiveModule
         }
         // Load up the core modules in the $core_directories config entry
         $core_dirs = explode(",", $this->core_directories);
-        foreach ($core_dirs as $core_dir)
-        {
+        foreach ($core_dirs as $core_dir) {
             $core_dir = trim($core_dir);
             $sec_name = str_replace("/", "_", $core_dir);
             // Only load anything if it really is a directory
             if (is_dir($core_dir)) {
                 $folder = dir($core_dir . "/");
-                while ($mod = $folder->read())
-                {
+                while ($mod = $folder->read()) {
                     if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                         $value = $this->bot->core("ini")->get($mod, $sec_name);
                         if (empty($value)) {
@@ -121,8 +116,7 @@ class ModuleCatcher_Core extends BasePassiveModule
         }
         // Load up all modules
         $folder = dir("./modules/");
-        while ($mod = $folder->read())
-        {
+        while ($mod = $folder->read()) {
             if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                 $value = $this->bot->core("ini")->get($mod, "Modules");
                 if (empty($value)) {
@@ -133,8 +127,7 @@ class ModuleCatcher_Core extends BasePassiveModule
         // Load up all game modules
         if (is_dir("./modules/" . $this->bot->game . "/")) {
             $folder = dir("./modules/" . $this->bot->game . "/");
-            while ($mod = $folder->read())
-            {
+            while ($mod = $folder->read()) {
                 if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                     $value = $this->bot->core("ini")->get($mod, "Modules");
                     if (empty($value)) {
@@ -146,8 +139,7 @@ class ModuleCatcher_Core extends BasePassiveModule
         // Load up all custom modules if the directoy exists
         if (is_dir("./custom/modules")) {
             $folder = dir("./custom/modules/");
-            while ($mod = $folder->read())
-            {
+            while ($mod = $folder->read()) {
                 if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                     $value = $this->bot->core("ini")
                         ->get($mod, "Custom_Modules");
@@ -160,15 +152,13 @@ class ModuleCatcher_Core extends BasePassiveModule
         }
         // Load up the modules in the $module_directories config entry
         $mod_dirs = explode(",", $this->module_directories);
-        foreach ($mod_dirs as $mod_dir)
-        {
-            $mod_dir  = trim($mod_dir);
+        foreach ($mod_dirs as $mod_dir) {
+            $mod_dir = trim($mod_dir);
             $sec_name = str_replace("/", "_", $mod_dir);
             // Only load anything if it really is a directory
             if (is_dir($mod_dir)) {
                 $folder = dir($mod_dir . "/");
-                while ($mod = $folder->read())
-                {
+                while ($mod = $folder->read()) {
                     if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                         $value = $this->bot->core("ini")->get($mod, $sec_name);
                         if (empty($value)) {

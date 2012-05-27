@@ -42,7 +42,7 @@ class Whois extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->help['description']             = 'Shows information about a player';
+        $this->help['description'] = 'Shows information about a player';
         $this->help['command']['whois <name>'] = "Shows information about player <name>.";
         $this->register_command("all", "whois", "GUEST");
         $this->bot->core("colors")
@@ -57,8 +57,7 @@ class Whois extends BaseActiveModule
         if ($this->bot->guildbot) {
             $altstat = TRUE;
         }
-        else
-        {
+        else {
             $altstat = FALSE;
         }
         $this->bot->core("settings")
@@ -68,7 +67,10 @@ class Whois extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Whois", "Online", TRUE, "Should we display if the player is online?");
         $this->bot->core("settings")
-            ->create("Whois", "ShowMain", TRUE, "Should we display the name of a characters main if they are on a registered alt? This only makes sense if Details are enabled and/or Alts is disabled ");
+            ->create(
+            "Whois", "ShowMain", TRUE,
+            "Should we display the name of a characters main if they are on a registered alt? This only makes sense if Details are enabled and/or Alts is disabled "
+        );
         $this->bot->core("settings")
             ->create("Whois", "Banned", TRUE, "Should Banned Status be returned on a whois?");
         $this->bot->core("settings")
@@ -89,8 +91,7 @@ class Whois extends BaseActiveModule
         if ($id && !($id instanceof BotError)) {
             return $this->whois_player($name, $info[1], $type);
         }
-        else
-        {
+        else {
             return "Player ##highlight##" . $info[1] . " ##end##does not exist.";
         }
     }
@@ -103,12 +104,12 @@ class Whois extends BaseActiveModule
     {
         $name = ucfirst(strtolower($name));
         if ($this->bot->game == "aoc") {
-            $this->name[$name]   = $source;
+            $this->name[$name] = $source;
             $this->origin[$name] = $origin;
         }
         $who = $this->bot->core("whois")->lookup($name);
         if (!$who || ($who instanceof BotError)) {
-            return false;
+            return FALSE;
         }
         if ($this->bot->game == "aoc") {
             unset($this->name[$name]);
@@ -124,8 +125,7 @@ class Whois extends BaseActiveModule
             $result .= $this->bot->core("shortcuts")
                 ->get_short($who["profession"]);
         }
-        else
-        {
+        else {
             $result .= $who["profession"];
         }
         if ($this->bot->game == "ao") {
@@ -137,8 +137,7 @@ class Whois extends BaseActiveModule
                 $result .= $this->bot->core("shortcuts")
                     ->get_short($who["rank"]);
             }
-            else
-            {
+            else {
                 $result .= $who["rank"];
             }
             $result .= " of ";
@@ -146,8 +145,7 @@ class Whois extends BaseActiveModule
                 $result .= $this->bot->core("shortcuts")
                     ->get_short($who["org"]);
             }
-            else
-            {
+            else {
                 $result .= $who["org"];
             }
             $result .= "##end##, ";
@@ -173,22 +171,21 @@ class Whois extends BaseActiveModule
                 ->get_notes($source, $name, "all", "DESC");
             if (!($notes instanceof BotError)) {
                 $notesin = "Notes for " . $name . ":\n\n";
-                foreach ($notes as $note)
-                {
+                foreach ($notes as $note) {
                     if ($note['class'] == 1) {
                         $notesin .= "Ban Reason #";
                     }
-                    elseif ($note['class'] == 2)
-                    {
+                    elseif ($note['class'] == 2) {
                         $notesin .= "Admin Note #";
                     }
-                    else
-                    {
+                    else {
                         $notesin .= "Note #";
                     }
-                    $notesin .= $note['pnid'] . " added by " . $note['author'] . " on " . gmdate($this->bot
-                        ->core("settings")
-                        ->get("Time", "FormatString"), $note['timestamp']) . ":\n";
+                    $notesin .= $note['pnid'] . " added by " . $note['author'] . " on " . gmdate(
+                        $this->bot
+                            ->core("settings")
+                            ->get("Time", "FormatString"), $note['timestamp']
+                    ) . ":\n";
                     $notesin .= $note['note'];
                     $notesin .= "\n\n";
                 }
@@ -207,8 +204,7 @@ class Whois extends BaseActiveModule
             $result .= " :: " . $this->bot->core("whois")
                 ->whois_details($source, $who);
         }
-        elseif ($this->bot->core("settings")->get("Whois", "Alts"))
-        {
+        elseif ($this->bot->core("settings")->get("Whois", "Alts")) {
             $alts = $this->bot->core("alts")->show_alt($name);
             if ($alts['alts']) {
                 $result .= " :: " . $alts['list'];

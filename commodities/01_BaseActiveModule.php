@@ -52,47 +52,55 @@ abstract class BaseActiveModule extends BasePassiveModule
     // $access is the minimum access level required to use the command on default.
     // $subcommands is an array with keys of subcommands and entries of access levels to define access
     // rights for possible subcommands. If $subcommands is NULL it will be ignored.
-    protected function register_command($channel, $command,
-                                        $access = "SUPERADMIN",
-                                        $subcommands = NULL)
+    protected function register_command(
+        $channel, $command,
+        $access = "SUPERADMIN",
+        $subcommands = NULL
+    )
     {
-        $levels      = array('ANONYMOUS',
-                             'GUEST',
-                             'MEMBER',
-                             'LEADER',
-                             'ADMIN',
-                             'SUPERADMIN',
-                             'OWNER');
-        $channels    = array('gc',
-                             'pgmsg',
-                             'tell',
-                             'extpgmsg',
-                             'all');
-        $allchannels = array('gc',
-                             'pgmsg',
-                             'tell');
+        $levels = array(
+            'ANONYMOUS',
+            'GUEST',
+            'MEMBER',
+            'LEADER',
+            'ADMIN',
+            'SUPERADMIN',
+            'OWNER'
+        );
+        $channels = array(
+            'gc',
+            'pgmsg',
+            'tell',
+            'extpgmsg',
+            'all'
+        );
+        $allchannels = array(
+            'gc',
+            'pgmsg',
+            'tell'
+        );
         if ((in_array($channel, $channels)) && (in_array($access, $levels))) {
             if (!$this->bot->exists_command($channel, $command)) {
                 $this->bot->register_command($channel, $command, $this);
                 $this->bot->core("access_control")
                     ->create($channel, $command, $access);
                 if ($subcommands != NULL) {
-                    foreach ($subcommands as $subcommand => $subacl)
-                    {
+                    foreach ($subcommands as $subcommand => $subacl) {
                         $this->bot->core("access_control")
                             ->create_subcommand($channel, $command, $subcommand, $subacl);
                     }
                 }
             }
-            else
-            {
+            else {
                 //Say something useful for modules not registering commands properly.
                 $old_module = $this->bot->get_command_handler($channel, $command);
-                $this->error->set("Duplicate command definition! The command '$command' for channel '$channel'" . " has already been registered by '$old_module' and is attempted re-registered by {$this->module_name}");
+                $this->error->set(
+                    "Duplicate command definition! The command '$command' for channel '$channel'"
+                        . " has already been registered by '$old_module' and is attempted re-registered by {$this->module_name}"
+                );
             }
         }
-        else
-        {
+        else {
             $this->error->set("Illegal channel or access level when registering command '$command'");
         }
     }
@@ -100,14 +108,18 @@ abstract class BaseActiveModule extends BasePassiveModule
 
     protected function unregister_command($channel, $command)
     {
-        $channels    = array('gc',
-                             'pgmsg',
-                             'tell',
-                             'extpgmsg',
-                             'all');
-        $allchannels = array('gc',
-                             'pgmsg',
-                             'tell');
+        $channels = array(
+            'gc',
+            'pgmsg',
+            'tell',
+            'extpgmsg',
+            'all'
+        );
+        $allchannels = array(
+            'gc',
+            'pgmsg',
+            'tell'
+        );
         if (in_array($channel, $channels)) {
             if ($this->bot->exists_command($channel, $command)) {
                 $this->bot->unregister_command($channel, $command);
@@ -130,33 +142,34 @@ abstract class BaseActiveModule extends BasePassiveModule
 
 
     // This function aids in parsing the command.
-    protected function parse_com($command, $pattern = array('com',
-                                                            'sub',
-                                                            'args'))
+    protected function parse_com(
+        $command, $pattern
+        = array(
+            'com',
+            'sub',
+            'args'
+        )
+    )
     {
         //preg_match for items and insert a replacement.
         if ($this->bot->game == "aoc") {
             $search_pattern = '/' . $this->bot->core('items')->itemPattern . '/i';
         }
-        else
-        {
+        else {
             $search_pattern = '|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
         }
         $item_count = preg_match_all($search_pattern, $command, $items, PREG_SET_ORDER);
-        for ($cnt = 0; $cnt < $item_count; $cnt++)
-        {
+        for ($cnt = 0; $cnt < $item_count; $cnt++) {
             $command = preg_replace($search_pattern, "##item_$cnt##", $command, 1);
         }
         //Split the command
         $num_pieces = count($pattern);
-        $num_com    = count(explode(' ', $command));
-        $pieces     = explode(' ', $command, $num_pieces);
-        $com        = array_combine(array_slice($pattern, 0, $num_com), $pieces);
+        $num_com = count(explode(' ', $command));
+        $pieces = explode(' ', $command, $num_pieces);
+        $com = array_combine(array_slice($pattern, 0, $num_com), $pieces);
         //Replace any item references with the original item strings.
-        foreach ($com as &$com_item)
-        {
-            for ($cnt = 0; $cnt < $item_count; $cnt++)
-            {
+        foreach ($com as &$com_item) {
+            for ($cnt = 0; $cnt < $item_count; $cnt++) {
                 $com_item = str_replace("##item_$cnt##", $items[$cnt][0], $com_item);
             }
         }
@@ -176,13 +189,12 @@ abstract class BaseActiveModule extends BasePassiveModule
      *************************************************************************/
     public function reply($name, $msg)
     {
-        if ($msg != false) {
+        if ($msg != FALSE) {
             if ($msg instanceof BotError) {
                 //We got an error. Return the error message.
                 $this->reply($name, $msg->message());
             }
-            else
-            {
+            else {
                 $this->output_destination($name, "##normal##$msg##end##", SAME);
             }
         }
@@ -194,7 +206,7 @@ abstract class BaseActiveModule extends BasePassiveModule
         $this->source = TELL;
         $this->error->reset();
         $reply = $this->command_handler($name, $msg, "tell");
-        if (($reply !== false) && ($reply !== '')) {
+        if (($reply !== FALSE) && ($reply !== '')) {
             $this->reply($name, $reply);
         }
     }
@@ -205,7 +217,7 @@ abstract class BaseActiveModule extends BasePassiveModule
         $this->source = GC;
         $this->error->reset();
         $reply = $this->command_handler($name, $msg, "gc");
-        if (($reply !== false) && ($reply !== '')) {
+        if (($reply !== FALSE) && ($reply !== '')) {
             $this->reply($name, $reply);
         }
     }
@@ -216,7 +228,7 @@ abstract class BaseActiveModule extends BasePassiveModule
         $this->source = PG;
         $this->error->reset();
         $reply = $this->command_handler($name, $msg, "pgmsg");
-        if (($reply !== false) && ($reply !== '')) {
+        if (($reply !== FALSE) && ($reply !== '')) {
             $this->reply($name, $reply);
         }
     }

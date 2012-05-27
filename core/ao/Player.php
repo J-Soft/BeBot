@@ -32,20 +32,20 @@
 class Player
 {
     //Game spesific variables
-    private $uid = false;
-    private $uname = false; //aka nickname
-    private $firstname = false;
-    private $lastname = false;
-    private $breed = false;
-    private $gender = false;
-    private $level = false;
-    private $profession = false;
-    private $ai_level = false;
-    private $organization = false;
-    private $org_rank = false;
+    private $uid = FALSE;
+    private $uname = FALSE; //aka nickname
+    private $firstname = FALSE;
+    private $lastname = FALSE;
+    private $breed = FALSE;
+    private $gender = FALSE;
+    private $level = FALSE;
+    private $profession = FALSE;
+    private $ai_level = FALSE;
+    private $organization = FALSE;
+    private $org_rank = FALSE;
     //Bot spesific variables
-    private $accesslevel = false;
-    private $user_level = false;
+    private $accesslevel = FALSE;
+    private $user_level = FALSE;
     private $preferences = array();
 
 
@@ -53,10 +53,9 @@ class Player
     //class can look up certain variables automagically.
     public function __construct(&$bothandle, $data)
     {
-        $this->bot   = $bothandle;
+        $this->bot = $bothandle;
         $this->error = new BotError($this->bot, get_class($this));
-        foreach ($data as $key => $value)
-        {
+        foreach ($data as $key => $value) {
             $this->$key = $value;
         }
     }
@@ -68,37 +67,36 @@ class Player
     */
     public function _get($variable)
     {
-        switch ($variable)
-        {
-            case 'uid':
-            case 'id':
-                return ($this->get_uid());
-                break;
-            case 'uname':
-            case 'nick':
-            case 'nickname':
-                return ($this->get_uname());
-                break;
-            case 'firstname':
-            case 'lastname':
-            case 'breed':
-            case 'gender':
-            case 'level':
-            case 'profession':
-            case 'ai_level':
-            case 'ai_rank':
-            case 'organization':
-            case 'org_rank':
-                return ($this->get_whois($variable));
-                break;
-            case 'pref':
-            case 'preferences':
-                return ($this->get_preferences($variable));
-                break;
-            default:
-                $this->error->set("Unknown attribute '$variable'.");
-                return $this->error;
-                break;
+        switch ($variable) {
+        case 'uid':
+        case 'id':
+            return ($this->get_uid());
+            break;
+        case 'uname':
+        case 'nick':
+        case 'nickname':
+            return ($this->get_uname());
+            break;
+        case 'firstname':
+        case 'lastname':
+        case 'breed':
+        case 'gender':
+        case 'level':
+        case 'profession':
+        case 'ai_level':
+        case 'ai_rank':
+        case 'organization':
+        case 'org_rank':
+            return ($this->get_whois($variable));
+            break;
+        case 'pref':
+        case 'preferences':
+            return ($this->get_preferences($variable));
+            break;
+        default:
+            $this->error->set("Unknown attribute '$variable'.");
+            return $this->error;
+            break;
         }
     }
 
@@ -111,7 +109,7 @@ class Player
             if ($this->uid instanceof BotError) {
                 //The uid could not be resolved.
                 $this->error = $this->uid;
-                $this->uid   = false;
+                $this->uid = FALSE;
                 return $this->error;
             }
         }
@@ -145,8 +143,7 @@ class Player
                 $this->get_uname($this->uid);
             }
             $data = $this->bot->core('whois')->lookup($this->uname);
-            foreach ($data as $key => $value)
-            {
+            foreach ($data as $key => $value) {
                 $this->$key = $value;
             }
         }

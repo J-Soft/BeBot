@@ -10,10 +10,10 @@ class Endpoints
 
     public function Endpoints($type, $name, $instance, $token)
     {
-        $this->m_Name     = $name;
-        $this->m_Type     = $type;
+        $this->m_Name = $name;
+        $this->m_Type = $type;
         $this->m_Instance = $instance;
-        $this->m_Token    = $token;
+        $this->m_Token = $token;
     }
 
 
