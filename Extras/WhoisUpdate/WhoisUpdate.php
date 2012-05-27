@@ -392,7 +392,7 @@ function get_site_data(
 
     socket_set_option(
         $socket, SOL_SOCKET, SO_RCVTIMEO, array(
-            "sec"  => $read_timeout,
+            "sec" => $read_timeout,
             "usec" => 0
         )
     );

@@ -36,48 +36,48 @@ class PB extends BaseActiveModule
 {
     private $slots
         = array(
-            'ocullar'     => 'eye',
-            'brain'       => 'head',
-            'right arm'   => 'rarm',
-            'left arm'    => 'larm',
+            'ocullar' => 'eye',
+            'brain' => 'head',
+            'right arm' => 'rarm',
+            'left arm' => 'larm',
             'right wrist' => 'rwrist',
-            'left wrist'  => 'lwrist',
-            'right hand'  => 'rhand',
-            'thigh'       => 'legs',
-            'left hand'   => 'lhand'
+            'left wrist' => 'lwrist',
+            'right hand' => 'rhand',
+            'thigh' => 'legs',
+            'left hand' => 'lhand'
         );
     private $profs
         = array(
-            'adventurer'      => 'adv',
-            'agent'           => 'agent',
-            'bureaucrat'      => 'crat',
-            'doctor'          => 'doc',
-            'enforcer'        => 'enf',
-            'engineer'        => 'eng',
-            'fixer'           => 'fixer',
-            'keeper'          => 'keeper',
-            'martial artist'  => 'ma',
-            'meta-physicist'  => 'mp',
+            'adventurer' => 'adv',
+            'agent' => 'agent',
+            'bureaucrat' => 'crat',
+            'doctor' => 'doc',
+            'enforcer' => 'enf',
+            'engineer' => 'eng',
+            'fixer' => 'fixer',
+            'keeper' => 'keeper',
+            'martial artist' => 'ma',
+            'meta-physicist' => 'mp',
             'nano-technician' => 'nt',
-            'soldier'         => 'sol',
-            'trader'          => 'trader'
+            'soldier' => 'sol',
+            'trader' => 'trader'
         );
     private $units
         = array(
-            'adv'    => array(
+            'adv' => array(
                 'infantry',
                 'artillery',
                 'support'
             ),
-            'agent'  => array('artillery'),
-            'crat'   => array(
+            'agent' => array('artillery'),
+            'crat' => array(
                 'control',
                 'extermination'
             ),
-            'doc'    => array('support'),
-            'enf'    => array('infantry'),
-            'eng'    => array('control'),
-            'fixer'  => array(
+            'doc' => array('support'),
+            'enf' => array('infantry'),
+            'eng' => array('control'),
+            'fixer' => array(
                 'artillery',
                 'support'
             ),
@@ -85,17 +85,17 @@ class PB extends BaseActiveModule
                 'infantry',
                 'support'
             ),
-            'ma'     => array(
+            'ma' => array(
                 'infantry',
                 'support'
             ),
-            'mp'     => array(
+            'mp' => array(
                 'control',
                 'extermination',
                 'support'
             ),
-            'nt'     => array('extermination'),
-            'sol'    => array('artillery'),
+            'nt' => array('extermination'),
+            'sol' => array('artillery'),
             'trader' => array(
                 'artillery',
                 'control',

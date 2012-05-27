@@ -452,20 +452,20 @@ class AccessControl_Core extends BasePassiveModule
         $count = 0;
         $countsub = 0;
         $cshort = array(
-            "tell"     => "t",
-            "gc"       => "g",
-            "pgmsg"    => "p",
+            "tell" => "t",
+            "gc" => "g",
+            "pgmsg" => "p",
             "extpgmsg" => "e"
         );
         $lshort = array(
-            "ANONYMOUS"  => "AN",
-            "GUEST"      => "G",
-            "MEMBER"     => "M",
-            "LEADER"     => "L",
-            "ADMIN"      => "A",
+            "ANONYMOUS" => "AN",
+            "GUEST" => "G",
+            "MEMBER" => "M",
+            "LEADER" => "L",
+            "ADMIN" => "A",
             "SUPERADMIN" => "SA",
-            "OWNER"      => "O",
-            "DISABLED"   => "D"
+            "OWNER" => "O",
+            "DISABLED" => "D"
         );
         foreach ($this->access_cache as $command => $value) {
             unset($subs);
@@ -530,13 +530,13 @@ class AccessControl_Core extends BasePassiveModule
         );
         $llong = array(
             'AN' => 'ANONYMOUS',
-            'G'  => 'GUEST',
-            'M'  => 'MEMBER',
-            'L'  => 'LEADER',
-            'A'  => 'ADMIN',
+            'G' => 'GUEST',
+            'M' => 'MEMBER',
+            'L' => 'LEADER',
+            'A' => 'ADMIN',
             'SA' => 'SUPERADMIN',
-            'O'  => 'OWNER',
-            'D'  => 'DISABLED'
+            'O' => 'OWNER',
+            'D' => 'DISABLED'
         );
         $results = $this->bot->db->select("SELECT commands FROM #___access_control_saves WHERE name = '" . mysql_real_escape_string($name) . "'");
         if (!empty($results)) {

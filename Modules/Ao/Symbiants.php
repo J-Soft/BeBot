@@ -39,19 +39,19 @@ class Symb_sql extends BaseActiveModule
 {
     private $slots
         = array(
-            'ocular'      => 'eye',
-            'brain'       => 'head',
-            'ear'         => 'ear',
-            'right arm'   => 'rarm',
-            'chest'       => 'chest',
-            'left arm'    => 'larm',
+            'ocular' => 'eye',
+            'brain' => 'head',
+            'ear' => 'ear',
+            'right arm' => 'rarm',
+            'chest' => 'chest',
+            'left arm' => 'larm',
             'right wrist' => 'rwrist',
-            'waist'       => 'waist',
-            'left wrist'  => 'lwrist',
-            'right hand'  => 'rhand',
-            'thigh'       => 'legs',
-            'left hand'   => 'lhand',
-            'feet'        => 'feet'
+            'waist' => 'waist',
+            'left wrist' => 'lwrist',
+            'right hand' => 'rhand',
+            'thigh' => 'legs',
+            'left hand' => 'lhand',
+            'feet' => 'feet'
         );
 
 

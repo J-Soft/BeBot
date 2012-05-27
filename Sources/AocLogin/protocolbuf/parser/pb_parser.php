@@ -17,19 +17,19 @@ class PBParser
         = array(
             'double',
             'float',
-            'int32'   => 'PBInt',
-            'int64'   => 'PBInt',
-            'uint32'  => 'PBInt',
+            'int32' => 'PBInt',
+            'int64' => 'PBInt',
+            'uint32' => 'PBInt',
             'uint64',
-            'sint32'  => 'PBSignedInt',
-            'sint64'  => 'PBSignedInt',
+            'sint32' => 'PBSignedInt',
+            'sint64' => 'PBSignedInt',
             'fixed32' => 'PBFixedInt',
             'fixed64',
             'sfixed32',
             'sfixed64',
-            'bool'    => 'PBBool',
-            'string'  => 'PBString',
-            'bytes'   => 'PBString'
+            'bool' => 'PBBool',
+            'string' => 'PBString',
+            'bytes' => 'PBString'
         );
 
 
@@ -302,8 +302,8 @@ class PBParser
                     $content = trim(substr($string, $offset['begin'] + 1, $offset['end'] - $offset['begin'] - 2));
                     // now adding all to myarray
                     $this->m_types[] = array(
-                        'name'  => trim($path . '.' . $name, '.'),
-                        'type'  => 'enum',
+                        'name' => trim($path . '.' . $name, '.'),
+                        'type' => 'enum',
                         'value' => $this->_parse_enum($content)
                     );
                     // removing it from string
@@ -316,7 +316,7 @@ class PBParser
                         throw new Exception('Proto file missformed');
                     }
                     $myarray[] = array(
-                        'type'  => 'field',
+                        'type' => 'field',
                         'value' => $this->_parse_field($matches[0][0], $myarray, $path)
                     );
                     $string = trim(substr($string, $matches[0][1] + strlen($matches[0][0])));
@@ -326,8 +326,8 @@ class PBParser
 
         // now adding myarray to array
         $this->m_types[] = array(
-            'name'  => $path,
-            'type'  => 'message',
+            'name' => $path,
+            'type' => 'message',
             'value' => $myarray
         );
     }
@@ -504,7 +504,7 @@ class PBParser
         if ($offset_begin === FALSE) {
             return array(
                 'begin' => -1,
-                'end'   => -1
+                'end' => -1
             );
         }
 
@@ -535,7 +535,7 @@ class PBParser
 
         return array(
             'begin' => $offset_begin,
-            'end'   => $_offset
+            'end' => $_offset
         );
     }
 

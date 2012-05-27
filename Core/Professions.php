@@ -47,46 +47,46 @@ class Profession_Core extends BasePassiveModule
         $this->register_module("professions");
         if ($this->bot->game == "aoc") {
             $this->cache = array(
-                'Barbarian'       => 'barb',
-                'Conqueror'       => 'conq',
-                'Guardian'        => 'guard',
+                'Barbarian' => 'barb',
+                'Conqueror' => 'conq',
+                'Guardian' => 'guard',
                 'Priest of Mitra' => 'pom',
-                'Tempest of Set'  => 'tos',
-                'Bear Shaman'     => 'bs',
-                'Dark Templar'    => 'dt',
-                'Assassin'        => 'ass',
-                'Ranger'          => 'rang',
-                'Necromancer'     => 'necro',
+                'Tempest of Set' => 'tos',
+                'Bear Shaman' => 'bs',
+                'Dark Templar' => 'dt',
+                'Assassin' => 'ass',
+                'Ranger' => 'rang',
+                'Necromancer' => 'necro',
                 'Herald of Xotli' => 'hox',
-                'Demonologist'    => 'demo'
+                'Demonologist' => 'demo'
             );
         }
         else {
             $this->cache = array(
-                'Adventurer'      => 'adv',
-                'Agent'           => 'agent',
-                'Bureaucrat'      => 'crat',
-                'Doctor'          => 'doc',
-                'Enforcer'        => 'enf',
-                'Engineer'        => 'eng',
-                'Fixer'           => 'fixer',
-                'Keeper'          => 'keeper',
-                'Martial Artist'  => 'ma',
-                'Meta-Physicist'  => 'mp',
+                'Adventurer' => 'adv',
+                'Agent' => 'agent',
+                'Bureaucrat' => 'crat',
+                'Doctor' => 'doc',
+                'Enforcer' => 'enf',
+                'Engineer' => 'eng',
+                'Fixer' => 'fixer',
+                'Keeper' => 'keeper',
+                'Martial Artist' => 'ma',
+                'Meta-Physicist' => 'mp',
                 'Nano-Technician' => 'nt',
-                'Shade'           => 'shade',
-                'Soldier'         => 'sol',
-                'Trader'          => 'trader'
+                'Shade' => 'shade',
+                'Soldier' => 'sol',
+                'Trader' => 'trader'
             );
             $this->units = array(
-                'artillery'     => array(
+                'artillery' => array(
                     'Adventurer',
                     'Agent',
                     'Fixer',
                     'Soldier',
                     'Trader'
                 ),
-                'control'       => array(
+                'control' => array(
                     'Bureaucrat',
                     'Engineer',
                     'Meta-Physicist',
@@ -97,13 +97,13 @@ class Profession_Core extends BasePassiveModule
                     'Meta-Physicist',
                     'Nano-Technician'
                 ),
-                'infantry'      => array(
+                'infantry' => array(
                     'Adventurer',
                     'Enforcer',
                     'Keeper',
                     'Martial Artist'
                 ),
-                'support'       => array(
+                'support' => array(
                     'Adventurer',
                     'Doctor',
                     'Fixer',

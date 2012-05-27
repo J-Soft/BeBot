@@ -49,20 +49,20 @@ class Rolls extends BaseActiveModule
         $this->count = 0;
         $this->register_command(
             "gc", "loot", "ANONYMOUS", array(
-                "add"    => "ANONYMOUS",
-                "rem"    => "ANONYMOUS",
-                "list"   => "ANONYMOUS",
-                "clear"  => "ADMIN",
+                "add" => "ANONYMOUS",
+                "rem" => "ANONYMOUS",
+                "list" => "ANONYMOUS",
+                "clear" => "ADMIN",
                 "result" => "ADMIN",
                 "reroll" => "ADMIN"
             )
         );
         $this->register_command(
             "tell", "loot", "ANONYMOUS", array(
-                "add"    => "ANONYMOUS",
-                "rem"    => "ANONYMOUS",
-                "list"   => "ANONYMOUS",
-                "clear"  => "ADMIN",
+                "add" => "ANONYMOUS",
+                "rem" => "ANONYMOUS",
+                "list" => "ANONYMOUS",
+                "clear" => "ADMIN",
                 "result" => "ADMIN",
                 "reroll" => "ADMIN"
             )

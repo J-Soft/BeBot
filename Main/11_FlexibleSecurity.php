@@ -65,12 +65,12 @@ class FlexibleSecurity_Core extends BasePassiveModule
         $this->register_event("cron", "6hour");
         $this->cache = array();
         $this->querynames = array(
-            'level'      => 'level',
+            'level' => 'level',
             'profession' => 'profession',
-            'faction'    => 'faction',
-            'rank_id'    => 'org_rank_id',
-            'org_id'     => 'org_id',
-            'at_id'      => 'defender_rank_id'
+            'faction' => 'faction',
+            'rank_id' => 'org_rank_id',
+            'org_id' => 'org_id',
+            'at_id' => 'defender_rank_id'
         );
         $this->update_table();
         $this->enabled = FALSE;

@@ -1021,7 +1021,7 @@ class Net_SmartIRC_base
             else {
                 $channels[] = array(
                     'name' => $value->name,
-                    'key'  => $value->key
+                    'key' => $value->key
                 );
             }
         }

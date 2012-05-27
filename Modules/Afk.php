@@ -220,7 +220,7 @@ class AFK extends BaseActiveModule
         }
         $this->afk[$name] = array(
             'time' => time(),
-            'msg'  => $msg
+            'msg' => $msg
         );
         // Add Aliases to AFK list
         $main = $this->bot->core("alts")->main($name);

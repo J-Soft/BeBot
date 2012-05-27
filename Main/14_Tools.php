@@ -167,7 +167,7 @@ class tools extends BasePassiveModule
 
         socket_set_option(
             $socket, SOL_SOCKET, SO_RCVTIMEO, array(
-                "sec"  => $read_timeout,
+                "sec" => $read_timeout,
                 "usec" => 0
             )
         );

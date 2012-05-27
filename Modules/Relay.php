@@ -834,8 +834,8 @@ class Relay extends BaseActiveModule
         }
         $key = $this->bot->core("settings")->get("Relay", "Key");
         $return = array(
-            'hmac'      => NULL,
-            'iv'        => NULL,
+            'hmac' => NULL,
+            'iv' => NULL,
             'encrypted' => NULL
         );
         $decrypted_string = trim($string);

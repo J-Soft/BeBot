@@ -186,10 +186,10 @@ class CharacterServerConnection extends ServerConnection
                     $stream->ReadString(); // ?? Blob MD5
 
                     $this->m_Parent->chars[] = array(
-                        "id"       => $characterID,
-                        "name"     => $characterName,
-                        "level"    => $level,
-                        "online"   => $loginState,
+                        "id" => $characterID,
+                        "name" => $characterName,
+                        "level" => $level,
+                        "online" => $loginState,
                         "language" => $language
                     );
 

@@ -676,9 +676,9 @@ class Security_Core extends BaseActiveModule
         $gid = $result[0][0];
         unset($result);
         $tmp = array(
-            "gid"          => $gid,
-            "name"         => $groupname,
-            "description"  => $description,
+            "gid" => $gid,
+            "name" => $groupname,
+            "description" => $description,
             "access_level" => 0
         );
         $tmp['members'] = array();
@@ -1287,7 +1287,7 @@ class Security_Core extends BaseActiveModule
             }
             else {
                 $tmp = array(
-                    'gid'  => $groupid,
+                    'gid' => $groupid,
                     'name' => $this->cache['groups'][$groupid]['name']
                 );
                 $this->cache_mgr("add", "groups", $tmp, $newacl);

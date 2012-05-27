@@ -90,11 +90,11 @@ class PlayerList extends BasePassiveModule
         }
 
         $this->namecache[$name] = array(
-            'id'     => $id,
+            'id' => $id,
             'expire' => time() + 21600
         );
         $this->uidcache[$id] = array(
-            'name'   => $name,
+            'name' => $name,
             'expire' => time() + 21600
         );
     }
