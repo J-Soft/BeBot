@@ -42,7 +42,7 @@ class MySQL
     public static $instance;
 
 
-    public function get_instance($bothandle)
+    public static function get_instance($bothandle)
     {
         $bot = Bot::get_instance($bothandle);
         if (!isset(self::$instance[$bothandle])) {

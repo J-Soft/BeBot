@@ -184,7 +184,7 @@ class AOChat
     }
 
 
-    public function get_instance($bothandle)
+    public static function get_instance($bothandle)
     {
         if (!isset(self::$instance[$bothandle])) {
             $class                      = __CLASS__;

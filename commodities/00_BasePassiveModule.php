@@ -82,7 +82,7 @@ class BasePassiveModule
     }
 
 
-    protected function output($name, $msg, $channel = false)
+    protected function output_destination($name, $msg, $channel = false)
     {
         if ($channel !== false) {
             if ($channel & SAME) {

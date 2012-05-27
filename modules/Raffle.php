@@ -43,7 +43,7 @@ class Raffle extends BaseActiveModule
     var $item;
     var $item_blank;
     var $users;
-    var $output;
+    var $output_setting;
     var $admin;
     var $result;
 
@@ -51,7 +51,7 @@ class Raffle extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->output = "group";
+        $this->output_setting = "group";
         $this->result = "";
         $this->register_command("all", "raffle", "GUEST");
         $this->help['description']                                   = 'Module to handle item lotteries';
@@ -145,7 +145,7 @@ class Raffle extends BaseActiveModule
                 $count--;
             }
             $results .= $res;
-            $this->output("\n##raffle_highlight##--------------------------------------------------------##end##\n" . "  ##raffle_highlight##" . $winner . "##end## has won the raffle for ##raffle_highlight##" . $this->item . "##end##! :: " . $this->bot
+            $this->output_destination("\n##raffle_highlight##--------------------------------------------------------##end##\n" . "  ##raffle_highlight##" . $winner . "##end## has won the raffle for ##raffle_highlight##" . $this->item . "##end##! :: " . $this->bot
                 ->core("tools")
                 ->make_blob("view results", $results) . "\n" . "##raffle_highlight##----------------------------------------------------------##end##");
             $this->users      = "";
@@ -176,7 +176,7 @@ class Raffle extends BaseActiveModule
         if (!empty($this->item) && (($this->admin == $name) || $this->bot
             ->core("security")->check_access($name, "admin"))
         ) {
-            $this->output("##raffle_highlight##$name##end## has canceled the raffle.");
+            $this->output_destination("##raffle_highlight##$name##end## has canceled the raffle.");
             $this->users      = "";
             $this->item       = "";
             $this->admin      = "";
@@ -209,7 +209,7 @@ class Raffle extends BaseActiveModule
                 $output .= "is still running :: ";
             }
             $output .= $this->click_join("join") . "\n" . "##raffle_highlight##----------------------------------------------------------##end##";
-            $this->output($output);
+            $this->output_destination($output);
         }
         else if (!isset($this->item)) {
             $this->bot->send_tell($name, "There is no raffle currently running.");
@@ -229,7 +229,7 @@ class Raffle extends BaseActiveModule
         if (isset($this->item) && (($this->admin == $name) || $this->bot
             ->core("security")->check_access($name, "admin"))
         ) {
-            $this->output("\n##raffle_highlight##----------------------------------------------------------##end##\n" . "  The raffle for ##raffle_highlight##" . $this->item . "##end## wil be " . "##raffle_highlight##closing soon##end## :: " . $this->click_join("join") . "\n" . "##raffle_highlight##----------------------------------------------------------##end##");
+            $this->output_destination("\n##raffle_highlight##----------------------------------------------------------##end##\n" . "  The raffle for ##raffle_highlight##" . $this->item . "##end## wil be " . "##raffle_highlight##closing soon##end## :: " . $this->click_join("join") . "\n" . "##raffle_highlight##----------------------------------------------------------##end##");
         }
         else if (!isset($this->item)) {
             $this->bot->send_tell($name, "There is no raffle currently running.");
@@ -249,8 +249,8 @@ class Raffle extends BaseActiveModule
         if (($this->admin == $name) || $this->bot->core("security")
             ->check_access($name, "admin")
         ) {
-            $this->output = $chan;
-            $this->output("Raffle output set to ##raffle_highlight##" . $chan . ".");
+            $this->output_setting = $chan;
+            $this->output_destination("Raffle output set to ##raffle_highlight##" . $chan . ".");
         }
         else
         {
@@ -274,7 +274,7 @@ class Raffle extends BaseActiveModule
         {
             $this->users[$name] = 1;
             $this->bot->send_tell($name, "You have joined the raffle. " . $this->click_join("leave"), 1);
-            $this->output("##raffle_highlight##" . $name . "##end## has ##raffle_highlight##joined##end##" . " the raffle ::" . $this->click_join("join"), 1);
+            $this->output_destination("##raffle_highlight##" . $name . "##end## has ##raffle_highlight##joined##end##" . " the raffle ::" . $this->click_join("join"), 1);
         }
     }
 
@@ -294,7 +294,7 @@ class Raffle extends BaseActiveModule
         {
             unset($this->users[$name]);
             $this->bot->send_tell($name, "You have left the raffle. " . $this->click_join("join"), 1);
-            $this->output("##raffle_highlight##" . $name . "##end## has ##raffle_highlight##left##end##" . " the raffle :: " . $this->click_join("join"), 1);
+            $this->output_destination("##raffle_highlight##" . $name . "##end## has ##raffle_highlight##left##end##" . " the raffle :: " . $this->click_join("join"), 1);
         }
     }
 
@@ -334,7 +334,7 @@ class Raffle extends BaseActiveModule
             $output = "\n##raffle_highlight##----------------------------------------------------------##end##\n";
             $output .= "  ##raffle_highlight##" . $name . "##end## has started a raffle for ##raffle_highlight##" . $item . "##end## :: " . $this->click_join("join");
             $output .= "\n##raffle_highlight##----------------------------------------------------------##end##";
-            $this->output($output);
+            $this->output_destination($output);
             $this->bot->send_tell($name, $this->make_admin($name));
         }
         else
@@ -405,12 +405,12 @@ class Raffle extends BaseActiveModule
     /*
     Outputs to the right chan
     */
-    function output($msg, $low = 0)
+    function output_destination($msg, $low = 0)
     {
-        if (($this->output == "guild") || ($this->output == "both")) {
+        if (($this->output_setting == "guild") || ($this->output_setting == "both")) {
             $this->bot->send_gc($msg, $low);
         }
-        if (($this->output == "group") || ($this->output == "both")) {
+        if (($this->output_setting == "group") || ($this->output_setting == "both")) {
             $this->bot->send_pgroup($msg);
         }
     }
@@ -433,7 +433,7 @@ class Raffle extends BaseActiveModule
             }
             else
             {
-                $this->output("Raffle for " . $this->item . " ended with no users.");
+                $this->output_destination("Raffle for " . $this->item . " ended with no users.");
                 $this->users      = "";
                 $this->item       = "";
                 $this->admin      = "";

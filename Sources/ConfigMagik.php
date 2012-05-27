@@ -63,7 +63,7 @@ class ConfigMagik
     }
 
 
-    public function get_instance($bothandle, $path = null, $synchronize = false,
+    public static function get_instance($bothandle, $path = null, $synchronize = false,
                                  $process_sections = true)
     {
         if (!isset(self::$instance[$bothandle])) {

@@ -277,7 +277,6 @@ class tools extends BasePassiveModule
         $tmp = explode("<" . $tag . ">", $xml);
         if (!isset($tmp[1])) {
             $tmp[1] = "";
-            echo "Debug: xml: $xml tag: $tag\n";
         }
         $tmp = explode("</" . $tag . ">", $tmp[1]);
         return $tmp[0];

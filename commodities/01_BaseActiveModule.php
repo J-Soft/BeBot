@@ -183,7 +183,7 @@ abstract class BaseActiveModule extends BasePassiveModule
             }
             else
             {
-                $this->output($name, "##normal##$msg##end##", SAME);
+                $this->output_destination($name, "##normal##$msg##end##", SAME);
             }
         }
     }

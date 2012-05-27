@@ -135,13 +135,13 @@ class Roster_Handler extends BaseActiveModule
                 }
             case 'rosterupdate':
                 if ($this->bot->guildbot) {
-                    $this->output($source, "Starting roster update.");
+                    $this->output_destination($source, "Starting roster update.");
                     $this->bot->core("roster_core")->update_guild(true);
                     return FALSE;
                 }
                 else
                 {
-                    $this->output($source, "Starting roster update.");
+                    $this->output_destination($source, "Starting roster update.");
                     $this->bot->core("roster_core")->update_raid(true);
                     return FALSE;
                 }
