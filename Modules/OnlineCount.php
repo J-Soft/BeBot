@@ -45,7 +45,7 @@ class OnlineCounting extends BaseActiveModule
             ->define_scheme("counting", "name", "forestgreen");
         $this->register_command("all", "count", "GUEST");
         $this->register_command("all", "check", "GUEST");
-        if ($this->bot->game == "aoc") {
+        if ($this->bot->game == 'Aoc') {
             $this->cp = "class";
         }
         else {

@@ -196,7 +196,7 @@ class Logon extends BaseActiveModule
                                     $res .= " (";
                                 }
                                 $res .= "Lvl ##logon_level##" . $result["level"] . "##end##";
-                                if ($this->bot->game == "ao") {
+                                if ($this->bot->game == 'Ao') {
                                     $res .= "/##logon_ailevel##" . $result["at_id"] . "##end## " . $result["faction"] . " " . $result["profession"];
                                     if ($result["org"] != '') {
                                         $res .= ", ##logon_organization##" . $result["rank"] . " of " . $result["org"] . "##end##";

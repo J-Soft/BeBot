@@ -281,7 +281,7 @@ class Alts_Core extends BasePassiveModule
                         }
                         if (!empty($whoisalt['level'])) {
                             $window .= "\n##normal## - (##highlight##" . $whoisalt['level'] . "##end##";
-                            if ($this->bot->game == "ao") {
+                            if ($this->bot->game == 'Ao') {
                                 $window .= "/##lime##" . $whoisalt['at_id'] . "##end##";
                             }
                             $window .= " " . $whoisalt['profession'] . ")##end##";

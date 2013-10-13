@@ -42,7 +42,7 @@ class BuddyList extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         $this->register_module('buddy');
 
-        if ($this->bot->game == "aoc") {
+        if ($this->bot->game == 'Aoc') {
             $this->bot->dispatcher->connect(
                 'core.on_buddy_onoff', array(
                     $this,

@@ -42,7 +42,7 @@ class Roster_Handler extends BaseActiveModule
         $this->register_command("all", "guest", "ADMIN");
         $this->register_command("all", "rosterupdate", "ADMIN");
         $this->register_command("all", "buddylist", "ADMIN");
-        if ($this->bot->game == "ao") {
+        if ($this->bot->game == 'Ao') {
             $this->register_event("cron", "1hour");
         }
         $this->help['description'] = 'Handles member roster commands.';
@@ -223,7 +223,7 @@ class Roster_Handler extends BaseActiveModule
     {
         $blob = "";
         $total = 0;
-        if ($this->bot->game == "aoc") {
+        if ($this->bot->game == 'Aoc') {
             $cp = "class";
         }
         else {

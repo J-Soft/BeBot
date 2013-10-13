@@ -143,7 +143,7 @@ class Alts extends BaseActiveModule
 
         $alts = $this->bot->core("alts")->show_alt($name);
 
-        if ($this->bot->game == "aoc") {
+        if ($this->bot->game == 'Aoc') {
             $retstr = "{$whois['nickname']} ({$whois['level']} / {$whois['class']}) - ";
         }
         else {

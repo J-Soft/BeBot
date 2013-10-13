@@ -54,7 +54,7 @@ class Raid extends BaseActiveModule
         $this->locked = FALSE;
         $this->register_command("all", "c", "LEADER");
         $this->register_command("all", "raid", "GUEST");
-        if ($this->bot->game == "ao") {
+        if ($this->bot->game == 'Ao') {
             $this->register_event("pgleave");
             $this->register_event("pgjoin");
             $this->register_event("buddy");
@@ -62,7 +62,7 @@ class Raid extends BaseActiveModule
         //$this -> register_event("connect");
         $this->register_event("logon_notify");
         $this->register_module("raid");
-        if ($this->bot->game == "ao") {
+        if ($this->bot->game == 'Ao') {
             $this->bot->core("settings")
                 ->create("Raid", "Remonleave", TRUE, "Automatically remove players from the raid if they leave <botname>'s channel?", "On;Off", FALSE, 15);
             $this->bot->core("settings")
@@ -91,7 +91,7 @@ class Raid extends BaseActiveModule
             ->create("Raid", "raidinfo", "", "Raid info.", NULL, TRUE, 2);
         $this->bot->core("settings")
             ->create("Raid", "showlft", TRUE, "show LFT link next to raid join");
-        if ($this->bot->game == "ao") {
+        if ($this->bot->game == 'Ao') {
             $this->bot->core("settings")
                 ->create("Raid", "inPG", TRUE, "Do users have to be in the PG to join a Raid?");
         }
@@ -647,7 +647,7 @@ class Raid extends BaseActiveModule
         elseif ($this->locked) {
             return "The raid status is currently ##highlight##locked##end##.";
         }
-        elseif ($this->bot->game == "ao"
+        elseif ($this->bot->game == 'Ao'
             && $this->bot->core("settings")
                 ->get('Raid', 'inpg')
             && !$this->bot->core("online")->in_chat($name)
@@ -819,7 +819,7 @@ class Raid extends BaseActiveModule
                     ->chatcmd("raid notinkick", "raid notinkick") . "\n\n";
 
                 if (!empty($players)) {
-                    if ($this->bot->game == "ao") {
+                    if ($this->bot->game == 'Ao') {
                         foreach ($players as $player) {
                             if (!empty($assist)) {
                                 $assist .= " \\n /assist $player";
