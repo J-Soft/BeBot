@@ -127,7 +127,7 @@ class User_Core extends BasePassiveModule
                 return $this->error;
             }
         }
-        if ($this->bot->game == 'Ao') {
+        if (strtolower($this->bot->game) == 'ao') {
             // Add the user to the whois cache.
             // If we are just adding the user to the whois cache, why do any error checking here if we are not going to actually use the data for anything?
             // When adding a new alt that has just been created there will not be any whois data to lookup anyways.

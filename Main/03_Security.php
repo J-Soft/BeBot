@@ -819,7 +819,7 @@ class Security_Core extends BaseActiveModule
         }
 
         // Get whois data & check for errors.
-        if ($this->bot->game == 'Ao') {
+        if (strtolower($this->bot->game) == 'ao') {
             $who = $this->bot->core("whois")->lookup($target);
             if ($who instanceof BotError) {
                 return $who;

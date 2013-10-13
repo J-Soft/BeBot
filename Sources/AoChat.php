@@ -216,7 +216,7 @@ class AOChat
     /* Network stuff */
     function connect($server = "default", $port = "default")
     {
-        if (strtolower(AOCHAT_GAME) == 'Ao') {
+        if (strtolower(AOCHAT_GAME) == 'ao') {
             if ($server == "default") {
                 $server = "chat2.d1.funcom.com";
             }
@@ -242,7 +242,7 @@ class AOChat
             return false;
         }
         /* For AO we expect the login seed when we connect to the chatserver */
-        if (strtolower(AOCHAT_GAME) == 'Ao') {
+        if (strtolower(AOCHAT_GAME) == 'ao') {
             $packet = $this->get_packet();
             if (!is_object($packet) || $packet->type != AOCP_LOGIN_SEED) {
                 trigger_error(
@@ -659,7 +659,7 @@ class AOChat
         $data = $this->read_data($len);
         // For AOC they are not sending the OK packet anymore
         // So when you receive the first packet, you are logged in
-        if (strtolower(AOCHAT_GAME) == 'Aoc' && $this->state != "ok") {
+        if (strtolower(AOCHAT_GAME) == 'aoc' && $this->state != "ok") {
             // $bot->log("LOGIN", "RESULT", "Bot is now loggend in.");
             $this->state = "ok";
         }
@@ -717,7 +717,7 @@ class AOChat
             // buddy/player
         case AOCP_CLIENT_NAME:
             // Cross-game compatibility
-            if (strtolower(AOCHAT_GAME) == 'Aoc') {
+            if (strtolower(AOCHAT_GAME) == 'aoc') {
                 list ($id, $unknown, $name) = $packet->args;
             }
             else {
@@ -762,7 +762,7 @@ class AOChat
             // Event is a buddy logging on/off
             list ($id, $status) = $packet->args;
 
-            if (strtolower(AOCHAT_GAME) == 'Aoc') {
+            if (strtolower(AOCHAT_GAME) == 'aoc') {
                 list ($bid, $bonline, $blevel, $blocation, $bclass) = $packet->args;
                 $this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | AOC_BUDDY_KNOWN;
                 $event = new sfEvent($this, 'Core.on_buddy_onoff', array(
@@ -816,7 +816,7 @@ class AOChat
             break;
         case AOCP_LOGIN_ERROR:
             $this->state = "disconnected";
-            if (strtolower(AOCHAT_GAME) == 'Aoc' && $this->login_num >= 1 && $this->login_num < 3) {
+            if (strtolower(AOCHAT_GAME) == 'aoc' && $this->login_num >= 1 && $this->login_num < 3) {
                 // Up this
                 $this->bot->log("LOGIN", "ERROR", "Received login error. Retrying ...");
                 $this->login_num++;
@@ -1240,7 +1240,7 @@ class AOChat
         if ($uid === $this->char['id']) {
             return false;
         }
-        if (strtolower(AOCHAT_GAME) == 'Ao') {
+        if (strtolower(AOCHAT_GAME) == 'ao') {
             $uid = array(
                 $uid,
                 $type
@@ -1262,7 +1262,7 @@ class AOChat
 
     function buddy_remove_unknown()
     {
-        if (strtolower(AOCHAT_GAME) == 'Ao') {
+        if (strtolower(AOCHAT_GAME) == 'ao') {
             $array = array(
                 "rembuddy",
                 "?"
