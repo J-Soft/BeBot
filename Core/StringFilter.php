@@ -110,7 +110,7 @@ class stringfilter_core extends BasePassiveModule
     { // Start function get_strings()
         if ($update) {
             $sql = "SELECT * FROM #___string_filter";
-            $result = $this->bot->db->select($sql, MYSQL_ASSOC);
+            $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
             if (empty($result)) {
                 return FALSE;
             }
@@ -129,13 +129,13 @@ class stringfilter_core extends BasePassiveModule
     */
     function add_string($search, $new = NULL)
     { // Start function add_string()
-        $search = mysql_real_escape_string(strtolower($search));
+        $search = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], strtolower($search)) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
         if (isset($this->stringlist[$search])) {
             $this->error->set("The string '" . $search . "' is already on the filtered word list.");
             return $this->error;
         }
         if (!is_null($new)) {
-            $new = mysql_real_escape_string(strtolower($new));
+            $new = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], strtolower($new)) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
             $sql = "INSERT INTO #___string_filter (search, new) VALUES ('" . $search . "', '" . $new . "')";
         }
         else {
@@ -149,7 +149,7 @@ class stringfilter_core extends BasePassiveModule
 
     function rem_string($search)
     { // Start function rem_string()
-        $search = mysql_real_escape_string(strtolower($search));
+        $search = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], strtolower($search)) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
         if (isset($this->stringlist[$search])) {
             unset($this->stringlist[$search]);
             $sql = "DELETE FROM #___string_filter WHERE search = '" . $search . "'";

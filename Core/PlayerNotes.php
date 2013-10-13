@@ -87,9 +87,9 @@ class PlayerNotes_Core extends BasePassiveModule
         if (strlen($note) > 255) {
             $note = substr($note, 0, 254);
         }
-        $note = mysql_real_escape_string($note);
-        $author = mysql_real_escape_string($author);
-        $player = mysql_real_escape_string($player);
+        $note = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $note) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $author = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $author) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $player = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $player) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
         $sql = "INSERT INTO #___player_notes (player, author, note, class, timestamp) ";
         $sql .= "VALUES ('$player', '$author', '$note', $class, " . time() . ")";
         $result = $this->bot->db->query($sql);
@@ -130,8 +130,8 @@ class PlayerNotes_Core extends BasePassiveModule
             $this->error->set("Only integers can be player note ID numbers.");
             return ($this->error);
         }
-        $what = mysql_real_escape_string($what);
-        $newvalue = mysql_real_escape_string($newvalue);
+        $what = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $what) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $newvalue = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $newvalue) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
         $sql = "UPDATE #___player_notes SET " . $what . " = " . $newvalue . " WHERE pnid = " . $pnid;
         if (!$this->bot->db->query($sql)) {
             $this->error->set("There was a MySQL error when updating '$what' to '$newvalue'.");
@@ -163,7 +163,7 @@ class PlayerNotes_Core extends BasePassiveModule
             $sql .= " " . $where . " pnid = " . $pnid;
         }
         $sql .= " ORDER BY pnid " . $order;
-        $result = $this->bot->db->select($sql, MYSQL_ASSOC);
+        $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
         if (empty($result)) {
             $this->error->set("No notes found for '$player'", FALSE);
             return ($this->error);

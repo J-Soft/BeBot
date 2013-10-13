@@ -44,7 +44,7 @@ if ((float)phpversion() < 5.2) {
 Load extentions we need
 */
 if (!extension_loaded("sockets")) {
-    if (OS_WINDOWS) {
+    if ('OS_WINDOWS') {
         if (!dl("php_sockets.dll")) {
             die("Loading php_sockets.dll failed. Sockets extention required to run this bot");
         }
@@ -53,14 +53,14 @@ if (!extension_loaded("sockets")) {
         die("Sockets extention required to run this bot");
     }
 }
-if (!extension_loaded("mysql")) {
-    if (OS_WINDOWS) {
-        if (!dl("php_mysql.dll")) {
-            die("Loading php_mysql.dll failed. MySQL extention required to run this bot");
+if (!extension_loaded("mysqli")) {
+    if ('OS_WINDOWS') {
+        if (!dl("php_mysqli.dll")) {
+            die("Loading php_mysqli.dll failed. MySQLi extention required to run this bot");
         }
     }
     else {
-        die("MySQL support required to run this bot");
+        die("MySQLi support required to run this bot");
     }
 }
 //From AOChat.php
@@ -78,7 +78,7 @@ if (!extension_loaded("bcmath")) {
 }
 // Check if we have curl available
 if (!extension_loaded("curl")) {
-    if (OS_WINDOWS) {
+    if ('OS_WINDOWS') {
         if (@!dl("php_curl.dll")) {
             echo "Curl not available\n";
         }

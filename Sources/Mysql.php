@@ -119,7 +119,7 @@ class MySQL
                 "schemaversion"
             )
         );
-        $fields = $this->select("EXPLAIN " . $this->master_tablename, MYSQL_ASSOC);
+        $fields = $this->select("EXPLAIN " . $this->master_tablename, MYSQLI_ASSOC);
         if (!empty($fields)) {
             foreach ($fields as $field) {
                 unset($columns[$field['Field']]);
@@ -142,12 +142,12 @@ class MySQL
         if ($initial) {
             $this->bot->log("MYSQL", "START", "Establishing MySQL database connection....");
         }
-        $conn = @mysql_connect($this->SERVER, $this->USER, $this->PASS);
+        $conn = @($GLOBALS["___mysqli_ston"] = mysqli_connect($this->SERVER,  $this->USER,  $this->PASS));
         if (!$conn) {
             $this->error("Cannot connect to the database server!", $initial, false);
             return false;
         }
-        if (!mysql_select_db($this->DBASE, $conn)) {
+        if (!((bool)mysqli_query( $conn, "USE $this->DBASE"))) {
             $this->error("Database not found or insufficient priviledges!", $initial, false);
             return false;
         }
@@ -161,7 +161,7 @@ class MySQL
     function close()
     {
         if ($this->CONN != NULL) {
-            mysql_close($this->CONN);
+            ((is_null($___mysqli_res = mysqli_close($this->CONN))) ? false : $___mysqli_res);
             $this->CONN = NULL;
         }
     }
@@ -169,7 +169,7 @@ class MySQL
 
     function error($text, $fatal = false, $connected = true)
     {
-        $msg = mysql_error();
+        $msg = ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false));
         $this->error_count++;
         $this->bot->log("MySQL", "ERROR", "(# " . $this->error_count . ") on query: $text", $connected);
         $this->bot->log("MySQL", "ERROR", $msg, $connected);
@@ -182,12 +182,12 @@ class MySQL
     }
 
 
-    function select($sql, $result_form = MYSQL_NUM)
+    function select($sql, $result_form = MYSQLI_NUM)
     {
         $this->connect();
         $data = "";
         $sql = $this->add_prefix($sql);
-        $result = mysql_query($sql, $this->CONN);
+        $result = mysqli_query( $this->CONN, $sql);
         if (!$result) {
             $this->error($sql);
             return false;
@@ -195,10 +195,10 @@ class MySQL
         if (empty($result)) {
             return false;
         }
-        while ($row = mysql_fetch_array($result, $result_form)) {
+        while ($row = mysqli_fetch_array($result,  $result_form)) {
             $data[] = $row;
         }
-        mysql_free_result($result);
+        ((mysqli_free_result($result) || (is_object($result) && (get_class($result) == "mysqli_result"))) ? true : false);
         return $data;
     }
 
@@ -207,7 +207,7 @@ class MySQL
     {
         $this->connect();
         $sql = $this->add_prefix($sql);
-        $return = mysql_query($sql, $this->CONN);
+        $return = mysqli_query( $this->CONN, $sql);
         if (!$return) {
             $this->error($sql);
             return false;
@@ -222,7 +222,7 @@ class MySQL
     {
         $this->connect();
         $sql = $this->add_prefix($sql);
-        $result = mysql_query($sql, $this->CONN);
+        $result = mysqli_query( $this->CONN, $sql);
         if (!$result) {
             return false;
         }
@@ -236,7 +236,7 @@ class MySQL
     {
         $this->connect();
         $sql = $this->add_prefix($sql);
-        $result = mysql_query("DROP TABLE " . $sql, $this->CONN);
+        $result = mysqli_query( $this->CONN, "DROP TABLE " . $sql);
         if (!$return) {
             $this->error($sql);
             return false;
@@ -387,7 +387,7 @@ class MySQL
 
     function update_table($table, $column, $action, $query)
     {
-        $fields = $this->select("EXPLAIN #___" . $table, MYSQL_ASSOC);
+        $fields = $this->select("EXPLAIN #___" . $table, MYSQLI_ASSOC);
         if (!empty($fields)) {
             foreach ($fields as $field) {
                 $columns[$field['Field']] = TRUE;

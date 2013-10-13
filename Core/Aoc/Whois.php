@@ -163,7 +163,7 @@ class Whois_Core extends BasePassiveModule
             $class_name = "Commoner";
         }
         $who["class"] = $class_name;
-        $lookup = $this->bot->db->select("SELECT * FROM #___craftingclass WHERE name = '" . $name . "'", MYSQL_ASSOC);
+        $lookup = $this->bot->db->select("SELECT * FROM #___craftingclass WHERE name = '" . $name . "'", MYSQLI_ASSOC);
         if (!empty($lookup)) {
             $who["craft1"] = $lookup[0]['class1'];
             $who["craft2"] = $lookup[0]['class2'];
@@ -295,7 +295,7 @@ class Whois_Core extends BasePassiveModule
             // entry outdated, remove it and get it from db again
             unset($this->cache[$name]);
         }
-        $lookup = $this->bot->db->select("SELECT * FROM #___whois WHERE nickname = '" . $name . "'", MYSQL_ASSOC);
+        $lookup = $this->bot->db->select("SELECT * FROM #___whois WHERE nickname = '" . $name . "'", MYSQLI_ASSOC);
 
         // If we have a result, we check it and return it, if it's still up-to-date.
         if (!empty($lookup)) {
@@ -468,9 +468,9 @@ class Whois_Core extends BasePassiveModule
             }
         }
         if ($this->bot->core("settings")->get('Whois', 'Debug')) {
-            $whois_debug = $this->bot->db->select("SELECT updated FROM #___whois WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC);
+            $whois_debug = $this->bot->db->select("SELECT updated FROM #___whois WHERE nickname = '" . $whois['nickname'] . "'", MYSQLI_ASSOC);
             $user_debug = $this->bot->db->select(
-                "SELECT id,notify,user_level,added_by,added_at,deleted_by,deleted_at,updated_at FROM #___users WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC
+                "SELECT id,notify,user_level,added_by,added_at,deleted_by,deleted_at,updated_at FROM #___users WHERE nickname = '" . $whois['nickname'] . "'", MYSQLI_ASSOC
             );
             $window .= "\n##red## Debug Information:##end##\n";
             if (!empty($whois_debug[0]['updated'])) {

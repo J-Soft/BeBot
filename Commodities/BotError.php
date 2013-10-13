@@ -49,6 +49,10 @@ class BotError
         $this->bot = $bot;
     }
 
+    public function __toString() {
+        return $this->description;
+    }
+
 
     function status()
     {

@@ -147,7 +147,7 @@ class BuddyList extends BasePassiveModule
         $who["location"] = $args['location']; // For offline users 'location' contains the last online time in milliseconds since 1970!
         $class_name = $this->bot->core("Whois")->class_name[$args['class']];
         $who["class"] = $class_name;
-        $lookup = $this->db->select("SELECT * FROM #___craftingclass WHERE name = '" . $user . "'", MYSQL_ASSOC);
+        $lookup = $this->db->select("SELECT * FROM #___craftingclass WHERE name = '" . $user . "'", MYSQLI_ASSOC);
         if (!empty($lookup)) {
             $who["craft1"] = $lookup[0]['class1'];
             $who["craft2"] = $lookup[0]['class2'];

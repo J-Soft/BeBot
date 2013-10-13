@@ -76,18 +76,18 @@ sleep(2);
 
 /*
 Load up the required files.
-RequirementCheck.php: Check that we're running in a sane environment
+RequirementsCheck.php: Check that we're running in a sane environment
 MySQL.conf: The MySQL configuration.
 MySQL.php: Used to communicate with the MySQL database
 AOChat.php: Interface to communicate with AO chat servers
 Bot.php: The actual bot itself.
 */
-require_once "./Sources/RequirementCheck.php";
-require_once "./Sources/MySQL.php";
-require_once "./Sources/AOChat.php";
+require_once "./Sources/RequirementsCheck.php";
+require_once "./Sources/Mysql.php";
+require_once "./Sources/AoChat.php";
 require_once "./Sources/ConfigMagik.php";
 require_once "./Sources/Bot.php";
-require_once "./Sources/sfEventDispatcher.php";
+require_once "./Sources/SymfonyEvent/sfEventDispatcher.php";
 
 /*
 Creating the bot.
@@ -103,21 +103,21 @@ $bot = Bot::get_instance($bothandle);
 $bot->dispatcher = new sfEventDispatcher();
 
 //Load modules.
-$bot->load_files('Commodities', 'commodities'); //Classes that do not instantiate themselves.
-$bot->load_files('Commodities', "commodities/{$bot->game}");
-$bot->load_files('Main', 'main');
-$bot->load_files('Core', 'core');
-$bot->load_files('Core', "core/{$bot->game}");
-$bot->load_files('Core', 'custom/core');
+$bot->load_files('Commodities', 'Commodities'); //Classes that do not instantiate themselves.
+$bot->load_files('Commodities', "Commodities/{$bot->game}");
+$bot->load_files('Main', 'Main');
+$bot->load_files('Core', 'Core');
+$bot->load_files('Core', "Core/{$bot->game}");
+$bot->load_files('Core', 'Custom/Core');
 if (!empty($bot->core_directories)) {
     $core_dirs = explode(",", $bot->core_directories);
     foreach ($core_dirs as $core_dir) {
         $bot->load_files('Core', trim($core_dir));
     }
 }
-$bot->load_files('Modules', 'modules');
-$bot->load_files('Modules', "modules/{$bot->game}");
-$bot->load_files('Modules', 'custom/modules');
+$bot->load_files('Modules', 'Modules');
+$bot->load_files('Modules', "Modules/{$bot->game}");
+$bot->load_files('Modules', 'Custom/Modules');
 if (!empty($bot->module_directories)) {
     $module_dirs = explode(",", $bot->module_directories);
     foreach ($module_dirs as $module_dir) {

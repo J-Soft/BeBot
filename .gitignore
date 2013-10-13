@@ -1,0 +1,4 @@
+*.org
+Conf/*.conf
+Conf/*.ini
+php.ini

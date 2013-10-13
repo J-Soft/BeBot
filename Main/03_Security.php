@@ -658,7 +658,7 @@ class Security_Core extends BaseActiveModule
             }
         }
         $groupname = str_replace(" ", "_", $groupname); // Replace Spaces with underscores.
-        $groupname = mysql_real_escape_string($groupname); // If any slashes are added, it's an invalid group.
+        $groupname = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $groupname) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")); // If any slashes are added, it's an invalid group.
         if (strpos($groupname, "\\")) {
             $this->error->set("Single quotes, double quotes, backslash and other special characters are not allowed in group names.");
             return $this->error;
@@ -669,7 +669,7 @@ class Security_Core extends BaseActiveModule
             return $this->error;
         }
         $sql = "INSERT INTO #___security_groups (name, description) ";
-        $sql .= "VALUES ('" . $groupname . "', '" . mysql_real_escape_string($description) . "')";
+        $sql .= "VALUES ('" . $groupname . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $description) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "')";
         $this->bot->db->query($sql);
         $sql = "SELECT gid FROM #___security_groups WHERE name = '" . $groupname . "'";
         $result = $this->bot->db->select($sql);
@@ -697,7 +697,7 @@ class Security_Core extends BaseActiveModule
             $this->error->set($target . " cannot be deleted.");
             return $this->error;
         }
-        $target = mysql_real_escape_string($target);
+        $target = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $target) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
         if (is_numeric($target)) {
             $sql = "SELECT name FROM #___security_groups WHERE gid = '" . $target . "'"; // FIXME: Could use the cache here.
             $result = $this->bot->db->select($sql);
@@ -847,7 +847,7 @@ class Security_Core extends BaseActiveModule
         else {
             $this->cache_mgr("add", $cache, $target);
             $sql = "INSERT INTO #___users (char_id, nickname, added_by, added_at, user_level, updated_at) ";
-            $sql .= "VALUES (" . $uid . ", '" . $target . "', '" . mysql_real_escape_string($admin) . "', " . time() . ", " . $lvlnum . ", " . time() . ") ";
+            $sql .= "VALUES (" . $uid . ", '" . $target . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $admin) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', " . time() . ", " . $lvlnum . ", " . time() . ") ";
             $sql .= "ON DUPLICATE KEY UPDATE added_by = VALUES(added_by), added_at = VALUES(added_at), user_level=VALUES(user_level), updated_at = VALUES(updated_at)";
             $this->bot->db->query($sql);
             $this->bot->log("SECURITY", "ADDUSER", $admin . " Added " . $target . " as a " . $level);
@@ -878,7 +878,7 @@ class Security_Core extends BaseActiveModule
             $this->bot->core("notify")->del($target);
             $sql
                 =
-                "UPDATE #___users SET user_level = 0, deleted_by = '" . mysql_real_escape_string($admin) . "', deleted_at = " . time() . ", notify = 0 WHERE nickname = '" . $target
+                "UPDATE #___users SET user_level = 0, deleted_by = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $admin) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', deleted_at = " . time() . ", notify = 0 WHERE nickname = '" . $target
                     . "'";
             $this->bot->db->query($sql);
             $this->bot->log("SECURITY", "DELUSER", $admin . " " . $target . " has been removed from <botname>.");
@@ -915,14 +915,14 @@ class Security_Core extends BaseActiveModule
         elseif (isset($this->cache['guests'][$target])) {
             $this->cache_mgr("rem", "guests", $target);
             $this->cache_mgr("add", "banned", $target);
-            $sql = "UPDATE #___users SET user_level = -1, banned_by = '" . mysql_real_escape_string($admin) . "', banned_at = " . time() . ", banned_for = '"
-                . mysql_real_escape_string($reason) . "', banned_until = " . $endtime . " WHERE nickname = '" . $target . "'";
+            $sql = "UPDATE #___users SET user_level = -1, banned_by = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $admin) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', banned_at = " . time() . ", banned_for = '"
+                . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $reason) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', banned_until = " . $endtime . " WHERE nickname = '" . $target . "'";
         }
         elseif (isset($this->cache['members'][$target])) {
             $this->cache_mgr("rem", "members", $target);
             $this->cache_mgr("add", "banned", $target);
-            $sql = "UPDATE #___users SET user_level = -1, banned_by = '" . mysql_real_escape_string($admin) . "', banned_at = " . time() . ", updated_at = " . time()
-                . ", banned_for = '" . mysql_real_escape_string($reason) . "', banned_until = " . $endtime . " WHERE nickname = '" . $target . "'";
+            $sql = "UPDATE #___users SET user_level = -1, banned_by = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $admin) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', banned_at = " . time() . ", updated_at = " . time()
+                . ", banned_for = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $reason) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', banned_until = " . $endtime . " WHERE nickname = '" . $target . "'";
         }
         else // They are not in the member table at all.
         {
@@ -934,8 +934,8 @@ class Security_Core extends BaseActiveModule
             $sql = "INSERT INTO #___users (char_id,nickname,added_by,added_at,banned_by,banned_at,banned_for,banned_until,notify,user_level,updated_at) ";
             $sql
                 .=
-                "VALUES ('" . $who['id'] . "', '" . $who['nickname'] . "', '" . mysql_real_escape_string($admin) . "', " . time() . ", '" . mysql_real_escape_string($admin) . "', "
-                    . time() . ", '" . mysql_real_escape_string($reason) . "', " . $endtime . ", 0, -1, " . time() . ") ";
+                "VALUES ('" . $who['id'] . "', '" . $who['nickname'] . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $admin) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', " . time() . ", '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $admin) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', "
+                    . time() . ", '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $reason) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', " . $endtime . ", 0, -1, " . time() . ") ";
             $sql .= " ON DUPLICATE KEY UPDATE banned_by = VALUES(banned_by), banned_at = VALUES(banned_at), user_level = VALUES(user_level), updated_at = VALUES(updated_at), banned_for = VALUES(banned_for), banned_until = VALUES(banned_until)";
         }
         $this->bot->db->query($sql);
@@ -1006,7 +1006,7 @@ class Security_Core extends BaseActiveModule
         $sql = "SELECT gid,name,description,access_level FROM #___security_groups ";
         $sql .= "WHERE name != 'superadmin' AND name != 'admin' AND name != 'leader' ";
         $sql .= "ORDER BY access_level DESC, name ASC";
-        $result = $this->bot->db->select($sql, MYSQL_ASSOC);
+        $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
         if (!empty($result)) {
             foreach ($result as $group) {
                 if ($group['access_level'] == SUPERADMIN && $group['name'] <> "superadmin") {
@@ -1041,7 +1041,7 @@ class Security_Core extends BaseActiveModule
             $sql .= "WHERE org_gov = '" . $this->bot->core("settings")
                 ->get('Security', 'Orggov') . "' ";
             $sql .= "ORDER BY org_rank_id ASC, access_level DESC";
-            $result = $this->bot->db->select($sql, MYSQL_ASSOC);
+            $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
             if (!empty($result)) // This really should never be empty as this module automaticaly inserts data here.
             {
                 foreach ($result as $rank) {
@@ -1113,7 +1113,7 @@ class Security_Core extends BaseActiveModule
     { // Start function show_groups()
         $sql = "SELECT gid, name, description, access_level FROM #___security_groups ";
         $sql .= "ORDER BY access_level DESC, gid ASC, name";
-        $result = $this->bot->db->select($sql, MYSQL_ASSOC);
+        $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
         $superadmins = "Access Level SUPERADMIN:\n";
         $admins = "Access Level ADMIN:\n";
         $leaders = "Access Level LEADER:\n";
@@ -1271,8 +1271,8 @@ class Security_Core extends BaseActiveModule
         )
         ) {
             $orgrank = TRUE;
-            $sql = "UPDATE #___security_org SET access_level = " . $newacl . " WHERE org_gov = '" . mysql_real_escape_string($government) . "' AND org_rank = '"
-                . mysql_real_escape_string($groupid) . "'";
+            $sql = "UPDATE #___security_org SET access_level = " . $newacl . " WHERE org_gov = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $government) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "' AND org_rank = '"
+                . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $groupid) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'";
             $return = "Org Rank " . $groupid . " changed to access level " . $this->get_access_name($newacl);
         }
         else {
@@ -1331,7 +1331,7 @@ class Security_Core extends BaseActiveModule
     function get_group_info($gid)
     { // Start function get_group_name()
         $sql = "SELECT * FROM #___security_groups WHERE gid = " . $gid;
-        $result = $this->bot->db->select($sql, MYSQL_ASSOC);
+        $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
         if (empty($result)) {
             return FALSE;
         }
@@ -1784,7 +1784,7 @@ class Security_Core extends BaseActiveModule
         if (empty($guild) || $guild != "") {
             $guild = $this->bot->guildname;
         }
-        $sql = "SELECT DISTINCT org_rank_id,org_rank FROM #___whois WHERE org_name = '" . mysql_real_escape_string($guild) . "' ORDER BY org_rank_id ASC"; // Gets the org ranks.
+        $sql = "SELECT DISTINCT org_rank_id,org_rank FROM #___whois WHERE org_name = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $guild) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "' ORDER BY org_rank_id ASC"; // Gets the org ranks.
         $result = $this->bot->db->select($sql);
         if (empty($result)) {
             //$this -> bot -> core("settings") -> save("Security", "orggov", "Unknown");
@@ -2052,7 +2052,7 @@ class Security_Core extends BaseActiveModule
         $sql .= "WHERE org_gov = '" . $this->bot->core("settings")
             ->get('Security', 'Orggov') . "' ";
         $sql .= "ORDER BY org_rank_id ASC";
-        $result = $this->bot->db->select($sql, MYSQL_ASSOC);
+        $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
         if (empty($result)) {
             return FALSE;
         } // Nothing to cache.
@@ -2070,7 +2070,7 @@ class Security_Core extends BaseActiveModule
         $this->cache['groups'] = array();
         $this->cache['membership'] = array();
         $sql = "SELECT * FROM #___security_groups";
-        $result = $this->bot->db->select($sql, MYSQL_ASSOC);
+        $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
         if (empty($result)) {
             $this->bot->log("SECURITY", "ERROR", "No groups exisit, not even the groups created by default. Something is very wrong.");
             exit();
@@ -2080,7 +2080,7 @@ class Security_Core extends BaseActiveModule
             $this->cache['groups'][$group['name']] = $group;
             $gid = $this->get_gid($group['name']);
             $sql = "SELECT name FROM #___security_members WHERE gid = " . $gid;
-            $members = $this->bot->db->select($sql, MYSQL_ASSOC);
+            $members = $this->bot->db->select($sql, MYSQLI_ASSOC);
             $this->cache['groups'][$group['gid']]['members'] = array();
             $this->cache['groups'][$group['name']]['members'] = array();
             // Cache members of the group, no big deal if there are no members.

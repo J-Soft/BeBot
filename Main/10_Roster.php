@@ -133,14 +133,14 @@ class Roster_Core extends BasePassiveModule
             if ($this->bot->core('prefs')
                 ->exists('AutoInv', 'receive_auto_invite')
             ) {
-                $fields = $this->bot->db->select("EXPLAIN #___users", MYSQL_ASSOC);
+                $fields = $this->bot->db->select("EXPLAIN #___users", MYSQLI_ASSOC);
                 if (!empty($fields)) {
                     foreach ($fields as $field) {
                         $columns[$field['Field']] = TRUE;
                     }
                 }
                 if (isset($columns['auto_invite'])) {
-                    $invited_users = $this->bot->db->select('SELECT char_id FROM #___users WHERE auto_invite=1', MYSQL_ASSOC);
+                    $invited_users = $this->bot->db->select('SELECT char_id FROM #___users WHERE auto_invite=1', MYSQLI_ASSOC);
                     if (!empty($invited_users)) {
                         foreach ($invited_users as $invited_user) {
                             $this->bot->core('prefs')

@@ -152,7 +152,7 @@ class Bot
 
     public static function factory($config_file = NULL)
     {
-        require ('./conf/ServerList.php');
+        require ('./Conf/ServerList.php');
         if (!empty($config_file)) {
             $config_file = ucfirst(strtolower($config_file)) . ".Bot.conf";
         }
@@ -160,35 +160,35 @@ class Bot
             $config_file = "Bot.conf";
         }
         //Read config_file
-        if (file_exists("./conf/" . $config_file)) {
-            require_once "./conf/" . $config_file;
-            echo "Loaded bot configuration from conf/" . $config_file . "\n";
+        if (file_exists("./Conf/" . $config_file)) {
+            require_once "./Conf/" . $config_file;
+            echo "Loaded bot configuration from Conf/" . $config_file . "\n";
         }
         else {
-            die("Could not read config file conf/" . $config_file);
+            die("Could not read config file Conf/" . $config_file);
         }
 
         if (empty($ao_password) || $ao_password == "") {
-            $fp = fopen('./conf/pw', 'r');
+            $fp = fopen('./Conf/pw', 'r');
             if ($fp) {
-                $ao_password = fread($fp, filesize('./conf/pw'));
+                $ao_password = fread($fp, filesize('./Conf/pw'));
                 fclose($fp);
-                $fp = fopen('./conf/pw', 'w');
+                $fp = fopen('./Conf/pw', 'w');
                 fwrite($fp, "");
                 fclose($fp);
             }
             else {
                 if (empty($ao_password) || $ao_password == "") {
-                    die("No password set in either ./conf/" . $config_file . " or in conf/pw");
+                    die("No password set in either ./Conf/" . $config_file . " or in Conf/pw");
                 }
             }
         }
         //Determine which game we are playing
-        if (!empty($server_list['ao'][$dimension])) {
-            define('AOCHAT_GAME', 'ao');
+        if (!empty($server_list['Ao'][$dimension])) {
+            define('AOCHAT_GAME', 'Ao');
         }
-        elseif (!empty($server_list['aoc'][$dimension])) {
-            define('AOCHAT_GAME', 'aoc');
+        elseif (!empty($server_list['Aoc'][$dimension])) {
+            define('AOCHAT_GAME', 'Aoc');
         }
         else {
             die("Unable to find dimension '$dimension' in any game.");
@@ -196,7 +196,7 @@ class Bot
         //Make sure that the log path exists.
         $logpath = $log_path . "/" . strtolower($bot_name) . "@RK" . $dimension;
         if (!file_exists($logpath)) {
-            mkdir($logpath);
+            mkdir($logpath, 0777, true);
         }
         //Determine bothandle
         $bothandle = $bot_name . "@" . $dimension;
@@ -251,7 +251,7 @@ class Bot
             self::$instance[$bothandle]->super_admin = NULL;
         }
         // create new ConfigMagik-Object (HACXX ALERT! This should most likely be a singleton!)
-        self::$instance[$bothandle]->ini = ConfigMagik::get_instance($bothandle, "conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", TRUE, TRUE);
+        self::$instance[$bothandle]->ini = ConfigMagik::get_instance($bothandle, "Conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", TRUE, TRUE);
         self::$instance[$bothandle]->register_module(self::$instance[$bothandle]->ini, 'ini');
         //Instantiate singletons
         self::$instance[$bothandle]->irc = &$irc; //To do: This should probably be a singleton aswell.
@@ -315,29 +315,31 @@ class Bot
         $this->cron_activated = FALSE;
         // Get dimension server
         switch ($this->dimension) {
-        case "0":
+        case "4":
             $dimension = "Testlive";
             break;
         case "1":
-            $dimension = "Atlantean";
+            $dimension = "Rubi-Ka";
             break;
         case "2":
-            $dimension = "Rimor";
+            $dimension = "Rubi-Ka";
             break;
         case "3":
-            $dimension = "Die neue welt";
+            $dimension = "Rubi-Ka";
             break;
+	case "5":
+	    $dimension = "Rubi-Ka";
         Default:
             $dimension = ucfirst(strtolower($this->dimension));
         }
-        Require ("conf/ServerList.php");
-        if (isset($server_list['ao'][$dimension])) {
-            $server = $server_list['ao'][$dimension]['server'];
-            $port = $server_list['ao'][$dimension]['port'];
+        Require ("Conf/ServerList.php");
+        if (isset($server_list['Ao'][$dimension])) {
+            $server = $server_list['Ao'][$dimension]['server'];
+            $port = $server_list['Ao'][$dimension]['port'];
         }
-        elseif (isset($server_list['aoc'][$dimension])) {
-            $server = $server_list['aoc'][$dimension]['server'];
-            $port = $server_list['aoc'][$dimension]['port'];
+        elseif (isset($server_list['Aoc'][$dimension])) {
+            $server = $server_list['Aoc'][$dimension]['server'];
+            $port = $server_list['Aoc'][$dimension]['port'];
         }
         else {
             die("Unknown dimension " . $this->dimension);
@@ -1337,7 +1339,7 @@ class Bot
         if ($write_to_db) {
             $logmsg = substr($msg, 0, 500);
             $this->db->query(
-                "INSERT INTO #___log_message (message, first, second, timestamp) VALUES ('" . mysql_real_escape_string($logmsg) . "','" . $first . "','" . $second . "','" . time()
+                "INSERT INTO #___log_message (message, first, second, timestamp) VALUES ('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $logmsg) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "','" . $first . "','" . $second . "','" . time()
                     . "')"
             );
         }

@@ -90,12 +90,12 @@ if (!extension_loaded("mysql")) {
 }
 
 echo "Connecting to the database.\n\n";
-$link = mysql_connect($dbserver, $username, $password) or die("Could not connect : " . mysql_error());
-mysql_select_db($dbname) or die("Could not select database");
+$link = ($GLOBALS["___mysqli_ston"] = mysqli_connect($dbserver,  $username,  $password)) or die("Could not connect : " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
+((bool)mysqli_query($GLOBALS["___mysqli_ston"], "USE $dbname")) or die("Could not select database");
 // Get all org ids out of the whois table, get the org infos, and add/update all user:
 $sqlquery = "SELECT org_id, org_name FROM (SELECT org_id, org_name, count(nickname) AS count FROM " . $tablename;
 $sqlquery .= " WHERE org_id != '' GROUP BY org_name) AS temp_whois ORDER BY count DESC;";
-$result = mysql_query($sqlquery) or die("Query failed : " . mysql_error());
+$result = mysqli_query($GLOBALS["___mysqli_ston"], $sqlquery) or die("Query failed : " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
 // simple counter, increased by one each time a get_site() call is made:
 $httpqueries = 0;
 // same for REPLACE/UPDATE in db:
@@ -104,7 +104,7 @@ $sqlquerycount = 0;
 $failedrosterlookup = 0;
 // same for failed person lookups:
 $failedpersonlookup = 0;
-while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
+while ($orgid = mysqli_fetch_array($result,  MYSQLI_ASSOC)) {
     if ($show_org_names) {
         echo gmdate("H:i:s") . " - Querying roster for " . $orgid['org_name'] . " (" . $orgid['org_id'] . ")...\n";
     }
@@ -116,7 +116,7 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
     }
     else {
         $starttime = time();
-        $orgname = mysql_real_escape_string(xmlparse($org_cont, "name"));
+        $orgname = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($org_cont, "name")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
         $orgfaction = xmlparse($org_cont, "side");
         $org = explode("<member>", $org_cont);
         if ($show_org_names) {
@@ -126,8 +126,8 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
         for ($i = 1; $i < count($org); $i++) {
             $content = $org[$i];
             $who["nickname"] = xmlparse($content, "nickname");
-            $who["firstname"] = mysql_real_escape_string(xmlparse($content, "firstname"));
-            $who["lastname"] = mysql_real_escape_string(xmlparse($content, "lastname"));
+            $who["firstname"] = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($content, "firstname")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+            $who["lastname"] = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($content, "lastname")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
             $who["level"] = xmlparse($content, "level");
             $who["gender"] = xmlparse($content, "gender");
             $who["breed"] = xmlparse($content, "breed");
@@ -202,7 +202,7 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
                                                     . "faction = VALUES(faction), profession = VALUES(profession), org_id = VALUES(org_id), "
                                                     . "defender_rank_id = VALUES(defender_rank_id), pictureurl = VALUES(pictureurl), updated = "
                                                     . "VALUES(updated), org_name = VALUES(org_name), org_rank = VALUES(org_rank), org_rank_id = " . "VALUES(org_rank_id)";
-                                                mysql_query($query) or die("Query failed : " . mysql_error());
+                                                mysqli_query($GLOBALS["___mysqli_ston"], $query) or die("Query failed : " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
                                                 $sqlquerycount++;
                                             }
                                         }
@@ -216,7 +216,7 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
         }
         // Unset all org entries that are still not updated but pointing to the current org id
         $query = "UPDATE whois SET org_id = 0, org_name = '', updated = updated - 86400 WHERE org_id = " . $orgid['org_id'] . " AND updated < " . $thistime . " - 10";
-        mysql_query($query) or die("Query failed : " . mysql_error());
+        mysqli_query($GLOBALS["___mysqli_ston"], $query) or die("Query failed : " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
 
         echo "     " . $i . " members completed in " . (time() - $starttime) . " seconds\n";
     }
@@ -226,7 +226,7 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
     // delay next parsing by $delaytime in seconds:
     sleep($delaytime);
 }
-mysql_free_result($result);
+((mysqli_free_result($result) || (is_object($result) && (get_class($result) == "mysqli_result"))) ? true : false);
 $orgruntime = time() - $thistime;
 $orgmins = floor($orgruntime / 60);
 $orgsec = $orgruntime % 60;
@@ -237,8 +237,8 @@ if ($do_unorged_users) {
     // Now work on all not updated entries left over (no org/switched org):
     $comptime = $thistime - 10;
     $sqlquery = "SELECT nickname FROM " . $tablename . " WHERE updated < " . $comptime;
-    $result = mysql_query($sqlquery) or die("Query failed : " . mysql_error());
-    while ($user = mysql_fetch_array($result, MYSQL_ASSOC)) {
+    $result = mysqli_query($GLOBALS["___mysqli_ston"], $sqlquery) or die("Query failed : " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
+    while ($user = mysqli_fetch_array($result,  MYSQLI_ASSOC)) {
         if ($show_character_names) {
             echo "Reading current stats for character " . $user['nickname'] . "...\n";
         }
@@ -247,8 +247,8 @@ if ($do_unorged_users) {
         if ($content_arr) {
             $content = $content_arr;
             $who["nick"] = xmlparse($content, "nick");
-            $who["firstname"] = mysql_real_escape_string(xmlparse($content, "firstname"));
-            $who["lastname"] = mysql_real_escape_string(xmlparse($content, "lastname"));
+            $who["firstname"] = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($content, "firstname")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+            $who["lastname"] = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($content, "lastname")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
             $who["level"] = xmlparse($content, "level");
             $who["gender"] = xmlparse($content, "gender");
             $who["breed"] = xmlparse($content, "breed");
@@ -259,7 +259,7 @@ if ($do_unorged_users) {
             if ($who["rank_id"] == '') {
                 $who["rank_id"] = 0;
             }
-            $who["org"] = mysql_real_escape_string(xmlparse($content, "organization_name"));
+            $who["org"] = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($content, "organization_name")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
             $who["org_id"] = xmlparse($content, "organization_id");
             if ($who["org_id"] == '') {
                 $who["org_id"] = 0;
@@ -279,31 +279,31 @@ if ($do_unorged_users) {
                     . $who["gender"] . "', breed='" . $who["breed"] . "', faction='" . $who["faction"] . "', profession='" . $who["profession"] . "', defender_rank_id='"
                     . $who["at"] . "', org_id='" . $who["org_id"] . "', org_name='" . $who["org"] . "', org_rank='" . $who["rank"] . "', org_rank_id='" . $who["rank_id"]
                     . "', updated='" . $thistime . "', pictureurl = '" . $who["pictureurl"] . "'" . " WHERE nickname='" . $who["nick"] . "';";
-                mysql_query($query) or die("Query failed : " . mysql_error());
+                mysqli_query($GLOBALS["___mysqli_ston"], $query) or die("Query failed : " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
                 $sqlquerycount++;
             }
             // delay next parsing by $delaytime in seconds:
             sleep($delaytime);
         }
     }
-    mysql_free_result($result);
+    ((mysqli_free_result($result) || (is_object($result) && (get_class($result) == "mysqli_result"))) ? true : false);
 }
 // What's the latest updated stamp for old outdated entries?
 $deletetime = $thistime - $hours * 3600;
 // Clean org infos on seriously outdated entries (using same value as for deleting):
 $query = "UPDATE whois SET org_id = 0, org_name = '' WHERE updated < " . $deletetime;
-mysql_query($query) or die("Query failed : " . mysql_error());
+mysqli_query($GLOBALS["___mysqli_ston"], $query) or die("Query failed : " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
 // Only delete non-updated entries if explicitly wished:
 if ($delete_not_updated) {
     // all not-updated entries:
     $sqlquery = "DELETE FROM " . $tablename . " WHERE updated < " . $deletetime;
-    mysql_query($sqlquery) or die("Query failed : " . mysql_error());
+    mysqli_query($GLOBALS["___mysqli_ston"], $sqlquery) or die("Query failed : " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
 }
 // do some statistics:
 $sqlquery = "SELECT count(*) as count FROM " . $tablename;
-$result = mysql_query($sqlquery) or die("Query failed : " . mysql_error());
-$count = mysql_fetch_array($result, MYSQL_ASSOC);
-mysql_free_result($result);
+$result = mysqli_query($GLOBALS["___mysqli_ston"], $sqlquery) or die("Query failed : " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
+$count = mysqli_fetch_array($result,  MYSQLI_ASSOC);
+((mysqli_free_result($result) || (is_object($result) && (get_class($result) == "mysqli_result"))) ? true : false);
 $runtime = time() - $thistime;
 $mins = floor($runtime / 60);
 $sec = $runtime % 60;
@@ -321,7 +321,7 @@ echo "================================================\n";
 if (file_exists($addons) && is_readable($addons)) {
     include ($addons);
 }
-mysql_close($link);
+((is_null($___mysqli_res = mysqli_close($link))) ? false : $___mysqli_res);
 
 
 function get_site($url, $strip_headers = FALSE, $read_timeout = FALSE)

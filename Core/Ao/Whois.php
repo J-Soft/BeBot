@@ -303,7 +303,7 @@ class Whois_Core extends BasePassiveModule
             // entry outdated, remove it and get it from db again
             unset($this->cache[$name]);
         }
-        $lookup = $this->bot->db->select("SELECT * FROM #___whois WHERE nickname = '" . $name . "'", MYSQL_ASSOC);
+        $lookup = $this->bot->db->select("SELECT * FROM #___whois WHERE nickname = '" . $name . "'", MYSQLI_ASSOC);
         /*
         If we have a result, we assume we might need to use it in case funcom XML is unresponsive.
         */
@@ -561,9 +561,9 @@ class Whois_Core extends BasePassiveModule
             $this->bot->db->query(
                 "INSERT INTO #___whois (id, nickname, firstname, lastname, level, gender, breed, faction,"
                     . " profession, defender_rank_id, org_id, org_name, org_rank, org_rank_id, pictureurl, updated)" . " VALUES ('" . $who["id"] . "', '" . $who["nickname"]
-                    . "', '" . mysql_real_escape_string($who["firstname"]) . "', '" . mysql_real_escape_string($who["lastname"]) . "', '" . $who["level"] . "', '" . $who["gender"]
+                    . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $who["firstname"]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $who["lastname"]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . $who["level"] . "', '" . $who["gender"]
                     . "', '" . $who["breed"] . "', '" . $who["faction"] . "', '" . $who["profession"] . "', '" . $who["at_id"] . "', '" . $who["org_id"] . "', '"
-                    . mysql_real_escape_string($who["org"]) . "', '" . $who["rank"] . "', '" . $who["rank_id"] . "', '" . $who["pictureurl"] . "','" . time()
+                    . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $who["org"]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . $who["rank"] . "', '" . $who["rank_id"] . "', '" . $who["pictureurl"] . "','" . time()
                     . "') ON DUPLICATE KEY UPDATE id = VALUES(id), "
                     . "firstname = VALUES(firstname), lastname = VALUES(lastname), level = VALUES(level), gender = VALUES(gender), "
                     . "breed = VALUES(breed), faction = VALUES(faction), profession = VALUES(profession), "
@@ -650,9 +650,9 @@ class Whois_Core extends BasePassiveModule
             }
         }
         if ($this->bot->core("settings")->get('Whois', 'Debug')) {
-            $whois_debug = $this->bot->db->select("SELECT updated FROM #___whois WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC);
+            $whois_debug = $this->bot->db->select("SELECT updated FROM #___whois WHERE nickname = '" . $whois['nickname'] . "'", MYSQLI_ASSOC);
             $user_debug = $this->bot->db->select(
-                "SELECT id,notify,user_level,added_by,added_at,deleted_by,deleted_at,updated_at FROM #___users WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC
+                "SELECT id,notify,user_level,added_by,added_at,deleted_by,deleted_at,updated_at FROM #___users WHERE nickname = '" . $whois['nickname'] . "'", MYSQLI_ASSOC
             );
             $window .= "\n##red## Debug Information:##end##\n";
             if (isset($whois_debug[0]) && !empty($whois_debug[0]['updated'])) {

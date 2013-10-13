@@ -127,8 +127,8 @@ class BotStatistics_Core extends BasePassiveModule
             $dim = $this->bot->dimension;
         }
         if ($bot) {
-            $bot = mysql_real_escape_string($bot);
-            $dim = mysql_real_escape_string($dim);
+            $bot = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $bot) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+            $dim = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $dim) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
             $result = $this->bot->db->select(
                 "SELECT bot, dim, online, time, start, total, restarts FROM " . $this->DB . "#___bots WHERE bot = '" . $bot . "' AND dim = '" . $dim . "'"
             );

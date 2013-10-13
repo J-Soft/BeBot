@@ -114,7 +114,7 @@ class ShortCuts_Core extends BasePassiveModule
         }
         $this->long[strtolower($short)] = $long;
         $this->short[strtolower($long)] = $short;
-        $this->bot->db->query("INSERT INTO #___shortcuts (shortcut, long_desc) VALUES ('" . mysql_real_escape_string($short) . "', '" . mysql_real_escape_string($long) . "')");
+        $this->bot->db->query("INSERT INTO #___shortcuts (shortcut, long_desc) VALUES ('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $short) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $long) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "')");
         return 'New shortcut "' . $short . '" added to database with corresponding long entry "' . $long . '".';
     }
 
@@ -128,7 +128,7 @@ class ShortCuts_Core extends BasePassiveModule
         }
         unset($this->short[strtolower($this->long[strtolower($short)])]);
         unset($this->long[strtolower($short)]);
-        $this->bot->db->query("DELETE FROM #___shortcuts WHERE shortcut = '" . mysql_real_escape_string($short) . "'");
+        $this->bot->db->query("DELETE FROM #___shortcuts WHERE shortcut = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $short) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'");
         return 'The shortcut "' . $short . '" and the corresponding long description "' . $this->long[strtolower($short)] . '" were deleted!';
     }
 
@@ -142,7 +142,7 @@ class ShortCuts_Core extends BasePassiveModule
         }
         unset($this->long[strtolower($this->short[strtolower($long)])]);
         unset($this->short[strtolower($long)]);
-        $this->bot->db->query("DELETE FROM #___shortcuts WHERE long_desc = '" . mysql_real_escape_string($long) . "'");
+        $this->bot->db->query("DELETE FROM #___shortcuts WHERE long_desc = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $long) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'");
         return 'The description "' . $long . '" and the corresponding shortcut "' . $this->short[strtolower($long)] . '" were deleted!';
     }
 

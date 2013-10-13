@@ -1480,7 +1480,10 @@ class AOChat
             $bytes = unpack("H*", pack("L*", $value));
         }
         for ($i = 3; $i >= 0; $i--) {
-            $result .= $bytes[$i];
+            if (isset($bytes[$i])) {
+                $result .= $bytes[$i];
+            }
+        
         }
         return $result;
     }

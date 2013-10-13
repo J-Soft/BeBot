@@ -50,7 +50,7 @@ class OnlineDisplay extends BaseActiveModule
         // Register for logon notifies
         $this->register_event("logon_notify");
         $this->register_event("pgjoin");
-        if ($this->bot->game == "ao") {
+        if ($this->bot->game == "Ao") {
             $cp = "profession";
             $this->cp = "profession";
             $mode = "Fancy";

@@ -45,9 +45,9 @@
  *
  */
 // ------- PHP code ----------
-include_once('SmartIRC/defines.php');
-include_once('SmartIRC/irccommands.php');
-include_once('SmartIRC/messagehandler.php');
+include_once('defines.php');
+include_once('irccommands.php');
+include_once('messagehandler.php');
 define('SMARTIRC_VERSION', '1.0.0 ($Revision: 723 $)');
 define('SMARTIRC_VERSIONSTRING', 'Net_SmartIRC ' . SMARTIRC_VERSION);
 

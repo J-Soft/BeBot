@@ -104,7 +104,7 @@ class PlayerList extends BasePassiveModule
     {
         if ($uname instanceof BotError) {
 
-            $this->bot->log("DEBUG", "PlayerList", "FIXME: core/PlayerList.php function id recieving BotError as " . $uname . "\nError is: " . $uname->get() . "\n");
+            $this->bot->log("DEBUG", "PlayerList", "FIXME: Core/PlayerList.php function id recieving BotError as " . $uname . "\nError is: " . $uname->get() . "\n");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
             return $uname;
         }
@@ -133,7 +133,7 @@ class PlayerList extends BasePassiveModule
                 // If we we didn't get a response from funcom, it's possible it was just a fluke, so try to get userid from whois
                 // table if the information there isn't stale.
                 $query = "SELECT ID,UPDATED FROM #___whois WHERE nickname = '$uname' LIMIT 1";
-                $result = $this->bot->db->select($query, MYSQL_ASSOC);
+                $result = $this->bot->db->select($query, MYSQLI_ASSOC);
                 // If we have a whois result, and its under 48 hours old,
                 if (!empty($result) && isset($result[0]['UPDATED'])) {
                     if (($result[0]['UPDATED'] + 172800 >= time()) && ($result[0]['ID'] >= 1)) {
@@ -188,7 +188,7 @@ class PlayerList extends BasePassiveModule
                 // If we we didn't get a responce from funcom, it's possible it was just a fluke, so try to get nickname from whois
                 // table if the information there isn't stale.
                 $query = "SELECT NICKNAME,UPDATED FROM #___whois WHERE id = '$uid' LIMIT 1";
-                $result = $this->bot->db->select($query, MYSQL_ASSOC);
+                $result = $this->bot->db->select($query, MYSQLI_ASSOC);
                 // If we have a whois result, and its under 48 hours old,
                 if (!empty($result) && isset($result[0]['UPDATED'])) {
                     if ($result[0]['updated'] + 172800 >= time()) {

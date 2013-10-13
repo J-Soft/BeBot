@@ -459,7 +459,7 @@ class OnlineDB_Core extends BasePassiveModule
             return ($this->error);
         }
         $query = "SELECT nickname FROM #___online WHERE ($where_clause) AND botname = '{$this->bot->botname}' ORDER BY nickname";
-        $users = $this->bot->db->select($query, MYSQL_ASSOC);
+        $users = $this->bot->db->select($query, MYSQLI_ASSOC);
         if (empty($users)) {
             $this->error->set("No users found in $channel");
             return ($this->error);

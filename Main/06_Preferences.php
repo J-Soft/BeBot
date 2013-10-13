@@ -94,7 +94,7 @@ class Preferences_core extends BasePassiveModule
     {
         //Grab all defaults and put them in cache
         $query = "SELECT module, name, default_value AS value FROM #___preferences_def";
-        $pref_defs = $this->bot->db->select($query, MYSQL_ASSOC);
+        $pref_defs = $this->bot->db->select($query, MYSQLI_ASSOC);
         $this->cache['def'] = array();
         if (!empty($pref_defs)) {
             foreach ($pref_defs as $preference) {
@@ -118,7 +118,7 @@ class Preferences_core extends BasePassiveModule
             if ($msg == 1) {
                 //cache costomized preferences.
                 $query = "SELECT value, module, name FROM #___preferences AS t1 JOIN #___preferences_def AS t2 ON t1.pref_ID = t2.ID WHERE owner=$uid";
-                $result = $this->bot->db->select($query, MYSQL_ASSOC);
+                $result = $this->bot->db->select($query, MYSQLI_ASSOC);
                 if (!empty($result)) {
                     foreach ($result as $preference) {
                         $this->cache[$uid][strtolower($preference['module'])][strtolower($preference['name'])] = $preference['value'];
@@ -136,7 +136,7 @@ class Preferences_core extends BasePassiveModule
     {
         //Condition the variables (ucfirst(strtolower()))
         $module = ucfirst(strtolower($module));
-        $description = mysql_real_escape_string($description);
+        $description = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $description) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
         $default = ucfirst(strtolower($default));
         $query = "SELECT ID, description, possible_values, default_value FROM #___preferences_def WHERE module = '$module' AND name = '$name' LIMIT 1";
         $prefs = $this->bot->db->select($query);
@@ -316,7 +316,7 @@ class Preferences_core extends BasePassiveModule
         //Show preferences for the given module
         //Grab some values from the definitions
         $query = "SELECT name, description, default_value, possible_values FROM #___preferences_def WHERE module='$module'";
-        $pref_defs = $this->bot->db->select($query, MYSQL_ASSOC);
+        $pref_defs = $this->bot->db->select($query, MYSQLI_ASSOC);
         //Grab current settings from the cache.
         $prefs = $this->bot->core('prefs')->get($name, $module);
         //Create a nice header for the window
