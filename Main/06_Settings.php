@@ -257,9 +257,9 @@ class Settings_Core extends BasePassiveModule
             return $status;
         }
         // Change $value to a string and add escape slashes if needed.
-        $module_sql = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], strval($module)) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
-        $setting_sql = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], strval($setting)) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
-        $value_sql = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], strval($value)) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $module_sql = $this->bot->db->real_escape_string(strval($module));
+        $setting_sql = $this->bot->db->real_escape_string(strval($setting));
+        $value_sql = $this->bot->db->real_escape_string(strval($value));
         if ($noupdate) {
             $sql
                 =
@@ -353,11 +353,11 @@ class Settings_Core extends BasePassiveModule
             $hidden = 0;
         }
         // Make sure any strings are escaped for MySQL.
-        $module = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $module) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
-        $setting = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $setting) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
-        $valuesql = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $value) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
-        $longdesc = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $longdesc) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
-        $defaultoptions = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $defaultoptions) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $module = $this->bot->db->real_escape_string($module);
+        $setting = $this->bot->db->real_escape_string($setting);
+        $valuesql = $this->bot->db->real_escape_string($value);
+        $longdesc = $this->bot->db->real_escape_string($longdesc);
+        $defaultoptions = $this->bot->db->real_escape_string($defaultoptions);
         $sql = "SELECT longdesc, defaultoptions, hidden, disporder FROM #___settings WHERE module = '" . $module . "' AND setting = '" . $setting . "'";
         $check = $this->bot->db->select($sql);
         if (!empty($check)) {
@@ -425,8 +425,8 @@ class Settings_Core extends BasePassiveModule
         );
         $module = $this->remove_space($module);
         $setting = $this->remove_space($setting);
-        $what = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $what) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
-        $to = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $to) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $what = $this->bot->db->real_escape_string($what);
+        $to = $this->bot->db->real_escape_string($to);
         $what = strtolower($what);
         $to = strtolower($to);
         $sql = "UPDATE #___settings SET " . $what . " = '" . $to . "' WHERE module = '" . $module . "' AND setting = '" . $setting . "'";
@@ -453,7 +453,7 @@ class Settings_Core extends BasePassiveModule
                 return $this->error;
             }
             else {
-                $sql = "DELETE FROM #___settings WHERE module = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $module) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'";
+                $sql = "DELETE FROM #___settings WHERE module = '" . $this->bot->db->real_escape_string($module) . "'";
                 $this->bot->db->query($sql);
                 unset($this->settings_cache[strtolower($module)]);
                 return "Deleted settings for $module.";
@@ -466,7 +466,7 @@ class Settings_Core extends BasePassiveModule
             }
             else {
                 unset($this->settings_cache[strtolower($module)][strtolower($setting)]);
-                $sql = "DELETE FROM #___settings WHERE module = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $module) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "' AND setting = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $setting) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'";
+                $sql = "DELETE FROM #___settings WHERE module = '" . $this->bot->db->real_escape_string($module) . "' AND setting = '" . $this->bot->db->real_escape_string($setting) . "'";
                 $this->bot->db->query($sql);
                 return "Deleted setting '$setting' from '$module'.";
             }

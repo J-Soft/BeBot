@@ -136,7 +136,7 @@ class Preferences_core extends BasePassiveModule
     {
         //Condition the variables (ucfirst(strtolower()))
         $module = ucfirst(strtolower($module));
-        $description = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $description) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $description = $this->bot->db->real_escape_string($description);
         $default = ucfirst(strtolower($default));
         $query = "SELECT ID, description, possible_values, default_value FROM #___preferences_def WHERE module = '$module' AND name = '$name' LIMIT 1";
         $prefs = $this->bot->db->select($query);

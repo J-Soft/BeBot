@@ -129,13 +129,13 @@ class stringfilter_core extends BasePassiveModule
     */
     function add_string($search, $new = NULL)
     { // Start function add_string()
-        $search = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], strtolower($search)) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $search = $this->bot->db->real_escape_string(strtolower($search));
         if (isset($this->stringlist[$search])) {
             $this->error->set("The string '" . $search . "' is already on the filtered word list.");
             return $this->error;
         }
         if (!is_null($new)) {
-            $new = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], strtolower($new)) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+            $new = $this->bot->db->real_escape_string(strtolower($new));
             $sql = "INSERT INTO #___string_filter (search, new) VALUES ('" . $search . "', '" . $new . "')";
         }
         else {
@@ -149,7 +149,7 @@ class stringfilter_core extends BasePassiveModule
 
     function rem_string($search)
     { // Start function rem_string()
-        $search = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], strtolower($search)) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $search = $this->bot->db->real_escape_string(strtolower($search));
         if (isset($this->stringlist[$search])) {
             unset($this->stringlist[$search]);
             $sql = "DELETE FROM #___string_filter WHERE search = '" . $search . "'";

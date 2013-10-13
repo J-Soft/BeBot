@@ -371,8 +371,8 @@ class Timer_Core extends BasePassiveModule
             $channel = "global";
         }
         $this->bot->db->query(
-            "INSERT INTO #___timer (name, timerclass, endtime, owner, channel, repeatinterval) VALUES " . "('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', " . $classid . ", "
-                . $endtime . ", '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $owner) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $channel) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', " . $repeat . ")"
+            "INSERT INTO #___timer (name, timerclass, endtime, owner, channel, repeatinterval) VALUES " . "('" . $this->bot->db->real_escape_string( $name) . "', " . $classid . ", "
+                . $endtime . ", '" . $this->bot->db->real_escape_string( $owner) . "', '" . $this->bot->db->real_escape_string( $channel) . "', " . $repeat . ")"
         );
         $timerid = $this->bot->db->select("SELECT LAST_INSERT_ID() as id");
         // If relaying is wished and relay is enabled send new timer to relayed bot(s):
@@ -523,9 +523,9 @@ class Timer_Core extends BasePassiveModule
     function create_timer_class($name, $description)
     {
         $this->bot->db->query(
-            "INSERT IGNORE INTO #___timer_classes (name, description) VALUES ('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $description) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "')"
+            "INSERT IGNORE INTO #___timer_classes (name, description) VALUES ('" . $this->bot->db->real_escape_string( $name) . "', '" . $this->bot->db->real_escape_string( $description) . "')"
         );
-        $id = $this->bot->db->select("SELECT id FROM #___timer_classes WHERE name = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'");
+        $id = $this->bot->db->select("SELECT id FROM #___timer_classes WHERE name = '" . $this->bot->db->real_escape_string( $name) . "'");
         if (empty($id)) {
             return -1;
         }
@@ -540,7 +540,7 @@ class Timer_Core extends BasePassiveModule
     {
         $this->bot->db->query(
             "INSERT IGNORE INTO #___timer_class_entries (next_id, class_id, notify_delay, notify_prefix, " . "notify_suffix) VALUES (" . $next_id . ", " . $class_id . ", " . $delay
-                . ", '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $prefix) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $suffix) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "')"
+                . ", '" . $this->bot->db->real_escape_string( $prefix) . "', '" . $this->bot->db->real_escape_string( $suffix) . "')"
         );
         $id = $this->bot->db->select("SELECT id FROM #___timer_class_entries WHERE class_id = " . $class_id . " AND notify_delay = " . $delay);
         if (empty($id)) {
@@ -579,14 +579,14 @@ class Timer_Core extends BasePassiveModule
     // Returns the ID of the default timer class (as defined by the setting) if $name doesn't exist.
     function get_class_id($name)
     {
-        $id = $this->bot->db->select("SELECT id FROM #___timer_classes WHERE name = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'", MYSQLI_ASSOC);
+        $id = $this->bot->db->select("SELECT id FROM #___timer_classes WHERE name = '" . $this->bot->db->real_escape_string( $name) . "'", MYSQLI_ASSOC);
         if (empty($id)) {
             $id = $this->bot->db->select(
-                "SELECT id FROM #___timer_classes WHERE name = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], 
+                "SELECT id FROM #___timer_classes WHERE name = '" . $this->bot->db->real_escape_string(
                     $this->bot
                         ->core("settings")
                         ->get("Timer", "DefaultClass")
-                ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'", MYSQLI_ASSOC
+                ) . "'", MYSQLI_ASSOC
             );
         }
         return $id[0]['id'];
@@ -598,19 +598,19 @@ class Timer_Core extends BasePassiveModule
     function create_class_setting($name, $default_class_name, $description)
     {
         $default_id = $this->get_class_id($default_class_name);
-        $class_setting = $this->bot->db->select("SELECT id, current_class FROM #___timer_class_settings WHERE name = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'", MYSQLI_ASSOC);
+        $class_setting = $this->bot->db->select("SELECT id, current_class FROM #___timer_class_settings WHERE name = '" . $this->bot->db->real_escape_string( $name) . "'", MYSQLI_ASSOC);
         if (empty($class_setting)) {
             // Setting doesn't exist, create new one:
             $this->bot->db->query(
-                "INSERT IGNORE INTO #___timer_class_settings (name, current_class, " . "default_class, description) VALUES ('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '"
-                    . $default_id . "', '" . $default_id . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $description) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "')"
+                "INSERT IGNORE INTO #___timer_class_settings (name, current_class, " . "default_class, description) VALUES ('" . $this->bot->db->real_escape_string( $name) . "', '"
+                    . $default_id . "', '" . $default_id . "', '" . $this->bot->db->real_escape_string( $description) . "')"
             );
-            $this->settings_cache[strtolower(((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")))] = $default_id;
+            $this->settings_cache[strtolower($this->bot->db->real_escape_string( $name))] = $default_id;
         }
         else {
             // UPDATE entry
             $this->bot->db->query(
-                "UPDATE #___timer_class_settings SET default_class = " . $default_id . ", description = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $description) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "' WHERE id = "
+                "UPDATE #___timer_class_settings SET default_class = " . $default_id . ", description = '" . $this->bot->db->real_escape_string( $description) . "' WHERE id = "
                     . $class_setting[0]['id']
             );
         }
@@ -621,11 +621,11 @@ class Timer_Core extends BasePassiveModule
     // Returns true on success, returns false if the class doesn't exists.
     function update_class_setting($name, $new_class_name)
     {
-        $class_setting = $this->bot->db->select("SELECT id FROM #___timer_class_settings WHERE name = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'", MYSQLI_ASSOC);
+        $class_setting = $this->bot->db->select("SELECT id FROM #___timer_class_settings WHERE name = '" . $this->bot->db->real_escape_string( $name) . "'", MYSQLI_ASSOC);
         if (!empty($class_setting)) {
             $class_id = $this->get_class_id($new_class_name);
             $this->bot->db->query("UPDATE #___timer_class_settings SET current_class = " . $class_id . " WHERE id = " . $class_setting[0]['id']);
-            $this->settings_cache[strtolower(((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")))] = $class_id;
+            $this->settings_cache[strtolower($this->bot->db->real_escape_string( $name))] = $class_id;
             return TRUE;
         }
         return FALSE;

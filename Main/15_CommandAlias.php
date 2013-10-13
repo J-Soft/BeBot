@@ -85,7 +85,7 @@ class CommandAlias_Core extends BasePassiveModule
     function unregister($alias)
     {
         $alias = strtolower($alias);
-        $get = $this->bot->db->select("SELECT alias, command FROM #___command_alias WHERE alias = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $alias) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'");
+        $get = $this->bot->db->select("SELECT alias, command FROM #___command_alias WHERE alias = '" . $this->bot->db->real_escape_string( $alias) . "'");
         if (empty($get) && isset($this->alias[$alias])) {
             unset($this->alias[$alias]);
             Return TRUE;
@@ -121,7 +121,7 @@ class CommandAlias_Core extends BasePassiveModule
         if (!isset($this->alias[$var[0]])) {
             if ($var[0] !== "comalias") {
                 $this->bot->db->query(
-                    "INSERT INTO #___command_alias (alias, command) VALUES ('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $var[0]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $var[1]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "')"
+                    "INSERT INTO #___command_alias (alias, command) VALUES ('" . $this->bot->db->real_escape_string( $var[0]) . "', '" . $this->bot->db->real_escape_string( $var[1]) . "')"
                 );
                 $this->alias[$var[0]] = $var[1];
                 Return ("##highlight##" . $var[0] . "##end## is now an alias of ##highlight##" . $this->alias[$var[0]] . "##end##!");
@@ -178,9 +178,9 @@ class CommandAlias_Core extends BasePassiveModule
     function del($alias)
     {
         $alias = strtolower($alias);
-        $get = $this->bot->db->select("SELECT alias, command FROM #___command_alias WHERE alias = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $alias) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'");
+        $get = $this->bot->db->select("SELECT alias, command FROM #___command_alias WHERE alias = '" . $this->bot->db->real_escape_string( $alias) . "'");
         if (!empty($get)) {
-            $this->bot->db->query("DELETE FROM #___command_alias WHERE alias = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $alias) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'");
+            $this->bot->db->query("DELETE FROM #___command_alias WHERE alias = '" . $this->bot->db->real_escape_string( $alias) . "'");
             unset($this->alias[$alias]);
             Return "Alias ##highlight##" . $alias . "##end## deleted.";
         }

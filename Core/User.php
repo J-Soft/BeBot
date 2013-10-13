@@ -157,14 +157,14 @@ class User_Core extends BasePassiveModule
         // Add the user to the users table
         if ($change_level) {
             $this->bot->db->query(
-                "UPDATE #___users SET user_level = '" . $user_level . "', notify = '" . $notifystate . "', added_by = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $source) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "' WHERE char_id = '"
+                "UPDATE #___users SET user_level = '" . $user_level . "', notify = '" . $notifystate . "', added_by = '" . $this->bot->db->real_escape_string($source) . "' WHERE char_id = '"
                     . $members["id"] . "'"
             );
         }
         else {
             $this->bot->db->query(
                 "INSERT INTO #___users (char_id, nickname, added_by, added_at, user_level, notify) VALUES('" . $members["id"] . "', '" . $members["nickname"] . "', '"
-                    . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $source) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . time() . "', '" . $user_level . "', '" . $notifystate . "')"
+                    . $this->bot->db->real_escape_string($source) . "', '" . time() . "', '" . $user_level . "', '" . $notifystate . "')"
             );
         }
         // If character is on notify add to buddy list
@@ -247,13 +247,13 @@ class User_Core extends BasePassiveModule
                     // Rerolled character, we need to make sure our information is updated.
                     if ($reroll == 1) {
                         $this->bot->db->query(
-                            "UPDATE #___users SET char_id = '" . $id . "', user_level = '0', deleted_by = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $source) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', deleted_at = '" . time()
+                            "UPDATE #___users SET char_id = '" . $id . "', user_level = '0', deleted_by = '" . $this->bot->db->real_escape_string($source) . "', deleted_at = '" . time()
                                 . "', notify = '0' WHERE nickname = '" . $name . "'"
                         );
                     }
                     else {
                         $this->bot->db->query(
-                            "UPDATE #___users SET user_level = '0', deleted_by = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $source) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', deleted_at = '" . time()
+                            "UPDATE #___users SET user_level = '0', deleted_by = '" . $this->bot->db->real_escape_string($source) . "', deleted_at = '" . time()
                                 . "', notify = '0' WHERE char_id = '"
                                 . $id . "'"
                         );

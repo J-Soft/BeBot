@@ -381,8 +381,12 @@ class Roster_Core extends BasePassiveModule
                     /*
                     Make sure we don't delete the member in the final step
                     */
-                    unset($buddies[$member["id"]]);
-                    unset($db_members[$member["nickname"]]);
+                    if (isset($buddies[$member["id"]])) {
+                        unset($buddies[$member["id"]]);
+                    }
+                    if (isset($db_members[$member["nickname"]])) {
+                        unset($db_members[$member["nickname"]]);
+                    }
                 }
                 //check  DB members not on Roster
                 if (!empty($db_members)) {

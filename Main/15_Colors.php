@@ -208,7 +208,7 @@ class Colors_Core extends BasePassiveModule
     // defines a new color:
     function define_color($name, $code, $cache = TRUE)
     {
-        $this->bot->db->query("INSERT IGNORE INTO #___colors (name, code) VALUES ('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $code) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "')");
+        $this->bot->db->query("INSERT IGNORE INTO #___colors (name, code) VALUES ('" . $this->bot->db->real_escape_string($name) . "', '" . $this->bot->db->real_escape_string($code) . "')");
         if ($cache) {
             $this->no_tags = TRUE;
             $this->create_color_cache();
@@ -220,8 +220,8 @@ class Colors_Core extends BasePassiveModule
     function define_scheme($module, $scheme, $color_name, $cache = TRUE)
     {
         $this->bot->db->query(
-            "INSERT IGNORE INTO #___color_schemes" . " (module, name, color_code) VALUES ('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $module) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $scheme) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""))
-                . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $color_name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "')"
+            "INSERT IGNORE INTO #___color_schemes" . " (module, name, color_code) VALUES ('" . $this->bot->db->real_escape_string($module) . "', '" . $this->bot->db->real_escape_string($scheme)
+                . "', '" . $this->bot->db->real_escape_string($color_name) . "')"
         );
         if ($cache) {
             $this->no_tags = TRUE;
@@ -235,12 +235,12 @@ class Colors_Core extends BasePassiveModule
     {
         // first add color:
         $this->bot->db->query(
-            "INSERT IGNORE INTO #___colors" . " (name, code) VALUES ('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $color_name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $color_code) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "')"
+            "INSERT IGNORE INTO #___colors" . " (name, code) VALUES ('" . $this->bot->db->real_escape_string($color_name) . "', '" . $this->bot->db->real_escape_string($color_code) . "')"
         );
         // then add scheme:
         $this->bot->db->query(
-            "INSERT IGNORE INTO #___color_schemes" . " (module, name, color_code) VALUES ('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $module) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $scheme) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""))
-                . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $color_name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "')"
+            "INSERT IGNORE INTO #___color_schemes" . " (module, name, color_code) VALUES ('" . $this->bot->db->real_escape_string($module) . "', '" . $this->bot->db->real_escape_string($scheme)
+                . "', '" . $this->bot->db->real_escape_string($color_name) . "')"
         );
         $this->no_tags = TRUE;
         $this->create_color_cache();
@@ -251,8 +251,8 @@ class Colors_Core extends BasePassiveModule
     function update_scheme($module, $scheme, $new_color_name)
     {
         $this->bot->db->query(
-            "UPDATE #___color_schemes" . " SET color_code = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $new_color_name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "' WHERE module = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $module) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""))
-                . "' AND name = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $scheme) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'"
+            "UPDATE #___color_schemes" . " SET color_code = '" . $this->bot->db->real_escape_string($new_color_name) . "' WHERE module = '" . $this->bot->db->real_escape_string($module)
+                . "' AND name = '" . $this->bot->db->real_escape_string($scheme) . "'"
         );
         $this->no_tags = TRUE;
         $this->create_color_cache();
@@ -276,8 +276,8 @@ class Colors_Core extends BasePassiveModule
         foreach ($scheme_file as $scheme_line) {
             if (preg_match("/scheme module=\"([a-z_]+)\" name=\"([a-z_]+)\" code=\"([a-z]+)\"/i", $scheme_line, $info)) {
                 $this->bot->db->query(
-                    "UPDATE #___color_schemes" . " SET color_code = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $info[3]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "' WHERE module = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $info[1]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""))
-                        . "' AND name = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $info[2]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'"
+                    "UPDATE #___color_schemes" . " SET color_code = '" . $this->bot->db->real_escape_string($info[3]) . "' WHERE module = '" . $this->bot->db->real_escape_string($info[1])
+                        . "' AND name = '" . $this->bot->db->real_escape_string($info[2]) . "'"
                 );
             }
         }
@@ -403,7 +403,7 @@ class Colors_Core extends BasePassiveModule
                 $this->theme[strtolower($info[1])] = $info[2];
             }
             elseif (preg_match("/color name=\"([a-z_]+)\" color=\"([a-z]+)\"/i", $theme_line, $info)) {
-                $cols = $this->bot->db->select("SELECT code FROM #___colors WHERE name = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $info[2]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'");
+                $cols = $this->bot->db->select("SELECT code FROM #___colors WHERE name = '" . $this->bot->db->real_escape_string($info[2]) . "'");
                 if (empty($cols)) {
                     $this->theme[strtolower($info[1])] = "#000000";
                 }

@@ -161,11 +161,15 @@ class MySQL
     function close()
     {
         if ($this->CONN != NULL) {
-            ((is_null($___mysqli_res = mysqli_close($this->CONN))) ? false : $___mysqli_res);
+            mysqli_close($this->CONN);
             $this->CONN = NULL;
         }
     }
 
+    function real_escape_string($string)
+    {
+        return mysqli_real_escape_string($this->CONN, $string);
+    }
 
     function error($text, $fatal = false, $connected = true)
     {

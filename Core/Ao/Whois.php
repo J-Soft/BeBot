@@ -545,7 +545,7 @@ class Whois_Core extends BasePassiveModule
         //Adding in some validation and error handling due to an unknown bug (work around).
         //If ID is stops being 0, then remove this code.
         if ($who instanceof BotError) {
-            return FALSE;
+            return false;
         }
 
 
@@ -561,9 +561,9 @@ class Whois_Core extends BasePassiveModule
             $this->bot->db->query(
                 "INSERT INTO #___whois (id, nickname, firstname, lastname, level, gender, breed, faction,"
                     . " profession, defender_rank_id, org_id, org_name, org_rank, org_rank_id, pictureurl, updated)" . " VALUES ('" . $who["id"] . "', '" . $who["nickname"]
-                    . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $who["firstname"]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $who["lastname"]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . $who["level"] . "', '" . $who["gender"]
+                    . "', '" . $this->bot->db->real_escape_string($who["firstname"]) . "', '" . $this->bot->db->real_escape_string($who["lastname"]) . "', '" . $who["level"] . "', '" . $who["gender"]
                     . "', '" . $who["breed"] . "', '" . $who["faction"] . "', '" . $who["profession"] . "', '" . $who["at_id"] . "', '" . $who["org_id"] . "', '"
-                    . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $who["org"]) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . $who["rank"] . "', '" . $who["rank_id"] . "', '" . $who["pictureurl"] . "','" . time()
+                    . $this->bot->db->real_escape_string($who["org"]) . "', '" . $who["rank"] . "', '" . $who["rank_id"] . "', '" . $who["pictureurl"] . "','" . time()
                     . "') ON DUPLICATE KEY UPDATE id = VALUES(id), "
                     . "firstname = VALUES(firstname), lastname = VALUES(lastname), level = VALUES(level), gender = VALUES(gender), "
                     . "breed = VALUES(breed), faction = VALUES(faction), profession = VALUES(profession), "
@@ -572,10 +572,10 @@ class Whois_Core extends BasePassiveModule
             );
             // Clear from memory cache
             $this->remove_from_cache($who["nickname"]);
-            return TRUE;
+            return true;
         }
         else {
-            return FALSE;
+            return false;
         }
     } // End function udpate()
 

@@ -504,10 +504,10 @@ class AccessControl_Core extends BasePassiveModule
         }
         $save = implode(";", $coms);
         if ($update) {
-            $sql = " ON DUPLICATE KEY UPDATE description = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $desc) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', commands = '" . $save . "'";
+            $sql = " ON DUPLICATE KEY UPDATE description = '" . $this->bot->db->real_escape_string($desc) . "', commands = '" . $save . "'";
         }
         $this->bot->db->query(
-            "INSERT INTO #___access_control_saves (name, description, commands) VALUES ('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $desc) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "', '"
+            "INSERT INTO #___access_control_saves (name, description, commands) VALUES ('" . $this->bot->db->real_escape_string($name) . "', '" . $this->bot->db->real_escape_string($desc) . "', '"
                 . $save . "')" . $sql
         );
         Return (array(
@@ -538,7 +538,7 @@ class AccessControl_Core extends BasePassiveModule
             'O' => 'OWNER',
             'D' => 'DISABLED'
         );
-        $results = $this->bot->db->select("SELECT commands FROM #___access_control_saves WHERE name = '" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $name) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "'");
+        $results = $this->bot->db->select("SELECT commands FROM #___access_control_saves WHERE name = '" . $this->bot->db->real_escape_string($name) . "'");
         if (!empty($results)) {
             $commands = explode(";", $results[0][0]);
             foreach ($commands as $command) {

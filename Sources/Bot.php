@@ -1339,7 +1339,7 @@ class Bot
         if ($write_to_db) {
             $logmsg = substr($msg, 0, 500);
             $this->db->query(
-                "INSERT INTO #___log_message (message, first, second, timestamp) VALUES ('" . ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], $logmsg) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : "")) . "','" . $first . "','" . $second . "','" . time()
+                "INSERT INTO #___log_message (message, first, second, timestamp) VALUES ('" . $this->bot->db->real_escape_string( $logmsg) . "','" . $first . "','" . $second . "','" . time()
                     . "')"
             );
         }

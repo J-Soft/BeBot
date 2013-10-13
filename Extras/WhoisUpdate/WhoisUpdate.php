@@ -116,7 +116,7 @@ while ($orgid = mysqli_fetch_array($result,  MYSQLI_ASSOC)) {
     }
     else {
         $starttime = time();
-        $orgname = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($org_cont, "name")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $orgname = $this->bot->db->real_escape_string(xmlparse($org_cont, "name"));
         $orgfaction = xmlparse($org_cont, "side");
         $org = explode("<member>", $org_cont);
         if ($show_org_names) {
@@ -126,8 +126,8 @@ while ($orgid = mysqli_fetch_array($result,  MYSQLI_ASSOC)) {
         for ($i = 1; $i < count($org); $i++) {
             $content = $org[$i];
             $who["nickname"] = xmlparse($content, "nickname");
-            $who["firstname"] = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($content, "firstname")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
-            $who["lastname"] = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($content, "lastname")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+            $who["firstname"] = $this->bot->db->real_escape_string(xmlparse($content, "firstname"));
+            $who["lastname"] = $this->bot->db->real_escape_string(xmlparse($content, "lastname"));
             $who["level"] = xmlparse($content, "level");
             $who["gender"] = xmlparse($content, "gender");
             $who["breed"] = xmlparse($content, "breed");
@@ -247,8 +247,8 @@ if ($do_unorged_users) {
         if ($content_arr) {
             $content = $content_arr;
             $who["nick"] = xmlparse($content, "nick");
-            $who["firstname"] = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($content, "firstname")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
-            $who["lastname"] = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($content, "lastname")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+            $who["firstname"] = $this->bot->db->real_escape_string(xmlparse($content, "firstname"));
+            $who["lastname"] = $this->bot->db->real_escape_string(xmlparse($content, "lastname"));
             $who["level"] = xmlparse($content, "level");
             $who["gender"] = xmlparse($content, "gender");
             $who["breed"] = xmlparse($content, "breed");
@@ -259,7 +259,7 @@ if ($do_unorged_users) {
             if ($who["rank_id"] == '') {
                 $who["rank_id"] = 0;
             }
-            $who["org"] = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"], xmlparse($content, "organization_name")) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+            $who["org"] = $this->bot->db->real_escape_string(xmlparse($content, "organization_name"));
             $who["org_id"] = xmlparse($content, "organization_id");
             if ($who["org_id"] == '') {
                 $who["org_id"] = 0;
