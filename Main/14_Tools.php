@@ -61,7 +61,7 @@ class tools extends BasePassiveModule
         case 'o':
         case 'gu':
         case '3':
-            if ($this->bot->game == 'Aoc') {
+            if (strtolower($this->bot->game) == 'aoc') {
                 $chatcmd = "gu <pre>";
             }
             else {

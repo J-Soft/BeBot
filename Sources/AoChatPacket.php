@@ -23,7 +23,7 @@ class AOChatPacket
     function AOChatPacket($dir, $type, $data)
     {
 //This is a hack that should be done better. I'm just not sure how.
-        if (strtolower(AOCHAT_GAME) == 'Ao') {
+        if (strtolower(AOCHAT_GAME) == 'ao') {
             $aocpdifs = array(
                 "IS",
                 "IIS",

@@ -1046,7 +1046,7 @@ class IRC extends BaseActiveModule
             if (!empty($who["lastname"]) && ($who["lastname"] != "Unknown")) {
                 $result .= " " . $who["lastname"];
             }
-            if ($this->bot->game == 'Ao') {
+            if (strtololower($this->bot->game) == 'ao') {
                 $result .= " is a level " . $who["level"] . " " . $at . "" . $who["gender"] . " " . $who["breed"] . " ";
                 $result .= $who["profession"] . ", " . $who["faction"];
             }

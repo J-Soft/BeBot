@@ -152,7 +152,7 @@ abstract class BaseActiveModule extends BasePassiveModule
     )
     {
         //preg_match for items and insert a replacement.
-        if ($this->bot->game == 'Aoc') {
+        if (strtolower($this->bot->game) == 'aoc') {
             $search_pattern = '/' . $this->bot->core('items')->itemPattern . '/i';
         }
         else {

@@ -45,7 +45,7 @@ class Profession_Core extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         $this->bot->db->query("DROP TABLE IF EXISTS #___professions");
         $this->register_module("professions");
-        if ($this->bot->game == 'Aoc') {
+        if (strtolower($this->bot->game) == 'aoc') {
             $this->cache = array(
                 'Barbarian' => 'barb',
                 'Conqueror' => 'conq',

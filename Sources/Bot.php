@@ -353,7 +353,7 @@ class Bot
             die("The bot is restarting.\n");
         }
         // AoC authentication is a bit different
-        if ($this->game == 'Aoc') {
+        if (strtolower($this->game) == 'aoc') {
             // Open connection
             $this->log("LOGIN", "STATUS", "Connecting to $this->game server $server:$port");
             if (!$this->aoc->connect($server, $port, $this->sixtyfourbit)) {
@@ -377,7 +377,7 @@ class Bot
         */
         unset($this->username);
         unset($this->password);
-        if ($this->game == 'Aoc') {
+        if (strtolower($this->game) == 'aoc') {
             $dispg = TRUE;
         }
         else {
@@ -639,7 +639,7 @@ class Bot
     )
     {
         // Never send any privategroup message in AoC, because this would disconnect the bot
-        if ($this->game == 'Aoc') {
+        if (strtolower($this->game) == 'aoc') {
             /*** FIXME ***/
             // We need to eradicate calls to this from all modules for sanitys sake.
             return FALSE;
@@ -707,7 +707,7 @@ class Bot
             if ($this->core("settings")->get("Core", "ColorizeGC")) {
                 $msg = $this->core("colors")->colorize("normal", $msg);
             }
-            if ($this->game == 'Ao') {
+            if (strtolower($this->game) == 'ao') {
                 $guild = $this->guildname;
             }
             else {
@@ -931,7 +931,7 @@ class Bot
             return TRUE;
         }
         if ($channel == "gmsg") {
-            if ($group == $this->guildname || ($this->game == 'Aoc' && $group == "~Guild")) {
+            if ($group == $this->guildname || (strtolower($this->game) == 'aoc' && $group == "~Guild")) {
                 $group = "org";
             }
             $registered = $this->commands[$channel][$group];
@@ -1154,7 +1154,7 @@ class Bot
     */
     function inc_gannounce($args)
     {
-        if ($args[2] == 32772 && $this->game == 'Ao') {
+        if ($args[2] == 32772 && strtolower($this->game) == 'ao') {
             $this->guildname = $args[1];
             $this->log("CORE", "INC_GANNOUNCE", "Detected org name as: $args[1]");
         }
@@ -1189,8 +1189,8 @@ class Bot
             $group = $this->core("chat")->get_gname($args[0]);
         }
         $args[2] = utf8_decode($args[2]);
-        if (isset($this->commands["gmsg"][$group]) || $group == $this->guildname || ($this->game == 'Aoc' && $group == "~Guild")) {
-            if ($this->game == 'Aoc' && $group == "~Guild") {
+        if (isset($this->commands["gmsg"][$group]) || $group == $this->guildname || (strtolower($this->game) == 'aoc' && $group == "~Guild")) {
+            if (strtolower($this->game) == 'aoc' && $group == "~Guild") {
                 $msg = "[" . $this->guildname . "] ";
             }
             else {
@@ -1207,7 +1207,7 @@ class Bot
         }
         $disgc = $this->core("settings")->get("Core", "DisableGC");
         $disgcchat = $this->core("settings")->get("Core", "DisableGCchat");
-        if (($group == $this->guildname || ($this->game == 'Aoc' && $group == "~Guild")) && $disgc && $disgcchat) {
+        if (($group == $this->guildname || (strtolower($this->game) == 'aoc' && $group == "~Guild")) && $disgc && $disgcchat) {
             Return FALSE;
         }
         if ($args[1] == 0) {
@@ -1227,7 +1227,7 @@ class Bot
             $this->log("GROUP", "MSG", $msg);
         }
         if (!isset($this->other_bots[$user])) {
-            if ($group == $this->guildname || ($this->game == 'Aoc' && $group == "~Guild")) {
+            if ($group == $this->guildname || (strtolower($this->game) == 'aoc' && $group == "~Guild")) {
                 if (!$disgc) {
                     $found = $this->handle_command_input($user, $args[2], "gc");
                 }

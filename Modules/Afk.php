@@ -274,7 +274,7 @@ class AFK extends BaseActiveModule
             if ($this->acheck($name)) {
                 $this->back($name);
                 $msgs = $this->msgs($name);
-                if ($this->bot->game == 'Ao') {
+                if (strtolower($this->bot->game) == 'ao') {
                     $this->bot->send_tell($name, "you have been set as back. " . $msgs . "");
                 }
             }
@@ -284,7 +284,7 @@ class AFK extends BaseActiveModule
                 if (!$this->acheck($name)) {
                     $this->gone($name);
                     $msgs = $this->msgs($name);
-                    if ($this->bot->game == 'Ao') {
+                    if (strtololower($this->bot->game) == 'ao') {
                         $this->bot->send_tell($name, "you have been set as AFK. " . $msgs . "");
                     }
                 }
