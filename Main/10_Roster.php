@@ -684,9 +684,9 @@ class Roster_Core extends BasePassiveModule
         $this->bot->log("ROSTER", "ADD", "Adding $name $reason");
         $result = $this->bot->core("user")->add($source, $name, $id, 2, 1);
         if (!($result instanceof BotError)) {
+            $this->bot->core("chat")->buddy_add($id);
             $this->added++;
         }
-        $this->bot->core("chat")->buddy_add($id);
     }
 
 

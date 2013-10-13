@@ -1339,7 +1339,7 @@ class Bot
         if ($write_to_db) {
             $logmsg = substr($msg, 0, 500);
             $this->db->query(
-                "INSERT INTO #___log_message (message, first, second, timestamp) VALUES ('" . $this->bot->db->real_escape_string( $logmsg) . "','" . $first . "','" . $second . "','" . time()
+                "INSERT INTO #___log_message (message, first, second, timestamp) VALUES ('" . $this->db->real_escape_string( $logmsg) . "','" . $first . "','" . $second . "','" . time()
                     . "')"
             );
         }
