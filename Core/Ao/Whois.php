@@ -545,37 +545,37 @@ class Whois_Core extends BasePassiveModule
         //Adding in some validation and error handling due to an unknown bug (work around).
         //If ID is stops being 0, then remove this code.
         if ($who instanceof BotError) {
+            $this->bot->log("DEBUG", "WHOIS", "update() encountered instanceof BotError for " . $who["nickname"]);
             return false;
-        }
+        } else {
+            if ($who["id"] < 1) {
+                $this->bot->log('Whois', 'Update', $who["nickname"] . " had an invalid user ID! UID: " . $who["id"]);
+                $who["id"] = $this->bot->core("player")->id($who["nickname"]);
+            }
 
-
-        if ($who["id"] < 1) {
-            $this->bot->log('Whois', 'Update', $who["nickname"] . " had an invalid user ID! UID: " . $who["id"]);
-            $who["id"] = $this->bot->core("player")->id($who["nickname"]);
-        }
-
-        if ($who["id"] >= 1) {
-            /*
-            Update our database cache
-            */
-            $this->bot->db->query(
-                "INSERT INTO #___whois (id, nickname, firstname, lastname, level, gender, breed, faction,"
-                    . " profession, defender_rank_id, org_id, org_name, org_rank, org_rank_id, pictureurl, updated)" . " VALUES ('" . $who["id"] . "', '" . $who["nickname"]
-                    . "', '" . $this->bot->db->real_escape_string($who["firstname"]) . "', '" . $this->bot->db->real_escape_string($who["lastname"]) . "', '" . $who["level"] . "', '" . $who["gender"]
-                    . "', '" . $who["breed"] . "', '" . $who["faction"] . "', '" . $who["profession"] . "', '" . $who["at_id"] . "', '" . $who["org_id"] . "', '"
-                    . $this->bot->db->real_escape_string($who["org"]) . "', '" . $who["rank"] . "', '" . $who["rank_id"] . "', '" . $who["pictureurl"] . "','" . time()
-                    . "') ON DUPLICATE KEY UPDATE id = VALUES(id), "
-                    . "firstname = VALUES(firstname), lastname = VALUES(lastname), level = VALUES(level), gender = VALUES(gender), "
-                    . "breed = VALUES(breed), faction = VALUES(faction), profession = VALUES(profession), "
-                    . "defender_rank_id = VALUES(defender_rank_id), pictureurl = VALUES(pictureurl), updated = VALUES(updated), "
-                    . "org_id = VALUES(org_id), org_name = VALUES(org_name), org_rank = VALUES(org_rank), org_rank_id = VALUES(org_rank_id)"
-            );
-            // Clear from memory cache
-            $this->remove_from_cache($who["nickname"]);
-            return true;
-        }
-        else {
-            return false;
+            if ($who["id"] >= 1) {
+                /*
+                Update our database cache
+                */
+                $this->bot->db->query(
+                    "INSERT INTO #___whois (id, nickname, firstname, lastname, level, gender, breed, faction,"
+                        . " profession, defender_rank_id, org_id, org_name, org_rank, org_rank_id, pictureurl, updated)" . " VALUES ('" . $who["id"] . "', '" . $who["nickname"]
+                        . "', '" . $this->bot->db->real_escape_string($who["firstname"]) . "', '" . $this->bot->db->real_escape_string($who["lastname"]) . "', '" . $who["level"] . "', '" . $who["gender"]
+                        . "', '" . $who["breed"] . "', '" . $who["faction"] . "', '" . $who["profession"] . "', '" . $who["at_id"] . "', '" . $who["org_id"] . "', '"
+                        . $this->bot->db->real_escape_string($who["org"]) . "', '" . $who["rank"] . "', '" . $who["rank_id"] . "', '" . $who["pictureurl"] . "','" . time()
+                        . "') ON DUPLICATE KEY UPDATE id = VALUES(id), "
+                        . "firstname = VALUES(firstname), lastname = VALUES(lastname), level = VALUES(level), gender = VALUES(gender), "
+                        . "breed = VALUES(breed), faction = VALUES(faction), profession = VALUES(profession), "
+                        . "defender_rank_id = VALUES(defender_rank_id), pictureurl = VALUES(pictureurl), updated = VALUES(updated), "
+                        . "org_id = VALUES(org_id), org_name = VALUES(org_name), org_rank = VALUES(org_rank), org_rank_id = VALUES(org_rank_id)"
+                );
+                // Clear from memory cache
+                $this->remove_from_cache($who["nickname"]);
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     } // End function udpate()
 
