@@ -749,7 +749,7 @@ class AOChat
                 $id = -1;
             }
 
-            echo "Debug: Firing event Core.on_player_id ($id, $name)\n";
+            // echo "Debug: Firing event Core.on_player_id ($id, $name)\n";
 
             $event = new sfEvent($this, 'Core.on_player_id', array(
                 'id' => $id,
@@ -1008,7 +1008,7 @@ class AOChat
             }
         }
 
-        echo "Debug: lookup_user for $u completed in $i iterations\n";
+        //echo "Debug: lookup_user for $u completed in $i iterations\n";
 
         /*** FIXME ***/
         // This is really ugly, and we really need to detect if we receive a Client Lookup packet as the lookup could be negative or null.
