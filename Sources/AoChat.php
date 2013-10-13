@@ -407,7 +407,7 @@ class AOChat
         $packet = $this->get_packet();
         // If we receive anything but the character list, something's wrong.
         if ($packet->type != AOCP_LOGIN_CHARLIST) {
-            die("AOChat: {$packet->args[0]}\n");
+            die("AOChat Expecting Character list, received: {$packet->args[0]}\n");
         }
         // Prepare an array of all characters returned
         for ($i = 0; $i < sizeof($packet->args[0]); $i++) {
