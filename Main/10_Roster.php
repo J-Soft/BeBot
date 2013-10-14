@@ -330,16 +330,16 @@ class Roster_Core extends BasePassiveModule
                 Go through all members and make sure we are up to date.
                 */
                 foreach ($members as $member) {
-                    $db_member = $db_members[$member["nickname"]];
+                    if (!isset($db_members[$member["nickname"]])) {
                     /*
                     If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
                     its a new member we havent picked up for some reason.
                     */
-                    if (empty($db_member)) {
                         $this->add("Roster-XML", $member["id"], $member["nickname"], "from XML");
                         $this->added++;
                     }
                     else {
+                        $db_member = $db_members[$member["nickname"]];
                         if ($db_member[2] == 1 || ($db_member[2] == 0 && (($db_member[3] + 172800) <= time()))) {
                             $this->add("Roster-XML", $member["id"], $member["nickname"], "from XML");
                             $this->added++;
@@ -720,6 +720,7 @@ class Roster_Core extends BasePassiveModule
         ) {
             // Get the guild roster
             $i = 0;
+            $j = 0;
             $xml_roster = $this->bot->core("tools")
                 ->get_site("http://people.anarchy-online.com/org/stats/d/$dim/name/$id/basicstats.xml");
             $faction = $this->bot->core("tools")
@@ -764,9 +765,16 @@ class Roster_Core extends BasePassiveModule
                     if ($member['nickname'] !== ucfirst(strtolower($this->bot->botname))) {
                         $members[] = $member;
                     }
-                    $i++;
+
+                    // If we cannot lookup the player, just ignore it here already
+                    if (is_numeric($member["id"] && $member{"id"} > 0)) {
+                        $i++;
+                    }
+                    else {
+                        $j++;
+                    }
                 }
-                $this->bot->log("ROSTER", "UPDATE", "XML for the $faction guild $orgname contained $i member entries");
+                $this->bot->log("ROSTER", "UPDATE", "XML for the $faction guild $orgname contained $i member entries. Ignored $j entries that could not be looked up.");
             }
         }
         if (($this->bot->core("settings")
