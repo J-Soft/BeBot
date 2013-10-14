@@ -123,7 +123,7 @@ class tools extends BasePassiveModule
             }
         }
 
-        if ($return['error']) {
+        if (isset($return['error'])) {
             $this->bot->log("ERROR", "tools", $return['errordesc'] . " Reason (" . $return['content'] . ")");
         }
 

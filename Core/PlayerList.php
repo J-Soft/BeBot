@@ -84,9 +84,10 @@ class PlayerList extends BasePassiveModule
         $name = ucfirst(strtolower($name));
 
         /*echo "Debug caching $name ($id)\n";*/
-        if ($id == 0) {
+        if ($id == 0 || $id == -1) {
             $this->bot->log("DEBUG", "PlayerList", "Debug " . $name . " has an userid less than 1!!!\n");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
+            return false;
         }
 
         $this->namecache[$name] = array(
@@ -97,6 +98,7 @@ class PlayerList extends BasePassiveModule
             'name' => $name,
             'expire' => time() + 21600
         );
+        return true;
     }
 
 
@@ -126,7 +128,7 @@ class PlayerList extends BasePassiveModule
             // Lookup user from Funcom server first
             $this->bot->aoc->lookup_user($uname);
             // We should have the user in cache if we got a response from FC server
-            if (isset($this->namecache[$uname])) {
+            if (isset($this->namecache[$uname]) && $this->namecache[$uname]['id'] >= 1) {
                 return $this->namecache[$uname]['id'];
             }
             else {
@@ -146,13 +148,9 @@ class PlayerList extends BasePassiveModule
                 }
             }
         }
-        else {
-            if (isset($this->namecache[$uname])) // so we HAVE the player in cache...
-            {
-                return $this->namecache[$uname]['id'];
-            }
+        else if (isset($this->namecache[$uname])) { // so we HAVE the player in cache...
+            return $this->namecache[$uname]['id'];
         }
-
         $this->error->set("Unable to find player '$uname' and all lookups have failed. The player might have been deleted.");
         return $this->error;
     }
@@ -191,7 +189,7 @@ class PlayerList extends BasePassiveModule
                 $result = $this->bot->db->select($query, MYSQLI_ASSOC);
                 // If we have a whois result, and its under 48 hours old,
                 if (!empty($result) && isset($result[0]['UPDATED'])) {
-                    if ($result[0]['updated'] + 172800 >= time()) {
+                    if (isset($result[0]['updated']) && $result[0]['updated'] + 172800 >= time()) {
                         $age = time() - $result[1];
                         $age = $age / 60 / 60;
                         $this->bot->log("PLAYERLIST", "WARN", "Username lookup for $uid failed, but using whois info that is $age hours old.");

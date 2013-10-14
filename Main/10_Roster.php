@@ -335,14 +335,17 @@ class Roster_Core extends BasePassiveModule
                     If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
                     its a new member we havent picked up for some reason.
                     */
-                        $this->add("Roster-XML", $member["id"], $member["nickname"], "from XML");
-                        $this->added++;
+                        if ($this->add("Roster-XML", $member["id"], $member["nickname"], "from XML") == true) {
+                            $this->added++;
+                        }
                     }
                     else {
                         $db_member = $db_members[$member["nickname"]];
                         if ($db_member[2] == 1 || ($db_member[2] == 0 && (($db_member[3] + 172800) <= time()))) {
-                            $this->add("Roster-XML", $member["id"], $member["nickname"], "from XML");
-                            $this->added++;
+                            if ($this->add("Roster-XML", $member["id"], $member["nickname"], "from XML") == true)
+                            {
+                                $this->added++;
+                            }
                         }
                         /*
                         We have an entry for the nickname, but the character id's have changed, rerolled character.
@@ -356,9 +359,10 @@ class Roster_Core extends BasePassiveModule
                                     $this->erase("Roster-XML", $db_member[0], $member["nickname"], "char_id mismatch (ID: " . $db_member[0] . ")");
                                     $this->removed++;
                                     if ($this->bot->guildid == $member["org_id"]) {
-                                        $this->add("Roster-XML-Reroll", $member["id"], $member["nickname"], "after reroll (ID: " . $member["id"] . ")");
-                                        $this->added++;
-                                        $this->rerolled++;
+                                        if ($this->add("Roster-XML-Reroll", $member["id"], $member["nickname"], "after reroll (ID: " . $member["id"] . ")") == true) {
+                                            $this->added++;
+                                            $this->rerolled++;
+                                        }
                                     }
                                 }
                             }

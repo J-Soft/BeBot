@@ -547,7 +547,11 @@ class Whois_Core extends BasePassiveModule
         if ($who["id"] instanceof BotError) {
             $this->bot->log("DEBUG", "WHOIS", "update() encountered instanceof BotError for " . $who["nickname"]);
             return false;
-        } else {
+        }
+        else if ($who[""] ) {
+
+        }
+        else {
             if ($who["id"] < 1) {
                 $this->bot->log('Whois', 'Update', $who["nickname"] . " had an invalid user ID! UID: " . $who["id"]);
                 $who["id"] = $this->bot->core("player")->id($who["nickname"]);
