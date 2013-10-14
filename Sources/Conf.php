@@ -50,8 +50,8 @@ class Conf
 
     function load($argv = FALSE)
     {
-        if (file_exists("./conf/" . $this->cf)) {
-            require "./conf/" . $this->cf;
+        if (file_exists("./Conf/" . $this->cf)) {
+            require "./Conf/" . $this->cf;
             if (empty($ao_password) || $ao_password == "") {
                 fwrite(STDOUT, "Password for $ao_username:");
                 system('stty -echo');
@@ -73,7 +73,7 @@ class Conf
                 $this->cf = "Bot.conf";
             }
         }
-        if (!file_exists("./conf/" . $this->cf)) {
+        if (!file_exists("./Conf/" . $this->cf)) {
             $setup = $this->todo();
         }
     }
@@ -227,7 +227,7 @@ class Conf
 	$proxy_server_address = "";				// Proxy server to use address to use
 
 ?>';
-        $fp = fopen('./conf/' . $this->cf, 'w');
+        $fp = fopen('./Conf/' . $this->cf, 'w');
         fwrite($fp, $file);
         fclose($fp);
         echo $this->cf . " Created\n";
@@ -237,13 +237,13 @@ class Conf
     function mysql_check()
     {
         //get botname
-        include ("./conf/" . $this->cf);
+        include ("./Conf/" . $this->cf);
         $botname = ucfirst(strtolower($bot_name));
-        $botname_mysql_conf = "conf/" . $botname . ".MySQL.conf";
+        $botname_mysql_conf = "Conf/" . $botname . ".Mysql.conf";
         if (file_exists($botname_mysql_conf)) {
             Return;
         }
-        elseif (file_exists("conf/MySQL.conf")) {
+        elseif (file_exists("Conf/Mysql.conf")) {
             Return;
         }
         else {
@@ -255,7 +255,7 @@ class Conf
     function mysql_todo($botname, $rep = FALSE)
     {
         if (!$rep) {
-            echo $botname . ".MySQL.conf and MySQL.conf Does not Exist\n What do you want to do?\n(r=Retry, n=new, q=quit)\n";
+            echo $botname . ".Mysql.conf and Mysql.conf Does not Exist\n What do you want to do?\n(r=Retry, n=new, q=quit)\n";
         }
         $do = $this->ask("Select: ");
         $do = strtolower($do);
@@ -276,16 +276,16 @@ class Conf
 
     function mysql_set_conf($botname)
     {
-        echo "\nCreating MySQL Conf File\n";
-        echo "Would u like to use botname like botname.MySQL.conf  (y/yes or n/no)\n";
+        echo "\nCreating Mysql Conf File\n";
+        echo "Would u like to use botname like botname.Mysql.conf  (y/yes or n/no)\n";
         while (!$filename) {
             $ubn = $this->ask("Use Botname:");
             $ubn = strtolower($ubn);
             if ($ubn == "y" || $ubn == "yes") {
-                $filename = $botname . ".MySQL.conf";
+                $filename = $botname . ".Mysql.conf";
             }
             elseif ($ubn == "n" || $ubn == "no") {
-                $filename = "MySQL.conf";
+                $filename = "Mysql.conf";
             }
         }
         echo "MySQL Details:\n";
@@ -367,7 +367,7 @@ class Conf
 	*/
 	' . $mt . '
 ?>';
-        $fp = fopen('./conf/' . $filename, 'w');
+        $fp = fopen('./Conf/' . $filename, 'w');
         fwrite($fp, $file);
         fclose($fp);
         echo $filename . " Created\n";

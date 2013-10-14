@@ -84,7 +84,7 @@ if ($argc > 1) {
 }
 while (TRUE) {
     if ($pw) {
-        $fp = fopen('./conf/pw', 'w');
+        $fp = fopen('./Conf/pw', 'w');
         fwrite($fp, $pw);
         fclose($fp);
     }

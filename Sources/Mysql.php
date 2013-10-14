@@ -65,14 +65,14 @@ class MySQL
         /*
         Load up config
         */
-        $botname_mysql_conf = "Conf/" . $this->botname . ".MySQL.conf";
+        $botname_mysql_conf = "Conf/" . $this->botname . ".Mysql.conf";
         if (file_exists($botname_mysql_conf)) {
             include $botname_mysql_conf;
             $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from " . $botname_mysql_conf, FALSE);
         }
         else {
-            include "Conf/MySQL.conf";
-            $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from Conf/MySQL.conf", FALSE);
+            include "Conf/Mysql.conf";
+            $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from Conf/Mysql.conf", FALSE);
         }
         $this->USER = $user;
         $this->PASS = $pass;
