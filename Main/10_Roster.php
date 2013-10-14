@@ -767,11 +767,11 @@ class Roster_Core extends BasePassiveModule
                     }
 
                     // If we cannot lookup the player, just ignore it here already
-                    if (is_numeric($member["id"] && $member{"id"} > 0)) {
-                        $i++;
+                    if ($member["id"] instanceof BotError) {
+                        $j++;
                     }
                     else {
-                        $j++;
+                        $i++;
                     }
                 }
                 $this->bot->log("ROSTER", "UPDATE", "XML for the $faction guild $orgname contained $i member entries. Ignored $j entries that could not be looked up.");

@@ -544,7 +544,7 @@ class Whois_Core extends BasePassiveModule
     { // Start function update()
         //Adding in some validation and error handling due to an unknown bug (work around).
         //If ID is stops being 0, then remove this code.
-        if ($who instanceof BotError) {
+        if ($who["id"] instanceof BotError) {
             $this->bot->log("DEBUG", "WHOIS", "update() encountered instanceof BotError for " . $who["nickname"]);
             return false;
         } else {
