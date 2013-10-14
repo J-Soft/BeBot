@@ -1175,10 +1175,7 @@ class AOChat
 
     function privategroup_join($group)
     {
-        $gid = $this->bot->core('player')->id($group);
-        if ($gid instanceof BotError) {
-            return false;
-        }
+        $gid = $this->get_gid($group);
         return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_JOIN, $gid));
     }
 
@@ -1191,10 +1188,7 @@ class AOChat
 
     function privategroup_leave($group)
     {
-        $gid = $this->bot->core('player')->id($group);
-        if ($gid instanceof BotError) {
-            return false;
-        }
+        $gid = $this->get_gid($group);
         return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_PART, $gid));
     }
 
