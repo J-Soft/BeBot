@@ -296,11 +296,11 @@ class Roster_Core extends BasePassiveModule
     function update_guild($force = false)
     {
         /*** FIXME: This is not the right place to tell people that the bot went online!
-        if ($this->startup && ! $force)
-        {
-        $msg = "Bot is online ::: ";
-        $this->startup = FALSE;
-        }
+         * if ($this->startup && ! $force)
+         * {
+         * $msg = "Bot is online ::: ";
+         * $this->startup = FALSE;
+         * }
          */
         $this->lastrun = $this->bot->core("settings")
             ->get("members", "LastRosterUpdate");
@@ -680,11 +680,11 @@ class Roster_Core extends BasePassiveModule
         }
         $this->running = true;
         /*** FIXME: This is not the right place to tell people that the bot went online!
-        if ($this->startup && ! $force)
-        {
-        $msg = "Bot is online ::: ";
-        $this->startup = FALSE;
-        }
+         * if ($this->startup && ! $force)
+         * {
+         * $msg = "Bot is online ::: ";
+         * $this->startup = FALSE;
+         * }
          */
         $this->lastrun = $this->bot->core("settings")
             ->get("members", "LastRosterUpdate");

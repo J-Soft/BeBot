@@ -182,7 +182,7 @@ abstract class BaseActiveModule extends BasePassiveModule
 
 
     /************************************************************************
-    Default to replying in the same channel as the command has been received
+     * Default to replying in the same channel as the command has been received
      *************************************************************************/
     public function reply($name, $msg)
     {

@@ -1365,10 +1365,10 @@ class Net_SmartIRC_base
      *
      * @see    example.php
      *
-     * @param integer $handlertype  bits constants, see in this documentation Message Types
+     * @param integer $handlertype bits constants, see in this documentation Message Types
      * @param string $regexhandler the message that has to be in the IRC message in regex syntax
-     * @param object $object       a reference to the objects of the method
-     * @param string $methodname   the methodname that will be called when the handler happens
+     * @param object $object a reference to the objects of the method
+     * @param string $methodname the methodname that will be called when the handler happens
      *
      * @return integer assigned actionhandler id
      * @access public
@@ -1524,8 +1524,8 @@ class Net_SmartIRC_base
      *
      * @see    example7.php
      *
-     * @param integer $interval   interval time in milliseconds
-     * @param object $object     a reference to the objects of the method
+     * @param integer $interval interval time in milliseconds
+     * @param object $object a reference to the objects of the method
      * @param string $methodname the methodname that will be called when the handler happens
      *
      * @return integer assigned timehandler id

@@ -35,9 +35,9 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      *
      * @see    DOCUMENTATION
      *
-     * @param integer $type        specifies the type, like QUERY/ACTION or CTCP see 'Message Types'
+     * @param integer $type specifies the type, like QUERY/ACTION or CTCP see 'Message Types'
      * @param string $destination can be a user or channel
-     * @param string $message     the message
+     * @param string $message the message
      *
      * @return boolean
      * @access public
@@ -263,8 +263,8 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      *
      * Changes/requests the mode of the given target.
      *
-     * @param string $target   the target, can be an user (only yourself) or a channel
-     * @param string $newmode  the new mode like +mt
+     * @param string $target the target, can be an user (only yourself) or a channel
+     * @param string $newmode the new mode like +mt
      * @param integer $priority message priority, default is SMARTIRC_MEDIUM
      *
      * @return void
@@ -466,7 +466,7 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * sends QUIT to IRC server and disconnects
      *
      * @param string $quitmessage optional quitmessage
-     * @param integer $priority    message priority, default is SMARTIRC_MEDIUM
+     * @param integer $priority message priority, default is SMARTIRC_MEDIUM
      *
      * @return void
      * @access public

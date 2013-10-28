@@ -474,8 +474,8 @@ class PBParser
     /**
      * Returns the begin and endpos of the char
      *
-     * @param String $string  protofile as string
-     * @param String $char    begin element such as '{'
+     * @param String $string protofile as string
+     * @param String $char begin element such as '{'
      * @param String $charend end element such as '}'
      *
      * @return array begin, end

@@ -41,11 +41,11 @@ class ConfigMagik
     /**
      * @desc   Constructor of this class.
      *
-     * @param  string $path             Path to ini-file to load at startup.
+     * @param  string $path Path to ini-file to load at startup.
      *                                  NOTE:   If the ini-file can not be found, it will try to generate a
      *                                  new empty one at the location indicated by path passed to
      *                                  constructor-method of this class.
-     * @param  bool $synchronize      TRUE for constant synchronisation of memory and file (disabled by default).
+     * @param  bool $synchronize TRUE for constant synchronisation of memory and file (disabled by default).
      * @param  bool $process_sections TRUE or FALSE to enable or disable sections in your ini-file (enabled by default).
      *
      * @return void Returns nothing, like any other constructor-method ��] .
@@ -127,7 +127,7 @@ class ConfigMagik
     /**
      * @desc                      Retrieves the value for a given key.
      *
-     * @param  string $key     Key or name of directive to set in current config.
+     * @param  string $key Key or name of directive to set in current config.
      * @param  string $section Name of section to set key/value-pair therein.
      *                         NOTE:                   Section must only be specified when sections are used in your ini-file.
      *
@@ -169,8 +169,8 @@ class ConfigMagik
     /**
      * @desc   Sets the value for a given key (in given section, if any specified).
      *
-     * @param  string $key     Key or name of directive to set in current config.
-     * @param  mixed $value   Value of directive to set in current config.
+     * @param  string $key Key or name of directive to set in current config.
+     * @param  mixed $value Value of directive to set in current config.
      * @param  string $section Name of section to set key/value-pair therein.
      *                         NOTE:   Section must only be specified when sections are enabled in your ini-file.
      *
@@ -206,7 +206,7 @@ class ConfigMagik
     /**
      * @desc   Remove a directive (key and it's value) from current config.
      *
-     * @param  string $key     Name of key to remove form current config.
+     * @param  string $key Name of key to remove form current config.
      * @param  string $section Optional name of section (if used).
      *
      * @return bool            Returns TRUE on success, FALSE on failure.

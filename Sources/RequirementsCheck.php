@@ -37,8 +37,12 @@ if ((!empty($_SERVER['HTTP_HOST'])) || (!empty($_SERVER['HTTP_USER_AGENT']))) {
     die("BeBot does not support being run from a web server and it is inherently dangerous to do so!\nFor your own good and for the safety of your account information, please do not attempt to run BeBot from a web server!");
 }
 // The minimum required PHP version to run.
-if ((float)phpversion() < 5.2) {
-    die("BeBot requires PHP version 5.2.0 or later to work.\n");
+if ((float)phpversion() < 5.3) {
+    die("BeBot requires PHP version 5.3.0 or later to work.\n");
+}
+// The recommended PHP version to run.
+if ((float)phpversion() < 5.5) {
+    echo "BeBot recommends PHP version 5.5.0 or later.\n";
 }
 /*
 Load extentions we need
