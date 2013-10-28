@@ -291,34 +291,27 @@ class Gemcut extends BaseActiveModule
             $words = trim(substr($msg, strlen('gemcut')));
             if (!empty($words)) {
                 return $this->gemtiers($words);
-            }
-            else {
+            } else {
                 return "Usage: gemcut [tier]";
             }
-        }
-        elseif (preg_match('/^geminfo/i', $msg, $info)) {
+        } elseif (preg_match('/^geminfo/i', $msg, $info)) {
             $words = trim(substr($msg, strlen('geminfo')));
             if (!empty($words)) {
                 return $this->gem_info($words);
-            }
-            else {
+            } else {
                 return "Usage: geminfo [Gem Name]";
             }
-        }
-        elseif (preg_match('/^gems/i', $msg, $info)) {
+        } elseif (preg_match('/^gems/i', $msg, $info)) {
             $words = trim(substr($msg, strlen('gems')));
             return $this->gems($words);
-        }
-        elseif (preg_match('/^gem/i', $msg, $info)) {
+        } elseif (preg_match('/^gem/i', $msg, $info)) {
             $words = trim(substr($msg, strlen('item')));
             if (!empty($words)) {
                 return $this->identify($words);
-            }
-            else {
+            } else {
                 return "Usage: gem [itemref]";
             }
-        }
-        else {
+        } else {
             $this->bot->send_help($name);
         }
     }
@@ -337,16 +330,14 @@ class Gemcut extends BaseActiveModule
             preg_match("/(Flawless|Uncut)\s(.*)/", $item['name'], $matches);
             if ($matches[1] == "Flawless") {
                 $rare = true;
-            }
-            else {
+            } else {
                 $rare = false;
             }
             $gem_info = $this->gem_array[$matches[2]];
             if (count($gem_info) == 2) {
                 $tier = $gem_info[0];
                 $type = $gem_info[1];
-            }
-            else {
+            } else {
                 $tier = 0;
                 $type = 'unknown';
             }
@@ -355,43 +346,41 @@ class Gemcut extends BaseActiveModule
                 $txt .= "##gemcut_normal##";
                 if ($rare) {
                     $txt .= "Quality: ##gemcut_highlight##Rare : Trillion/Teardrop/Cabochon (fits in size 2 sockets - shape 10)##end##\n";
-                }
-                else {
+                } else {
                     $txt .= "Quality: ##gemcut_highlight##Common : Rhombic/Oval/Oblique (fits in size 1 sockets - shape 5)##end##\n";
                 }
                 $txt .= "Tier: ##gemcut_highlight##" . $tier . " (lvl " . (($tier + 3) * 10) . ")##end##\n";
                 $txt .= "Effects: ##gemcut_highlight##";
                 switch ($type) {
-                case "black":
-                    $txt .= "Unholy dmg / Unholy dd / Poison dmg / Poison dd";
-                    break;
-                case "blue":
-                    $txt .= "Tap mana / Tap stamina / Tap health / Cold dmg / Cold dd / Wisdom / Intelligence";
-                    break;
-                case "green":
-                    $txt .= "Fatality / Dexterity / Melee dmg / Pierce dmg / Crushing immune / Pierce immune / Slashing immune / Tap stamina / Bow dmg";
-                    break;
-                case "orange":
-                    $txt .= "Fire dmg / Fire DD / Cold Immunity";
-                    break;
-                case "purple":
-                    $txt .= "Hate / Taunt / Magic immunities";
-                    break;
-                case "red":
-                    $txt .= "Crushing dmg / Slashing dmg / Tap health / Strength / Stamina + melee immunities / Holy dmg";
-                    break;
-                case "white":
-                    $txt .= "Electrical dmg / Electrical dd / Electrical Immunity / Perception";
-                    break;
-                case "yellow":
-                    $txt .= "Magic dmg / Holy dmg / Holy dd / Poison immunity / Unholy immunity";
-                    break;
+                    case "black":
+                        $txt .= "Unholy dmg / Unholy dd / Poison dmg / Poison dd";
+                        break;
+                    case "blue":
+                        $txt .= "Tap mana / Tap stamina / Tap health / Cold dmg / Cold dd / Wisdom / Intelligence";
+                        break;
+                    case "green":
+                        $txt .= "Fatality / Dexterity / Melee dmg / Pierce dmg / Crushing immune / Pierce immune / Slashing immune / Tap stamina / Bow dmg";
+                        break;
+                    case "orange":
+                        $txt .= "Fire dmg / Fire DD / Cold Immunity";
+                        break;
+                    case "purple":
+                        $txt .= "Hate / Taunt / Magic immunities";
+                        break;
+                    case "red":
+                        $txt .= "Crushing dmg / Slashing dmg / Tap health / Strength / Stamina + melee immunities / Holy dmg";
+                        break;
+                    case "white":
+                        $txt .= "Electrical dmg / Electrical dd / Electrical Immunity / Perception";
+                        break;
+                    case "yellow":
+                        $txt .= "Magic dmg / Holy dmg / Holy dd / Poison immunity / Unholy immunity";
+                        break;
                 }
                 $txt .= "##end##\n\n##gemcut_info##The gem effect is randomly determined when the gem is cut.##end##\n\n";
                 if ($rare) {
                     $txt .= "Shapes: ##gemcut_highlight##Trillion(1 handed), Teardrop(2 handed) and Cabochon(Armor). Can be used in blue crafted armor and weapons .##end##\n\n";
-                }
-                else {
+                } else {
                     $txt .= "Shapes: ##gemcut_highlight##Rhombic(1 handed), Oval(2 handed) and Oblique(Armor). Can be used in green crafted armor and weapons.##end##\n\n";
                 }
                 $txt .= "\n\n";
@@ -399,8 +388,7 @@ class Gemcut extends BaseActiveModule
         }
         if (empty($txt)) {
             return "The gem could not be identified.";
-        }
-        else {
+        } else {
             $txt .= "##gemcut_info##Socketing:\n";
             $txt .= "- Make sure both the item and the gem are in your inventory and NOT equipped.\n";
             $txt .= "- Select the gem, the items that the gem can be added to will be surrounded with a green border.\n";
@@ -415,29 +403,29 @@ class Gemcut extends BaseActiveModule
     function gemtiers($msg)
     {
         switch ($msg) {
-        case 1:
-            $txt
-                = "Tier 1 gems are (level 40-49): Obsidian, Azurite, Chrysoprase, Carnelian, Rose Quartz, Spinel, Quartz and Citrine. Drops in: Field of the Dead or Noble District.";
-            break;
-        case 2:
-            $txt = "Tier 2 gems are (level 50-59): Onyx, Lapis Lazuli, Malachite, Tiger Eye, Iolite, Jasper, Zircon and Chrysoberyl. Drops in: Eiglophian Mountains.";
-            break;
-        case 3:
-            $txt = "Tier 3 gems are (level 60-69): Jet, Turquoise, Peridot, Chalcedony, Amethyst, Garnet, Moonstone and Sagenite. Drops in: Thunder River, Atzel's Approach";
-            break;
-        case 4:
-            $txt = "Tier 4 gems are (level 70-74): Black Jasper, Aquamarine, Sphene, Sunstone, Duskstone, Blood Opal, Achronite and Topaz. Drops in: Atzel's Approach, Keshatta";
-            break;
-        case 5:
-            $txt = "Tier 5 gems are (level 75-79): Nightstar, Sapphire, Jade, Fire Agate, Royal Azel, Ruby, White Opal and Heliodor. Drops in: Keshatta";
-            break;
-        case 6:
-            $txt
-                = "Tier 6 gems are (level 80+): Black Diamond, Star Saphire, Emerald, Padpaasahsa, Tyrian Sapphire, Star Ruby, Diamond and Golden Beryl. Drops in: Keshatta (listed as lvl 75)";
-            break;
-        default:
-            $txt = "Valid tiers are: 1-6";
-            break;
+            case 1:
+                $txt
+                    = "Tier 1 gems are (level 40-49): Obsidian, Azurite, Chrysoprase, Carnelian, Rose Quartz, Spinel, Quartz and Citrine. Drops in: Field of the Dead or Noble District.";
+                break;
+            case 2:
+                $txt = "Tier 2 gems are (level 50-59): Onyx, Lapis Lazuli, Malachite, Tiger Eye, Iolite, Jasper, Zircon and Chrysoberyl. Drops in: Eiglophian Mountains.";
+                break;
+            case 3:
+                $txt = "Tier 3 gems are (level 60-69): Jet, Turquoise, Peridot, Chalcedony, Amethyst, Garnet, Moonstone and Sagenite. Drops in: Thunder River, Atzel's Approach";
+                break;
+            case 4:
+                $txt = "Tier 4 gems are (level 70-74): Black Jasper, Aquamarine, Sphene, Sunstone, Duskstone, Blood Opal, Achronite and Topaz. Drops in: Atzel's Approach, Keshatta";
+                break;
+            case 5:
+                $txt = "Tier 5 gems are (level 75-79): Nightstar, Sapphire, Jade, Fire Agate, Royal Azel, Ruby, White Opal and Heliodor. Drops in: Keshatta";
+                break;
+            case 6:
+                $txt
+                    = "Tier 6 gems are (level 80+): Black Diamond, Star Saphire, Emerald, Padpaasahsa, Tyrian Sapphire, Star Ruby, Diamond and Golden Beryl. Drops in: Keshatta (listed as lvl 75)";
+                break;
+            default:
+                $txt = "Valid tiers are: 1-6";
+                break;
         }
         return $txt;
     }
@@ -457,32 +445,32 @@ class Gemcut extends BaseActiveModule
                 list ($prefix, $cut_1h, $cut_2h, $cut_arm, $rarity, $min, $max) = split(":", $info);
                 if ($min <= $tier && $tier <= $max) {
                     switch ($rarity) {
-                    case 0:
-                        $common[] = array(
-                            $msg,
-                            $info,
-                            $effect
-                        );
-                        break;
-                    case 1:
-                        $rare[] = array(
-                            $msg,
-                            $info,
-                            $effect
-                        );
-                        break;
-                    case 2:
-                        $common[] = array(
-                            $msg,
-                            $info,
-                            $effect
-                        );
-                        $rare[] = array(
-                            $msg,
-                            $info,
-                            $effect
-                        );
-                        break;
+                        case 0:
+                            $common[] = array(
+                                $msg,
+                                $info,
+                                $effect
+                            );
+                            break;
+                        case 1:
+                            $rare[] = array(
+                                $msg,
+                                $info,
+                                $effect
+                            );
+                            break;
+                        case 2:
+                            $common[] = array(
+                                $msg,
+                                $info,
+                                $effect
+                            );
+                            $rare[] = array(
+                                $msg,
+                                $info,
+                                $effect
+                            );
+                            break;
                     }
                 }
             }
@@ -492,8 +480,7 @@ class Gemcut extends BaseActiveModule
             $txt .= $this->renderBlock($common, false);
             return "Gem Information : " . $this->bot->core("tools")
                 ->make_blob("$msg", $txt) . ".";
-        }
-        else {
+        } else {
             return "Sorry! I've never heard of that Gem.";
         }
     }
@@ -505,16 +492,18 @@ class Gemcut extends BaseActiveModule
             $txt = "##gemcut_highlight##Tier $msg gems##end## : Level " . $this->tier_info[$msg - 1][0] . " - Drops in: " . $this->tier_info[$msg - 1][1] . ".\n\n<hr/>\n\n";
             $txt .= $this->displayGems($msg);
             $output = "Tier $msg gems : " . $this->bot->core("tools")
-                ->make_blob("click here", $txt) . ".";
-        }
-        else {
+                    ->make_blob("click here", $txt) . ".";
+        } else {
             $txt = "";
             for ($i = 0; $i < count($this->tier_info); $i++) {
                 $txt .= $this->bot->core("tools")
-                    ->chatcmd("gems " . ($i + 1), "Tier " . ($i + 1) . " gems") . " : Level " . $this->tier_info[$i][0] . " - Drops in: " . $this->tier_info[$i][1] . ".\n";
+                        ->chatcmd(
+                            "gems " . ($i + 1),
+                            "Tier " . ($i + 1) . " gems"
+                        ) . " : Level " . $this->tier_info[$i][0] . " - Drops in: " . $this->tier_info[$i][1] . ".\n";
             }
             $output = "Gemcutting info : " . $this->bot->core("tools")
-                ->make_blob("click here", $txt) . ".";
+                    ->make_blob("click here", $txt) . ".";
         }
         return $output;
     }
@@ -525,7 +514,7 @@ class Gemcut extends BaseActiveModule
         $txt = "";
         foreach ($this->gem_types as $colour => $gems) {
             $txt .= ucfirst($colour) . " Gem : " . $this->bot->core("tools")
-                ->chatcmd("geminfo " . $gems[0][$tier - 1], $gems[0][$tier - 1]) . "\n";
+                    ->chatcmd("geminfo " . $gems[0][$tier - 1], $gems[0][$tier - 1]) . "\n";
         }
         return $txt;
     }
@@ -544,16 +533,27 @@ class Gemcut extends BaseActiveModule
                     $text .= "##gemcut_info##$prefix##end## ##gemcut_highlight##:##end## ";
                     $text .= $this->renderLink($prefix, "Trillion", $gem, "1H", $cut_1h) . "##gemcut_info##/##end##";
                     $text .= $this->renderLink($prefix, "Teardrop", $gem, "2H", $cut_2h) . "##gemcut_info##/##end##";
-                    $text .= $this->renderLink($prefix, "Cabochon", $gem, "Arm", $cut_arm) . " ##gemcut_highlight##:##end## ";
+                    $text .= $this->renderLink(
+                            $prefix,
+                            "Cabochon",
+                            $gem,
+                            "Arm",
+                            $cut_arm
+                        ) . " ##gemcut_highlight##:##end## ";
                     $text .= "##gemcut_info##(##end##$effect##gemcut_info##)##end##\n";
                 }
-            }
-            else {
+            } else {
                 if ($rarity == 2 || $rarity == 0) {
                     $text .= "##gemcut_info##$prefix##end## ##gemcut_highlight##:##end## ";
                     $text .= $this->renderLink($prefix, "Rhombic", $gem, "1H", $cut_1h) . "##gemcut_info##/##end##";
                     $text .= $this->renderLink($prefix, "Oval", $gem, "2H", $cut_2h) . "##gemcut_info##/##end##";
-                    $text .= $this->renderLink($prefix, "Oblique", $gem, "Arm", $cut_arm) . " ##gemcut_highlight##:##end## ";
+                    $text .= $this->renderLink(
+                            $prefix,
+                            "Oblique",
+                            $gem,
+                            "Arm",
+                            $cut_arm
+                        ) . " ##gemcut_highlight##:##end## ";
                     $text .= "##gemcut_info##(##end##$effect##gemcut_info##)##end##\n";
                 }
             }
@@ -570,8 +570,7 @@ class Gemcut extends BaseActiveModule
         if ($flag == 1) {
             return $this->bot->core("tools")
                 ->chatcmd("items +$prefix +$rarity +$gem", $text);
-        }
-        else {
+        } else {
             return "-";
         }
     }

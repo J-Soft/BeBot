@@ -76,7 +76,7 @@ class craftclasses extends BaseActiveModule
             = "Sets the two crafting classes for you. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None";
         $this->help['command']['craft'] = "Shows the classes you currently have assigned to you.";
         $this->bot->core("settings")
-            ->create("Craftclasses", "Remind", TRUE, "Should users level 40+ be reminded to set their craft classes?");
+            ->create("Craftclasses", "Remind", true, "Should users level 40+ be reminded to set their craft classes?");
         $this->update_table();
     }
 
@@ -84,16 +84,20 @@ class craftclasses extends BaseActiveModule
     function update_table()
     {
         switch ($this->bot->db->get_version("craftingclass")) {
-        case 1:
-            $this->bot->db->update_table(
-                "craftingclass", "class1", "modify",
-                "ALTER IGNORE TABLE #___craftingclass modify `class1` enum('Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
-            );
-            $this->bot->db->update_table(
-                "craftingclass", "class2", "modify",
-                "ALTER IGNORE TABLE #___craftingclass modify `class2` enum('Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
-            );
-        default:
+            case 1:
+                $this->bot->db->update_table(
+                    "craftingclass",
+                    "class1",
+                    "modify",
+                    "ALTER IGNORE TABLE #___craftingclass modify `class1` enum('Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
+                );
+                $this->bot->db->update_table(
+                    "craftingclass",
+                    "class2",
+                    "modify",
+                    "ALTER IGNORE TABLE #___craftingclass modify `class2` enum('Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
+                );
+            default:
         }
         $this->bot->db->set_version("craftingclass", 2);
     }
@@ -118,26 +122,31 @@ class craftclasses extends BaseActiveModule
             $options[1] = ucwords(strtolower($options[1]));
             if (empty($options[0]) || empty($options[1])) {
                 $output = "You MUST set both craft classes at the same time.";
-            }
-            elseif ((array_search($options[0], $craftclass) !== FALSE) && (array_search($options[1], $craftclass) !== FALSE)) {
+            } elseif ((array_search($options[0], $craftclass) !== false) && (array_search(
+                        $options[1],
+                        $craftclass
+                    ) !== false)
+            ) {
                 $this->bot->db->query(
                     'INSERT INTO #___craftingclass (name,class1,class2) VALUES("' . $name . '","' . $options[0] . '","' . $options[1]
-                        . '") ON DUPLICATE KEY UPDATE class1=values(class1), class2=values(class2)'
+                    . '") ON DUPLICATE KEY UPDATE class1=values(class1), class2=values(class2)'
                 );
-                $this->bot->db->query("UPDATE #___whois set craft1 = '" . $options[0] . "', craft2 = '" . $options[1] . "' WHERE nickname = '" . $name . "'");
+                $this->bot->db->query(
+                    "UPDATE #___whois set craft1 = '" . $options[0] . "', craft2 = '" . $options[1] . "' WHERE nickname = '" . $name . "'"
+                );
                 $this->bot->core("whois")->remove_from_cache($name);
                 $output = "Thank you for updating your crafting information.";
-            }
-            else {
+            } else {
                 $output = "Classes can ONLY be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None. You MUST set both at the same time.";
             }
-        }
-        elseif (preg_match("/^craft$/i", $msg, $info)) {
-            $lookup = $this->bot->db->select("SELECT * FROM #___craftingclass WHERE name = '" . $name . "'", MYSQL_ASSOC);
+        } elseif (preg_match("/^craft$/i", $msg, $info)) {
+            $lookup = $this->bot->db->select(
+                "SELECT * FROM #___craftingclass WHERE name = '" . $name . "'",
+                MYSQL_ASSOC
+            );
             if (!empty($lookup)) {
                 $output = "Your crafting classes are: " . $lookup[0]['class1'] . " and " . $lookup[0]['class2'];
-            }
-            else {
+            } else {
                 $output
                     = "You have no crafting information set. Please use '/tell <botname> <pre>setcraft [class1] [class2]'. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None.";
             }
@@ -146,10 +155,10 @@ class craftclasses extends BaseActiveModule
     }
 
 
-    function notify($name, $startup = FALSE)
+    function notify($name, $startup = false)
     {
         if ($this->bot->core("settings")
-            ->get("Craftclasses", "Remind")
+                ->get("Craftclasses", "Remind")
             && !$startup
         ) {
             $id = $this->bot->core("player")->id($name);

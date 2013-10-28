@@ -67,34 +67,39 @@ class LandControlZones extends BaseActiveModule
             ->exists("LandControl", "SchemaVersion")
         ) {
             $this->bot->db->set_version(
-                "land_control_zones", $this->bot
+                "land_control_zones",
+                $this->bot
                     ->core("settings")->get("LandControl", "SchemaVersion")
             );
             $this->bot->core("settings")->del("LandControl", "SchemaVersion");
         }
         switch ($this->bot->db->get_version("land_control_zones")) {
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-            $this->bot->db->update_table(
-                "land_control_zones", "short", "add",
-                "ALTER IGNORE TABLE #___land_control_zones ADD short VARCHAR(5) DEFAULT NULL"
-            );
-            $this->bot->db->update_table(
-                "land_control_zones", "zoneid", "add",
-                "ALTER IGNORE TABLE #___land_control_zones ADD zoneid INT(11) DEFAULT NULL"
-            );
-            $this->bot->db->query("truncate table #___land_control_zones");
-            $filename = "./extra/table_data/lc_zones.sql";
-            $handle = fopen($filename, "r");
-            $query = fread($handle, filesize($filename));
-            fclose($handle);
-            if (!empty($query)) {
-                $this->bot->db->query($query);
-            }
-        default:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                $this->bot->db->update_table(
+                    "land_control_zones",
+                    "short",
+                    "add",
+                    "ALTER IGNORE TABLE #___land_control_zones ADD short VARCHAR(5) DEFAULT NULL"
+                );
+                $this->bot->db->update_table(
+                    "land_control_zones",
+                    "zoneid",
+                    "add",
+                    "ALTER IGNORE TABLE #___land_control_zones ADD zoneid INT(11) DEFAULT NULL"
+                );
+                $this->bot->db->query("truncate table #___land_control_zones");
+                $filename = "./extra/table_data/lc_zones.sql";
+                $handle = fopen($filename, "r");
+                $query = fread($handle, filesize($filename));
+                fclose($handle);
+                if (!empty($query)) {
+                    $this->bot->db->query($query);
+                }
+            default:
         }
         $this->bot->db->set_version("land_control_zones", 6);
         $this->register_command("all", "lc", "MEMBER");
@@ -105,52 +110,49 @@ class LandControlZones extends BaseActiveModule
     {
         if (preg_match("/^lc  (.+)$/i", $msg, $info)) {
             return $this->show_lc($info[1]);
-        }
-        elseif (preg_match("/^lc (\d+) (\d+) (.+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^lc (\d+) (\d+) (.+)$/i", $msg, $info)) {
             return $this->show_lc($info[3], $info[1], $info[2]);
-        }
-        elseif (preg_match("/^lc (\d+) ([^\d]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^lc (\d+) ([^\d]+)$/i", $msg, $info)) {
             return $this->show_lc($info[2], $info[1], $info[1]);
-        }
-        elseif (preg_match("/^lc (\d+) (\d+)$/i", $msg, $info)) {
-            return $this->show_lc(NULL, $info[1], $info[2]);
-        }
-        elseif (preg_match("/^lc (\d+)$/i", $msg, $info)) {
-            return $this->show_lc(NULL, $info[1], $info[1]);
-        }
-        elseif (preg_match("/^lc ([^\d]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^lc (\d+) (\d+)$/i", $msg, $info)) {
+            return $this->show_lc(null, $info[1], $info[2]);
+        } elseif (preg_match("/^lc (\d+)$/i", $msg, $info)) {
+            return $this->show_lc(null, $info[1], $info[1]);
+        } elseif (preg_match("/^lc ([^\d]+)$/i", $msg, $info)) {
             return $this->show_lc($info[1]);
-        }
-        elseif (preg_match("/^lc$/i", $msg, $info)) {
+        } elseif (preg_match("/^lc$/i", $msg, $info)) {
             return $this->show_lc("--all--");
         }
-        return FALSE;
+        return false;
     }
 
 
-    function show_lc($iarea = NULL, $lrange = 0, $hrange = 300)
+    function show_lc($iarea = null, $lrange = 0, $hrange = 300)
     {
         if ($iarea == "--all--") {
-            $areas = $this->bot->db->select("select distinct(area),count(area) from #___land_control_zones group by area");
+            $areas = $this->bot->db->select(
+                "select distinct(area),count(area) from #___land_control_zones group by area"
+            );
             if (!empty($areas)) {
                 $return .= "<div align=center><u><font color=#10a5e5>Land Control Areas</font></u></div>";
                 foreach ($areas as $area) {
                     $return .= $this->bot->core("tools")
-                        ->chatcmd("lc  " . $area[0], $area[0]) . " (" . $area[1] . ")<br>";
+                            ->chatcmd("lc  " . $area[0], $area[0]) . " (" . $area[1] . ")<br>";
                 }
                 return $this->bot->core("tools")
                     ->make_blob("Land Control Areas", $return);
-            }
-            else {
+            } else {
                 return "No matches";
             }
-        }
-        else {
+        } else {
             if (!$iarea) {
-                $areas = $this->bot->db->select("select distinct(area),count(area) from #___land_control_zones group by area");
-            }
-            else {
-                $areas = $this->bot->db->select("select distinct(area),count(area) from #___land_control_zones where area like '%" . $iarea . "%' group by area");
+                $areas = $this->bot->db->select(
+                    "select distinct(area),count(area) from #___land_control_zones group by area"
+                );
+            } else {
+                $areas = $this->bot->db->select(
+                    "select distinct(area),count(area) from #___land_control_zones where area like '%" . $iarea . "%' group by area"
+                );
             }
             if (!empty($areas)) {
                 foreach ($areas as $area) {
@@ -162,18 +164,19 @@ class LandControlZones extends BaseActiveModule
                     if ($lrange == $hrange) {
                         $lcs = $this->bot->db->select(
                             "select id, lrange, hrange, area, huge, x, y, name from #___land_control_zones where area='" . $area[0] . "' AND lrange<=" . $lrange . " AND hrange>="
-                                . $hrange . " order by huge"
+                            . $hrange . " order by huge"
                         );
-                    }
-                    else {
+                    } else {
                         $lcs = $this->bot->db->select(
                             "select id, lrange, hrange, area, huge, x, y, name from #___land_control_zones where area='" . $area[0] . "' AND lrange>=" . $lrange . " AND hrange<="
-                                . $hrange . " order by huge"
+                            . $hrange . " order by huge"
                         );
                     }
                     if (!empty($lcs)) {
                         foreach ($lcs as $lc) {
-                            $temp .= " Area: " . $lc[7] . "<br> Range: " . $this->conv($lc[1]) . "-" . $this->conv($lc[2]) . "<br> Coords: " . $this->coords($lc[5]) . "x"
+                            $temp .= " Area: " . $lc[7] . "<br> Range: " . $this->conv($lc[1]) . "-" . $this->conv(
+                                    $lc[2]
+                                ) . "<br> Coords: " . $this->coords($lc[5]) . "x"
                                 . $this->coords($lc[6]) . "<br> Hugemap: " . $lc[4] . "<br><br>";
                         }
                         $return .= $temp;
@@ -181,8 +184,7 @@ class LandControlZones extends BaseActiveModule
                 }
                 return $this->bot->core("tools")
                     ->make_blob("Land Control Areas", $return);
-            }
-            else {
+            } else {
                 return "No matches";
             }
         }
@@ -193,11 +195,9 @@ class LandControlZones extends BaseActiveModule
     {
         if (strlen($num) < 2) {
             return $num;
-        }
-        elseif (strlen($num) < 3) {
+        } elseif (strlen($num) < 3) {
             return $num;
-        }
-        else {
+        } else {
             return $num;
         }
     }
@@ -207,14 +207,11 @@ class LandControlZones extends BaseActiveModule
     {
         if (strlen($num) < 2) {
             return $num;
-        }
-        elseif (strlen($num) < 3) {
+        } elseif (strlen($num) < 3) {
             return $num;
-        }
-        elseif (strlen($num) < 4) {
+        } elseif (strlen($num) < 4) {
             return $num;
-        }
-        else {
+        } else {
             return $num;
         }
     }

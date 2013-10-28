@@ -43,10 +43,13 @@ class Callers extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->callers = array();
         $this->register_command(
-            'all', 'caller', 'GUEST', array(
-                "clear" => "LEADER",
-                "add" => "LEADER",
-                "del" => "LEADER"
+            'all',
+            'caller',
+            'GUEST',
+            array(
+                 "clear" => "LEADER",
+                 "add" => "LEADER",
+                 "del" => "LEADER"
             )
         );
         $this->register_alias("caller", "callers");
@@ -62,16 +65,13 @@ class Callers extends BaseActiveModule
     {
         if (preg_match("/^caller clear/i", $msg)) {
             return $this->clear_callers($name);
-        }
-        else {
+        } else {
             if (preg_match("/^caller add (.+)/i", $msg, $info)) {
                 return $this->caller_add($info[1]);
-            }
-            else {
+            } else {
                 if (preg_match("/^caller del (.+)/i", $msg, $info)) {
                     return $this->caller_del($info[1]);
-                }
-                else {
+                } else {
                     if (preg_match("/^caller/i", $msg)) {
                         return $this->show_callers();
                     }
@@ -90,8 +90,7 @@ class Callers extends BaseActiveModule
         if ($this->bot->core('player')->id($name)) {
             $this->callers[$name] = 1;
             return "##YELLOW##" . $name . "##END## has been added to caller list. " . $this->show_callers();
-        }
-        else {
+        } else {
             return "Player ##YELLOW##" . $name . "##END## does not exist.";
         }
     }
@@ -106,18 +105,15 @@ class Callers extends BaseActiveModule
         if ($name == "All") {
             $this->callers = array();
             return "List of callers has been cleared.";
-        }
-        else {
+        } else {
             if ($this->bot->core('player')->id($name) != -1) {
                 if (isset($this->callers[$name])) {
                     unset($this->callers[$name]);
                     return "##YELLOW##" . $name . "##END## has been removed from caller list. " . $this->show_callers();
-                }
-                else {
+                } else {
                     return "##YELLOW##" . $name . "##END## is not on list of callers. " . $this->show_callers();
                 }
-            }
-            else {
+            } else {
                 return "Player ##YELLOW##" . $name . "##END## does not exist.";
             }
         }
@@ -140,8 +136,7 @@ class Callers extends BaseActiveModule
         $call = array_keys($this->callers);
         if (empty($call)) {
             return "No callers on list.";
-        }
-        else {
+        } else {
             $batch = "";
             $count = 0;
             $list = "##AO_INFOHEADLINE##::: List of callers :::##END##\n\n";

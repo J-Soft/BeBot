@@ -2,3 +2,7 @@
 Conf/*.conf
 Conf/*.ini
 php.ini
+
+.idea/workspace.xml
+.idea/tasks.xml
+*.iws

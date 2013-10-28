@@ -40,7 +40,7 @@ abstract class PBMessage
     var $wired_type = 2;
 
     // the value of a class
-    var $value = NULL;
+    var $value = null;
 
     // modus byte or string parse (byte for productive string for better reading and debuging)
     // 1 = byte, 2 = String
@@ -60,7 +60,7 @@ abstract class PBMessage
     /**
      * Constructor - initialize base128 class
      */
-    public function __construct($reader = NULL)
+    public function __construct($reader = null)
     {
         $this->reader = $reader;
         $this->value = $this;
@@ -111,9 +111,8 @@ abstract class PBMessage
 
                     $stringinner .= $newstring;
                 }
-            }
-            else {
-                if ($this->values[$index] != NULL) {
+            } else {
+                if ($this->values[$index] != null) {
                     // wired and type
                     $newstring = '';
                     $newstring .= $this->values[$index]->SerializeToString($index);
@@ -181,7 +180,7 @@ abstract class PBMessage
         $_begin = $this->reader->get_pointer();
         while ($this->reader->get_pointer() - $_begin < $length) {
             $next = $this->reader->next();
-            if ($next === FALSE) {
+            if ($next === false) {
                 break;
             }
 
@@ -194,16 +193,13 @@ abstract class PBMessage
                 // throw new Exception('Field ' . $messtypes['field'] . ' not present ');
                 if ($messtypes['wired'] == PBMessage::WIRED_LENGTH_DELIMITED) {
                     $consume = new PBString($this->reader);
-                }
-                else {
+                } else {
                     if ($messtypes['wired'] == PBMessage::WIRED_VARINT) {
                         $consume = new PBInt($this->reader);
-                    }
-                    else {
+                    } else {
                         if ($messtypes['wired'] == PBMessage::WIRED_32BIT) {
                             $consume = new PBFixedInt($this->reader);
-                        }
-                        else {
+                        } else {
                             throw new Exception('I dont understand this wired code:' . $messtypes['wired']);
                         }
                     }
@@ -226,8 +222,7 @@ abstract class PBMessage
                     throw new Exception('Expected type:' . $messtypes['wired'] . ' but had ' . $this->fields[$messtypes['field']]->wired_type);
                 }
                 $this->values[$messtypes['field']][$index]->ParseFromArray();
-            }
-            else {
+            } else {
                 //echo "Called as value : " . $this->fields[$messtypes['field']] . " : " . $messtypes['wired'] . " ($index)\n";
                 $this->values[$messtypes['field']] = new $this->fields[$messtypes['field']]($this->reader);
                 if ($messtypes['wired'] != $this->values[$messtypes['field']]->wired_type) {
@@ -286,8 +281,7 @@ abstract class PBMessage
     {
         if (gettype($value) == 'object') {
             $this->values[$index] = $value;
-        }
-        else {
+        } else {
             $this->values[$index] = new $this->fields[$index]();
             $this->values[$index]->value = $value;
         }
@@ -301,8 +295,8 @@ abstract class PBMessage
      */
     protected function _get_value($index)
     {
-        if ($this->values[$index] == NULL) {
-            return NULL;
+        if ($this->values[$index] == null) {
+            return null;
         }
         return $this->values[$index]->value;
     }
@@ -350,23 +344,25 @@ abstract class PBMessage
      *
      * @return String - the return string from the request to the url
      */
-    public function Send($url, &$class = NULL)
+    public function Send($url, &$class = null)
     {
         $ch = curl_init();
         $this->_d_string = '';
 
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt(
-            $ch, CURLOPT_WRITEFUNCTION, array(
-                $this,
-                '_save_string'
+            $ch,
+            CURLOPT_WRITEFUNCTION,
+            array(
+                 $this,
+                 '_save_string'
             )
         );
         curl_setopt($ch, CURLOPT_POSTFIELDS, 'message=' . urlencode($this->SerializeToString()));
         $result = curl_exec($ch);
 
-        if ($class != NULL) {
+        if ($class != null) {
             $class->parseFromString($this->_d_string);
         }
         return $this->_d_string;
@@ -412,8 +408,7 @@ abstract class PBMessage
                     if (isset($name2)) {
                         unset($value->$name2);
                     }
-                }
-                else {
+                } else {
                     if (is_object($value) AND method_exists($value, '__destruct')) {
                         $value->__destruct();
                     }

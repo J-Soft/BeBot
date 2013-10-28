@@ -55,45 +55,50 @@ class Notify extends BaseActiveModule
     function command_handler($name, $msg, $origin)
     {
         $com = $this->parse_com(
-            $msg, array(
-                'com',
-                'sub',
-                'arg'
+            $msg,
+            array(
+                 'com',
+                 'sub',
+                 'arg'
             )
         );
         Switch ($com['sub']) {
-        case 'on':
-            return $this->add_notify($name, $com['arg']);
-        case 'off':
-            return $this->del_notify($com['arg']);
-        case 'cache':
-            Switch (strtolower($com['arg'])) {
-            case 'clear':
-                return $this->bot->core("notify")->clear_cache();
-            case 'update':
-                $this->bot->core("notify")->update_cache();
-                return "Updating notify cache.";
+            case 'on':
+                return $this->add_notify($name, $com['arg']);
+            case 'off':
+                return $this->del_notify($com['arg']);
+            case 'cache':
+                Switch (strtolower($com['arg'])) {
+                    case 'clear':
+                        return $this->bot->core("notify")->clear_cache();
+                    case 'update':
+                        $this->bot->core("notify")->update_cache();
+                        return "Updating notify cache.";
+                    Default:
+                        return $this->bot->core("notify")->list_cache();
+                }
+            case 'list':
+            case '':
+                return $this->show_notify_list();
             Default:
-                return $this->bot->core("notify")->list_cache();
-            }
-        case 'list':
-        case '':
-            return $this->show_notify_list();
-        Default:
-            if (strtolower($com['arg']) == "on" || strtolower($com['arg']) == "off") // asume they want to turn notify on or off but did wrong order
-            {
-                Return $this->command_handler($name, $com['com'] . " " . $com['arg'] . " " . $com['sub'], $origin);
-            }
-            else {
-                Return ("##error##Error: Unknown Sub Command ##highlight##" . $com['sub'] . "##end####end##");
-            }
+                if (strtolower($com['arg']) == "on" || strtolower(
+                        $com['arg']
+                    ) == "off"
+                ) // asume they want to turn notify on or off but did wrong order
+                {
+                    Return $this->command_handler($name, $com['com'] . " " . $com['arg'] . " " . $com['sub'], $origin);
+                } else {
+                    Return ("##error##Error: Unknown Sub Command ##highlight##" . $com['sub'] . "##end####end##");
+                }
         }
     }
 
 
     function show_notify_list()
     {
-        $notlist = $this->bot->db->select("SELECT nickname, user_level FROM #___users WHERE notify = 1 ORDER BY nickname");
+        $notlist = $this->bot->db->select(
+            "SELECT nickname, user_level FROM #___users WHERE notify = 1 ORDER BY nickname"
+        );
         if (empty($notlist)) {
             return "Nobody on notify!";
         }
@@ -106,17 +111,15 @@ class Notify extends BaseActiveModule
         $other = "##blob_title## ::: All others on notify for " . $this->bot->botname . " ::: ##end##\n";
         foreach ($notlist as $notuser) {
             $blob = "\n&#8226; " . $notuser[0] . " " . $this->bot->core("tools")
-                ->chatcmd("notify off " . $notuser[0], "[Remove]");
+                    ->chatcmd("notify off " . $notuser[0], "[Remove]");
             $blob = $this->bot->core("colors")->colorize("blob_text", $blob);
             if ($notuser[1] >= 2) {
                 $member .= $blob;
                 $membercount++;
-            }
-            elseif ($notuser[1] == 1) {
+            } elseif ($notuser[1] == 1) {
                 $guest .= $blob;
                 $guestcount++;
-            }
-            else {
+            } else {
                 $other .= $blob;
                 $othercount++;
             }

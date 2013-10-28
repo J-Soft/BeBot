@@ -71,19 +71,35 @@ class AccessControl_Core extends BasePassiveModule
 					PRIMARY KEY (name)
 				)"
         );
-        $this->startup = TRUE;
+        $this->startup = true;
         $this->register_module("access_control");
         $this->register_event("cron", "1hour");
         $this->bot->core("settings")
             ->create(
-            "AccessControl", "DefaultLevel", "SUPERADMIN",
-            "Which is the minimal access level that should get access to new commands on default? Or should the default for new commands be to disabled access to them at all?",
-            "ANONYMOUS;GUEST;MEMBER;LEADER;ADMIN;SUPERADMIN;OWNER;DISABLED"
-        );
+                "AccessControl",
+                "DefaultLevel",
+                "SUPERADMIN",
+                "Which is the minimal access level that should get access to new commands on default? Or should the default for new commands be to disabled access to them at all?",
+                "ANONYMOUS;GUEST;MEMBER;LEADER;ADMIN;SUPERADMIN;OWNER;DISABLED"
+            );
         $this->bot->core("settings")
-            ->create("AccessControl", "LockGc", FALSE, "Are all commands in the guild chat locked from use?", "On;Off", TRUE);
+            ->create(
+                "AccessControl",
+                "LockGc",
+                false,
+                "Are all commands in the guild chat locked from use?",
+                "On;Off",
+                true
+            );
         $this->bot->core("settings")
-            ->create("AccessControl", "LockPgroup", FALSE, "Are all commands in the private chatgroup locked from use?", "On;Off", TRUE);
+            ->create(
+                "AccessControl",
+                "LockPgroup",
+                false,
+                "Are all commands in the private chatgroup locked from use?",
+                "On;Off",
+                true
+            );
         $this->update_table();
         $this->access_levels = array(
             'ANONYMOUS',
@@ -123,32 +139,41 @@ class AccessControl_Core extends BasePassiveModule
             ->exists("accesscontrol", "schemaversion")
         ) {
             $this->bot->db->set_version(
-                "access_control", $this->bot
+                "access_control",
+                $this->bot
                     ->core("settings")->get("accesscontrol", "schemaversion")
             );
             $this->bot->core("settings")->del("accesscontrol", "schemaversion");
         }
         switch ($this->bot->db->get_version("access_control")) {
-        case 1:
-            $this->bot->db->update_table(
-                "access_control", "subcommand", "add", "ALTER IGNORE TABLE #___access_control ADD COLUMN subcommand VARCHAR(50) NOT NULL DEFAULT '*' AFTER command"
-            );
-            $this->bot->db->query("ALTER IGNORE TABLE #___access_control DROP PRIMARY KEY");
-            $this->bot->db->update_table(
-                "access_control", array(
-                    "command",
+            case 1:
+                $this->bot->db->update_table(
+                    "access_control",
                     "subcommand",
-                    "channel"
-                ), "alter", "ALTER IGNORE TABLE #___access_control ADD PRIMARY KEY (command, subcommand, channel)"
-            );
-            $this->bot->db->query("UPDATE #___access_control SET subcommand = '*' WHERE subcommand = ''");
-        case 2:
-            $this->bot->db->update_table(
-                "access_control", "minlevel", "modify",
-                "ALTER IGNORE TABLE #___access_control MODIFY minlevel enum('ANONYMOUS', 'GUEST', 'MEMBER', 'LEADER', 'ADMIN', 'SUPERADMIN', 'OWNER', 'DISABLED', 'DELETED') NOT NULL DEFAULT 'DISABLED'"
-            );
-        case 3:
-        default:
+                    "add",
+                    "ALTER IGNORE TABLE #___access_control ADD COLUMN subcommand VARCHAR(50) NOT NULL DEFAULT '*' AFTER command"
+                );
+                $this->bot->db->query("ALTER IGNORE TABLE #___access_control DROP PRIMARY KEY");
+                $this->bot->db->update_table(
+                    "access_control",
+                    array(
+                         "command",
+                         "subcommand",
+                         "channel"
+                    ),
+                    "alter",
+                    "ALTER IGNORE TABLE #___access_control ADD PRIMARY KEY (command, subcommand, channel)"
+                );
+                $this->bot->db->query("UPDATE #___access_control SET subcommand = '*' WHERE subcommand = ''");
+            case 2:
+                $this->bot->db->update_table(
+                    "access_control",
+                    "minlevel",
+                    "modify",
+                    "ALTER IGNORE TABLE #___access_control MODIFY minlevel enum('ANONYMOUS', 'GUEST', 'MEMBER', 'LEADER', 'ADMIN', 'SUPERADMIN', 'OWNER', 'DISABLED', 'DELETED') NOT NULL DEFAULT 'DISABLED'"
+                );
+            case 3:
+            default:
         }
         $this->bot->db->set_version("access_control", 3);
     }
@@ -157,7 +182,7 @@ class AccessControl_Core extends BasePassiveModule
     function cron()
     {
         if ($this->startup) {
-            $this->startup = FALSE;
+            $this->startup = false;
             // The 2/3 channels:
             $channel[0] = "tell";
             $channel[1] = "pgmsg";
@@ -172,7 +197,9 @@ class AccessControl_Core extends BasePassiveModule
                 if (!(empty($this->bot->commands[$channel[$i]]))) {
                     ksort($this->bot->commands[$channel[$i]]);
                     foreach ($this->bot->commands[$channel[$i]] as $key => $val) {
-                        $rights = $this->bot->db->select("SELECT * FROM #___access_control WHERE command = '" . $key . "' AND channel = '" . $channel[$i] . "'");
+                        $rights = $this->bot->db->select(
+                            "SELECT * FROM #___access_control WHERE command = '" . $key . "' AND channel = '" . $channel[$i] . "'"
+                        );
                         if (empty($rights)) {
                             $this->bot->db->query(
                                 "INSERT INTO #___access_control (command, subcommand, channel, " . "minlevel) VALUES ('" . $key . "', '*', '" . $channel[$i] . "', '" . $this->bot
@@ -200,7 +227,9 @@ class AccessControl_Core extends BasePassiveModule
             return;
         }
         foreach ($access_rights as $right) {
-            $this->access_cache[strtolower($right[0])][strtolower($right[1])][strtolower($right[2])] = strtoupper($right[3]);
+            $this->access_cache[strtolower($right[0])][strtolower($right[1])][strtolower($right[2])] = strtoupper(
+                $right[3]
+            );
         }
     }
 
@@ -209,13 +238,19 @@ class AccessControl_Core extends BasePassiveModule
     function do_check($user, $command, $subcommand, $channel)
     {
         // If disabled or delted, return false, as no access is allowed
-        if (in_array($this->access_cache[strtolower($command)][strtolower($subcommand)][strtolower($channel)], $this->deny_levels)) {
-            return FALSE;
-        }
-        else {
+        if (in_array(
+            $this->access_cache[strtolower($command)][strtolower($subcommand)][strtolower($channel)],
+            $this->deny_levels
+        )
+        ) {
+            return false;
+        } else {
             // Otherwise check access level of $user vs the minlevel of $command, $subcommand in $channel:
             return $this->bot->core("security")
-                ->check_access($user, $this->access_cache[strtolower($command)][strtolower($subcommand)][strtolower($channel)]);
+                ->check_access(
+                    $user,
+                    $this->access_cache[strtolower($command)][strtolower($subcommand)][strtolower($channel)]
+                );
         }
     }
 
@@ -225,16 +260,16 @@ class AccessControl_Core extends BasePassiveModule
     {
         // Check for locks in gc or pgmsg first:
         if (($channel == "gc"
-            && $this->bot->core("settings")
-                ->get("AccessControl", "LockGc"))
+                && $this->bot->core("settings")
+                    ->get("AccessControl", "LockGc"))
             || ($channel == "pgmsg"
                 && $this->bot
                     ->core("settings")->get("AccessControl", "LockPgroup"))
         ) {
-            return FALSE;
+            return false;
         }
         $subcommand = strpos($msg, " ");
-        if ($subcommand === FALSE) {
+        if ($subcommand === false) {
             // No subcommand, check if special "only command" entry exists, otherwise fall back on
             // general entry for command if that exists.
             if (isset($this->access_cache[strtolower($command)]['$'][strtolower($channel)])) {
@@ -245,9 +280,8 @@ class AccessControl_Core extends BasePassiveModule
                 return $this->do_check($user, $command, '*', $channel);
             }
             // No entry for command at all, deny access:
-            return FALSE;
-        }
-        else {
+            return false;
+        } else {
             // Possible subcommand, extract it and check for entry:
             $parts = explode(" ", $msg, 3);
             // "$" is not allowed as subcommand, same for "*" - both are special chars in subcommand field.
@@ -255,16 +289,18 @@ class AccessControl_Core extends BasePassiveModule
             if (strcmp($parts[1], "*") == 0 || strcmp($parts[1], "$") == 0) {
                 if (isset($this->access_cache[strtolower($command)]['*'][strtolower($channel)])) {
                     return $this->do_check($user, $command, '*', $channel);
-                }
-                else {
+                } else {
                     // No access level defined, deny access on default:
-                    return FALSE;
+                    return false;
                 }
             }
             // We got a true subcommand, if entry for this subcommand exists use it for access check:
             if (isset($this->access_cache[strtolower($command)][strtolower($parts[1])][strtolower($channel)])) {
                 // Make sure the access control entry for this subcommand is not deleted
-                if ($this->access_cache[strtolower($command)][strtolower($parts[1])][strtolower($channel)] != 'DELETED') {
+                if ($this->access_cache[strtolower($command)][strtolower($parts[1])][strtolower(
+                        $channel
+                    )] != 'DELETED'
+                ) {
                     return $this->do_check($user, $command, $parts[1], $channel);
                 }
             }
@@ -273,7 +309,7 @@ class AccessControl_Core extends BasePassiveModule
                 return $this->do_check($user, $command, '*', $channel);
             }
             // No fitting entry exists, deny access:
-            return FALSE;
+            return false;
         }
     }
 
@@ -293,7 +329,7 @@ class AccessControl_Core extends BasePassiveModule
         // Add access level if not yet existing, otherwise update existing entry:
         $this->bot->db->query(
             "INSERT INTO #___access_control (command, subcommand, channel, minlevel) VALUES ('" . $command . "', '*', '" . $channel . "', '" . $newlevel
-                . "') ON DUPLICATE KEY UPDATE minlevel = '" . $newlevel . "'"
+            . "') ON DUPLICATE KEY UPDATE minlevel = '" . $newlevel . "'"
         );
         // Update cache:
         $this->access_cache[strtolower($command)]['*'][strtolower($channel)] = $newlevel;
@@ -311,12 +347,20 @@ class AccessControl_Core extends BasePassiveModule
         $defaultlevel = strtoupper($defaultlevel);
         // Check that a correct access level is used:
         if (!(in_array($defaultlevel, $this->access_levels)) || $defaultlevel == 'DELETED') {
-            $this->bot->log("ACCESS", "ERROR", "Trying to set an illegal default level of " . $defaultlevel . " for " . $command . " in " . $channel . "!");
+            $this->bot->log(
+                "ACCESS",
+                "ERROR",
+                "Trying to set an illegal default level of " . $defaultlevel . " for " . $command . " in " . $channel . "!"
+            );
             return;
         }
         // Make sure the channel is valid:
         if (!(in_array($channel, $this->channels))) {
-            $this->bot->log("ACCESS", "ERROR", "Trying to set default access rights for an illegal channel: " . $channel . " for " . $command . "!");
+            $this->bot->log(
+                "ACCESS",
+                "ERROR",
+                "Trying to set default access rights for an illegal channel: " . $channel . " for " . $command . "!"
+            );
             return;
         }
         if ($channel == "all") {
@@ -335,8 +379,7 @@ class AccessControl_Core extends BasePassiveModule
                     $this->access_cache[strtolower($command)]['*'][strtolower($chan)] = $defaultlevel;
                 }
             }
-        }
-        else {
+        } else {
             // Add the default level if no entry for the channel/command combination exists yet:
             $this->bot->db->query(
                 "INSERT IGNORE INTO #___access_control (command, subcommand, channel, minlevel) VALUES ('" . $command . "', '*', '" . $channel . "', '" . $defaultlevel . "')"
@@ -365,20 +408,24 @@ class AccessControl_Core extends BasePassiveModule
         // Check that a correct access level is used:
         if (!(in_array($newlevel, $this->access_levels))) {
             $this->bot->log(
-                "ACCESS", "ERROR", "Trying to set an illegal default level of " . $newlevel . " for " . $command . " with subcommand " . $sub . " in " . $channel . "!"
+                "ACCESS",
+                "ERROR",
+                "Trying to set an illegal default level of " . $newlevel . " for " . $command . " with subcommand " . $sub . " in " . $channel . "!"
             );
             return;
         }
         if ($newlevel == 'DELETED' && $sub == '*') {
             $this->bot->log(
-                "ACCESS", "ERROR", "You cannot delete commands (subcommand * entries)! " . "Command: " . $command . " with subcommand " . $sub . " in " . $channel . "!"
+                "ACCESS",
+                "ERROR",
+                "You cannot delete commands (subcommand * entries)! " . "Command: " . $command . " with subcommand " . $sub . " in " . $channel . "!"
             );
             return;
         }
         // Add access level if not yet existing, otherwise update existing entry:
         $this->bot->db->query(
             "INSERT INTO #___access_control (command, subcommand, channel, minlevel) VALUES ('" . $command . "', '" . $sub . "', '" . $channel . "', '" . $newlevel
-                . "') ON DUPLICATE KEY UPDATE minlevel = '" . $newlevel . "'"
+            . "') ON DUPLICATE KEY UPDATE minlevel = '" . $newlevel . "'"
         );
         // Update cache:
         $this->access_cache[$command][$sub][$channel] = $newlevel;
@@ -398,18 +445,25 @@ class AccessControl_Core extends BasePassiveModule
         // Check that a correct access level is used:
         if (!(in_array($defaultlevel, $this->access_levels))) {
             $this->bot->log(
-                "ACCESS", "ERROR", "Trying to set an illegal default level of " . $defaultlevel . " for " . $command . " with subcommand " . $sub . " in " . $channel . "!"
+                "ACCESS",
+                "ERROR",
+                "Trying to set an illegal default level of " . $defaultlevel . " for " . $command . " with subcommand " . $sub . " in " . $channel . "!"
             );
             return;
         }
         // Make sure the channel is valid:
         if (!(in_array($channel, $this->channels))) {
-            $this->bot->log("ACCESS", "ERROR", "Trying to set default access rights for an illegal channel: " . $channel . " with subcommand " . $sub . " for " . $command . "!");
+            $this->bot->log(
+                "ACCESS",
+                "ERROR",
+                "Trying to set default access rights for an illegal channel: " . $channel . " with subcommand " . $sub . " for " . $command . "!"
+            );
             return;
         }
         if ($sub == "*") {
             $this->bot->log(
-                "ACCESS", "ERROR",
+                "ACCESS",
+                "ERROR",
                 "You cannot set access levels for the general subcommand * " . "using the create_subcommand() function! Use create() for that! Command " . $command . "!"
             );
             return;
@@ -424,19 +478,18 @@ class AccessControl_Core extends BasePassiveModule
                 // Add the default level if no entry for the channel/command combination exists yet:
                 $this->bot->db->query(
                     "INSERT IGNORE INTO #___access_control (command, subcommand, channel, minlevel) VALUES ('" . $command . "', '" . $sub . "', '" . $chan . "', '" . $defaultlevel
-                        . "')"
+                    . "')"
                 );
                 // Add to cache if not set yet:
                 if (!isset($this->access_cache[$command][$sub][$chan])) {
                     $this->access_cache[$command][$sub][$chan] = $defaultlevel;
                 }
             }
-        }
-        else {
+        } else {
             // Add the default level if no entry for the channel/command combination exists yet:
             $this->bot->db->query(
                 "INSERT IGNORE INTO #___access_control (command, subcommand, channel, minlevel) VALUES ('" . $command . "', '" . $sub . "', '" . $channel . "', '" . $defaultlevel
-                    . "')"
+                . "')"
             );
             // Add to cache if not set yet:
             if (!isset($this->access_cache[$command][$sub][$channel])) {
@@ -447,7 +500,7 @@ class AccessControl_Core extends BasePassiveModule
 
 
     // Saves the current access control settings under $name with $description into the access_control_saves table.
-    function save($name, $desc, $update = FALSE)
+    function save($name, $desc, $update = false)
     {
         $count = 0;
         $countsub = 0;
@@ -476,8 +529,7 @@ class AccessControl_Core extends BasePassiveModule
                         $chans[$channel] = $level;
                         if ($subcom == "*") {
                             $count++;
-                        }
-                        else {
+                        } else {
                             $countsub++;
                         }
                     }
@@ -485,11 +537,9 @@ class AccessControl_Core extends BasePassiveModule
                 if (!empty($chans)) {
                     if ($chans["tell"] && $chans["tell"] == $chans["gc"] && $chans["tell"] == $chans["pgmsg"] && !$chans["extpgmsg"]) {
                         $chan[] = "a," . $lshort[$chans["tell"]];
-                    }
-                    elseif ($chans["tell"] && !$chans["gc"] && $chans["tell"] == $chans["pgmsg"] && !$chans["extpgmsg"]) {
+                    } elseif ($chans["tell"] && !$chans["gc"] && $chans["tell"] == $chans["pgmsg"] && !$chans["extpgmsg"]) {
                         $chan[] = "r," . $lshort[$chans["tell"]];
-                    }
-                    else {
+                    } else {
                         foreach ($chans as $channel => $level) {
                             $chan[] = $cshort[$channel] . "," . $lshort[$level];
                         }
@@ -504,11 +554,15 @@ class AccessControl_Core extends BasePassiveModule
         }
         $save = implode(";", $coms);
         if ($update) {
-            $sql = " ON DUPLICATE KEY UPDATE description = '" . $this->bot->db->real_escape_string($desc) . "', commands = '" . $save . "'";
+            $sql = " ON DUPLICATE KEY UPDATE description = '" . $this->bot->db->real_escape_string(
+                    $desc
+                ) . "', commands = '" . $save . "'";
         }
         $this->bot->db->query(
-            "INSERT INTO #___access_control_saves (name, description, commands) VALUES ('" . $this->bot->db->real_escape_string($name) . "', '" . $this->bot->db->real_escape_string($desc) . "', '"
-                . $save . "')" . $sql
+            "INSERT INTO #___access_control_saves (name, description, commands) VALUES ('" . $this->bot->db->real_escape_string(
+                $name
+            ) . "', '" . $this->bot->db->real_escape_string($desc) . "', '"
+            . $save . "')" . $sql
         );
         Return (array(
             $count,
@@ -538,7 +592,11 @@ class AccessControl_Core extends BasePassiveModule
             'O' => 'OWNER',
             'D' => 'DISABLED'
         );
-        $results = $this->bot->db->select("SELECT commands FROM #___access_control_saves WHERE name = '" . $this->bot->db->real_escape_string($name) . "'");
+        $results = $this->bot->db->select(
+            "SELECT commands FROM #___access_control_saves WHERE name = '" . $this->bot->db->real_escape_string(
+                $name
+            ) . "'"
+        );
         if (!empty($results)) {
             $commands = explode(";", $results[0][0]);
             foreach ($commands as $command) {
@@ -572,8 +630,7 @@ class AccessControl_Core extends BasePassiveModule
                                 "pgmsg",
                                 $llong[$lvl]
                             );
-                        }
-                        elseif ($chan == "r") {
+                        } elseif ($chan == "r") {
                             $load[] = array(
                                 $com,
                                 $subcom,
@@ -586,8 +643,7 @@ class AccessControl_Core extends BasePassiveModule
                                 "pgmsg",
                                 $llong[$lvl]
                             );
-                        }
-                        else {
+                        } else {
                             $load[] = array(
                                 $com,
                                 $subcom,
@@ -602,13 +658,12 @@ class AccessControl_Core extends BasePassiveModule
                 if (isset($this->bot->commands[$coms[2]][$coms[0]])) {
                     $this->bot->db->query(
                         "UPDATE #___access_control SET minlevel = '" . $coms[3] . "' WHERE command = '" . $coms[0] . "' AND subcommand = '" . $coms[1] . "' AND channel = '"
-                            . $coms[2] . "'"
+                        . $coms[2] . "'"
                     );
                     $this->access_cache[$coms[0]][$coms[1]][$coms[2]] = $coms[3];
                     if ($coms[1] == "*") {
                         $count++;
-                    }
-                    else {
+                    } else {
                         $countsub++;
                     }
                 }
@@ -618,9 +673,8 @@ class AccessControl_Core extends BasePassiveModule
                 $count,
                 $countsub
             ));
-        }
-        else {
-            Return FALSE;
+        } else {
+            Return false;
         }
     }
 
@@ -631,7 +685,7 @@ class AccessControl_Core extends BasePassiveModule
         $command = strtolower($command);
         $minlevel = $this->get_min_access_level($command);
         if ($minlevel == OWNER + 1) {
-            return FALSE;
+            return false;
         }
         return $this->bot->core("security")->check_access($name, $minlevel);
     }
@@ -648,10 +702,13 @@ class AccessControl_Core extends BasePassiveModule
     function do_min_check($command, $subcommand, $channel)
     {
         // If disabled or delted, return false, as no access is allowed
-        if (in_array($this->access_cache[strtolower($command)][strtolower($subcommand)][strtolower($channel)], $this->deny_levels)) {
+        if (in_array(
+            $this->access_cache[strtolower($command)][strtolower($subcommand)][strtolower($channel)],
+            $this->deny_levels
+        )
+        ) {
             return OWNER + 1;
-        }
-        else {
+        } else {
             // Otherwise check access level of $user vs the minlevel of $command, $subcommand in $channel:
             return constant($this->access_cache[strtolower($command)][strtolower($subcommand)][strtolower($channel)]);
         }
@@ -664,8 +721,8 @@ class AccessControl_Core extends BasePassiveModule
     {
         // Check for locks in gc or pgmsg first:
         if (($channel == "gc"
-            && $this->bot->core("settings")
-                ->get("AccessControl", "LockGc"))
+                && $this->bot->core("settings")
+                    ->get("AccessControl", "LockGc"))
             || ($channel == "pgmsg"
                 && $this->bot
                     ->core("settings")->get("AccessControl", "LockPgroup"))
@@ -673,7 +730,7 @@ class AccessControl_Core extends BasePassiveModule
             return OWNER + 1;
         }
         $subcommand = strpos($msg, " ");
-        if ($subcommand === FALSE) {
+        if ($subcommand === false) {
             // No subcommand, check if special "only command" entry exists, otherwise fall back on
             // general entry for command if that exists.
             if (isset($this->access_cache[strtolower($command)]['$'][strtolower($channel)])) {
@@ -685,8 +742,7 @@ class AccessControl_Core extends BasePassiveModule
             }
             // No entry for command at all, access denied on default:
             return OWNER + 1;
-        }
-        else {
+        } else {
             // Possible subcommand, extract it and check for entry:
             $parts = explode(" ", $msg, 3);
             // "$" is not allowed as subcommand, same for "*" - both are special chars in subcommand field.
@@ -694,8 +750,7 @@ class AccessControl_Core extends BasePassiveModule
             if (strcmp($parts[1], "*") == 0 || strcmp($parts[1], "$") == 0) {
                 if (isset($this->access_cache[strtolower($command)]['*'][strtolower($channel)])) {
                     return $this->do_min_check($command, '*', $channel);
-                }
-                else {
+                } else {
                     // No access level defined, access denied on default:
                     return OWNER + 1;
                 }
@@ -703,7 +758,10 @@ class AccessControl_Core extends BasePassiveModule
             // We got a true subcommand, if entry for this subcommand exists use it for access check:
             if (isset($this->access_cache[strtolower($command)][strtolower($parts[1])][strtolower($channel)])) {
                 // Make sure the access control entry for this subcommand is not deleted
-                if ($this->access_cache[strtolower($command)][strtolower($parts[1])][strtolower($channel)] != 'DELETED') {
+                if ($this->access_cache[strtolower($command)][strtolower($parts[1])][strtolower(
+                        $channel
+                    )] != 'DELETED'
+                ) {
                     return $this->do_min_check($command, $parts[1], $channel);
                 }
             }
@@ -719,7 +777,7 @@ class AccessControl_Core extends BasePassiveModule
 
     // Returns the minimum access level to access $command in $channel
     // or any channel (tell, gc, pgmsg) if $channel is set to FALSE.
-    function get_min_access_level($command, $channel = FALSE)
+    function get_min_access_level($command, $channel = false)
     {
         $command = strtolower($command);
         if ($channel) {

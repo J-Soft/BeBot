@@ -40,14 +40,14 @@ class BasePassiveModule
     function __construct(&$bot, $module_name)
     {
         //Save reference to bot
-        $this->bot = &$bot;
+        $this->bot = & $bot;
         $this->module_name = $module_name;
-        $this->link_name = NULL;
+        $this->link_name = null;
         $this->error = new BotError($bot, $module_name);
     }
 
 
-    protected function register_event($event, $target = FALSE)
+    protected function register_event($event, $target = false)
     {
         $ret = $this->bot->register_event($event, $target, $this);
         if ($ret) {
@@ -56,7 +56,7 @@ class BasePassiveModule
     }
 
 
-    protected function unregister_event($event, $target = FALSE)
+    protected function unregister_event($event, $target = false)
     {
         $ret = $this->bot->unregister_event($event, $target, $this);
         if ($ret) {
@@ -67,7 +67,7 @@ class BasePassiveModule
 
     protected function register_module($name)
     {
-        if ($this->link_name == NULL) {
+        if ($this->link_name == null) {
             $this->link_name = strtolower($name);
             $this->bot->register_module($this, strtolower($name));
         }
@@ -76,25 +76,23 @@ class BasePassiveModule
 
     protected function unregister_module()
     {
-        if ($this->link_name != NULL) {
+        if ($this->link_name != null) {
             $this->bot->unregister_module($this->link_name);
         }
     }
 
 
-    protected function output_destination($name, $msg, $channel = FALSE)
+    protected function output_destination($name, $msg, $channel = false)
     {
-        if ($channel !== FALSE) {
+        if ($channel !== false) {
             if ($channel & SAME) {
                 if ($channel & $this->source) {
                     $channel -= SAME;
-                }
-                else {
+                } else {
                     $channel += $this->source;
                 }
             }
-        }
-        else {
+        } else {
             $channel += $this->source;
         }
         if ($channel & TELL) {

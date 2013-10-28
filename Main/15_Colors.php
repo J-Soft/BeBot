@@ -72,102 +72,102 @@ class Colors_Core extends BasePassiveModule
 						PRIMARY KEY (module, name)
 					)"
         );
-        $this->startup = TRUE;
+        $this->startup = true;
         $this->bot->core("settings")
-            ->create("Color", "Theme", "Default", "What is the name of the theme file to use?", "", TRUE);
-        $this->define_color("aqua", "#00FFFF", FALSE);
-        $this->define_color("beige", "#FFE3A1", FALSE);
-        $this->define_color("black", "#000000", FALSE);
-        $this->define_color("blue", "#0000FF", FALSE);
-        $this->define_color("bluegray", "#8CB6FF", FALSE);
-        $this->define_color("bluesilver", "#9AD5D9", FALSE);
-        $this->define_color("brown", "#999926", FALSE);
-        $this->define_color("darkaqua", "#2299FF", FALSE);
-        $this->define_color("darklime", "#00A651", FALSE);
-        $this->define_color("darkorange", "#DF6718", FALSE);
-        $this->define_color("darkpink", "#FF0099", FALSE);
-        $this->define_color("forestgreen", "#66AA66", FALSE);
-        $this->define_color("fuchsia", "#FF00FF", FALSE);
-        $this->define_color("gold", "#CCAA44", FALSE);
-        $this->define_color("gray", "#808080", FALSE);
-        $this->define_color("green", "#008000", FALSE);
-        $this->define_color("lightbeige", "#FFFFC9", FALSE);
-        $this->define_color("lightfuchsia", "#FF63FF", FALSE);
-        $this->define_color("lightgray", "#D9D9D2", FALSE);
-        $this->define_color("lightgreen", "#00DD44", FALSE);
-        $this->define_color("brightgreen", "#00F000", FALSE);
-        $this->define_color("lightmaroon", "#FF0040", FALSE);
-        $this->define_color("lightteal", "#15E0A0", FALSE);
-        $this->define_color("dullteal", "#30D2FF", FALSE);
-        $this->define_color("lightyellow", "#DEDE42", FALSE);
-        $this->define_color("lime", "#00FF00", FALSE);
-        $this->define_color("maroon", "#800000", FALSE);
-        $this->define_color("navy", "#000080", FALSE);
-        $this->define_color("olive", "#808000", FALSE);
-        $this->define_color("orange", "#FF7718", FALSE);
-        $this->define_color("pink", "#FF8CFC", FALSE);
-        $this->define_color("purple", "#800080", FALSE);
-        $this->define_color("red", "#FF0000", FALSE);
-        $this->define_color("redpink", "#FF61A6", FALSE);
-        $this->define_color("seablue", "#6699FF", FALSE);
-        $this->define_color("seagreen", "#66FF99", FALSE);
-        $this->define_color("silver", "#C0C0C0", FALSE);
-        $this->define_color("tan", "#DDDD44", FALSE);
-        $this->define_color("teal", "#008080", FALSE);
-        $this->define_color("white", "#FFFFFF", FALSE);
-        $this->define_color("yellow", "#FFFF00", FALSE);
-        $this->define_color("omni", "#00ffff", FALSE);
-        $this->define_color("clan", "#ff9933", FALSE);
-        $this->define_color("neutral", "#ffffff", FALSE);
-        $this->define_scheme("ao", "admin", "pink", FALSE);
-        $this->define_scheme("ao", "cash", "gold", FALSE);
-        $this->define_scheme("ao", "ccheader", "white", FALSE);
-        $this->define_scheme("ao", "cctext", "lightgray", FALSE);
-        $this->define_scheme("ao", "clan", "brightgreen", FALSE);
-        $this->define_scheme("ao", "emote", "darkpink", FALSE);
-        $this->define_scheme("ao", "error", "red", FALSE);
-        $this->define_scheme("ao", "feedback", "yellow", FALSE);
-        $this->define_scheme("ao", "gm", "redpink", FALSE);
-        $this->define_scheme("ao", "infoheader", "lightgreen", FALSE);
-        $this->define_scheme("ao", "infoheadline", "tan", FALSE);
-        $this->define_scheme("ao", "infotext", "forestgreen", FALSE);
-        $this->define_scheme("ao", "infotextbold", "white", FALSE);
-        $this->define_scheme("ao", "megotxp", "yellow", FALSE);
-        $this->define_scheme("ao", "meheald", "bluegray", FALSE);
-        $this->define_scheme("ao", "mehitbynano", "white", FALSE);
-        $this->define_scheme("ao", "mehitother", "lightgray", FALSE);
-        $this->define_scheme("ao", "menubar", "lightteal", FALSE);
-        $this->define_scheme("ao", "misc", "white", FALSE);
-        $this->define_scheme("ao", "monsterhitme", "red", FALSE);
-        $this->define_scheme("ao", "mypet", "orange", FALSE);
-        $this->define_scheme("ao", "newbie", "seagreen", FALSE);
-        $this->define_scheme("ao", "news", "brightgreen", FALSE);
-        $this->define_scheme("ao", "none", "fuchsia", FALSE);
-        $this->define_scheme("ao", "npcchat", "bluesilver", FALSE);
-        $this->define_scheme("ao", "npcdescription", "yellow", FALSE);
-        $this->define_scheme("ao", "npcemote", "lightbeige", FALSE);
-        $this->define_scheme("ao", "npcooc", "lightbeige", FALSE);
-        $this->define_scheme("ao", "npcquestion", "lightgreen", FALSE);
-        $this->define_scheme("ao", "npcsystem", "red", FALSE);
-        $this->define_scheme("ao", "npctrade", "lightbeige", FALSE);
-        $this->define_scheme("ao", "otherhitbynano", "bluesilver", FALSE);
-        $this->define_scheme("ao", "otherpet", "darkorange", FALSE);
-        $this->define_scheme("ao", "pgroup", "white", FALSE);
-        $this->define_scheme("ao", "playerhitme", "red", FALSE);
-        $this->define_scheme("ao", "seekingteam", "seablue", FALSE);
-        $this->define_scheme("ao", "seekingteam", "seablue", FALSE);
-        $this->define_scheme("ao", "shout", "lightbeige", FALSE);
-        $this->define_scheme("ao", "skillcolor", "beige", FALSE);
-        $this->define_scheme("ao", "system", "white", FALSE);
-        $this->define_scheme("ao", "team", "seagreen", FALSE);
-        $this->define_scheme("ao", "tell", "aqua", FALSE);
-        $this->define_scheme("ao", "tooltip", "black", FALSE);
-        $this->define_scheme("ao", "tower", "lightfuchsia", FALSE);
-        $this->define_scheme("ao", "vicinity", "lightyellow", FALSE);
-        $this->define_scheme("ao", "whisper", "dullteal", FALSE);
+            ->create("Color", "Theme", "Default", "What is the name of the theme file to use?", "", true);
+        $this->define_color("aqua", "#00FFFF", false);
+        $this->define_color("beige", "#FFE3A1", false);
+        $this->define_color("black", "#000000", false);
+        $this->define_color("blue", "#0000FF", false);
+        $this->define_color("bluegray", "#8CB6FF", false);
+        $this->define_color("bluesilver", "#9AD5D9", false);
+        $this->define_color("brown", "#999926", false);
+        $this->define_color("darkaqua", "#2299FF", false);
+        $this->define_color("darklime", "#00A651", false);
+        $this->define_color("darkorange", "#DF6718", false);
+        $this->define_color("darkpink", "#FF0099", false);
+        $this->define_color("forestgreen", "#66AA66", false);
+        $this->define_color("fuchsia", "#FF00FF", false);
+        $this->define_color("gold", "#CCAA44", false);
+        $this->define_color("gray", "#808080", false);
+        $this->define_color("green", "#008000", false);
+        $this->define_color("lightbeige", "#FFFFC9", false);
+        $this->define_color("lightfuchsia", "#FF63FF", false);
+        $this->define_color("lightgray", "#D9D9D2", false);
+        $this->define_color("lightgreen", "#00DD44", false);
+        $this->define_color("brightgreen", "#00F000", false);
+        $this->define_color("lightmaroon", "#FF0040", false);
+        $this->define_color("lightteal", "#15E0A0", false);
+        $this->define_color("dullteal", "#30D2FF", false);
+        $this->define_color("lightyellow", "#DEDE42", false);
+        $this->define_color("lime", "#00FF00", false);
+        $this->define_color("maroon", "#800000", false);
+        $this->define_color("navy", "#000080", false);
+        $this->define_color("olive", "#808000", false);
+        $this->define_color("orange", "#FF7718", false);
+        $this->define_color("pink", "#FF8CFC", false);
+        $this->define_color("purple", "#800080", false);
+        $this->define_color("red", "#FF0000", false);
+        $this->define_color("redpink", "#FF61A6", false);
+        $this->define_color("seablue", "#6699FF", false);
+        $this->define_color("seagreen", "#66FF99", false);
+        $this->define_color("silver", "#C0C0C0", false);
+        $this->define_color("tan", "#DDDD44", false);
+        $this->define_color("teal", "#008080", false);
+        $this->define_color("white", "#FFFFFF", false);
+        $this->define_color("yellow", "#FFFF00", false);
+        $this->define_color("omni", "#00ffff", false);
+        $this->define_color("clan", "#ff9933", false);
+        $this->define_color("neutral", "#ffffff", false);
+        $this->define_scheme("ao", "admin", "pink", false);
+        $this->define_scheme("ao", "cash", "gold", false);
+        $this->define_scheme("ao", "ccheader", "white", false);
+        $this->define_scheme("ao", "cctext", "lightgray", false);
+        $this->define_scheme("ao", "clan", "brightgreen", false);
+        $this->define_scheme("ao", "emote", "darkpink", false);
+        $this->define_scheme("ao", "error", "red", false);
+        $this->define_scheme("ao", "feedback", "yellow", false);
+        $this->define_scheme("ao", "gm", "redpink", false);
+        $this->define_scheme("ao", "infoheader", "lightgreen", false);
+        $this->define_scheme("ao", "infoheadline", "tan", false);
+        $this->define_scheme("ao", "infotext", "forestgreen", false);
+        $this->define_scheme("ao", "infotextbold", "white", false);
+        $this->define_scheme("ao", "megotxp", "yellow", false);
+        $this->define_scheme("ao", "meheald", "bluegray", false);
+        $this->define_scheme("ao", "mehitbynano", "white", false);
+        $this->define_scheme("ao", "mehitother", "lightgray", false);
+        $this->define_scheme("ao", "menubar", "lightteal", false);
+        $this->define_scheme("ao", "misc", "white", false);
+        $this->define_scheme("ao", "monsterhitme", "red", false);
+        $this->define_scheme("ao", "mypet", "orange", false);
+        $this->define_scheme("ao", "newbie", "seagreen", false);
+        $this->define_scheme("ao", "news", "brightgreen", false);
+        $this->define_scheme("ao", "none", "fuchsia", false);
+        $this->define_scheme("ao", "npcchat", "bluesilver", false);
+        $this->define_scheme("ao", "npcdescription", "yellow", false);
+        $this->define_scheme("ao", "npcemote", "lightbeige", false);
+        $this->define_scheme("ao", "npcooc", "lightbeige", false);
+        $this->define_scheme("ao", "npcquestion", "lightgreen", false);
+        $this->define_scheme("ao", "npcsystem", "red", false);
+        $this->define_scheme("ao", "npctrade", "lightbeige", false);
+        $this->define_scheme("ao", "otherhitbynano", "bluesilver", false);
+        $this->define_scheme("ao", "otherpet", "darkorange", false);
+        $this->define_scheme("ao", "pgroup", "white", false);
+        $this->define_scheme("ao", "playerhitme", "red", false);
+        $this->define_scheme("ao", "seekingteam", "seablue", false);
+        $this->define_scheme("ao", "seekingteam", "seablue", false);
+        $this->define_scheme("ao", "shout", "lightbeige", false);
+        $this->define_scheme("ao", "skillcolor", "beige", false);
+        $this->define_scheme("ao", "system", "white", false);
+        $this->define_scheme("ao", "team", "seagreen", false);
+        $this->define_scheme("ao", "tell", "aqua", false);
+        $this->define_scheme("ao", "tooltip", "black", false);
+        $this->define_scheme("ao", "tower", "lightfuchsia", false);
+        $this->define_scheme("ao", "vicinity", "lightyellow", false);
+        $this->define_scheme("ao", "whisper", "dullteal", false);
         // No tags cache created yet:
-        $this->startup = FALSE;
-        $this->no_tags = TRUE;
+        $this->startup = false;
+        $this->no_tags = true;
         $this->theme_info = "";
         $this->theme = array();
         $this->create_color_cache();
@@ -187,8 +187,7 @@ class Colors_Core extends BasePassiveModule
     {
         if ($this->color_tags['##' . $color . '##'] != '') {
             return $this->color_tags['##' . $color . '##'];
-        }
-        else {
+        } else {
             return "<font color=#000000>";
         }
     }
@@ -198,33 +197,38 @@ class Colors_Core extends BasePassiveModule
     {
         if ($this->color_tags['##' . $color . '##'] != '') {
             return $this->color_tags['##' . $color . '##'] . $text . "</font>";
-        }
-        else {
+        } else {
             return $text;
         }
     }
 
 
     // defines a new color:
-    function define_color($name, $code, $cache = TRUE)
+    function define_color($name, $code, $cache = true)
     {
-        $this->bot->db->query("INSERT IGNORE INTO #___colors (name, code) VALUES ('" . $this->bot->db->real_escape_string($name) . "', '" . $this->bot->db->real_escape_string($code) . "')");
+        $this->bot->db->query(
+            "INSERT IGNORE INTO #___colors (name, code) VALUES ('" . $this->bot->db->real_escape_string(
+                $name
+            ) . "', '" . $this->bot->db->real_escape_string($code) . "')"
+        );
         if ($cache) {
-            $this->no_tags = TRUE;
+            $this->no_tags = true;
             $this->create_color_cache();
         }
     }
 
 
     // defines a new color scheme:
-    function define_scheme($module, $scheme, $color_name, $cache = TRUE)
+    function define_scheme($module, $scheme, $color_name, $cache = true)
     {
         $this->bot->db->query(
-            "INSERT IGNORE INTO #___color_schemes" . " (module, name, color_code) VALUES ('" . $this->bot->db->real_escape_string($module) . "', '" . $this->bot->db->real_escape_string($scheme)
-                . "', '" . $this->bot->db->real_escape_string($color_name) . "')"
+            "INSERT IGNORE INTO #___color_schemes" . " (module, name, color_code) VALUES ('" . $this->bot->db->real_escape_string(
+                $module
+            ) . "', '" . $this->bot->db->real_escape_string($scheme)
+            . "', '" . $this->bot->db->real_escape_string($color_name) . "')"
         );
         if ($cache) {
-            $this->no_tags = TRUE;
+            $this->no_tags = true;
             $this->create_color_cache();
         }
     }
@@ -235,14 +239,18 @@ class Colors_Core extends BasePassiveModule
     {
         // first add color:
         $this->bot->db->query(
-            "INSERT IGNORE INTO #___colors" . " (name, code) VALUES ('" . $this->bot->db->real_escape_string($color_name) . "', '" . $this->bot->db->real_escape_string($color_code) . "')"
+            "INSERT IGNORE INTO #___colors" . " (name, code) VALUES ('" . $this->bot->db->real_escape_string(
+                $color_name
+            ) . "', '" . $this->bot->db->real_escape_string($color_code) . "')"
         );
         // then add scheme:
         $this->bot->db->query(
-            "INSERT IGNORE INTO #___color_schemes" . " (module, name, color_code) VALUES ('" . $this->bot->db->real_escape_string($module) . "', '" . $this->bot->db->real_escape_string($scheme)
-                . "', '" . $this->bot->db->real_escape_string($color_name) . "')"
+            "INSERT IGNORE INTO #___color_schemes" . " (module, name, color_code) VALUES ('" . $this->bot->db->real_escape_string(
+                $module
+            ) . "', '" . $this->bot->db->real_escape_string($scheme)
+            . "', '" . $this->bot->db->real_escape_string($color_name) . "')"
         );
-        $this->no_tags = TRUE;
+        $this->no_tags = true;
         $this->create_color_cache();
     }
 
@@ -251,10 +259,12 @@ class Colors_Core extends BasePassiveModule
     function update_scheme($module, $scheme, $new_color_name)
     {
         $this->bot->db->query(
-            "UPDATE #___color_schemes" . " SET color_code = '" . $this->bot->db->real_escape_string($new_color_name) . "' WHERE module = '" . $this->bot->db->real_escape_string($module)
-                . "' AND name = '" . $this->bot->db->real_escape_string($scheme) . "'"
+            "UPDATE #___color_schemes" . " SET color_code = '" . $this->bot->db->real_escape_string(
+                $new_color_name
+            ) . "' WHERE module = '" . $this->bot->db->real_escape_string($module)
+            . "' AND name = '" . $this->bot->db->real_escape_string($scheme) . "'"
         );
-        $this->no_tags = TRUE;
+        $this->no_tags = true;
         $this->create_color_cache();
     }
 
@@ -265,7 +275,9 @@ class Colors_Core extends BasePassiveModule
         $theme_dir = "./Themes/";
         // Make sure filename is valid
         if (!preg_match("/^([a-z01-9-_]+)$/i", $filename)) {
-            $this->error->set("Illegal filename for scheme file! The filename must only contain letters, numbers, - and _!");
+            $this->error->set(
+                "Illegal filename for scheme file! The filename must only contain letters, numbers, - and _!"
+            );
             return $this->error;
         }
         $scheme_file = file($theme_dir . $filename . ".scheme.xml");
@@ -274,14 +286,21 @@ class Colors_Core extends BasePassiveModule
             return $this->error;
         }
         foreach ($scheme_file as $scheme_line) {
-            if (preg_match("/scheme module=\"([a-z_]+)\" name=\"([a-z_]+)\" code=\"([a-z]+)\"/i", $scheme_line, $info)) {
+            if (preg_match(
+                "/scheme module=\"([a-z_]+)\" name=\"([a-z_]+)\" code=\"([a-z]+)\"/i",
+                $scheme_line,
+                $info
+            )
+            ) {
                 $this->bot->db->query(
-                    "UPDATE #___color_schemes" . " SET color_code = '" . $this->bot->db->real_escape_string($info[3]) . "' WHERE module = '" . $this->bot->db->real_escape_string($info[1])
-                        . "' AND name = '" . $this->bot->db->real_escape_string($info[2]) . "'"
+                    "UPDATE #___color_schemes" . " SET color_code = '" . $this->bot->db->real_escape_string(
+                        $info[3]
+                    ) . "' WHERE module = '" . $this->bot->db->real_escape_string($info[1])
+                    . "' AND name = '" . $this->bot->db->real_escape_string($info[2]) . "'"
                 );
             }
         }
-        $this->no_tags = TRUE;
+        $this->no_tags = true;
         $this->create_color_cache();
         return "Theme file " . $filename . " read, schemes updated!";
     }
@@ -293,10 +312,14 @@ class Colors_Core extends BasePassiveModule
         $theme_dir = "./Themes/";
         // Make sure filename is valid
         if (!preg_match("/^([a-z01-9-_]+)$/i", $filename)) {
-            $this->error->set("Illegal filename for scheme file! The filename must only contain letters, numbers, - and _!");
+            $this->error->set(
+                "Illegal filename for scheme file! The filename must only contain letters, numbers, - and _!"
+            );
             return $this->error;
         }
-        $header = '<schemes name="Scheme for ' . ucfirst(strtolower($this->bot->botname)) . '" version="1.0" author="' . ucfirst(strtolower($name)) . '" link="">';
+        $header = '<schemes name="Scheme for ' . ucfirst(
+                strtolower($this->bot->botname)
+            ) . '" version="1.0" author="' . ucfirst(strtolower($name)) . '" link="">';
         $footer = '</schemes>';
         $filename = $filename .= ".scheme.xml";
         $handle = fopen($theme_dir . $filename, "w");
@@ -309,17 +332,21 @@ class Colors_Core extends BasePassiveModule
             $this->error->set("No schemes defined!");
             return $this->error;
         }
-        $status = TRUE;
+        $status = true;
         if (!fwrite($handle, $header . "\n")) {
-            $status = FALSE;
+            $status = false;
         }
         foreach ($schemes as $scheme) {
-            if (!fwrite($handle, '<scheme module="' . $scheme[0] . '" name="' . $scheme[1] . '" code="' . $scheme[2] . '" />' . "\n")) {
-                $status = FALSE;
+            if (!fwrite(
+                $handle,
+                '<scheme module="' . $scheme[0] . '" name="' . $scheme[1] . '" code="' . $scheme[2] . '" />' . "\n"
+            )
+            ) {
+                $status = false;
             }
         }
         if (!fwrite($handle, $footer . "\n")) {
-            $status = FALSE;
+            $status = false;
         }
         fclose($handle);
         if (!$status) {
@@ -343,20 +370,20 @@ class Colors_Core extends BasePassiveModule
         // Try to open the theme file, bail on error
         $handle = fopen($name, "a");
         if (!$handle) {
-            return FALSE;
+            return false;
         }
         // Now write the lines for the default theme file, mark errors to bail after closing file
-        $status = TRUE;
+        $status = true;
         foreach ($theme_file as $theme_line) {
             if (!fwrite($handle, $theme_line . "\n")) {
-                $status = FALSE;
+                $status = false;
             }
         }
         // Close file
         fclose($handle);
         // If error while writing bail
         if (!$status) {
-            return FALSE;
+            return false;
         }
         // Return default theme file
         $this->bot->log("COLOR", "THEME", "Created default theme!");
@@ -370,19 +397,19 @@ class Colors_Core extends BasePassiveModule
         $theme_dir = "./Themes/";
         // Security check, theme filename HAS to be all letters or numbers, otherwise dying here for security reasons!
         if (!preg_match(
-            "/^([a-z01-9-_]+)$/i", $this->bot->core("settings")
+            "/^([a-z01-9-_]+)$/i",
+            $this->bot->core("settings")
                 ->get("Color", "Theme")
         )
         ) {
             die("POSSIBLE SECURITY PROBLEM! The theme filename can only contain letters, numbers - and _ for security reasons!\nThe bot has been shutdown.\n");
         }
         $theme_file_name = $theme_dir . $this->bot->core("settings")
-            ->get("Color", "Theme") . ".colors.xml";
+                ->get("Color", "Theme") . ".colors.xml";
         // If theme file doesn't exist try to create it
         if (!is_file($theme_file_name)) {
             $theme_file = $this->create_theme_file($theme_file_name);
-        }
-        else {
+        } else {
             $theme_file = file($theme_file_name);
         }
         // If we don't got a theme file here yet we are in serious trouble, bail out!
@@ -399,19 +426,28 @@ class Colors_Core extends BasePassiveModule
         // Parse the input file now
         foreach ($theme_file as $theme_line) {
             $theme_line = trim($theme_line);
-            if (preg_match("/color name=\"([a-z_]+)\" code=\"(#[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f])\"/i", $theme_line, $info)) {
+            if (preg_match(
+                "/color name=\"([a-z_]+)\" code=\"(#[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f])\"/i",
+                $theme_line,
+                $info
+            )
+            ) {
                 $this->theme[strtolower($info[1])] = $info[2];
-            }
-            elseif (preg_match("/color name=\"([a-z_]+)\" color=\"([a-z]+)\"/i", $theme_line, $info)) {
-                $cols = $this->bot->db->select("SELECT code FROM #___colors WHERE name = '" . $this->bot->db->real_escape_string($info[2]) . "'");
+            } elseif (preg_match("/color name=\"([a-z_]+)\" color=\"([a-z]+)\"/i", $theme_line, $info)) {
+                $cols = $this->bot->db->select(
+                    "SELECT code FROM #___colors WHERE name = '" . $this->bot->db->real_escape_string($info[2]) . "'"
+                );
                 if (empty($cols)) {
                     $this->theme[strtolower($info[1])] = "#000000";
-                }
-                else {
+                } else {
                     $this->theme[strtolower($info[1])] = $cols[0][0];
                 }
-            }
-            elseif (preg_match("/theme name=\"(.*)\" version=\"(.*)\" author=\"(.*)\" link=\"(.*)\"/i", $theme_line, $info)) {
+            } elseif (preg_match(
+                "/theme name=\"(.*)\" version=\"(.*)\" author=\"(.*)\" link=\"(.*)\"/i",
+                $theme_line,
+                $info
+            )
+            ) {
                 $this->theme_info = "Name of theme: " . $info[1] . "\n";
                 $this->theme_info .= "Version: " . $info[2] . "\n";
                 $this->theme_info .= "Author: " . $info[3] . "\n";
@@ -428,7 +464,7 @@ class Colors_Core extends BasePassiveModule
         if ($this->startup) {
             return;
         }
-        $this->no_tags = FALSE;
+        $this->no_tags = false;
         $this->color_tags = array();
         // Parse theme file
         $this->read_theme();
@@ -451,20 +487,22 @@ class Colors_Core extends BasePassiveModule
         // Create all scheme tags for schemes using theme colors
         $cols = $this->bot->db->select(
             "SELECT concat(module, '_', name) AS scheme, color_code FROM #___color_schemes " . "WHERE " . $theme_string
-                . " UNION SELECT name AS scheme, color_code FROM #___color_schemes WHERE (" . $theme_string . ") AND module = 'global'"
+            . " UNION SELECT name AS scheme, color_code FROM #___color_schemes WHERE (" . $theme_string . ") AND module = 'global'"
         );
         if (!empty($cols)) {
             foreach ($cols as $col) {
                 if (!isset($this->color_tags["##" . strtolower($col[0]) . "##"])) {
-                    $this->color_tags["##" . strtolower($col[0]) . "##"] = "<font color=" . $this->theme[strtolower($col[1])] . ">";
+                    $this->color_tags["##" . strtolower($col[0]) . "##"] = "<font color=" . $this->theme[strtolower(
+                            $col[1]
+                        )] . ">";
                 }
             }
         }
         // Now create all scheme tags for schemes using no theme colors
         $cols = $this->bot->db->select(
             "SELECT concat(t1.module, '_', t1.name) AS name, t2.code FROM " . "#___color_schemes AS t1, #___colors AS t2 WHERE t1.color_code = t2.name AND NOT (" . $theme_string
-                . ") UNION " . "SELECT t1.name AS name, t2.code AS code FROM #___color_schemes AS t1, #___colors AS t2 WHERE "
-                . "t1.color_code = t2.name AND t1.module = 'global' AND NOT (" . $theme_string . ")"
+            . ") UNION " . "SELECT t1.name AS name, t2.code AS code FROM #___color_schemes AS t1, #___colors AS t2 WHERE "
+            . "t1.color_code = t2.name AND t1.module = 'global' AND NOT (" . $theme_string . ")"
         );
         $this->color_tags["##end##"] = "</font>";
         if (!empty($cols)) {
@@ -484,7 +522,7 @@ class Colors_Core extends BasePassiveModule
             $this->create_color_cache();
         }
         // No replacing if no tags can be in the text
-        if (strpos($text, "##") === FALSE) {
+        if (strpos($text, "##") === false) {
             return $text;
         }
         // Go ahead and replace all tags

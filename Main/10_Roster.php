@@ -69,18 +69,21 @@ class Roster_Core extends BasePassiveModule
         $this->register_event("cron", "24hour");
         $this->update_table();
         $this->bot->core("settings")
-            ->create("Members", "LastRosterUpdate", 1, "Last time we completed a Roster update", NULL, TRUE, 2);
+            ->create("Members", "LastRosterUpdate", 1, "Last time we completed a Roster update", null, true, 2);
         $this->bot->core("settings")
             ->create(
-            'Members', 'Roster', 'XML', 'What should we use to look up organization information? (Fallback means that if XML fails the cache will be used)',
-            'XML;WhoisCache;Fallback'
-        );
+                'Members',
+                'Roster',
+                'XML',
+                'What should we use to look up organization information? (Fallback means that if XML fails the cache will be used)',
+                'XML;WhoisCache;Fallback'
+            );
         $this->bot->core("settings")
-            ->create("Members", "Update", TRUE, "Should the roster be updated automaticly?");
+            ->create("Members", "Update", true, "Should the roster be updated automaticly?");
         $this->bot->core("settings")
-            ->create("Members", "QuietUpdate", FALSE, "Do roster update quietly without spamming the guild channel?");
-        $this->startup = TRUE;
-        $this->running = FALSE;
+            ->create("Members", "QuietUpdate", false, "Do roster update quietly without spamming the guild channel?");
+        $this->startup = true;
+        $this->running = false;
     }
 
 
@@ -91,116 +94,136 @@ class Roster_Core extends BasePassiveModule
         }
         if ($this->bot->core("settings")->exists("members", "schemaversion")) {
             $this->bot->db->set_version(
-                "users", $this->bot->core("settings")
+                "users",
+                $this->bot->core("settings")
                     ->get("members", "schemaversion")
             );
             $this->bot->core("settings")->del("members", "schemaversion");
         }
         switch ($this->bot->db->get_version("users")) {
-        case 1:
-            $this->bot->db->update_table(
-                "users", array(
-                    "banned_for",
-                    "banned_until"
-                ), "add", "ALTER TABLE #___users ADD banned_for VARCHAR(100) AFTER banned_at, ADD banned_until INT(11) DEFAULT '0' AFTER banned_for"
-            );
-            $this->bot->db->set_version("users", 2);
-            $this->update_table();
-            return;
-        case 2:
-            $this->bot->db->update_table(
-                "users", array(
-                    "user_level",
-                    "banned_until",
-                    "notify"
-                ), "alter", "ALTER TABLE #___users ADD INDEX (user_level), ADD INDEX (banned_until), ADD INDEX (notify)"
-            );
-            $this->bot->db->set_version("users", 3);
-            $this->update_table();
-            return;
-        case 3:
-            $this->bot->db->update_table(
-                'users', array(
-                    'receive_announce',
-                    'receive_invite',
-                    'admin_level'
-                ), 'drop', "ALTER TABLE #___users DROP receive_announce, DROP receive_invite, DROP admin_level"
-            );
-            $this->bot->db->set_version("users", 4);
-            $this->update_table();
-            return;
-        case 4:
-            if ($this->bot->core('prefs')
-                ->exists('AutoInv', 'receive_auto_invite')
-            ) {
-                $fields = $this->bot->db->select("EXPLAIN #___users", MYSQLI_ASSOC);
-                if (!empty($fields)) {
-                    foreach ($fields as $field) {
-                        $columns[$field['Field']] = TRUE;
-                    }
-                }
-                if (isset($columns['auto_invite'])) {
-                    $invited_users = $this->bot->db->select('SELECT char_id FROM #___users WHERE auto_invite=1', MYSQLI_ASSOC);
-                    if (!empty($invited_users)) {
-                        foreach ($invited_users as $invited_user) {
-                            $this->bot->core('prefs')
-                                ->change($invited_user['char_id'], 'AutoInv', 'receive_auto_invite', 'On');
+            case 1:
+                $this->bot->db->update_table(
+                    "users",
+                    array(
+                         "banned_for",
+                         "banned_until"
+                    ),
+                    "add",
+                    "ALTER TABLE #___users ADD banned_for VARCHAR(100) AFTER banned_at, ADD banned_until INT(11) DEFAULT '0' AFTER banned_for"
+                );
+                $this->bot->db->set_version("users", 2);
+                $this->update_table();
+                return;
+            case 2:
+                $this->bot->db->update_table(
+                    "users",
+                    array(
+                         "user_level",
+                         "banned_until",
+                         "notify"
+                    ),
+                    "alter",
+                    "ALTER TABLE #___users ADD INDEX (user_level), ADD INDEX (banned_until), ADD INDEX (notify)"
+                );
+                $this->bot->db->set_version("users", 3);
+                $this->update_table();
+                return;
+            case 3:
+                $this->bot->db->update_table(
+                    'users',
+                    array(
+                         'receive_announce',
+                         'receive_invite',
+                         'admin_level'
+                    ),
+                    'drop',
+                    "ALTER TABLE #___users DROP receive_announce, DROP receive_invite, DROP admin_level"
+                );
+                $this->bot->db->set_version("users", 4);
+                $this->update_table();
+                return;
+            case 4:
+                if ($this->bot->core('prefs')
+                    ->exists('AutoInv', 'receive_auto_invite')
+                ) {
+                    $fields = $this->bot->db->select("EXPLAIN #___users", MYSQLI_ASSOC);
+                    if (!empty($fields)) {
+                        foreach ($fields as $field) {
+                            $columns[$field['Field']] = true;
                         }
                     }
-                    $this->bot->db->update_table('users', array('auto_invite'), 'drop', "ALTER TABLE #___users DROP auto_invite");
+                    if (isset($columns['auto_invite'])) {
+                        $invited_users = $this->bot->db->select(
+                            'SELECT char_id FROM #___users WHERE auto_invite=1',
+                            MYSQLI_ASSOC
+                        );
+                        if (!empty($invited_users)) {
+                            foreach ($invited_users as $invited_user) {
+                                $this->bot->core('prefs')
+                                    ->change($invited_user['char_id'], 'AutoInv', 'receive_auto_invite', 'On');
+                            }
+                        }
+                        $this->bot->db->update_table(
+                            'users',
+                            array('auto_invite'),
+                            'drop',
+                            "ALTER TABLE #___users DROP auto_invite"
+                        );
+                    }
+                    $this->bot->db->set_version("users", 5);
+                } else {
+                    // We have to delay any further updates until we can correctly update the autoinvite fields!
+                    return;
                 }
                 $this->bot->db->set_version("users", 5);
-            }
-            else {
-                // We have to delay any further updates until we can correctly update the autoinvite fields!
+                $this->update_table();
                 return;
-            }
-            $this->bot->db->set_version("users", 5);
-            $this->update_table();
-            return;
-        case 5:
-            // update pref default and remove old settings, useing user scheme since it used to be in user table
-            if ($this->bot->core("settings")
-                ->exists("members", "Receiveannounce")
-            ) {
+            case 5:
+                // update pref default and remove old settings, useing user scheme since it used to be in user table
                 if ($this->bot->core("settings")
-                    ->get("members", "Receiveannounce")
+                    ->exists("members", "Receiveannounce")
                 ) {
-                    $set = "On";
+                    if ($this->bot->core("settings")
+                        ->get("members", "Receiveannounce")
+                    ) {
+                        $set = "On";
+                    } else {
+                        $set = "Off";
+                    }
+                    $this->bot->core("prefs")
+                        ->change_default("Roster Module", "MassMsg", "receive_message", $set);
+                    $this->bot->core("settings")
+                        ->del("members", "Receiveannounce");
                 }
-                else {
-                    $set = "Off";
-                }
-                $this->bot->core("prefs")
-                    ->change_default("Roster Module", "MassMsg", "receive_message", $set);
-                $this->bot->core("settings")
-                    ->del("members", "Receiveannounce");
-            }
-            if ($this->bot->core("settings")
-                ->exists("members", "Receiveinvite")
-            ) {
                 if ($this->bot->core("settings")
-                    ->get("members", "Receiveinvite")
+                    ->exists("members", "Receiveinvite")
                 ) {
-                    $set = "On";
+                    if ($this->bot->core("settings")
+                        ->get("members", "Receiveinvite")
+                    ) {
+                        $set = "On";
+                    } else {
+                        $set = "Off";
+                    }
+                    $this->bot->core("prefs")
+                        ->change_default("Roster Module", "MassMsg", "receive_invite", $set);
+                    $this->bot->core("settings")
+                        ->del("members", "Receiveinvite");
                 }
-                else {
-                    $set = "Off";
-                }
-                $this->bot->core("prefs")
-                    ->change_default("Roster Module", "MassMsg", "receive_invite", $set);
-                $this->bot->core("settings")
-                    ->del("members", "Receiveinvite");
-            }
-            $this->bot->db->set_version("users", 6);
-            $this->update_table();
-            return;
-        case 6:
-            $this->bot->db->update_table("users", "char_id", "alter", "ALTER TABLE #___users MODIFY char_id BIGINT NOT NULL");
-            $this->bot->db->set_version("users", 7);
-            $this->update_table();
-            return;
-        default:
+                $this->bot->db->set_version("users", 6);
+                $this->update_table();
+                return;
+            case 6:
+                $this->bot->db->update_table(
+                    "users",
+                    "char_id",
+                    "alter",
+                    "ALTER TABLE #___users MODIFY char_id BIGINT NOT NULL"
+                );
+                $this->bot->db->set_version("users", 7);
+                $this->update_table();
+                return;
+            default:
         }
     }
 
@@ -213,13 +236,16 @@ class Roster_Core extends BasePassiveModule
                 $source = $info[1];
                 $id = $this->bot->core("player")->id($person);
                 $this->del("Org Message", $id, $person, "from Org Message, kicked by $source");
-                $this->bot->send_gc("##highlight##$person ##end##has been kicked from the org by##highlight## $source##end##");
+                $this->bot->send_gc(
+                    "##highlight##$person ##end##has been kicked from the org by##highlight## $source##end##"
+                );
                 $this->bot->send_irc(
                     $this->bot->core("settings")
-                        ->get("Irc", "Ircguildprefix"), "", "$person has been Kicked from Org by $source"
+                        ->get("Irc", "Ircguildprefix"),
+                    "",
+                    "$person has been Kicked from Org by $source"
                 );
-            }
-            else {
+            } else {
                 if (preg_match("/(.+) has left the organization./i", $msg, $info)) {
                     $person = $info[1];
                     $id = $this->bot->core("player")->id($person);
@@ -227,10 +253,11 @@ class Roster_Core extends BasePassiveModule
                     $this->bot->send_gc("##highlight##$person ##end##has left the org");
                     $this->bot->send_irc(
                         $this->bot->core("settings")
-                            ->get("Irc", "Ircguildprefix"), "", "$person has Left the Org"
+                            ->get("Irc", "Ircguildprefix"),
+                        "",
+                        "$person has Left the Org"
                     );
-                }
-                else {
+                } else {
                     if (preg_match("/(.+) invited (.+) to your organization./i", $msg, $info)) {
                         $inviter = $info[1];
                         $person = $info[2];
@@ -239,7 +266,9 @@ class Roster_Core extends BasePassiveModule
                         $this->bot->send_gc("Welcome##highlight## $person##end##!!!");
                         $this->bot->send_irc(
                             $this->bot->core("settings")
-                                ->get("Irc", "Ircguildprefix"), "", "$person has been invited to the org by $inviter"
+                                ->get("Irc", "Ircguildprefix"),
+                            "",
+                            "$person has been invited to the org by $inviter"
                         );
                     }
                 }
@@ -258,14 +287,13 @@ class Roster_Core extends BasePassiveModule
         }
         if ($this->bot->guildbot) {
             $this->update_guild();
-        }
-        else {
+        } else {
             $this->update_raid();
         }
     }
 
 
-    function update_guild($force = FALSE)
+    function update_guild($force = false)
     {
         /*** FIXME: This is not the right place to tell people that the bot went online!
         if ($this->startup && ! $force)
@@ -276,7 +304,7 @@ class Roster_Core extends BasePassiveModule
          */
         $this->lastrun = $this->bot->core("settings")
             ->get("members", "LastRosterUpdate");
-        if (($this->lastrun + 21600) >= time() && $force == FALSE) {
+        if (($this->lastrun + 21600) >= time() && $force == false) {
             $this->bot->log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
             return;
         }
@@ -286,8 +314,12 @@ class Roster_Core extends BasePassiveModule
             }
             return;
         }
-        $this->running = TRUE;
-        $this->bot->log("ROSTER", "UPDATE", "Starting roster update for guild id: " . $this->bot->guildid . " on RK" . $this->bot->dimension);
+        $this->running = true;
+        $this->bot->log(
+            "ROSTER",
+            "UPDATE",
+            "Starting roster update for guild id: " . $this->bot->guildid . " on RK" . $this->bot->dimension
+        );
         if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
             $this->bot->send_gc("##normal##Roster update starting ::: System busy##end##");
         }
@@ -295,18 +327,18 @@ class Roster_Core extends BasePassiveModule
         if (strtolower($this->bot->game) == 'ao') {
             $dimension = $this->bot->dimension;
             switch (strtolower($dimension)) {
-            case "testlive":
-                $dimension = "0";
-                break;
-            case "atlantean";
-                $dimension = "1";
-                break;
-            case "rimor":
-                $dimension = "2";
-                break;
-            case "die neue welt":
-                $dimension = "3";
-                break;
+                case "testlive":
+                    $dimension = "0";
+                    break;
+                case "atlantean";
+                    $dimension = "1";
+                    break;
+                case "rimor":
+                    $dimension = "2";
+                    break;
+                case "die neue welt":
+                    $dimension = "3";
+                    break;
             }
             $members = $this->parse_org($dimension, $this->bot->guildid);
         }
@@ -332,46 +364,57 @@ class Roster_Core extends BasePassiveModule
                 */
                 foreach ($members as $member) {
                     if (!isset($db_members[$member["nickname"]])) {
-                    /*
-                    If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
-                    its a new member we havent picked up for some reason.
-                    */
+                        /*
+                        If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
+                        its a new member we havent picked up for some reason.
+                        */
                         if ($this->add("Roster-XML", $member["id"], $member["nickname"], "from XML") == true) {
                             $this->added++;
-                        }
-                        else {
+                        } else {
                             $this->skipped++;
                             continue;
                         }
-                    }
-                    else {
+                    } else {
                         $db_member = $db_members[$member["nickname"]];
                         if ($db_member[2] == 1 || ($db_member[2] == 0 && (($db_member[3] + 172800) <= time()))) {
-                            if ($this->add("Roster-XML", $member["id"], $member["nickname"], "from XML") == true)
-                            {
+                            if ($this->add("Roster-XML", $member["id"], $member["nickname"], "from XML") == true) {
                                 $this->added++;
-                            }
-                            else {
+                            } else {
                                 $this->skipped++;
                                 continue;
                             }
-                        }
-                        /*
+                        } /*
                         We have an entry for the nickname, but the character id's have changed, rerolled character.
                         */
                         else {
                             if ($db_member[0] != $member["id"]) {
-                                if ($member["id"] == "0" || $member["id"] == "-1" || $member["id"] == "" || $member["id"] == NULL || empty($member["id"]) || strlen($id) < 5) {
-                                    $this->bot->log("ROSTER", "ID", "Get ID Failed for {$member['nickname']} (ID: " . $member["id"] . ")");
-                                }
-                                else {
-                                    $this->erase("Roster-XML", $db_member[0], $member["nickname"], "char_id mismatch (ID: " . $db_member[0] . ")");
+                                if ($member["id"] == "0" || $member["id"] == "-1" || $member["id"] == "" || $member["id"] == null || empty($member["id"]) || strlen(
+                                        $id
+                                    ) < 5
+                                ) {
+                                    $this->bot->log(
+                                        "ROSTER",
+                                        "ID",
+                                        "Get ID Failed for {$member['nickname']} (ID: " . $member["id"] . ")"
+                                    );
+                                } else {
+                                    $this->erase(
+                                        "Roster-XML",
+                                        $db_member[0],
+                                        $member["nickname"],
+                                        "char_id mismatch (ID: " . $db_member[0] . ")"
+                                    );
                                     $this->removed++;
                                     if ($this->bot->guildid == $member["org_id"]) {
-                                        if ($this->add("Roster-XML-Reroll", $member["id"], $member["nickname"], "after reroll (ID: " . $member["id"] . ")") == true) {
+                                        if ($this->add(
+                                                "Roster-XML-Reroll",
+                                                $member["id"],
+                                                $member["nickname"],
+                                                "after reroll (ID: " . $member["id"] . ")"
+                                            ) == true
+                                        ) {
                                             $this->rerolled++;
-                                        }
-                                        else {
+                                        } else {
                                             $this->skipped++;
                                             continue;
                                         }
@@ -392,7 +435,9 @@ class Roster_Core extends BasePassiveModule
                     Update the timestamp, but only if its a member.
                     */
                     if (!empty($db_member) && $db_member[2] <= 2) {
-                        $this->bot->db->query("UPDATE #___users SET updated_at = '" . time() . "' WHERE char_id = '" . $member["id"] . "'");
+                        $this->bot->db->query(
+                            "UPDATE #___users SET updated_at = '" . time() . "' WHERE char_id = '" . $member["id"] . "'"
+                        );
                     }
                     /*
                     Make sure we don't delete the member in the final step
@@ -414,7 +459,10 @@ class Roster_Core extends BasePassiveModule
                         Catch newly added members and give them their first update timestamp
                         */
                         if ($dbmember[3] == 0) {
-                            $this->bot->db->query("UPDATE #___users SET updated_at = '" . time() . "' WHERE char_id = '" . $dbmember[0] . "'");
+                            $this->bot->db->query(
+                                "UPDATE #___users SET updated_at = '" . time(
+                                ) . "' WHERE char_id = '" . $dbmember[0] . "'"
+                            );
                         }
                         /*
                         If we still have no updates for this member after 2 days, remove.
@@ -422,9 +470,12 @@ class Roster_Core extends BasePassiveModule
                         if ((($dbmember[3] + 172800) <= time()) && ($dbmember[3] != 0)) {
                             $this->del("Roster-XML", $dbmember[0], $dbmember[1], "removed");
                             $this->removed++;
-                        }
-                        else {
-                            $this->bot->log("ROSTER", "INFO", $dbmember[1] . " is in members table but appears to not to be in XML, skipping removal for now");
+                        } else {
+                            $this->bot->log(
+                                "ROSTER",
+                                "INFO",
+                                $dbmember[1] . " is in members table but appears to not to be in XML, skipping removal for now"
+                            );
                         }
                         unset($buddies[$dbmember[0]]);
                     }
@@ -452,13 +503,17 @@ class Roster_Core extends BasePassiveModule
             if (!empty($buddies)) {
                 foreach ($buddies as $id => $value) {
                     $name = $this->bot->core("player")->name($id);
-                    $member = $this->bot->db->select("SELECT char_id, user_level, updated_at FROM #___users WHERE char_id = '" . $id . "' AND user_level >= '2'");
+                    $member = $this->bot->db->select(
+                        "SELECT char_id, user_level, updated_at FROM #___users WHERE char_id = '" . $id . "' AND user_level >= '2'"
+                    );
                     if (!empty($member)) {
                         /*
                         Catch newly added members and give them their first update timestamp
                         */
                         if ($member[0][2] == 0) {
-                            $this->bot->db->query("UPDATE #___users SET updated_at = '" . time() . "' WHERE char_id = '" . $id . "'");
+                            $this->bot->db->query(
+                                "UPDATE #___users SET updated_at = '" . time() . "' WHERE char_id = '" . $id . "'"
+                            );
                         }
                         /*
                         If we still have no updates for this member after 2 days, remove.
@@ -466,17 +521,21 @@ class Roster_Core extends BasePassiveModule
                         if ((($member[0][2] + 172800) <= time()) && ($member[0][2] != 0)) {
                             $this->del("Roster-XML", $id, $name, "removed");
                             $this->removed++;
+                        } else {
+                            $this->bot->log(
+                                "ROSTER",
+                                "INFO",
+                                "$name is in members table but appears to not to be in XML, skipping removal for now"
+                            );
                         }
-                        else {
-                            $this->bot->log("ROSTER", "INFO", "$name is in members table but appears to not to be in XML, skipping removal for now");
-                        }
-                    }
-                    else {
+                    } else {
                         $this->bot->core("chat")->buddy_remove($id);
                     }
                 }
             }
-            $members = $this->bot->db->select("SELECT char_id, nickname, user_level, notify, updated_at, added_by FROM #___users ORDER BY nickname");
+            $members = $this->bot->db->select(
+                "SELECT char_id, nickname, user_level, notify, updated_at, added_by FROM #___users ORDER BY nickname"
+            );
             if (!empty($members)) {
                 foreach ($members as $member) {
                     $id = $this->bot->core("player")->id($member[1]);
@@ -484,7 +543,7 @@ class Roster_Core extends BasePassiveModule
                     Make sure we have an entry in the whois cache for the character.
                     */
                     $whois = $this->bot->core("whois")
-                        ->lookup($member[1], FALSE, TRUE);
+                        ->lookup($member[1], false, true);
                     if (strtolower($this->bot->game) == 'ao') {
                         /*
                         Catch deleted characters.
@@ -494,30 +553,44 @@ class Roster_Core extends BasePassiveModule
                         */
                         if (!$id) {
                             if ((($member[4] + 172800) <= time()) && ($member[4] != 0)) {
-                                $this->erase("Roster", $member[0], $member[1], "as the character appears to have been deleted.");
+                                $this->erase(
+                                    "Roster",
+                                    $member[0],
+                                    $member[1],
+                                    "as the character appears to have been deleted."
+                                );
                                 $this->removed++;
                                 continue;
-                            }
-                            else {
-                                $this->bot->log("ROSTER", "INFO", $member[1] . " is in members table but appears to not to be in XML, skipping removal for now");
+                            } else {
+                                $this->bot->log(
+                                    "ROSTER",
+                                    "INFO",
+                                    $member[1] . " is in members table but appears to not to be in XML, skipping removal for now"
+                                );
                             }
                         }
                         if ($whois instanceof BotError) {
                             Continue; // prob shouldnt skip this but it will stop the crashing
-                        }
-                        /*
+                        } /*
                         Catch rerolled characters.
                         */
                         else {
                             if ($id != $member[0] && $member[2] >= 1) {
-                                if ($id == "0" || $id == "-1" || $id == "" || $id == NULL || empty($id) || strlen($id) < 5) {
+                                if ($id == "0" || $id == "-1" || $id == "" || $id == null || empty($id) || strlen(
+                                        $id
+                                    ) < 5
+                                ) {
                                     $this->bot->log("ROSTER", "ID", "Get ID Failed for $name (ID: " . $id . ")");
                                 }
-                                $this->erase("Roster", $member[0], $member[1], "as the character appears to have been rerolled. Old: $member[0] New: $id");
+                                $this->erase(
+                                    "Roster",
+                                    $member[0],
+                                    $member[1],
+                                    "as the character appears to have been rerolled. Old: $member[0] New: $id"
+                                );
                                 $this->removed++;
                                 continue;
-                            }
-                            /*
+                            } /*
                             Catch characters who are no longer in the org.
                             */
                             else {
@@ -531,12 +604,14 @@ class Roster_Core extends BasePassiveModule
                                         $this->del("Roster-XML", $member[0], $member[1], "removed");
                                         $this->removed++;
                                         continue;
+                                    } else {
+                                        $this->bot->log(
+                                            "ROSTER",
+                                            "INFO",
+                                            $member[1] . " is in members table but appears to not to be in XML, skipping removal for now"
+                                        );
                                     }
-                                    else {
-                                        $this->bot->log("ROSTER", "INFO", $member[1] . " is in members table but appears to not to be in XML, skipping removal for now");
-                                    }
-                                }
-                                /*
+                                } /*
                                 If not we just run through the paces and make sure everything is in order.
                                 */
                                 else {
@@ -559,9 +634,8 @@ class Roster_Core extends BasePassiveModule
                     // Do some sanity checking since funcom has broken chatserver
                     $uid = $this->bot->core("player")->id($user[0]);
                     if ($uid instanceof BotError) {
-                         $this->bot->db->query("UPDATE #___users SET notify = 0 WHERE nickname = '" . $user[0] . "'");
-                    }
-                    else if (!$this->bot->core("chat")->buddy_exists($user[0])) {
+                        $this->bot->db->query("UPDATE #___users SET notify = 0 WHERE nickname = '" . $user[0] . "'");
+                    } else if (!$this->bot->core("chat")->buddy_exists($user[0])) {
                         $this->bot->core("chat")->buddy_add($user[0]);
                     }
                 }
@@ -577,27 +651,26 @@ class Roster_Core extends BasePassiveModule
                 $msg .= "::: " . $this->rerolled . " members was found to have rerolled ";
             }
             if ($this->skipped > 0) {
-                $msg .= "::: " . $this->skipped . " members was skipped due to errors "; 
+                $msg .= "::: " . $this->skipped . " members was skipped due to errors ";
             }
             $this->bot->core("settings")
                 ->save("members", "LastRosterUpdate", time());
-            $this->bot->log("ROSTER", "UPDATE", "Roster update complete. $msg", TRUE);
+            $this->bot->log("ROSTER", "UPDATE", "Roster update complete. $msg", true);
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_gc("##normal##Roster update completed. $msg ##end##");
             }
-        }
-        else {
-            $this->bot->log("ROSTER", "UPDATE", "Roster update failed. Funcom XML returned 0 members.", TRUE);
+        } else {
+            $this->bot->log("ROSTER", "UPDATE", "Roster update failed. Funcom XML returned 0 members.", true);
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_gc("##normal##Roster update failed! Funcom XML returned 0 members ##end##");
             }
         }
         $this->bot->core("notify")->update_cache();
-        $this->running = FALSE;
+        $this->running = false;
     }
 
 
-    function update_raid($force = FALSE)
+    function update_raid($force = false)
     {
         if ($this->running) {
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
@@ -605,7 +678,7 @@ class Roster_Core extends BasePassiveModule
             }
             return;
         }
-        $this->running = TRUE;
+        $this->running = true;
         /*** FIXME: This is not the right place to tell people that the bot went online!
         if ($this->startup && ! $force)
         {
@@ -615,10 +688,9 @@ class Roster_Core extends BasePassiveModule
          */
         $this->lastrun = $this->bot->core("settings")
             ->get("members", "LastRosterUpdate");
-        if (($this->lastrun + (60 * 60 * 6)) >= time() && $force == FALSE) {
+        if (($this->lastrun + (60 * 60 * 6)) >= time() && $force == false) {
             $this->bot->log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
-        }
-        else {
+        } else {
             $this->bot->log("ROSTER", "UPDATE", "Starting roster update");
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_pgroup("##normal##" . $msg . "Roster update starting ::: System busy##end##");
@@ -627,7 +699,9 @@ class Roster_Core extends BasePassiveModule
             $num = 0;
             $this->removed = 0;
             $this->rerolled = 0;
-            $members = $this->bot->db->select("SELECT char_id, nickname, user_level, notify, updated_at FROM #___users");
+            $members = $this->bot->db->select(
+                "SELECT char_id, nickname, user_level, notify, updated_at FROM #___users"
+            );
             if (!empty($members)) {
                 foreach ($members as $member) {
                     $id = $this->bot->core("player")->id($member[1]);
@@ -636,28 +710,43 @@ class Roster_Core extends BasePassiveModule
                     */
                     if (!$id) {
                         if ((($member[4] + 172800) <= time()) && ($member[4] != 0)) {
-                            $this->erase("Roster", $member[0], $member[1], "as the character appears to have been deleted.");
+                            $this->erase(
+                                "Roster",
+                                $member[0],
+                                $member[1],
+                                "as the character appears to have been deleted."
+                            );
                             $this->removed++;
+                        } else {
+                            $this->bot->log(
+                                "ROSTER",
+                                "INFO",
+                                $member[1] . " is in members table but Apears to have been Deleted, skipping removal for now"
+                            );
+                            $this->bot->db->query(
+                                "UPDATE #___users SET updated_at = " . time() . " WHERE char_id = '" . $member[0] . "'"
+                            );
                         }
-                        else {
-                            $this->bot->log("ROSTER", "INFO", $member[1] . " is in members table but Apears to have been Deleted, skipping removal for now");
-                            $this->bot->db->query("UPDATE #___users SET updated_at = " . time() . " WHERE char_id = '" . $member[0] . "'");
-                        }
-                    }
-                    /*
+                    } /*
                     Catch rerolled characters.
                     */
                     else {
                         if ($id != $member[0]) {
-                            if ($id == "0" || $id == "-1" || $id == "" || $id == NULL || empty($id) || strlen($id) < 5) {
+                            if ($id == "0" || $id == "-1" || $id == "" || $id == null || empty($id) || strlen(
+                                    $id
+                                ) < 5
+                            ) {
                                 $this->bot->log("ROSTER", "ID", "Get ID Failed for $name (ID: " . $id . ")");
-                            }
-                            else {
-                                $this->erase("Roster", $member[0], $member[1], "as the character appears to have been rerolled. Old: $member[0] New: $id");
+                            } else {
+                                $this->erase(
+                                    "Roster",
+                                    $member[0],
+                                    $member[1],
+                                    "as the character appears to have been rerolled. Old: $member[0] New: $id"
+                                );
                                 $this->rerolled++;
                             }
-                        }
-                        /*
+                        } /*
                         If not we just run through the paces and make sure everything is in order.
                         */
                         else {
@@ -668,7 +757,7 @@ class Roster_Core extends BasePassiveModule
                             Make sure we have an entry in the whois cache for the character.
                             */
                             $this->bot->core("whois")
-                                ->lookup($member[1], FALSE, TRUE);
+                                ->lookup($member[1], false, true);
                             if ($member[3] == 1) {
                                 /*
                                 Make sure all on characters on notify list are in buddy list
@@ -683,7 +772,12 @@ class Roster_Core extends BasePassiveModule
                     }
                 }
             }
-            $this->bot->log("CRON", "ROSTER", "Done updating roster. Removed " . $this->removed . " members of which " . $this->rerolled . " was rerolled characters.", TRUE);
+            $this->bot->log(
+                "CRON",
+                "ROSTER",
+                "Done updating roster. Removed " . $this->removed . " members of which " . $this->rerolled . " was rerolled characters.",
+                true
+            );
             $this->bot->log("CRON", "ROSTER", "Cleaning buddylist.");
             /*
             cycle through anything still on our buddylist
@@ -699,7 +793,7 @@ class Roster_Core extends BasePassiveModule
                 $this->bot->send_pgroup("##normal##Roster update completed ##end##");
             }
         }
-        $this->running = FALSE;
+        $this->running = false;
     }
 
 
@@ -736,10 +830,10 @@ class Roster_Core extends BasePassiveModule
     function parse_org($dim, $id)
     {
         if (($this->bot->core("settings")
-            ->get("Members", "Roster") == "XML"
-            || $this->bot
-                ->core("settings")
-                ->get("Members", "Roster") == "Fallback")
+                    ->get("Members", "Roster") == "XML"
+                || $this->bot
+                    ->core("settings")
+                    ->get("Members", "Roster") == "Fallback")
             && strtolower($this->bot->game) == 'ao'
         ) {
             // Get the guild roster
@@ -790,27 +884,30 @@ class Roster_Core extends BasePassiveModule
                     // If we cannot lookup the player, just ignore it here already
                     if ($member["id"] instanceof BotError) {
                         $j++;
-                    }
-                    else {
+                    } else {
                         if ($member['nickname'] !== ucfirst(strtolower($this->bot->botname))) {
                             $members[] = $member;
                         }
                         $i++;
                     }
                 }
-                $this->bot->log("ROSTER", "UPDATE", "XML for the $faction guild $orgname contained $i member entries. Ignored $j entries that could not be looked up.");
+                $this->bot->log(
+                    "ROSTER",
+                    "UPDATE",
+                    "XML for the $faction guild $orgname contained $i member entries. Ignored $j entries that could not be looked up."
+                );
             }
         }
         if (($this->bot->core("settings")
-            ->get("Members", "Roster") == "WhoisCache"
-            || $this->bot
-                ->core("settings")
-                ->get("Members", "Roster") == "Fallback")
+                    ->get("Members", "Roster") == "WhoisCache"
+                || $this->bot
+                    ->core("settings")
+                    ->get("Members", "Roster") == "Fallback")
             && (empty($members) || $members == 0)
         ) {
             $db_members = $this->bot->db->select(
                 "SELECT id, nickname, firstname,lastname,level,gender,breed,faction,profession,defender_rank,defender_rank_id,org_id,org_name,org_rank,org_rank_id,pictureurl FROM #___whois WHERE org_id = '"
-                    . $id . "'"
+                . $id . "'"
             );
             if (!empty($db_members)) {
                 foreach ($db_members as $key => $db_member) {

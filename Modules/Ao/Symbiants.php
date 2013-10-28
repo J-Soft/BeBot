@@ -58,7 +58,7 @@ class Symb_sql extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->bot = &$bot;
+        $this->bot = & $bot;
         $this->register_command("all", "symb", "GUEST");
         $this->help['description'] = "Advanced search for symbiants and pocket bosses.";
         $this->help['command']['symb <level>[-<level2>]'] = "Find symbs of QL level. If [-<level2>] is specified it finds symbs between the two";
@@ -84,18 +84,18 @@ class Symb_sql extends BaseActiveModule
     {
         $this->bot->db->define_tablename("symbiants", "false");
         Switch ($this->bot->db->get_version("symbiants")) {
-        case 1:
-        case 2:
-            $filename = "./extra/symbiants/symbiants.sql";
-            $handle = fopen($filename, "r");
-            $query = fread($handle, filesize($filename));
-            fclose($handle);
-            $query = explode(";", $query);
-            foreach ($query as $q) {
-                if (!empty($q)) {
-                    $this->bot->db->query($q);
+            case 1:
+            case 2:
+                $filename = "./extra/symbiants/symbiants.sql";
+                $handle = fopen($filename, "r");
+                $query = fread($handle, filesize($filename));
+                fclose($handle);
+                $query = explode(";", $query);
+                foreach ($query as $q) {
+                    if (!empty($q)) {
+                        $this->bot->db->query($q);
+                    }
                 }
-            }
         }
         $this->bot->db->set_version("symbiants", 3);
     }
@@ -104,25 +104,26 @@ class Symb_sql extends BaseActiveModule
     function command_handler($name, $msg, $source)
     {
         $com = $this->parse_com(
-            $msg, array(
-                'com',
-                'args'
+            $msg,
+            array(
+                 'com',
+                 'args'
             )
         );
         switch ($com['com']) {
-        case 'symb':
-            return ($this->symb($com['args']));
-            break;
+            case 'symb':
+                return ($this->symb($com['args']));
+                break;
         }
     }
 
 
     function symb($args)
     {
-        $query_ql = FALSE; //quality level in query format
-        $query_slot = FALSE; //slots in query format
-        $query_unit = FALSE; //unit in query format
-        $query_name = FALSE; //Name of symbiant in query format
+        $query_ql = false; //quality level in query format
+        $query_slot = false; //slots in query format
+        $query_unit = false; //unit in query format
+        $query_name = false; //Name of symbiant in query format
         $prof_units = array();
         //Condition args.
         //Lower case everything so we know what we're working with.
@@ -132,10 +133,13 @@ class Symb_sql extends BaseActiveModule
         //Turn any short hand profession into it's full name.
         $args = preg_replace(
             explode(
-                ',', '/\b' . $this->bot
-                ->core('professions')->get_shortcuts('\b/,/\b') . '\b/'
-            ), $this->bot
-                ->core('professions')->get_profession_array(), $args
+                ',',
+                '/\b' . $this->bot
+                    ->core('professions')->get_shortcuts('\b/,/\b') . '\b/'
+            ),
+            $this->bot
+                ->core('professions')->get_profession_array(),
+            $args
         );
         //Turn symbiant-style and full-name slots into short hand implant-style slots
         foreach ($this->slots as $slot_name => $name) {
@@ -147,8 +151,10 @@ class Symb_sql extends BaseActiveModule
             $profession
         ) {
             $args = str_replace(
-                $profession, $this->bot->core('professions')
-                    ->get_unit_list($profession, ' '), $args
+                $profession,
+                $this->bot->core('professions')
+                    ->get_unit_list($profession, ' '),
+                $args
             );
         }
         //Make arguments an array we can iterate trough
@@ -157,71 +163,62 @@ class Symb_sql extends BaseActiveModule
         foreach ($args as $arg) {
             //Check if $arg is a unit
             if (in_array(
-                $arg, $this->bot->core('professions')
+                $arg,
+                $this->bot->core('professions')
                     ->get_unit_array()
             )
             ) {
                 if (!in_array($arg, $prof_units)) {
                     $prof_units[] = $arg;
-                    if ($query_unit === FALSE) {
+                    if ($query_unit === false) {
                         $query_unit = "unit = '$arg'";
                         $readable_units = "$arg";
-                    }
-                    else {
+                    } else {
                         $query_unit .= " or unit = '$arg'";
                         $readable_units .= " and $arg";
                     }
                 }
-            }
-            //Check if $arg is a slot
+            } //Check if $arg is a slot
             elseif ($slot_match = array_search($arg, $this->slots)) {
-                if ($query_slot === FALSE) {
+                if ($query_slot === false) {
                     $query_slot = "slot = '{$this->slots[$slot_match]}'";
                     $readable_slot = $slot_match;
-                }
-                else {
+                } else {
                     $query_slot .= " or slot='{$this->slots[$slot_match]}'";
                     $readable_slot .= " and $slot_match";
                 }
-            }
-            //Check if $arg is a number and thus a QL
+            } //Check if $arg is a number and thus a QL
             elseif (is_numeric($arg)) {
-                if ($query_ql === FALSE) {
+                if ($query_ql === false) {
                     $query_ql = "ql = $arg";
                     $readable_ql = "$arg";
-                }
-                else {
+                } else {
                     $query_ql .= " OR ql = $arg";
                     $readable_ql .= " or $arg";
                 }
-            }
-            //Check if $arg is a QL-range
+            } //Check if $arg is a QL-range
             elseif (preg_match("/(\d{1,3})-(\d{1,3})/", $arg, $pql)) {
                 //Check if the range is low-high
                 if ($pql[1] < $pql[2]) {
                     $low = $pql[1];
                     $high = $pql[2];
-                }
-                else {
+                } else {
                     $low = $pql[2];
                     $high = $pql[1];
                 }
-                if ($query_ql === FALSE) {
+                if ($query_ql === false) {
                     $query_ql = " (ql >= $low AND ql <= $high)";
                     $readable_ql = "between $low and $high";
-                }
-                else {
+                } else {
                     $query_ql .= " OR (ql >= $low and ql <= $high)";
                     $readable_ql .= " or between $low and $high";
                 }
-            }
-            //Assume that $arg is name since it's none of the above
+            } //Assume that $arg is name since it's none of the above
             else {
-                if ($query_name === FALSE) {
+                if ($query_name === false) {
                     $query_name = "t1.name like '%$arg%'";
                     $readable_name = "'$arg'";
-                }
-                else {
+                } else {
                     $query_name .= " or t1.name like '%$arg%'";
                     $readable_name .= " or '$arg'";
                 }
@@ -243,22 +240,22 @@ class Symb_sql extends BaseActiveModule
         }
         $readable_output .= "------------------------------------------\n\n";
         //Build a query
-        if ($query_ql !== FALSE) {
+        if ($query_ql !== false) {
             $where_string = "($query_ql)";
         }
-        if ($query_slot !== FALSE) {
+        if ($query_slot !== false) {
             if (!empty($where_string)) {
                 $where_string .= ' and ';
             }
             $where_string .= "($query_slot)";
         }
-        if ($query_unit !== FALSE) {
+        if ($query_unit !== false) {
             if (!empty($where_string)) {
                 $where_string .= ' and ';
             }
             $where_string .= "($query_unit)";
         }
-        if ($query_name !== FALSE) {
+        if ($query_name !== false) {
             if (!empty($where_string)) {
                 $where_string .= ' and ';
             }
@@ -271,10 +268,12 @@ class Symb_sql extends BaseActiveModule
             $readable_output .= 'No matches...';
             return ($this->bot->core('tools')
                 ->make_blob('Symbiants', $readable_output));
-        }
-        else {
+        } else {
             foreach ($symbiants as $symb) {
-                $title = "QL {$symb['ql']} {$symb['symb']} " . array_search($symb['slot'], $this->slots) . " symbiant, {$symb['unit']} unit aban";
+                $title = "QL {$symb['ql']} {$symb['symb']} " . array_search(
+                        $symb['slot'],
+                        $this->slots
+                    ) . " symbiant, {$symb['unit']} unit aban";
                 $title = ucwords($title);
                 $link = "<a href='itemref://{$symb['itemref']}/{$symb['itemref']}/{$symb['ql']}'>$title</a>";
                 $readable_output .= "$link\n";

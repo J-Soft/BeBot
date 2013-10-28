@@ -18,8 +18,7 @@ $server_list['Ao']['Die neue welt'] = array(
 );
 
 
-
-$server_list['Ao']['Rubi-Ka'] =  array('server'=>'chat.d1.funcom.com', 'port'=>7105);
+$server_list['Ao']['Rubi-Ka'] = array('server' => 'chat.d1.funcom.com', 'port' => 7105);
 
 $server_list['Ao']['5'] = $server_list['Ao']['Rubi-Ka'];
 $server_list['Ao']['5'] = $server_list['Ao']['Rubi-Ka'];

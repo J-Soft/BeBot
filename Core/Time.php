@@ -52,9 +52,11 @@ class Time_Core extends BaseActiveModule
         $this->help['command']['time'] = "Shows the current time.";
         $this->bot->core("settings")
             ->create(
-            "Time", "FormatString", "F jS, Y H:i",
-            "The format string used in all gmdate() calls throughout the bot. For more info check the help to gmdate() in the php manual. WARNING: DO NOT CHANGE THIS IF YOU DON'T KNOW WHAT THIS MEANS! Wrong entries will break the time display throughout the bot!"
-        );
+                "Time",
+                "FormatString",
+                "F jS, Y H:i",
+                "The format string used in all gmdate() calls throughout the bot. For more info check the help to gmdate() in the php manual. WARNING: DO NOT CHANGE THIS IF YOU DON'T KNOW WHAT THIS MEANS! Wrong entries will break the time display throughout the bot!"
+            );
     }
 
 
@@ -75,8 +77,7 @@ class Time_Core extends BaseActiveModule
             $output .= " " . $this->ao_year() . " Rubi-Ka Universal Time. ";
             $e1 = " from Uncle Pumpkin-head";
             $e2 = "Leet";
-        }
-        else {
+        } else {
             $e2 = "Conan";
         }
         if (gmdate("n") == 10 && gmdate("j") == 31) // OMG Pumpkinsheads!
@@ -138,12 +139,10 @@ class Time_Core extends BaseActiveModule
         if (stristr($timestr, 'm')) {
             $timesize = 60;
             $timeunit = 2;
-        }
-        elseif (stristr($timestr, 'h')) {
+        } elseif (stristr($timestr, 'h')) {
             $timesize = 60 * 60;
             $timeunit = 3;
-        }
-        elseif (stristr($timestr, 'd')) {
+        } elseif (stristr($timestr, 'd')) {
             $timesize = 60 * 60 * 24;
             $timeunit = 4;
         }
@@ -155,17 +154,14 @@ class Time_Core extends BaseActiveModule
                 $numberlength += $timesize * $timeparts[$i];
                 if ($timeunit == 1) {
                     $timesize = 60;
-                }
-                elseif ($timeunit == 2) {
+                } elseif ($timeunit == 2) {
                     $timesize = 60 * 60;
-                }
-                elseif ($timeunit >= 3) {
+                } elseif ($timeunit >= 3) {
                     $timesize = 24 * 60 * 60;
                 }
                 $timeunit++;
             }
-        }
-        else {
+        } else {
             $numberlength = $timestr;
             settype($numberlength, "integer");
             $numberlength = $numberlength * $timesize;
@@ -191,8 +187,7 @@ class Time_Core extends BaseActiveModule
                 $diftimedays = floor($diftime / 24);
                 $timestr = $diftime % 24 . " hours" . $timestr;
                 return $diftimedays . " days " . $timestr . " ago";
-            }
-            else {
+            } else {
                 $timestr = $diftime . " hours" . $timestr;
                 return $timestr . " ago";
             }

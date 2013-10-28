@@ -48,14 +48,29 @@ class Buddy_Queue_Core extends BasePassiveModule
         $this->register_module("buddy_queue");
 
         $this->bot->core("settings")
-            ->create("Buddy_Queue", "Enabled", TRUE, "Should buddies be queued or added as requested? (Queueing buddies may slow down the bot.)");
+            ->create(
+                "Buddy_Queue",
+                "Enabled",
+                true,
+                "Should buddies be queued or added as requested? (Queueing buddies may slow down the bot.)"
+            );
         $this->bot->core("settings")
-            ->create("Buddy_Queue", "Rate", 1, "How many buddy add and removes should be done per second?", "1;2;3;4;5;6;7;8;9;10");
+            ->create(
+                "Buddy_Queue",
+                "Rate",
+                1,
+                "How many buddy add and removes should be done per second?",
+                "1;2;3;4;5;6;7;8;9;10"
+            );
         $this->bot->core("settings")
             ->register_callback("Buddy_Queue", "Rate", $this);
         $this->settings(
-            FALSE, FALSE, FALSE, $this->bot->core("settings")
-                ->get("Buddy_Queue", "Rate"), FALSE
+            false,
+            false,
+            false,
+            $this->bot->core("settings")
+                ->get("Buddy_Queue", "Rate"),
+            false
         );
     }
 
@@ -74,16 +89,19 @@ class Buddy_Queue_Core extends BasePassiveModule
             if (!($this->bot->core("chat")->buddy_exists($uid))) {
                 $this->bot->aoc->buddy_add($uid);
                 $this->bot->log(
-                    "BUDDY QUEUE", "BUDDY-ADD", $this->bot
+                    "BUDDY QUEUE",
+                    "BUDDY-ADD",
+                    $this->bot
                         ->core("player")->name($uid)
                 );
             }
-        }
-        else {
+        } else {
             $this->bot->log(
-                "BUDDY QUEUE", "BUDDY-ERROR", "Tried to add " . $this->bot
-                ->core("player")
-                ->name($uid) . " as a buddy when they already are one."
+                "BUDDY QUEUE",
+                "BUDDY-ERROR",
+                "Tried to add " . $this->bot
+                    ->core("player")
+                    ->name($uid) . " as a buddy when they already are one."
             );
         }
     }
@@ -99,15 +117,18 @@ class Buddy_Queue_Core extends BasePassiveModule
                         ->name($uid)
                 );
                 $this->bot->log(
-                    "BUDDY QUEUE", "BUDDY-DEL", $this->bot
+                    "BUDDY QUEUE",
+                    "BUDDY-DEL",
+                    $this->bot
                         ->core("player")->name($uid)
                 );
-            }
-            else {
+            } else {
                 $this->bot->log(
-                    "BUDDY QUEUE", "BUDDY-ERROR", "Tried to remove " . $this->bot
-                    ->core("player")
-                    ->name($uid) . " as a buddy when they are not one."
+                    "BUDDY QUEUE",
+                    "BUDDY-ERROR",
+                    "Tried to remove " . $this->bot
+                        ->core("player")
+                        ->name($uid) . " as a buddy when they are not one."
                 );
             }
         }
@@ -121,8 +142,7 @@ class Buddy_Queue_Core extends BasePassiveModule
     {
         if ($info[1]) {
             $this->do_add($info[0]);
-        }
-        else {
+        } else {
             $this->do_delete($info[0]);
         }
     }
@@ -134,9 +154,8 @@ class Buddy_Queue_Core extends BasePassiveModule
     function check_queue()
     {
         if (!$this->bot->core("settings")->get("Buddy_Queue", "Enabled")) {
-            Return TRUE;
-        }
-        else {
+            Return true;
+        } else {
             return $this->bot->core("queue")->check_queue("buddy");
         }
     }

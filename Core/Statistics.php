@@ -57,7 +57,7 @@ class statistics extends BasePassiveModule
         );
         $this->register_module("statistics");
         $this->bot->core("settings")
-            ->create('Statistics', "Enabled", FALSE, "Capture Statistics?");
+            ->create('Statistics', "Enabled", false, "Capture Statistics?");
     }
 
 
@@ -67,9 +67,11 @@ class statistics extends BasePassiveModule
     What we're capturing is the module name, the action, and a simple count.
     */
     function capture_statistic(
-        $module, $action, $comment = "", $count = 1
-    )
-        //function capture_statistic ()
+        $module,
+        $action,
+        $comment = "",
+        $count = 1
+    ) //function capture_statistic ()
     {
         if ($this->bot->core("settings")->get("Statistics", "Enabled")) {
             $total_count = $this->bot->db->select(
@@ -83,8 +85,7 @@ class statistics extends BasePassiveModule
                     "UPDATE #___statistics SET count = '" . $total_count . "' WHERE module = '" . $module . "' AND action = '" . $action . "' AND comment = '" . $comment . "'"
                 );
                 return;
-            }
-            else {
+            } else {
                 $total_count = $count;
                 $this->bot->db->query(
                     "INSERT INTO #___statistics (module, action, comment, count) VALUES ('" . $module . "','" . $action . "','" . $comment . "'," . $total_count . ")"

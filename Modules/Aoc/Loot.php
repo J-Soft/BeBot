@@ -48,27 +48,39 @@ class Rolls extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->count = 0;
         $this->register_command(
-            "gc", "loot", "ANONYMOUS", array(
-                "add" => "ANONYMOUS",
-                "rem" => "ANONYMOUS",
-                "list" => "ANONYMOUS",
-                "clear" => "ADMIN",
-                "result" => "ADMIN",
-                "reroll" => "ADMIN"
+            "gc",
+            "loot",
+            "ANONYMOUS",
+            array(
+                 "add" => "ANONYMOUS",
+                 "rem" => "ANONYMOUS",
+                 "list" => "ANONYMOUS",
+                 "clear" => "ADMIN",
+                 "result" => "ADMIN",
+                 "reroll" => "ADMIN"
             )
         );
         $this->register_command(
-            "tell", "loot", "ANONYMOUS", array(
-                "add" => "ANONYMOUS",
-                "rem" => "ANONYMOUS",
-                "list" => "ANONYMOUS",
-                "clear" => "ADMIN",
-                "result" => "ADMIN",
-                "reroll" => "ADMIN"
+            "tell",
+            "loot",
+            "ANONYMOUS",
+            array(
+                 "add" => "ANONYMOUS",
+                 "rem" => "ANONYMOUS",
+                 "list" => "ANONYMOUS",
+                 "clear" => "ADMIN",
+                 "result" => "ADMIN",
+                 "reroll" => "ADMIN"
             )
         );
         $this->bot->core("settings")
-            ->create("Loot", "Roll", "SINGLE", "Should you be allowed to be added to the roll of more than one slot?", "SINGLE;MULTI");
+            ->create(
+                "Loot",
+                "Roll",
+                "SINGLE",
+                "Should you be allowed to be added to the roll of more than one slot?",
+                "SINGLE;MULTI"
+            );
         $this->bot->core("colors")
             ->define_scheme("loot", "highlight", "yellow");
         $this->help['description'] = 'Module to flat roll on items.';
@@ -91,47 +103,52 @@ class Rolls extends BaseActiveModule
     { // Start function handler()
         $this->error->reset(); //Reset the error message so we don't trigger the handler by old error messages.
         $com = $this->parse_com(
-            $msg, array(
-                'com',
-                'sub',
-                'args'
+            $msg,
+            array(
+                 'com',
+                 'sub',
+                 'args'
             )
         );
         switch (strtolower($com['sub'])) {
-        case 'clear':
-            unset($this->loot);
-            unset($this->leftovers);
-            $this->count = 0;
-            $this->bot->send_gc("##loot_highlight##" . $name . "##end## cancelled the loot rolls in progress");
-            break;
-        case 'result':
-            $this->roll($name);
-            break;
-        case 'list':
-            $this->rlist();
-            break;
-        case 'add':
-            $this->add($name, $com['args'], FALSE);
-            break;
-        case 'reroll':
-            $this->reroll($name);
-            break;
-        case 'rem':
-            if (is_numeric($com['args']) && (int)$com['args'] == (real)$com['args'] && array_key_exists($name, $this->loot[$com['args']])) {
-                unset($this->loot[$com['args']][$name]);
-                $this->bot->send_gc("##loot_highlight##" . $name . "##end## removed from rolls in slot##loot_highlight## #" . $com['args']);
-            }
-            else {
-                $this->bot->send_help($name);
-            }
-            break;
-        default:
-            if (!empty($com['sub']) || !empty($com['args'])) {
-                $this->loot($com['sub'] . ' ' . $com['args'], $name);
-            }
-            else {
-                $this->bot->send_help($name);
-            }
+            case 'clear':
+                unset($this->loot);
+                unset($this->leftovers);
+                $this->count = 0;
+                $this->bot->send_gc("##loot_highlight##" . $name . "##end## cancelled the loot rolls in progress");
+                break;
+            case 'result':
+                $this->roll($name);
+                break;
+            case 'list':
+                $this->rlist();
+                break;
+            case 'add':
+                $this->add($name, $com['args'], false);
+                break;
+            case 'reroll':
+                $this->reroll($name);
+                break;
+            case 'rem':
+                if (is_numeric($com['args']) && (int)$com['args'] == (real)$com['args'] && array_key_exists(
+                        $name,
+                        $this->loot[$com['args']]
+                    )
+                ) {
+                    unset($this->loot[$com['args']][$name]);
+                    $this->bot->send_gc(
+                        "##loot_highlight##" . $name . "##end## removed from rolls in slot##loot_highlight## #" . $com['args']
+                    );
+                } else {
+                    $this->bot->send_help($name);
+                }
+                break;
+            default:
+                if (!empty($com['sub']) || !empty($com['args'])) {
+                    $this->loot($com['sub'] . ' ' . $com['args'], $name);
+                } else {
+                    $this->bot->send_help($name);
+                }
         }
     } // End function handler()
 
@@ -149,12 +166,11 @@ class Rolls extends BaseActiveModule
                 }
             }
             $this->addmsg = "##loot_highlight##" . $name . "##end## removed from all slots.";
-        }
-        else {
-            $present = FALSE;
+        } else {
+            $present = false;
             if ($this->loot[$slot]) {
                 if ($this->bot->core("settings")
-                    ->get('Loot', 'Roll') == "SINGLE"
+                        ->get('Loot', 'Roll') == "SINGLE"
                 ) {
                     $slots = array_keys($this->loot);
                     foreach ($slots as $key => $sslot) {
@@ -162,24 +178,21 @@ class Rolls extends BaseActiveModule
                         foreach ($list as $playerslot => $player) {
                             if ($player == $name) {
                                 unset($this->loot[$sslot][$player]);
-                                $present = TRUE;
+                                $present = true;
                             }
                         }
                     }
-                    if ($present == TRUE) {
+                    if ($present == true) {
                         $this->addmsg = "##loot_highlight##" . $name . "##end## changed to slot##loot_highlight## #" . $slot . "##end##";
-                    }
-                    else {
+                    } else {
                         $this->addmsg = "##loot_highlight##" . $name . "##end## assigned to slot##loot_highlight## #" . $slot . "##end##";
                     }
                     $this->loot[$slot][$name] = 1;
-                }
-                else {
+                } else {
                     $this->loot[$slot][$name] = 1;
                     $this->addmsg = "##loot_highlight##" . $name . "##end## assiged to slot##loot_highlight## #" . $slot . "##end##";
                 }
-            }
-            else {
+            } else {
                 $this->addmsg = "There is currently no roll in slot $slot";
             }
         }
@@ -189,12 +202,12 @@ class Rolls extends BaseActiveModule
 
     function loot($msg, $name)
     {
-        $notyet = TRUE;
+        $notyet = true;
         for ($i = 1; $i <= $this->count; $i++) {
             if ($msg == $this->loot[$i]['item']) {
                 $this->loot[$i]['num']++;
                 $num = $this->loot[$i]['num'];
-                $notyet = FALSE;
+                $notyet = false;
                 $numslot = $i;
             }
         }
@@ -205,7 +218,9 @@ class Rolls extends BaseActiveModule
             $this->loot[$numslot]['item'] = $msg;
             $this->loot[$numslot]['num'] = 1;
         }
-        $this->bot->send_gc("##loot_highlight##" . $num . "x " . $msg . "##end## being rolled in slot##loot_highlight## #" . $numslot);
+        $this->bot->send_gc(
+            "##loot_highlight##" . $num . "x " . $msg . "##end## being rolled in slot##loot_highlight## #" . $numslot
+        );
         if ($this->count == 1) {
             unset($this->leftovers);
         }
@@ -239,8 +254,7 @@ class Rolls extends BaseActiveModule
                     $winner = Nobody;
                     $lcount = count($this->leftovers) + 1;
                     $this->leftovers[$lcount] = $item;
-                }
-                else {
+                } else {
                     unset($slot[$winner]);
                 }
                 $msg .= "##loot_highlight##Item: ##end##" . $item . "  (Slot##loot_highlight## #" . $num . "##end##)\n";
@@ -253,7 +267,7 @@ class Rolls extends BaseActiveModule
             $num++;
         }
         $blob = "Item Winners List :: " . $this->bot->core("tools")
-            ->make_blob("click to view", $msg);
+                ->make_blob("click to view", $msg);
         $this->bot->send_gc($blob);
         $this->count = 0;
     }
@@ -264,16 +278,15 @@ class Rolls extends BaseActiveModule
         $lcount = count($this->leftovers);
         if ($lcount == 0) {
             $this->bot->send_gc("##loot_highlight##No leftovers from last roll.##end##");
-        }
-        else {
+        } else {
             $this->count = 0;
             foreach ($this->leftovers as $item) {
-                $notyet = TRUE;
+                $notyet = true;
                 for ($i = 1; $i <= $this->count; $i++) {
                     if ($item == $this->loot[$i][item]) {
                         $this->loot[$i][num]++;
                         $num = $this->loot[$i][num];
-                        $notyet = FALSE;
+                        $notyet = false;
                         $numslot = $i;
                     }
                 }
@@ -287,7 +300,7 @@ class Rolls extends BaseActiveModule
                 $msg .= "##loot_highlight##" . $num . "x " . $item . "##end## being rolled in slot##loot_highlight## #" . $numslot . "##end##.\n";
             }
             $blob = "Item Roll List :: " . $this->bot->core("tools")
-                ->make_blob("click to view", $msg);
+                    ->make_blob("click to view", $msg);
             $this->bot->send_gc($blob);
             unset($this->leftovers);
         }
@@ -301,14 +314,13 @@ class Rolls extends BaseActiveModule
         foreach ($this->loot as $slot) {
             $num++;
             $msg .= "Slot ##loot_highlight###" . $num . "##end##: (" . $this->bot
-                ->core("tools")
-                ->chatcmd("loot add " . $num, "Add") . "/" . $this->bot
-                ->core("tools")->chatcmd("loot rem " . $num, "Remove") . ")\n";
+                    ->core("tools")
+                    ->chatcmd("loot add " . $num, "Add") . "/" . $this->bot
+                    ->core("tools")->chatcmd("loot rem " . $num, "Remove") . ")\n";
             $msg .= "Item: ##loot_highlight##" . $slot[item] . "##end## (##loot_highlight##" . $slot[num] . "x##end##)\n";
             if (count($slot) == 1) {
                 $msg .= "";
-            }
-            else {
+            } else {
                 $list = array_keys($slot);
                 foreach ($list as $key => $player) {
                     if (($player != "item") && ($player != "num") && ($slot[$player] == 2)) {
@@ -324,7 +336,7 @@ class Rolls extends BaseActiveModule
             $msg .= "\n\n";
         }
         $blob = "Item Roll List :: " . $this->bot->core("tools")
-            ->make_blob("click to view", $msg);
+                ->make_blob("click to view", $msg);
         $this->bot->send_gc($blob);
     }
 }

@@ -537,12 +537,12 @@ class Level extends BaseActiveModule
         $vars = explode(' ', strtolower($msg));
         $command = $vars[0];
         switch ($command) {
-        case 'level':
-            return $this->get_level($vars[1]);
-        case 'mission':
-            return $this->get_mish($vars[1]);
-        default:
-            return "Broken plugin, received unhandled command: $command";
+            case 'level':
+                return $this->get_level($vars[1]);
+            case 'mission':
+                return $this->get_mish($vars[1]);
+            default:
+                return "Broken plugin, received unhandled command: $command";
         }
         return false;
     }
@@ -555,8 +555,7 @@ class Level extends BaseActiveModule
         }
         if ($lvl < 200) {
             $xp = " XP";
-        }
-        else {
+        } else {
             $xp = " SK";
         }
         $lvllow = floor(($lvl * 0.7226)) + 1;
@@ -566,14 +565,12 @@ class Level extends BaseActiveModule
         }
         if ($lvl <= 5) {
             $pvplow = 1;
-        }
-        else {
+        } else {
             $pvplow = round($lvl * 0.8) - 1;
         }
         if ($lvl <= 2) {
             $pvphigh = 5;
-        }
-        else {
+        } else {
             $pvphigh = $lvl + (ceil($lvl / 4)) + 1;
         }
         if ($pvphigh > 220) {

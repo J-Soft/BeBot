@@ -56,16 +56,13 @@ class StringFilter_Interface extends BaseActiveModule
         // preg_match just works better than explode for string based input that may have spaces.
         if (preg_match("/^filter add (.+?) replace: (.+)$/i", $msg, $info)) {
             return $this->add($info[1], $info[2]);
-        }
-        else {
+        } else {
             if (preg_match("/^filter add (.+?)$/i", $msg, $info)) {
                 return $this->add($info[1]);
-            }
-            else {
+            } else {
                 if (preg_match("/^filter rem (.+)$/i", $msg, $info)) {
                     return $this->rem($info[1]);
-                }
-                else {
+                } else {
                     return $this->show($name);
                 }
             }
@@ -73,7 +70,7 @@ class StringFilter_Interface extends BaseActiveModule
     }
 
 
-    function add($string, $new = NULL)
+    function add($string, $new = null)
     {
         return $this->bot->core("stringfilter")->add_string($string, $new);
     }
@@ -91,7 +88,7 @@ class StringFilter_Interface extends BaseActiveModule
         $inside = "Filtered String List:\n\n";
         foreach ($return as $string => $replace) {
             $inside .= "Search for: \"" . $string . "\" Replace with: \"" . $replace . "\" " . $this->bot
-                ->core("tools")->chatcmd("filter rem " . $string, "[REMOVE]");
+                    ->core("tools")->chatcmd("filter rem " . $string, "[REMOVE]");
             $inside .= "\n";
         }
         return $this->bot->core("tools")

@@ -47,8 +47,7 @@ class OnlineCounting extends BaseActiveModule
         $this->register_command("all", "check", "GUEST");
         if (strtolower($this->bot->game) == 'aoc') {
             $this->cp = "class";
-        }
-        else {
+        } else {
             $this->cp = "profession";
         }
         $this->help['description'] = 'Lists characters in chat group';
@@ -69,32 +68,23 @@ class OnlineCounting extends BaseActiveModule
     {
         if (preg_match("/^count$/i", $msg, $info)) {
             return $this->count_all();
-        }
-        elseif (preg_match("/^count all$/i", $msg, $info)) {
+        } elseif (preg_match("/^count all$/i", $msg, $info)) {
             return $this->count_all();
-        }
-        elseif (preg_match("/^count org$/i", $msg, $info)) {
+        } elseif (preg_match("/^count org$/i", $msg, $info)) {
             return $this->count_org();
-        }
-        elseif (preg_match("/^count org (.*)$/i", $msg, $info)) {
+        } elseif (preg_match("/^count org (.*)$/i", $msg, $info)) {
             return $this->count_org_members($info[1]);
-        }
-        elseif (preg_match("/^count (.*)$/i", $msg, $info)) {
+        } elseif (preg_match("/^count (.*)$/i", $msg, $info)) {
             return $this->count($info[1]);
-        }
-        elseif (preg_match("/^check$/i", $msg, $info)) {
+        } elseif (preg_match("/^check$/i", $msg, $info)) {
             return $this->check_all();
-        }
-        elseif (preg_match("/^check all$/i", $msg, $info)) {
+        } elseif (preg_match("/^check all$/i", $msg, $info)) {
             return $this->check_all();
-        }
-        elseif (preg_match("/^check org$/i", $msg, $info)) {
+        } elseif (preg_match("/^check org$/i", $msg, $info)) {
             return $this->check_org();
-        }
-        elseif (preg_match("/^check org (.*)$/i", $msg, $info)) {
+        } elseif (preg_match("/^check org (.*)$/i", $msg, $info)) {
             return $this->check_org_members($info[1]);
-        }
-        elseif (preg_match("/^check (.*)$/i", $msg, $info)) {
+        } elseif (preg_match("/^check (.*)$/i", $msg, $info)) {
             return $this->check($info[1]);
         }
     }
@@ -120,8 +110,7 @@ class OnlineCounting extends BaseActiveModule
     {
         if ($prof == "") {
             $profsearch = "!= ''";
-        }
-        else {
+        } else {
             $profsearch = "= '" . $prof . "'";
         }
         return $this->bot->db->select(
@@ -135,13 +124,13 @@ class OnlineCounting extends BaseActiveModule
     function get_orgs()
     {
         $innersql = "SELECT t2.org_name as org, COUNT(DISTINCT t1.nickname) AS count " . " FROM " . $this->bot
-            ->core("online")
-            ->full_tablename() . " WHERE t2.org_name != '' GROUP BY t2.org_name ORDER BY count DESC, org_name ASC";
+                ->core("online")
+                ->full_tablename() . " WHERE t2.org_name != '' GROUP BY t2.org_name ORDER BY count DESC, org_name ASC";
         $sql = "SELECT t1.org AS org, t1.count AS count, SUM(t2.level) / t1.count AS avg_level FROM (" . $innersql
             . ") AS t1, #___whois AS t2, #___online AS t3 WHERE t1.org = t2.org_name AND " . "t2.nickname = t3.nickname AND " . $this->bot
-            ->core("online")->otherbots("t3.") . " AND " . $this->bot
-            ->core("online")
-            ->channels("t3.") . " GROUP BY org ORDER BY t1.count DESC, t1.org ASC";
+                ->core("online")->otherbots("t3.") . " AND " . $this->bot
+                ->core("online")
+                ->channels("t3.") . " GROUP BY org ORDER BY t1.count DESC, t1.org ASC";
         return $this->bot->db->select($sql, MYSQL_ASSOC);
     }
 
@@ -163,18 +152,20 @@ class OnlineCounting extends BaseActiveModule
     function count_all()
     {
         $profession_list = "'" . $this->bot->core('professions')
-            ->get_professions("', '") . "'";
+                ->get_professions("', '") . "'";
         $shortcut_array = array_combine(
             $this->bot->core('professions')
-                ->get_profession_array(), $this->bot->core('professions')
+                ->get_profession_array(),
+            $this->bot->core('professions')
                 ->get_shortcut_array()
         );
         foreach ($shortcut_array as $prof) {
             $profession_count[$prof] = 0;
         }
         $query = "SELECT t2." . $this->cp . " as profession, COUNT(DISTINCT t1.nickname) as count" . " FROM " . $this->bot
-            ->core("online")
-            ->full_tablename() . " WHERE t2." . $this->cp . " IN (" . $profession_list . ") GROUP BY " . $this->cp . "";
+                ->core("online")
+                ->full_tablename(
+                ) . " WHERE t2." . $this->cp . " IN (" . $profession_list . ") GROUP BY " . $this->cp . "";
         $online_count = $this->bot->db->select($query, MYSQL_ASSOC);
         $total_online = 0;
         if (!empty($online_count)) {
@@ -194,7 +185,7 @@ class OnlineCounting extends BaseActiveModule
     function count($shortcut)
     {
         if (($prof = $this->bot->core("professions")
-            ->full_name($shortcut)) instanceof BotError
+                ->full_name($shortcut)) instanceof BotError
         ) {
             return $prof;
         }
@@ -213,11 +204,11 @@ class OnlineCounting extends BaseActiveModule
         $strings = array();
         foreach ($profchars as $curchar) {
             $helpstr = $this->bot->core("colors")
-                ->colorize("counting_name", $curchar[0]) . " [";
+                    ->colorize("counting_name", $curchar[0]) . " [";
             $helpstr .= $this->bot->core("colors")
-                ->colorize("counting_number", $curchar[1]) . "/";
+                    ->colorize("counting_number", $curchar[1]) . "/";
             $helpstr .= $this->bot->core("colors")
-                ->colorize("counting_number", $curchar[2]) . "]";
+                    ->colorize("counting_number", $curchar[2]) . "]";
             $strings[] = $helpstr;
         }
         $retstr .= implode(", ", $strings);
@@ -235,7 +226,8 @@ class OnlineCounting extends BaseActiveModule
         $tcount = $this->bot->db->select(
             "SELECT count(DISTINCT nickname) as count FROM #___online WHERE " . $this->bot
                 ->core("online")->otherbots("") . " AND " . $this->bot
-                ->core("online")->channels(""), MYSQL_ASSOC
+                ->core("online")->channels(""),
+            MYSQL_ASSOC
         );
         $totalcount = $tcount[0]['count'];
         $orgs = array();
@@ -243,11 +235,17 @@ class OnlineCounting extends BaseActiveModule
             $perc = (100 * $org['count']) / $totalcount;
             $orgcmd = $this->bot->core("tools")
                 ->chatcmd("count org " . $org['org'], $org['org']);
-            $orgstr = round($perc, 1) . "% " . $orgcmd . ": " . $org['count'] . " with an average level of " . round($org['avg_level'], 1);
+            $orgstr = round($perc, 1) . "% " . $orgcmd . ": " . $org['count'] . " with an average level of " . round(
+                    $org['avg_level'],
+                    1
+                );
             $orgs[] = $orgstr;
         }
         return $this->bot->core("tools")
-            ->make_blob("Online organizations", "##blob_title##Online organisations:##end##<br><br>" . implode("<br>", $orgs));
+            ->make_blob(
+                "Online organizations",
+                "##blob_title##Online organisations:##end##<br><br>" . implode("<br>", $orgs)
+            );
     }
 
 
@@ -268,11 +266,11 @@ class OnlineCounting extends BaseActiveModule
         $strings = array();
         foreach ($profchars as $curchar) {
             $helpstr = $this->bot->core("colors")
-                ->colorize("counting_name", $curchar[0]) . " [";
+                    ->colorize("counting_name", $curchar[0]) . " [";
             $helpstr .= $this->bot->core("colors")
-                ->colorize("counting_number", $curchar[1]) . "/";
+                    ->colorize("counting_number", $curchar[1]) . "/";
             $helpstr .= $this->bot->core("colors")
-                ->colorize("counting_number", $curchar[2]) . "]";
+                    ->colorize("counting_number", $curchar[2]) . "]";
             $strings[] = $helpstr;
         }
         $retstr .= implode(", ", $strings);
@@ -298,7 +296,7 @@ class OnlineCounting extends BaseActiveModule
     function check($shortcut)
     {
         if (($prof = $this->bot->core("professions")
-            ->full_name($shortcut)) instanceof BotError
+                ->full_name($shortcut)) instanceof BotError
         ) {
             return $prof;
         }

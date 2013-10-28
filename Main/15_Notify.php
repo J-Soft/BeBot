@@ -51,7 +51,7 @@ class Notify_Core extends BasePassiveModule
         $notifylist = $this->bot->db->select("SELECT nickname FROM #___users WHERE notify = 1");
         if (!empty($notifylist)) {
             foreach ($notifylist as $user) {
-                $this->cache[ucfirst(strtolower($user[0]))] = TRUE;
+                $this->cache[ucfirst(strtolower($user[0]))] = true;
             }
         }
     }
@@ -76,8 +76,7 @@ class Notify_Core extends BasePassiveModule
         if (empty($usr)) {
             // Need to add $user to users table as anonymous and silent
             $this->bot->core("user")->add($source, $user, 0, 0, 1);
-        }
-        else {
+        } else {
             // Check if already on notify
             if ($usr[0][0] == 1) {
                 $this->error->set($user . " is already on the notify list!");
@@ -86,7 +85,7 @@ class Notify_Core extends BasePassiveModule
         }
         // Mark for notify in users table and cache
         $this->bot->db->query("UPDATE #___users SET notify = 1 WHERE nickname = '" . $user . "'");
-        $this->cache[$user] = TRUE;
+        $this->cache[$user] = true;
         // Now add to notify list if not yet there
         $this->bot->core("chat")->buddy_add($id);
         return $user . " added to notify list!";
@@ -116,7 +115,9 @@ class Notify_Core extends BasePassiveModule
         unset($this->cache[$user]);
         // If in buddy list remove
         $this->bot->core("chat")->buddy_remove($id);
-        $this->bot->db->query("UPDATE #___online SET status_gc = 0 WHERE nickname = '" . $user . "' AND botname = '" . $this->bot->botname . "'");
+        $this->bot->db->query(
+            "UPDATE #___online SET status_gc = 0 WHERE nickname = '" . $user . "' AND botname = '" . $this->bot->botname . "'"
+        );
         return $user . " removed from notify list!";
     }
 
@@ -131,20 +132,17 @@ class Notify_Core extends BasePassiveModule
             $msg .= $key;
             if ($value == 1) {
                 $msg .= " [##green##Cache##end##]";
-            }
-            else {
+            } else {
                 $msg .= " [##red##Cache##end##]";
             }
             if ($notify_db[0][0] == 1) {
                 $msg .= "[##green##DB##end##]";
-            }
-            else {
+            } else {
                 $msg .= "[##red##DB##end##]";
             }
             if ($notify_db[0][0] != $value) {
                 $msg .= " ##yellow##MISMATCH##end##\n";
-            }
-            else {
+            } else {
                 $msg .= "\n";
             }
             $count++;

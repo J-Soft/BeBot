@@ -59,11 +59,11 @@ class Log extends BaseActiveModule
         $this->help['description'] = 'Module to manage and display logs.';
         $this->help['command']['log'] = "Displays a list of log categories.";
         $this->help['command']['log <category>'] = "Displays the last " . $this->bot
-            ->core("settings")
-            ->get("Log", "LimitMessage") . " logs for that category.";
+                ->core("settings")
+                ->get("Log", "LimitMessage") . " logs for that category.";
         $this->help['command']['log all'] = "Displays the last " . $this->bot
-            ->core("settings")
-            ->get("Log", "LimitMessage") . " logs for all log messages.";
+                ->core("settings")
+                ->get("Log", "LimitMessage") . " logs for all log messages.";
     }
 
 
@@ -71,8 +71,7 @@ class Log extends BaseActiveModule
     {
         if (preg_match("/^log$/i", $msg)) {
             return $this->show_log();
-        }
-        else {
+        } else {
             if (preg_match("/^log (.+)$/i", $msg, $info)) {
                 return $this->show_log($info[1]);
             }
@@ -83,29 +82,28 @@ class Log extends BaseActiveModule
     /*
     Starts a Log
     */
-    function show_log($category = FALSE)
+    function show_log($category = false)
     {
-        if ($category === FALSE) {
+        if ($category === false) {
             $results = $this->bot->db->select("SELECT DISTINCT first FROM #___log_message ORDER BY first");
             $inside .= $this->bot->core("tools")
-                ->chatcmd(
-                "log all", "Show the last " . $this->bot
-                ->core("settings")
-                ->get("Log", "LimitMessage") . " log messages"
-            ) . "\n";
+                    ->chatcmd(
+                        "log all",
+                        "Show the last " . $this->bot
+                            ->core("settings")
+                            ->get("Log", "LimitMessage") . " log messages"
+                    ) . "\n";
             if (!empty($results)) {
                 foreach ($results as $result) {
                     $inside .= $this->bot->core("tools")
-                        ->chatcmd("log " . $result[0], $result[0]) . "\n";
+                            ->chatcmd("log " . $result[0], $result[0]) . "\n";
                 }
-            }
-            else {
+            } else {
                 $inside = "No log messages found.";
             }
             return "Log categories :: " . $this->bot->core("tools")
                 ->make_blob("Click to view", $inside);
-        }
-        elseif ($category == "all") {
+        } elseif ($category == "all") {
             $results = $this->bot->db->select(
                 "SELECT first,second,message,timestamp FROM #___log_message ORDER BY timestamp DESC LIMIT " . $this->bot
                     ->core("settings")->get("Log", "LimitMessage")
@@ -113,18 +111,17 @@ class Log extends BaseActiveModule
             if (!empty($results)) {
                 foreach ($results as $result) {
                     $inside .= "[" . gmdate(
-                        $this->bot->core("settings")
-                            ->get("time", "formatstring"), $result[3]
-                    ) . "]\n" . $result[1] . ": " . $result[2] . "\n\n";
+                            $this->bot->core("settings")
+                                ->get("time", "formatstring"),
+                            $result[3]
+                        ) . "]\n" . $result[1] . ": " . $result[2] . "\n\n";
                 }
-            }
-            else {
+            } else {
                 $inside = "No log messages found.";
             }
             return "Log messages :: " . $this->bot->core("tools")
                 ->make_blob("Click to view", $inside);
-        }
-        else {
+        } else {
             $results = $this->bot->db->select(
                 "SELECT first,second,message,timestamp FROM #___log_message WHERE first = '" . $category . "' ORDER BY timestamp DESC LIMIT " . $this->bot
                     ->core("settings")->get("Log", "LimitMessage")
@@ -132,12 +129,12 @@ class Log extends BaseActiveModule
             if (!empty($results)) {
                 foreach ($results as $result) {
                     $inside .= "[" . gmdate(
-                        $this->bot->core("settings")
-                            ->get("time", "formatstring"), $result[3]
-                    ) . "]\n" . $result[1] . ": " . $result[2] . "\n\n";
+                            $this->bot->core("settings")
+                                ->get("time", "formatstring"),
+                            $result[3]
+                        ) . "]\n" . $result[1] . ": " . $result[2] . "\n\n";
                 }
-            }
-            else {
+            } else {
                 $inside = "No log messages found.";
             }
             return "Log messages for " . $category . " :: " . $this->bot

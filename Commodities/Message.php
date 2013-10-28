@@ -45,14 +45,13 @@ class message
     }
 
 
-    function set_destination($destination, $overwrite = FALSE)
+    function set_destination($destination, $overwrite = false)
     {
         if (empty($this->destination)) {
             $this->destination[] = $destination;
-            return TRUE;
-        }
-        else {
-            return FALSE;
+            return true;
+        } else {
+            return false;
         }
     }
 

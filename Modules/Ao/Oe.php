@@ -52,11 +52,10 @@ class Oe extends BaseActiveModule
     {
         if (preg_match("/^oe (.+)$/i", $msg, $info)) {
             return $this->calc_oe($info[1]);
-        }
-        else {
+        } else {
             $this->bot->send_help($name);
         }
-        return FALSE;
+        return false;
     }
 
 
@@ -66,7 +65,7 @@ class Oe extends BaseActiveModule
     function calc_oe($oe)
     {
         return "With a skill of <font color=#ffff00>" . (int)$oe . "</font>, you will be OE above <font color=#ffff00>" . (int)($oe / 0.8) . "</font> skill. "
-            . "With a requirement of <font color=#ffff00>" . (int)$oe . "</font> skill, you can have <font color=#ffff00>" . (int)($oe * 0.8) . "</font> without being OE.";
+        . "With a requirement of <font color=#ffff00>" . (int)$oe . "</font> skill, you can have <font color=#ffff00>" . (int)($oe * 0.8) . "</font> without being OE.";
     }
 }
 

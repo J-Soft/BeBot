@@ -75,8 +75,7 @@ class CommandAlias_Core extends BasePassiveModule
         $alias = explode(" ", $alias, 3);
         if (!empty($alias[1])) {
             $this->alias_sub[strtolower($alias[0])][strtolower($alias[1])] = $command;
-        }
-        else {
+        } else {
             $this->alias[strtolower($alias[0])] = $command;
         }
     }
@@ -85,13 +84,16 @@ class CommandAlias_Core extends BasePassiveModule
     function unregister($alias)
     {
         $alias = strtolower($alias);
-        $get = $this->bot->db->select("SELECT alias, command FROM #___command_alias WHERE alias = '" . $this->bot->db->real_escape_string( $alias) . "'");
+        $get = $this->bot->db->select(
+            "SELECT alias, command FROM #___command_alias WHERE alias = '" . $this->bot->db->real_escape_string(
+                $alias
+            ) . "'"
+        );
         if (empty($get) && isset($this->alias[$alias])) {
             unset($this->alias[$alias]);
-            Return TRUE;
-        }
-        else {
-            Return FALSE;
+            Return true;
+        } else {
+            Return false;
         }
     }
 
@@ -102,8 +104,7 @@ class CommandAlias_Core extends BasePassiveModule
         if (!empty($msg[1]) && isset($this->alias_sub[strtolower($msg[0])][strtolower($msg[1])])) {
             $msg[0] = $this->alias_sub[strtolower($msg[0])][strtolower($msg[1])];
             unset($msg[1]);
-        }
-        elseif (isset($this->alias[strtolower($msg[0])])) {
+        } elseif (isset($this->alias[strtolower($msg[0])])) {
             $msg[0] = $this->alias[strtolower($msg[0])];
         }
         $msg = implode(" ", $msg);
@@ -121,16 +122,16 @@ class CommandAlias_Core extends BasePassiveModule
         if (!isset($this->alias[$var[0]])) {
             if ($var[0] !== "comalias") {
                 $this->bot->db->query(
-                    "INSERT INTO #___command_alias (alias, command) VALUES ('" . $this->bot->db->real_escape_string( $var[0]) . "', '" . $this->bot->db->real_escape_string( $var[1]) . "')"
+                    "INSERT INTO #___command_alias (alias, command) VALUES ('" . $this->bot->db->real_escape_string(
+                        $var[0]
+                    ) . "', '" . $this->bot->db->real_escape_string($var[1]) . "')"
                 );
                 $this->alias[$var[0]] = $var[1];
                 Return ("##highlight##" . $var[0] . "##end## is now an alias of ##highlight##" . $this->alias[$var[0]] . "##end##!");
-            }
-            else {
+            } else {
                 Return ("##highlight##" . $var[0] . "##end## Cannot be set as an alias!");
             }
-        }
-        else {
+        } else {
             Return ("##highlight##" . $var[0] . "##end## is already an alias of ##highlight##" . $this->alias[$var[0]] . "##end##!");
         }
     }
@@ -150,14 +151,13 @@ class CommandAlias_Core extends BasePassiveModule
                 $inside .= "##orange##" . $key . "##end## is an alias of ##orange##" . $value . "##end##.";
                 if (isset($tablealiases[$key])) {
                     $inside .= " " . $this->bot->core("tools")
-                        ->chatcmd("comalias del " . $key, "[DELETE]");
+                            ->chatcmd("comalias del " . $key, "[DELETE]");
                 }
                 $inside .= "\n";
             }
             Return "Command aliases :: " . $this->bot->core("tools")
                 ->make_blob("click to view", $inside);
-        }
-        else {
+        } else {
             Return "No command aliases set!";
         }
     }
@@ -167,10 +167,9 @@ class CommandAlias_Core extends BasePassiveModule
     {
         $alias = strtolower($alias);
         if (isset($this->alias[$alias])) {
-            Return TRUE;
-        }
-        else {
-            Return FALSE;
+            Return true;
+        } else {
+            Return false;
         }
     }
 
@@ -178,17 +177,21 @@ class CommandAlias_Core extends BasePassiveModule
     function del($alias)
     {
         $alias = strtolower($alias);
-        $get = $this->bot->db->select("SELECT alias, command FROM #___command_alias WHERE alias = '" . $this->bot->db->real_escape_string( $alias) . "'");
+        $get = $this->bot->db->select(
+            "SELECT alias, command FROM #___command_alias WHERE alias = '" . $this->bot->db->real_escape_string(
+                $alias
+            ) . "'"
+        );
         if (!empty($get)) {
-            $this->bot->db->query("DELETE FROM #___command_alias WHERE alias = '" . $this->bot->db->real_escape_string( $alias) . "'");
+            $this->bot->db->query(
+                "DELETE FROM #___command_alias WHERE alias = '" . $this->bot->db->real_escape_string($alias) . "'"
+            );
             unset($this->alias[$alias]);
             Return "Alias ##highlight##" . $alias . "##end## deleted.";
-        }
-        else {
+        } else {
             if (isset($this->alias[$alias])) {
                 Return "Alias ##highlight##" . $alias . "##end## cannot be deleted.";
-            }
-            else {
+            } else {
                 Return "Alias ##highlight##" . $alias . "##end## not found.";
             }
         }

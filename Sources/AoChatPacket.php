@@ -30,8 +30,7 @@ class AOChatPacket
                 "IS",
                 "s"
             );
-        }
-        else {
+        } else {
             $aocpdifs = array(
                 "IIS",
                 "IBBIB",
@@ -253,65 +252,63 @@ class AOChatPacket
             for ($i = 0; $i < strlen($pmap["args"]); $i++) {
                 $sa = $pmap["args"][$i];
                 switch ($sa) {
-                case "I":
-                    $temparray = unpack("N", $data);
+                    case "I":
+                        $temparray = unpack("N", $data);
 // If we are not running 64bit php, we need to use float instead of int due to large numbers
 // And due PHP not converting from int to float when unpack() is used, we have to force it.
-                    if (PHP_INT_SIZE != 8) {
+                        if (PHP_INT_SIZE != 8) {
 // We mainly use this for userid's which never have negative values
 // However some error returns use negative values so using -100 instead of -1 just as a precaution
-                        if ($temparray[1] < -100) {
-                            $temparray[1] += 0x100000000;
+                            if ($temparray[1] < -100) {
+                                $temparray[1] += 0x100000000;
+                            }
                         }
-                    }
-                    $res = array_pop($temparray);
-                    $data = substr($data, 4);
-                    break;
-                case "B":
-                    $temparray = unpack("C", $data);
-                    $res = array_pop($temparray);
-                    $data = substr($data, 1);
-                    break;
-                case "S":
-                    $temparray = unpack("n", $data);
-                    $len = array_pop($temparray);
-                    $res = substr($data, 2, $len);
-                    $data = substr($data, 2 + $len);
-                    break;
-                case "G":
-                    $res = substr($data, 0, 5);
-                    $data = substr($data, 5);
-                    break;
-                case "i":
-                    $temparray = unpack("n", $data);
-                    $len = array_pop($temparray);
-                    $res = array_values(unpack("N" . $len, substr($data, 2)));
-                    $data = substr($data, 2 + 4 * $len);
-                    break;
-                case "s":
-                    $temparray = unpack("n", $data);
-                    $len = array_pop($temparray);
-                    $data = substr($data, 2);
-                    $res = array();
-                    while ($len--) {
+                        $res = array_pop($temparray);
+                        $data = substr($data, 4);
+                        break;
+                    case "B":
+                        $temparray = unpack("C", $data);
+                        $res = array_pop($temparray);
+                        $data = substr($data, 1);
+                        break;
+                    case "S":
                         $temparray = unpack("n", $data);
-                        $slen = array_pop($temparray);
-                        $res[] = substr($data, 2, $slen);
-                        $data = substr($data, 2 + $slen);
-                    }
-                    break;
-                default:
-                    echo "Unknown argument type! (" . $sa . ")\n";
-                    continue (2);
+                        $len = array_pop($temparray);
+                        $res = substr($data, 2, $len);
+                        $data = substr($data, 2 + $len);
+                        break;
+                    case "G":
+                        $res = substr($data, 0, 5);
+                        $data = substr($data, 5);
+                        break;
+                    case "i":
+                        $temparray = unpack("n", $data);
+                        $len = array_pop($temparray);
+                        $res = array_values(unpack("N" . $len, substr($data, 2)));
+                        $data = substr($data, 2 + 4 * $len);
+                        break;
+                    case "s":
+                        $temparray = unpack("n", $data);
+                        $len = array_pop($temparray);
+                        $data = substr($data, 2);
+                        $res = array();
+                        while ($len--) {
+                            $temparray = unpack("n", $data);
+                            $slen = array_pop($temparray);
+                            $res[] = substr($data, 2, $slen);
+                            $data = substr($data, 2 + $slen);
+                        }
+                        break;
+                    default:
+                        echo "Unknown argument type! (" . $sa . ")\n";
+                        continue (2);
                 }
                 $this->args[] = $res;
             }
-        }
-        else {
+        } else {
             if (!is_array($data)) {
                 $args = array($data);
-            }
-            else {
+            } else {
                 $args = $data;
             }
             $data = "";
@@ -323,27 +320,27 @@ class AOChatPacket
                     break;
                 }
                 switch ($sa) {
-                case "I":
-                    $data .= pack("N", $it);
-                    break;
-                case "i":
-                    $data .= pack("n", $it);
-                    break;
-                case "S":
-                    $data .= pack("n", strlen($it)) . $it;
-                    break;
-                case "G":
-                    $data .= $it;
-                    break;
-                case "s":
-                    $data .= pack("n", sizeof($it));
-                    foreach ($it as $it_elem) {
-                        $data .= pack("n", strlen($it_elem)) . $it_elem;
-                    }
-                    break;
-                default:
-                    echo "Unknown argument type! (" . $sa . ")\n";
-                    continue (2);
+                    case "I":
+                        $data .= pack("N", $it);
+                        break;
+                    case "i":
+                        $data .= pack("n", $it);
+                        break;
+                    case "S":
+                        $data .= pack("n", strlen($it)) . $it;
+                        break;
+                    case "G":
+                        $data .= $it;
+                        break;
+                    case "s":
+                        $data .= pack("n", sizeof($it));
+                        foreach ($it as $it_elem) {
+                            $data .= pack("n", strlen($it_elem)) . $it_elem;
+                        }
+                        break;
+                    default:
+                        echo "Unknown argument type! (" . $sa . ")\n";
+                        continue (2);
                 }
             }
             $this->data = $data;

@@ -196,7 +196,7 @@ $GLOBALS["ref_cat"] = array(
 class AOExtMsg
 {
 
-    function AOExtMsg($str = NULL)
+    function AOExtMsg($str = null)
     {
         $this->type = 'AOEM_UNKNOWN';
         if (!empty($str)) {
@@ -211,7 +211,7 @@ class AOExtMsg
         if (isset($this->args[$key])) {
             return $this->args[$key];
         }
-        return NULL;
+        return null;
     }
 
 
@@ -235,28 +235,27 @@ class AOExtMsg
             $ename = substr($eone, 1);
             $msg = substr($msg, 1); // skip the data type id
             switch ($eone[0]) {
-            case "s":
-                $len = ord($msg[0]) - 1;
-                $str = substr($msg, 1, $len);
-                $msg = substr($msg, $len + 1);
-                $args[$ename] = $str;
-                break;
-            case "i":
-            case "u":
-                $num = $this->b85g($msg);
-                $args[$ename] = $num;
-                break;
-            case "R":
-                $cat = $this->b85g($msg);
-                $ins = $this->b85g($msg);
-                if (!isset($GLOBALS["ref_cat"][$cat]) || !isset($GLOBALS["ref_cat"][$cat][$ins])) {
-                    $str = "Unknown ($cat, $ins)";
-                }
-                else {
-                    $str = $GLOBALS["ref_cat"][$cat][$ins];
-                }
-                $args[$ename] = $str;
-                break;
+                case "s":
+                    $len = ord($msg[0]) - 1;
+                    $str = substr($msg, 1, $len);
+                    $msg = substr($msg, $len + 1);
+                    $args[$ename] = $str;
+                    break;
+                case "i":
+                case "u":
+                    $num = $this->b85g($msg);
+                    $args[$ename] = $num;
+                    break;
+                case "R":
+                    $cat = $this->b85g($msg);
+                    $ins = $this->b85g($msg);
+                    if (!isset($GLOBALS["ref_cat"][$cat]) || !isset($GLOBALS["ref_cat"][$cat][$ins])) {
+                        $str = "Unknown ($cat, $ins)";
+                    } else {
+                        $str = $GLOBALS["ref_cat"][$cat][$ins];
+                    }
+                    $args[$ename] = $str;
+                    break;
             }
         }
         $str = strtr($fmt, $args);

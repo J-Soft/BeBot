@@ -64,11 +64,17 @@ class Logon_Notifies_Core extends BasePassiveModule
         $this->modules = array();
         $this->cron_running = 0;
         $this->notifies = array();
-        $this->waiting = FALSE;
+        $this->waiting = false;
         $this->bot->core("settings")
-            ->create("Logon_Notifies", "Notify_Delay", 5, "How many seconds should be waited after logon of a buddy till any notifies are sent to him?", "0;1;2;3;4;5;10;15;30");
+            ->create(
+                "Logon_Notifies",
+                "Notify_Delay",
+                5,
+                "How many seconds should be waited after logon of a buddy till any notifies are sent to him?",
+                "0;1;2;3;4;5;10;15;30"
+            );
         $this->bot->core("settings")
-            ->create("Logon_Notifies", "Enabled", TRUE, "Are notifies on logon enabled or disabled?");
+            ->create("Logon_Notifies", "Enabled", true, "Are notifies on logon enabled or disabled?");
         // Set startup high enough that it cannot be reached before connection is done successfully:
         $this->startup = time() + 3600;
     }
@@ -77,14 +83,14 @@ class Logon_Notifies_Core extends BasePassiveModule
     // registers a new module
     function register(&$module)
     {
-        $this->modules[get_class($module)] = &$module;
+        $this->modules[get_class($module)] = & $module;
     }
 
 
     function unregister(&$module)
     {
         if (isset($this->modules[get_class($module)])) {
-            $this->modules[get_class($module)] = NULL;
+            $this->modules[get_class($module)] = null;
             unset($this->modules[get_class($module)]);
         }
     }
@@ -101,8 +107,8 @@ class Logon_Notifies_Core extends BasePassiveModule
                 ->check($name)
         ) {
             $this->notifies[$name] = time() + $this->bot->core("settings")
-                ->get("Logon_notifies", "Notify_delay");
-            $this->waiting = TRUE;
+                    ->get("Logon_notifies", "Notify_delay");
+            $this->waiting = true;
         }
     }
 
@@ -110,7 +116,7 @@ class Logon_Notifies_Core extends BasePassiveModule
     function connect()
     {
         $this->startup = time() + 120 + $this->bot->core("settings")
-            ->get("Logon_notifies", "Notify_delay");
+                ->get("Logon_notifies", "Notify_delay");
     }
 
 
@@ -120,27 +126,25 @@ class Logon_Notifies_Core extends BasePassiveModule
             return;
         }
         if (empty($this->notifies)) {
-            $this->waiting = FALSE;
+            $this->waiting = false;
             $this->cron_running = 0;
             return;
         }
         if ($this->cron_running == 0) {
             $this->cron_running = 1;
-        }
-        else {
+        } else {
             return;
         }
         $thistime = time();
         if ($thistime >= $this->startup) {
-            $starting = FALSE;
-        }
-        else {
-            $starting = TRUE;
+            $starting = false;
+        } else {
+            $starting = true;
         }
         foreach ($this->notifies as $user => $time) {
             if ($time <= $thistime) {
                 foreach ($this->modules as $module) {
-                    if ($module != NULL) {
+                    if ($module != null) {
                         $module->notify($user, $starting);
                     }
                 }

@@ -32,20 +32,20 @@
 class Player
 {
     //Game spesific variables
-    private $uid = FALSE;
-    private $uname = FALSE; //aka nickname
-    private $firstname = FALSE;
-    private $lastname = FALSE;
-    private $breed = FALSE;
-    private $gender = FALSE;
-    private $level = FALSE;
-    private $profession = FALSE;
-    private $ai_level = FALSE;
-    private $organization = FALSE;
-    private $org_rank = FALSE;
+    private $uid = false;
+    private $uname = false; //aka nickname
+    private $firstname = false;
+    private $lastname = false;
+    private $breed = false;
+    private $gender = false;
+    private $level = false;
+    private $profession = false;
+    private $ai_level = false;
+    private $organization = false;
+    private $org_rank = false;
     //Bot spesific variables
-    private $accesslevel = FALSE;
-    private $user_level = FALSE;
+    private $accesslevel = false;
+    private $user_level = false;
     private $preferences = array();
 
 
@@ -68,35 +68,35 @@ class Player
     public function _get($variable)
     {
         switch ($variable) {
-        case 'uid':
-        case 'id':
-            return ($this->get_uid());
-            break;
-        case 'uname':
-        case 'nick':
-        case 'nickname':
-            return ($this->get_uname());
-            break;
-        case 'firstname':
-        case 'lastname':
-        case 'breed':
-        case 'gender':
-        case 'level':
-        case 'profession':
-        case 'ai_level':
-        case 'ai_rank':
-        case 'organization':
-        case 'org_rank':
-            return ($this->get_whois($variable));
-            break;
-        case 'pref':
-        case 'preferences':
-            return ($this->get_preferences($variable));
-            break;
-        default:
-            $this->error->set("Unknown attribute '$variable'.");
-            return $this->error;
-            break;
+            case 'uid':
+            case 'id':
+                return ($this->get_uid());
+                break;
+            case 'uname':
+            case 'nick':
+            case 'nickname':
+                return ($this->get_uname());
+                break;
+            case 'firstname':
+            case 'lastname':
+            case 'breed':
+            case 'gender':
+            case 'level':
+            case 'profession':
+            case 'ai_level':
+            case 'ai_rank':
+            case 'organization':
+            case 'org_rank':
+                return ($this->get_whois($variable));
+                break;
+            case 'pref':
+            case 'preferences':
+                return ($this->get_preferences($variable));
+                break;
+            default:
+                $this->error->set("Unknown attribute '$variable'.");
+                return $this->error;
+                break;
         }
     }
 
@@ -109,7 +109,7 @@ class Player
             if ($this->uid instanceof BotError) {
                 //The uid could not be resolved.
                 $this->error = $this->uid;
-                $this->uid = FALSE;
+                $this->uid = false;
                 return $this->error;
             }
         }

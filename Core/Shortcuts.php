@@ -42,15 +42,18 @@ class ShortCuts_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("shortcuts", "false") . " (id INT NOT NULL AUTO_INCREMENT UNIQUE, "
-                . " shortcut VARCHAR(20) NOT NULL PRIMARY KEY, " . " long_desc VARCHAR(255) NOT NULL UNIQUE)"
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename(
+                "shortcuts",
+                "false"
+            ) . " (id INT NOT NULL AUTO_INCREMENT UNIQUE, "
+            . " shortcut VARCHAR(20) NOT NULL PRIMARY KEY, " . " long_desc VARCHAR(255) NOT NULL UNIQUE)"
         );
         $this->bot->db->query(
             "INSERT IGNORE INTO #___shortcuts (`shortcut`, `long_desc`) VALUES "
-                . "('Pres', 'President'), ('Gen', 'General'), ('SC', 'Squad Commander'), ('UC', 'Unit Commander'), "
-                . "('UL', 'Unit Leader'), ('UM', 'Unit Member'), ('App', 'Applicant'), ('Dir', 'Director'), ('BM', 'Board Member'), "
-                . "('Exec', 'Executive'), ('Mem', 'Member'), ('Adv', 'Advisor'), ('Vet', 'Veteran'), ('Mon', 'Monarch'), "
-                . "('Coun', 'Counsel'), ('Fol', 'Follower'), ('Anar', 'Anarchist'), ('Lord', 'Lord'), ('Knght', 'Knight'), " . "('Vas', 'Vassal '), ('Peas', 'Peasant')"
+            . "('Pres', 'President'), ('Gen', 'General'), ('SC', 'Squad Commander'), ('UC', 'Unit Commander'), "
+            . "('UL', 'Unit Leader'), ('UM', 'Unit Member'), ('App', 'Applicant'), ('Dir', 'Director'), ('BM', 'Board Member'), "
+            . "('Exec', 'Executive'), ('Mem', 'Member'), ('Adv', 'Advisor'), ('Vet', 'Veteran'), ('Mon', 'Monarch'), "
+            . "('Coun', 'Counsel'), ('Fol', 'Follower'), ('Anar', 'Anarchist'), ('Lord', 'Lord'), ('Knght', 'Knight'), " . "('Vas', 'Vassal '), ('Peas', 'Peasant')"
         );
         $this->register_module("shortcuts");
         $this->register_event("cron", "1hour");
@@ -105,16 +108,26 @@ class ShortCuts_Core extends BasePassiveModule
     function add($short, $long)
     {
         if (isset($this->short[strtolower($long)])) {
-            $this->error->set('The text ' . $long . ' already is in the databse with shortcut "' . $this->short[strtolower($long)] . '"!');
+            $this->error->set(
+                'The text ' . $long . ' already is in the databse with shortcut "' . $this->short[strtolower(
+                    $long
+                )] . '"!'
+            );
             return $this->error;
         }
         if (isset($this->long[strtolower($short)])) {
-            $this->error->set('The shortcut ' . $short . ' is already defined for "' . $this->long[strtolower($short)] . '"!');
+            $this->error->set(
+                'The shortcut ' . $short . ' is already defined for "' . $this->long[strtolower($short)] . '"!'
+            );
             return $this->error;
         }
         $this->long[strtolower($short)] = $long;
         $this->short[strtolower($long)] = $short;
-        $this->bot->db->query("INSERT INTO #___shortcuts (shortcut, long_desc) VALUES ('" . $this->bot->db->real_escape_string($short) . "', '" . $this->bot->db->real_escape_string($long) . "')");
+        $this->bot->db->query(
+            "INSERT INTO #___shortcuts (shortcut, long_desc) VALUES ('" . $this->bot->db->real_escape_string(
+                $short
+            ) . "', '" . $this->bot->db->real_escape_string($long) . "')"
+        );
         return 'New shortcut "' . $short . '" added to database with corresponding long entry "' . $long . '".';
     }
 
@@ -128,8 +141,12 @@ class ShortCuts_Core extends BasePassiveModule
         }
         unset($this->short[strtolower($this->long[strtolower($short)])]);
         unset($this->long[strtolower($short)]);
-        $this->bot->db->query("DELETE FROM #___shortcuts WHERE shortcut = '" . $this->bot->db->real_escape_string($short) . "'");
-        return 'The shortcut "' . $short . '" and the corresponding long description "' . $this->long[strtolower($short)] . '" were deleted!';
+        $this->bot->db->query(
+            "DELETE FROM #___shortcuts WHERE shortcut = '" . $this->bot->db->real_escape_string($short) . "'"
+        );
+        return 'The shortcut "' . $short . '" and the corresponding long description "' . $this->long[strtolower(
+            $short
+        )] . '" were deleted!';
     }
 
 
@@ -142,8 +159,12 @@ class ShortCuts_Core extends BasePassiveModule
         }
         unset($this->long[strtolower($this->short[strtolower($long)])]);
         unset($this->short[strtolower($long)]);
-        $this->bot->db->query("DELETE FROM #___shortcuts WHERE long_desc = '" . $this->bot->db->real_escape_string($long) . "'");
-        return 'The description "' . $long . '" and the corresponding shortcut "' . $this->short[strtolower($long)] . '" were deleted!';
+        $this->bot->db->query(
+            "DELETE FROM #___shortcuts WHERE long_desc = '" . $this->bot->db->real_escape_string($long) . "'"
+        );
+        return 'The description "' . $long . '" and the corresponding shortcut "' . $this->short[strtolower(
+            $long
+        )] . '" were deleted!';
     }
 
 

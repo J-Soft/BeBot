@@ -53,7 +53,7 @@ class Alts_Core extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("alts", "false")
-                . " (alt VARCHAR(255) NOT NULL PRIMARY KEY, main VARCHAR(255), confirmed INT DEFAULT '1')"
+            . " (alt VARCHAR(255) NOT NULL PRIMARY KEY, main VARCHAR(255), confirmed INT DEFAULT '1')"
         );
         $this->register_module("alts");
         $this->register_event("cron", "1hour");
@@ -63,23 +63,38 @@ class Alts_Core extends BasePassiveModule
         $this->bot->core("settings")
             ->create('Alts', "Output", "Fancy", "How would you like your alts list", "Fancy;Old");
         $this->bot->core("settings")
-            ->create('Alts', "Detail", TRUE, "Show level and profession in the alts list");
+            ->create('Alts', "Detail", true, "Show level and profession in the alts list");
         $this->bot->core("settings")
-            ->create('Alts', "LastSeen", TRUE, "Show the time we last saw an alt if they are offline");
+            ->create('Alts', "LastSeen", true, "Show the time we last saw an alt if they are offline");
         $this->bot->core("settings")
-            ->create('Alts', "Confirmation", FALSE, "Does the Alt have to Confirm him Self as an Alt after being Added?");
+            ->create(
+                'Alts',
+                "Confirmation",
+                false,
+                "Does the Alt have to Confirm him Self as an Alt after being Added?"
+            );
         $this->bot->core("settings")
-            ->create('Alts', "incAll", FALSE, "Should the Alt that was used to call the info also be listed inside the blob?");
+            ->create(
+                'Alts',
+                "incAll",
+                false,
+                "Should the Alt that was used to call the info also be listed inside the blob?"
+            );
     }
 
 
     function update_table()
     {
         switch ($this->bot->db->get_version("alts")) {
-        case 1:
-            $this->bot->db->update_table("alts", "confirmed", "add", "ALTER TABLE #___alts ADD `confirmed` INT DEFAULT '1'");
-        case 2:
-        default:
+            case 1:
+                $this->bot->db->update_table(
+                    "alts",
+                    "confirmed",
+                    "add",
+                    "ALTER TABLE #___alts ADD `confirmed` INT DEFAULT '1'"
+                );
+            case 2:
+            default:
         }
         $this->bot->db->set_version("alts", 2);
     }
@@ -92,7 +107,9 @@ class Alts_Core extends BasePassiveModule
     {
         $this->mains = array();
         $this->alts = array();
-        $altlist = $this->bot->db->select("SELECT main, alt FROM #___alts WHERE confirmed = 1 ORDER BY main ASC, alt ASC");
+        $altlist = $this->bot->db->select(
+            "SELECT main, alt FROM #___alts WHERE confirmed = 1 ORDER BY main ASC, alt ASC"
+        );
         if (empty($altlist)) {
             return;
         }
@@ -153,8 +170,7 @@ class Alts_Core extends BasePassiveModule
         // 		$char = ucfirst(strtolower($this -> bot -> core("chat") -> get_uname($char)));
         if (isset($this->mains[$char])) {
             return $this->mains[$char];
-        }
-        else {
+        } else {
             return $char;
         }
     }
@@ -183,11 +199,10 @@ class Alts_Core extends BasePassiveModule
         $main = $this->main($who);
         $alts = $this->get_alts($main);
         if (empty($alts)) {
-            $ret['alts'] = FALSE;
+            $ret['alts'] = false;
             $ret['list'] = "";
-        }
-        else {
-            $ret['alts'] = TRUE;
+        } else {
+            $ret['alts'] = true;
             $ret['list'] = $this->make_alt_blob($main, ucfirst(strtolower($who)), $alts, $returntype);
         }
         return $ret;
@@ -202,18 +217,16 @@ class Alts_Core extends BasePassiveModule
         $result = "##highlight##::: " . $main . "'s Alts :::##end##\n\n";
         foreach ($alts as $alt) {
             $result .= $this->bot->core("tools")
-                ->chatcmd("whois " . $alt, $alt) . "\n";
+                    ->chatcmd("whois " . $alt, $alt) . "\n";
         }
         if ($main == $who) {
             $title = "Alts";
-        }
-        else {
+        } else {
             $title = $main . "�s alts";
         }
         if ($returntype == 1) {
             return $result;
-        }
-        else {
+        } else {
             return $this->bot->core("tools")->make_blob($title, $result);
         }
     }
@@ -241,15 +254,13 @@ class Alts_Core extends BasePassiveModule
                 array_unshift($alts, $main);
             }
             if (empty($alts)) {
-                $ret['alts'] = FALSE;
-            }
-            else {
-                $ret['alts'] = TRUE;
+                $ret['alts'] = false;
+            } else {
+                $ret['alts'] = true;
             }
             $ret['list'] = $this->make_info_blob($whois, $main, $alts, $returntype);
             return $ret;
-        }
-        else {
+        } else {
             return ("##highlight##$name##end## does not exist.");
         }
     }
@@ -268,7 +279,7 @@ class Alts_Core extends BasePassiveModule
                         ->get('Alts', "incAll")
                 ) {
                     $window .= $this->bot->core("tools")
-                        ->chatcmd("whois " . $alt, $alt) . "</a>";
+                            ->chatcmd("whois " . $alt, $alt) . "</a>";
                     $online = $this->bot->core("online")
                         ->get_online_state($alt);
                     $window .= " " . $online['content'];
@@ -296,7 +307,8 @@ class Alts_Core extends BasePassiveModule
                             ) {
                                 $time = gmdate(
                                     $this->bot->core("settings")
-                                        ->get("Time", "FormatString"), $this->bot
+                                        ->get("Time", "FormatString"),
+                                    $this->bot
                                         ->core("online")->get_last_seen($alt)
                                 );
                                 $window .= "\n##normal## - Last seen at:##highlight## $time##end####end##";
@@ -309,14 +321,12 @@ class Alts_Core extends BasePassiveModule
         }
         if (strtolower($whois['nickname']) == strtolower($main)) {
             $title = "Alts";
-        }
-        else {
+        } else {
             $title = $main . "�s alts";
         }
         if ($returntype == 1) {
             return $window;
-        }
-        else {
+        } else {
             return ($this->bot->core("tools")->make_blob($title, $window));
         }
     }
@@ -330,15 +340,15 @@ class Alts_Core extends BasePassiveModule
     function show_alt($who, $returntype = 0)
     {
         switch ($this->bot->core("settings")->get('Alts', 'Output')) {
-        case 'Old':
-            return ($this->old_output(ucfirst(strtolower($who)), $returntype));
-            break;
-        case 'Fancy':
-            return ($this->fancy_output(ucfirst(strtolower($who)), $returntype));
-            break;
-        default:
-            return 'Settings module required for this module to work properly!';
-            break;
+            case 'Old':
+                return ($this->old_output(ucfirst(strtolower($who)), $returntype));
+                break;
+            case 'Fancy':
+                return ($this->fancy_output(ucfirst(strtolower($who)), $returntype));
+                break;
+            default:
+                return 'Settings module required for this module to work properly!';
+                break;
         }
     }
 }

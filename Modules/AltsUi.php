@@ -57,75 +57,74 @@ class Alts extends BaseActiveModule
         $this->help['command']['altadmin confirm <main> <alt>'] = "Confirms <alt> as alt of <main>.";
         $this->bot->core("settings")
             ->create(
-            "Alts", "Security", TRUE,
-            "Should security restrictions be enabled to prevent users from gaining higher access levels by adding alts with higher access level when Usealts for the security module is enabled?"
-        );
+                "Alts",
+                "Security",
+                true,
+                "Should security restrictions be enabled to prevent users from gaining higher access levels by adding alts with higher access level when Usealts for the security module is enabled?"
+            );
     }
 
 
     function command_handler($name, $msg, $origin)
     {
-        $security = FALSE;
+        $security = false;
         $vars = explode(' ', strtolower($msg));
         $command = $vars[0];
         if (($this->bot->core("settings")
-            ->get("Alts", "Security") == TRUE)
+                    ->get("Alts", "Security") == true)
             && ($this->bot
-                ->core("settings")
-                ->get("Security", "UseAlts") == TRUE)
+                    ->core("settings")
+                    ->get("Security", "UseAlts") == true)
         ) {
-            $security = TRUE;
+            $security = true;
         }
         switch ($command) {
-        case 'alts':
-            switch ($vars[1]) {
-            case 'add':
-                return $this->add_alt($name, $vars[2]);
-            case 'del':
-            case 'rem':
-                return $this->del_alt($name, $vars[2]);
-            case '':
-                return $this->display_alts($name);
-            case 'confirm':
-                return $this->confirm($name, $vars[2]);
-            default:
-                return $this->display_alts($vars[1]);
-            }
-        case 'altadmin':
-            switch ($vars[1]) {
-            case 'add':
-                if ($security) {
-                    if ($this->bot->core("security")
-                        ->get_access_level($name) < $this->bot
-                        ->core("security")->get_access_level($vars[2])
-                    ) {
-                        return "##error##Character ##highlight##$vars[2]##end## has a higher security level then you, so you cannot add ##highlight##$vars[3]##end## to ##highlight##$vars[2]##end##'s alts.##end##";
-                    }
-                    elseif ($this->bot->core("security")
-                        ->get_access_level($name) < $this->bot
-                        ->core("security")->get_access_level($vars[3])
-                    ) {
-                        return "##error##Character ##highlight##$vars[3]##end## has a higher security level then you, so you cannot add ##highlight##$vars[3]##end## to ##highlight##$vars[2]##end##'s alts.##end##";
-                    }
-                    else {
-                        return $this->add_alt($vars[2], $vars[3], 1);
-                    }
+            case 'alts':
+                switch ($vars[1]) {
+                    case 'add':
+                        return $this->add_alt($name, $vars[2]);
+                    case 'del':
+                    case 'rem':
+                        return $this->del_alt($name, $vars[2]);
+                    case '':
+                        return $this->display_alts($name);
+                    case 'confirm':
+                        return $this->confirm($name, $vars[2]);
+                    default:
+                        return $this->display_alts($vars[1]);
                 }
-                else {
-                    return $this->add_alt($vars[2], $vars[3], 1);
+            case 'altadmin':
+                switch ($vars[1]) {
+                    case 'add':
+                        if ($security) {
+                            if ($this->bot->core("security")
+                                    ->get_access_level($name) < $this->bot
+                                    ->core("security")->get_access_level($vars[2])
+                            ) {
+                                return "##error##Character ##highlight##$vars[2]##end## has a higher security level then you, so you cannot add ##highlight##$vars[3]##end## to ##highlight##$vars[2]##end##'s alts.##end##";
+                            } elseif ($this->bot->core("security")
+                                    ->get_access_level($name) < $this->bot
+                                    ->core("security")->get_access_level($vars[3])
+                            ) {
+                                return "##error##Character ##highlight##$vars[3]##end## has a higher security level then you, so you cannot add ##highlight##$vars[3]##end## to ##highlight##$vars[2]##end##'s alts.##end##";
+                            } else {
+                                return $this->add_alt($vars[2], $vars[3], 1);
+                            }
+                        } else {
+                            return $this->add_alt($vars[2], $vars[3], 1);
+                        }
+                    case 'rem':
+                    case 'del':
+                        return $this->del_alt($vars[2], $vars[3]);
+                    case 'confirm':
+                        return $this->confirm($vars[3], $vars[2]);
+                    default:
+                        return "Unknown Subcommand: ##highlight##" . $vars[1] . "##end##";
                 }
-            case 'rem':
-            case 'del':
-                return $this->del_alt($vars[2], $vars[3]);
-            case 'confirm':
-                return $this->confirm($vars[3], $vars[2]);
             default:
-                return "Unknown Subcommand: ##highlight##" . $vars[1] . "##end##";
-            }
-        default:
-            return "Broken plugin, received unhandled command: $command";
+                return "Broken plugin, received unhandled command: $command";
         }
-        return FALSE;
+        return false;
     }
 
 
@@ -145,16 +144,14 @@ class Alts extends BaseActiveModule
 
         if (strtolower($this->bot->game) == 'aoc') {
             $retstr = "{$whois['nickname']} ({$whois['level']} / {$whois['class']}) - ";
-        }
-        else {
+        } else {
             $retstr
                 = "{$whois['firstname']}' ##{$whois['faction']}##{$whois['nickname']}##end##' {$whois['lastname']} ({$whois['level']} / ##lime## {$whois['at_id']}##end## {$whois['profession']}) - ";
         }
 
         if ($alts['alts']) {
             $retstr .= $alts['list'];
-        }
-        else {
+        } else {
             $retstr .= "has no alts defined!";
         }
         return $retstr;
@@ -166,17 +163,17 @@ class Alts extends BaseActiveModule
     */
     function add_alt($name, $alt, $admin = 0)
     {
-        $security = FALSE;
+        $security = false;
         $name = ucfirst(strtolower($name));
         $alt = ucfirst(strtolower($alt));
         if (($this->bot->core("settings")
-            ->get("Alts", "Security") == TRUE)
+                    ->get("Alts", "Security") == true)
             && ($this->bot
-                ->core("settings")
-                ->get("Security", "UseAlts") == TRUE)
+                    ->core("settings")
+                    ->get("Security", "UseAlts") == true)
             && ($admin == 0)
         ) {
-            $security = TRUE;
+            $security = true;
         }
         //Check that we're not trying to register ourself as an alt
         if ($name == $alt) {
@@ -198,8 +195,7 @@ class Alts extends BaseActiveModule
         if (!empty($result)) {
             if ($result[0][1] == 1) {
                 return ("##highlight##$alt##end## is already registered as an alt of ##highlight##" . $result[0][0] . "##end##.");
-            }
-            else {
+            } else {
                 return ("##highlight##$alt##end## is already an unconfirmed alt of ##highlight##" . $result[0][0] . "##end##.");
             }
         }
@@ -217,8 +213,8 @@ class Alts extends BaseActiveModule
         if ($security) {
             // Check if the Alt being Added has Higher Security
             if ($this->bot->core("security")
-                ->get_access_level($name) < $this->bot->core("security")
-                ->get_access_level($alt)
+                    ->get_access_level($name) < $this->bot->core("security")
+                    ->get_access_level($alt)
             ) {
                 return "##error##Character ##highlight##$alt##end## is Higher User Level and Cannot be Added as your Alt.##end##";
             }
@@ -226,17 +222,18 @@ class Alts extends BaseActiveModule
         $alt = ucfirst(strtolower($alt));
         $main = ucfirst(strtolower($main));
         if ($this->bot->core("settings")
-            ->get("Alts", "Confirmation")
+                ->get("Alts", "Confirmation")
             && ($admin == 0)
         ) {
             $this->bot->db->query("INSERT INTO #___alts (alt, main, confirmed) VALUES ('$alt', '$main', 0)");
             $inside = "##blob_title##  :::  Alt Confirmation Request :::##end##\n\n";
             $inside .= "##blob_text## $main has added you as an Alt\n\n " . $this->bot
-                ->core("tools")
-                ->chatcmd("alts confirm " . $main, "Click here") . " to Confirm.";
+                    ->core("tools")
+                    ->chatcmd("alts confirm " . $main, "Click here") . " to Confirm.";
             $this->bot->send_tell(
-                $alt, "Alt Confirmation :: " . $this->bot
-                ->core("tools")->make_blob("Click to view", $inside)
+                $alt,
+                "Alt Confirmation :: " . $this->bot
+                    ->core("tools")->make_blob("Click to view", $inside)
             );
             return "##highlight##$alt##end## has been registered but Now requires Confirmation, to confirm do ##highlight##<pre>alts confirm $main##end## on $alt";
         }
@@ -275,8 +272,7 @@ class Alts extends BaseActiveModule
         $result = $this->bot->db->select("SELECT main FROM #___alts WHERE alt = '$alt' AND main = '$main'");
         if (empty($result)) {
             return "##highlight##$alt##end## is not registered as an alt of ##highlight##$main##end##.";
-        }
-        else {
+        } else {
             $this->bot->db->query("DELETE FROM #___alts WHERE alt = '" . ucfirst(strtolower($alt)) . "'");
             $this->bot->core("alts")->del_alt($main, $alt);
             return "##highlight##$alt##end## has been removed from ##highlight##$main##end##s alt-list.";
@@ -295,12 +291,10 @@ class Alts extends BaseActiveModule
                     $this->bot->core("points")->check_alts($main);
                 }
                 return "##highlight##$alt##end## has been confirmed as a new alt of ##highlight##$main##end##.";
-            }
-            else {
+            } else {
                 return ("##highlight##$alt##end## is already a confirmed alt of ##highlight##$main##end##.");
             }
-        }
-        else {
+        } else {
             return "##error####highlight##$alt##end## is not registered as an alt of ##highlight##$main##end##.##end##";
         }
     }

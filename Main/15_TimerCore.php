@@ -141,37 +141,65 @@ class Timer_Core extends BasePassiveModule
         $this->register_event("cron", "1hour");
         $this->register_event("connect");
         $this->bot->core("settings")
-            ->create("Timer", "DefaultClass", "Standard", "Which is the name of the default class to use for timers if no other is specified?");
+            ->create(
+                "Timer",
+                "DefaultClass",
+                "Standard",
+                "Which is the name of the default class to use for timers if no other is specified?"
+            );
         $this->bot->core("settings")
             ->create(
-            "Timer", "GuestChannel", "origin", "Should an timer started in guestchannel or org-chat show up in both those channels or just in the channel of origin?", "both;origin"
-        );
+                "Timer",
+                "GuestChannel",
+                "origin",
+                "Should an timer started in guestchannel or org-chat show up in both those channels or just in the channel of origin?",
+                "both;origin"
+            );
         $this->bot->core("settings")
             ->create(
-            "Timer", "Global", FALSE,
-            "Are all timers global? Notices for global timers are sent both to guild chat and private group. Global timers are listed in every timer listing too."
-        );
-        $this->bot->core("settings")
-            ->create("Timer", "DeleteRank", "ADMIN", "Minimal access level to remove timer of other players.", "ANONYMOUS;GUEST;MEMBER;LEADER;ADMIN;SUPERADMIN;OWNER");
-        $this->bot->core("settings")
-            ->create(
-            "Timer", "Relay", FALSE,
-            "Should new timer be relayed to all relay bots using the established relay network (See module/Relay.php for more informations about relaying)?"
-        );
+                "Timer",
+                "Global",
+                false,
+                "Are all timers global? Notices for global timers are sent both to guild chat and private group. Global timers are listed in every timer listing too."
+            );
         $this->bot->core("settings")
             ->create(
-            "Timer", "MinRepeatInterval", 30, "What's the minimal repeat interval for repeating timers (in seconds)? This is used to prevent annoying spam.",
-            "5;10;15;20;25;30;45;60"
-        );
+                "Timer",
+                "DeleteRank",
+                "ADMIN",
+                "Minimal access level to remove timer of other players.",
+                "ANONYMOUS;GUEST;MEMBER;LEADER;ADMIN;SUPERADMIN;OWNER"
+            );
         $this->bot->core("settings")
-            ->create("Timer", "RecoveryCheckInterval", 10, "How many minutes should pass between each check to recover after a database failures?", "5;10;15;30;45;60");
+            ->create(
+                "Timer",
+                "Relay",
+                false,
+                "Should new timer be relayed to all relay bots using the established relay network (See module/Relay.php for more informations about relaying)?"
+            );
+        $this->bot->core("settings")
+            ->create(
+                "Timer",
+                "MinRepeatInterval",
+                30,
+                "What's the minimal repeat interval for repeating timers (in seconds)? This is used to prevent annoying spam.",
+                "5;10;15;20;25;30;45;60"
+            );
+        $this->bot->core("settings")
+            ->create(
+                "Timer",
+                "RecoveryCheckInterval",
+                10,
+                "How many minutes should pass between each check to recover after a database failures?",
+                "5;10;15;30;45;60"
+            );
         $this->schema_version = 3;
         $this->update_timer_table();
         $this->create_class_cache();
         $this->update_next_timer();
         $this->modules = array();
         // Lock down timer checking until we are connected to the chatserver:
-        $this->checking = TRUE;
+        $this->checking = true;
         $classid = $this->create_timer_class('Standard', 'Standard timer class with default notifications.');
         $nextid = $this->create_timer_class_entry($classid, -1, 10, 'Timer', 'has 10 seconds left');
         $nextid = $this->create_timer_class_entry($classid, $nextid, 30, 'Timer', 'has 30 seconds left');
@@ -183,14 +211,20 @@ class Timer_Core extends BasePassiveModule
         $nextid = $this->create_timer_class_entry($classid, $nextid, 3600, 'Timer', 'has one hour left');
         $nextid = $this->create_timer_class_entry($classid, $nextid, 7200, 'Timer', 'has two hours left');
         $nextid = $this->create_timer_class_entry($classid, $nextid, 21600, 'Timer', 'has six hours left');
-        $classid = $this->create_timer_class("LowSpam", "Default timer class with less notifies then the Standard class.");
+        $classid = $this->create_timer_class(
+            "LowSpam",
+            "Default timer class with less notifies then the Standard class."
+        );
         $nextid = $this->create_timer_class_entry($classid, -1, 30, "Timer", "has 30 seconds left");
         $nextid = $this->create_timer_class_entry($classid, $nextid, 60, "Timer", "has one minute left");
         $nextid = $this->create_timer_class_entry($classid, $nextid, 300, "Timer", "has five minutes left");
         $nextid = $this->create_timer_class_entry($classid, $nextid, 900, "Timer", "has 15 minutes left");
         $nextid = $this->create_timer_class_entry($classid, $nextid, 1800, "Timer", "has 30 minutes left");
         $nextid = $this->create_timer_class_entry($classid, $nextid, 3600, "Timer", "has one hour left");
-        $classid = $this->create_timer_class("None", "Default timer class containing no notifies at all, not even any added output when the timer runs out.");
+        $classid = $this->create_timer_class(
+            "None",
+            "Default timer class containing no notifies at all, not even any added output when the timer runs out."
+        );
         $this->create_timer_class_entry($classid, -2, 0, "", "");
     }
 
@@ -200,29 +234,37 @@ class Timer_Core extends BasePassiveModule
         if ($this->bot->core("settings")->exists("timer", "schemaversion")) {
             $sv = $this->bot->core("settings")->get("timer", "schemaversion");
             Switch ($sv) {
-            case 3:
-                $this->bot->db->set_version("timer", 2);
-            case 2:
-                $this->bot->db->set_version("timer_class_entries", 2);
+                case 3:
+                    $this->bot->db->set_version("timer", 2);
+                case 2:
+                    $this->bot->db->set_version("timer_class_entries", 2);
             }
             $this->bot->core("settings")->del("timer", "schemaversion");
         }
         switch ($this->bot->db->get_version("timer_class_entries")) {
-        case 1:
-            $res = $this->bot->db->select("SELECT notify_suffix FROM #___timer_class_entries");
-            $this->bot->db->update_table(
-                "timer_class_entries", "notify_prefix", "add", "ALTER IGNORE TABLE #___timer_class_entries ADD notify_prefix VARCHAR(255) NOT "
-                . "NULL DEFAULT '' AFTER notify_delay, CHANGE notify_text notify_suffix VARCHAR(255) NOT NULL DEFAULT ''"
-            );
-            if (empty($res)) {
-                $this->bot->db->query("UPDATE #___timer_class_entries SET notify_prefix = 'Timer' " . "WHERE notify_prefix = ''");
-            }
+            case 1:
+                $res = $this->bot->db->select("SELECT notify_suffix FROM #___timer_class_entries");
+                $this->bot->db->update_table(
+                    "timer_class_entries",
+                    "notify_prefix",
+                    "add",
+                    "ALTER IGNORE TABLE #___timer_class_entries ADD notify_prefix VARCHAR(255) NOT "
+                    . "NULL DEFAULT '' AFTER notify_delay, CHANGE notify_text notify_suffix VARCHAR(255) NOT NULL DEFAULT ''"
+                );
+                if (empty($res)) {
+                    $this->bot->db->query(
+                        "UPDATE #___timer_class_entries SET notify_prefix = 'Timer' " . "WHERE notify_prefix = ''"
+                    );
+                }
         }
         switch ($this->bot->db->get_version("timer")) {
-        case 1:
-            $this->bot->db->update_table(
-                "timer", "channel", "modify", "ALTER IGNORE TABLE #___timer MODIFY channel ENUM('tell', 'gc', 'pgmsg', 'both', 'global', 'internal') NOT NULL default 'both'"
-            );
+            case 1:
+                $this->bot->db->update_table(
+                    "timer",
+                    "channel",
+                    "modify",
+                    "ALTER IGNORE TABLE #___timer MODIFY channel ENUM('tell', 'gc', 'pgmsg', 'both', 'global', 'internal') NOT NULL default 'both'"
+                );
         }
         $this->bot->db->set_version("timer", 2);
         $this->bot->db->set_version("timer_class_entries", 2);
@@ -232,7 +274,7 @@ class Timer_Core extends BasePassiveModule
     function connect()
     {
         // Unlock timers after connect:
-        $this->checking = FALSE;
+        $this->checking = false;
     }
 
 
@@ -248,7 +290,7 @@ class Timer_Core extends BasePassiveModule
         // Check if a recovery after a database failure should happen
         // This recovery happens in a fixed interval, it doesn't really detect database failures:
         if ($this->last_recovery_check + 60 * $this->bot->core("settings")
-            ->get("Timer", "RecoveryCheckInterval") <= $thistime
+                ->get("Timer", "RecoveryCheckInterval") <= $thistime
         ) {
             $this->update_next_timer();
         }
@@ -257,7 +299,7 @@ class Timer_Core extends BasePassiveModule
             return;
         }
         // Lock function:
-        $this->checking = TRUE;
+        $this->checking = true;
         // Get all timers ending now as well as all notifications to do now
         $timers = $this->get_all_timer_notifications($thistime);
         if (!empty($timers)) {
@@ -272,15 +314,17 @@ class Timer_Core extends BasePassiveModule
                 if ($channel == 'internal') {
                     // Handle the timed event:
                     if (isset($this->modules[strtolower($timer['owner'])])) {
-                        if ($this->modules[strtolower($timer['owner'])] != NULL) {
+                        if ($this->modules[strtolower($timer['owner'])] != null) {
                             // There is a registered callback for this module:
                             $this->modules[strtolower($timer['owner'])]->timer(
-                                $timer['name'], $this->class_cache[$timerclass]['prefix'], $this->class_cache[$timerclass]['suffix'], $this->class_cache[$timerclass]['delay']
+                                $timer['name'],
+                                $this->class_cache[$timerclass]['prefix'],
+                                $this->class_cache[$timerclass]['suffix'],
+                                $this->class_cache[$timerclass]['delay']
                             );
                         }
                     }
-                }
-                else {
+                } else {
                     $msg = "";
                     // It's a normal timer:
                     if ($this->class_cache[$timerclass]['prefix'] != "") {
@@ -292,8 +336,7 @@ class Timer_Core extends BasePassiveModule
                     }
                     if ($channel == "global") {
                         $channel = "both";
-                    }
-                    else {
+                    } else {
                         if ($channel != "tell") {
                             $msg .= ", ##highlight##" . $timer['owner'] . "##end##";
                         }
@@ -303,23 +346,29 @@ class Timer_Core extends BasePassiveModule
                 }
                 // If it was a notify update timerclass:
                 if ($timer['endtime'] > $thistime) {
-                    $this->bot->db->query("UPDATE #___timer SET timerclass = " . $this->class_cache[$timerclass]['next'] . " WHERE id = " . $timer['id']);
-                }
-                // If it's no notify check for repeating timers:
+                    $this->bot->db->query(
+                        "UPDATE #___timer SET timerclass = " . $this->class_cache[$timerclass]['next'] . " WHERE id = " . $timer['id']
+                    );
+                } // If it's no notify check for repeating timers:
                 elseif ($timer['repeatinterval'] > 0) {
                     // Get timer class entry for the repeated timer
                     if ($this->class_cache[$timerclass]['class'] == "Default") {
                         $entry = $this->get_class_entry(
                             $this->bot
                                 ->core("settings")
-                                ->get("Timer", "DefaultClass"), $timer['repeatinterval']
+                                ->get("Timer", "DefaultClass"),
+                            $timer['repeatinterval']
+                        );
+                    } else {
+                        $entry = $this->get_class_entry(
+                            $this->class_cache[$timerclass]['class'],
+                            $timer['repeatinterval']
                         );
                     }
-                    else {
-                        $entry = $this->get_class_entry($this->class_cache[$timerclass]['class'], $timer['repeatinterval']);
-                    }
                     // Now simply update the existing timer in the table
-                    $this->bot->db->query("UPDATE #___timer SET timerclass = " . $entry . ", endtime = endtime + repeatinterval WHERE id = " . $timer['id']);
+                    $this->bot->db->query(
+                        "UPDATE #___timer SET timerclass = " . $entry . ", endtime = endtime + repeatinterval WHERE id = " . $timer['id']
+                    );
                 }
             }
             // Now delete all handled timers:
@@ -327,7 +376,7 @@ class Timer_Core extends BasePassiveModule
         }
         $this->update_next_timer();
         // Unlock function:
-        $this->checking = FALSE;
+        $this->checking = false;
     }
 
 
@@ -335,22 +384,25 @@ class Timer_Core extends BasePassiveModule
     {
         $classret = $this->bot->db->select(
             "SELECT t1.id FROM #___timer_class_entries AS t1, #___timer_classes AS t2" . " WHERE t1.class_id = t2.id AND t2.name = '" . $class . "' AND t1.notify_delay < "
-                . $duration . " ORDER BY t1.notify_delay DESC LIMIT 1"
+            . $duration . " ORDER BY t1.notify_delay DESC LIMIT 1"
         );
         if (empty($classret)) {
             return -1;
-        }
-        else {
+        } else {
             return $classret[0][0];
         }
     }
 
 
     function add_timer(
-        $relaying, $owner, $duration, $name, $channel, $repeat,
+        $relaying,
+        $owner,
+        $duration,
+        $name,
+        $channel,
+        $repeat,
         $class = ""
-    )
-    {
+    ) {
         $endtime = time() + $duration;
         $channel = strtolower($channel);
         $classcheck = $this->bot->db->select("SELECT id FROM #___timer_classes WHERE name = '" . $class . "'");
@@ -359,20 +411,24 @@ class Timer_Core extends BasePassiveModule
         }
         $classid = $this->get_class_entry($class, $duration);
         if ($this->bot->core("settings")
-            ->get("Timer", "GuestChannel") == "both"
+                ->get("Timer", "GuestChannel") == "both"
             && ($channel == "gc" || $channel == "pgmsg")
         ) {
             $channel = "both";
         }
         if ($this->bot->core("settings")
-            ->get("Timer", "Global")
+                ->get("Timer", "Global")
             && $channel != "internal"
         ) {
             $channel = "global";
         }
         $this->bot->db->query(
-            "INSERT INTO #___timer (name, timerclass, endtime, owner, channel, repeatinterval) VALUES " . "('" . $this->bot->db->real_escape_string( $name) . "', " . $classid . ", "
-                . $endtime . ", '" . $this->bot->db->real_escape_string( $owner) . "', '" . $this->bot->db->real_escape_string( $channel) . "', " . $repeat . ")"
+            "INSERT INTO #___timer (name, timerclass, endtime, owner, channel, repeatinterval) VALUES " . "('" . $this->bot->db->real_escape_string(
+                $name
+            ) . "', " . $classid . ", "
+            . $endtime . ", '" . $this->bot->db->real_escape_string(
+                $owner
+            ) . "', '" . $this->bot->db->real_escape_string($channel) . "', " . $repeat . ")"
         );
         $timerid = $this->bot->db->select("SELECT LAST_INSERT_ID() as id");
         // If relaying is wished and relay is enabled send new timer to relayed bot(s):
@@ -386,14 +442,14 @@ class Timer_Core extends BasePassiveModule
         ) {
             $msg = "<pre>relaytimer class:" . $class . " endtime:" . $endtime . " owner:" . $owner . " repeat:" . $repeat;
             $msg .= " channel:" . $channel . " name:" . $name;
-            $this->bot->core("relay")->relay_to_bot($msg, FALSE);
+            $this->bot->core("relay")->relay_to_bot($msg, false);
         }
         $this->update_next_timer();
         return $timerid[0][0];
     }
 
 
-    function del_timer($deleter, $id, $silent = TRUE)
+    function del_timer($deleter, $id, $silent = true)
     {
         $deleter = ucfirst(strtolower($deleter));
         $deltimer = $this->bot->db->select("SELECT owner, name FROM #___timer WHERE id = " . $id);
@@ -401,23 +457,22 @@ class Timer_Core extends BasePassiveModule
             $this->error->set("Invalid timer ID!");
             return $this->error;
         }
-        $dodelete = FALSE;
-        $admin = FALSE;
+        $dodelete = false;
+        $admin = false;
         if (ucfirst(strtolower($deltimer[0][0])) == $deleter) {
-            $dodelete = TRUE;
-        }
-        elseif ($this->bot->core("alts")->main($deleter) == $this->bot
-            ->core("alts")->main($deltimer[0][0])
+            $dodelete = true;
+        } elseif ($this->bot->core("alts")->main($deleter) == $this->bot
+                ->core("alts")->main($deltimer[0][0])
         ) {
-            $dodelete = TRUE;
-        }
-        elseif ($this->bot->core("security")->check_access(
-            $deleter, $this->bot
+            $dodelete = true;
+        } elseif ($this->bot->core("security")->check_access(
+            $deleter,
+            $this->bot
                 ->core("settings")->get("Timer", "DeleteRank")
         )
         ) {
-            $dodelete = TRUE;
-            $admin = TRUE;
+            $dodelete = true;
+            $admin = true;
         }
         if (!$dodelete) {
             $this->error->set("You are not allowed to delete this timer!");
@@ -436,7 +491,10 @@ class Timer_Core extends BasePassiveModule
 
     function list_timed_events($owner)
     {
-        return $this->bot->db->select("SELECT id, name FROM #___timer WHERE channel = 'internal' AND owner = '" . $owner . "'", MYSQLI_ASSOC);
+        return $this->bot->db->select(
+            "SELECT id, name FROM #___timer WHERE channel = 'internal' AND owner = '" . $owner . "'",
+            MYSQLI_ASSOC
+        );
     }
 
 
@@ -444,9 +502,8 @@ class Timer_Core extends BasePassiveModule
     {
         $ret = $this->bot->db->select("SELECT * FROM #___timer WHERE id = " . $id, MYSQLI_ASSOC);
         if (empty($ret)) {
-            return NULL;
-        }
-        else {
+            return null;
+        } else {
             return $ret[0];
         }
     }
@@ -474,8 +531,8 @@ class Timer_Core extends BasePassiveModule
     {
         return $this->bot->db->select(
             "SELECT id, name, timerclass, channel, owner, endtime, repeatinterval " . " FROM #___timer WHERE endtime <= " . $thistime
-                . " UNION SELECT t1.id AS id, name, timerclass, channel, owner, endtime, repeatinterval "
-                . " FROM #___timer AS t1 JOIN #___timer_class_entries AS t2 ON t1.timerclass <> -1 AND t1.timerclass = t2.id " . " WHERE endtime - notify_delay <= " . $thistime,
+            . " UNION SELECT t1.id AS id, name, timerclass, channel, owner, endtime, repeatinterval "
+            . " FROM #___timer AS t1 JOIN #___timer_class_entries AS t2 ON t1.timerclass <> -1 AND t1.timerclass = t2.id " . " WHERE endtime - notify_delay <= " . $thistime,
             MYSQLI_ASSOC
         );
     }
@@ -500,7 +557,10 @@ class Timer_Core extends BasePassiveModule
         $this->class_cache[-1]['delay'] = 0;
         $this->class_cache[-1]['prefix'] = "Timer";
         $this->class_cache[-1]['suffix'] = "has finished";
-        $classentries = $this->bot->db->select("SELECT id, class_id, next_id, notify_delay, notify_prefix, notify_suffix FROM #___timer_class_entries", MYSQLI_ASSOC);
+        $classentries = $this->bot->db->select(
+            "SELECT id, class_id, next_id, notify_delay, notify_prefix, notify_suffix FROM #___timer_class_entries",
+            MYSQLI_ASSOC
+        );
         if (!empty($classentries)) {
             foreach ($classentries as $entry) {
                 $this->class_cache[$entry['id']]['class'] = $entry['class_id'];
@@ -511,7 +571,10 @@ class Timer_Core extends BasePassiveModule
             }
         }
         $this->settings_cache = array();
-        $settings_entries = $this->bot->db->select("SELECT id, name, current_class FROM #___timer_class_settings", MYSQLI_ASSOC);
+        $settings_entries = $this->bot->db->select(
+            "SELECT id, name, current_class FROM #___timer_class_settings",
+            MYSQLI_ASSOC
+        );
         if (!empty($settings_entries)) {
             foreach ($settings_entries as $entry) {
                 $this->settings_cache[strtolower($entry['name'])] = $entry['current_class'];
@@ -523,9 +586,13 @@ class Timer_Core extends BasePassiveModule
     function create_timer_class($name, $description)
     {
         $this->bot->db->query(
-            "INSERT IGNORE INTO #___timer_classes (name, description) VALUES ('" . $this->bot->db->real_escape_string( $name) . "', '" . $this->bot->db->real_escape_string( $description) . "')"
+            "INSERT IGNORE INTO #___timer_classes (name, description) VALUES ('" . $this->bot->db->real_escape_string(
+                $name
+            ) . "', '" . $this->bot->db->real_escape_string($description) . "')"
         );
-        $id = $this->bot->db->select("SELECT id FROM #___timer_classes WHERE name = '" . $this->bot->db->real_escape_string( $name) . "'");
+        $id = $this->bot->db->select(
+            "SELECT id FROM #___timer_classes WHERE name = '" . $this->bot->db->real_escape_string($name) . "'"
+        );
         if (empty($id)) {
             return -1;
         }
@@ -534,21 +601,29 @@ class Timer_Core extends BasePassiveModule
 
 
     function create_timer_class_entry(
-        $class_id, $next_id, $delay, $prefix,
+        $class_id,
+        $next_id,
+        $delay,
+        $prefix,
         $suffix
-    )
-    {
+    ) {
         $this->bot->db->query(
             "INSERT IGNORE INTO #___timer_class_entries (next_id, class_id, notify_delay, notify_prefix, " . "notify_suffix) VALUES (" . $next_id . ", " . $class_id . ", " . $delay
-                . ", '" . $this->bot->db->real_escape_string( $prefix) . "', '" . $this->bot->db->real_escape_string( $suffix) . "')"
+            . ", '" . $this->bot->db->real_escape_string($prefix) . "', '" . $this->bot->db->real_escape_string(
+                $suffix
+            ) . "')"
         );
-        $id = $this->bot->db->select("SELECT id FROM #___timer_class_entries WHERE class_id = " . $class_id . " AND notify_delay = " . $delay);
+        $id = $this->bot->db->select(
+            "SELECT id FROM #___timer_class_entries WHERE class_id = " . $class_id . " AND notify_delay = " . $delay
+        );
         if (empty($id)) {
             return -1;
         }
         // Updated self-referencing entries (or those that HAVE to be self-referencing) correctly:
         if ($delay == 0 || $next_id == -2) {
-            $this->bot->db->query("UPDATE #___timer_class_entries SET next_id = " . $id[0][0] . " WHERE class_id = " . $class_id . " AND notify_delay = " . $delay);
+            $this->bot->db->query(
+                "UPDATE #___timer_class_entries SET next_id = " . $id[0][0] . " WHERE class_id = " . $class_id . " AND notify_delay = " . $delay
+            );
         }
         // Update cache with new entry:
         $this->create_class_cache();
@@ -559,7 +634,7 @@ class Timer_Core extends BasePassiveModule
     // Registers a module for callback timer events, the module name MUST be unique.
     function register_callback($modulename, &$module)
     {
-        $this->modules[strtolower($modulename)] = &$module;
+        $this->modules[strtolower($modulename)] = & $module;
     }
 
 
@@ -567,9 +642,9 @@ class Timer_Core extends BasePassiveModule
     function unregister_callback($modulename)
     {
         if (isset($this->modules[strtolower($modulename)])) {
-            $this->modules[strtolower($modulename)] = NULL;
+            $this->modules[strtolower($modulename)] = null;
             unset($this->modules[strtolower($modulename)]);
-            return FALSE;
+            return false;
         }
         return "Invalid modulename $modulename or timer callback not registered!";
     }
@@ -579,14 +654,18 @@ class Timer_Core extends BasePassiveModule
     // Returns the ID of the default timer class (as defined by the setting) if $name doesn't exist.
     function get_class_id($name)
     {
-        $id = $this->bot->db->select("SELECT id FROM #___timer_classes WHERE name = '" . $this->bot->db->real_escape_string( $name) . "'", MYSQLI_ASSOC);
+        $id = $this->bot->db->select(
+            "SELECT id FROM #___timer_classes WHERE name = '" . $this->bot->db->real_escape_string($name) . "'",
+            MYSQLI_ASSOC
+        );
         if (empty($id)) {
             $id = $this->bot->db->select(
                 "SELECT id FROM #___timer_classes WHERE name = '" . $this->bot->db->real_escape_string(
                     $this->bot
                         ->core("settings")
                         ->get("Timer", "DefaultClass")
-                ) . "'", MYSQLI_ASSOC
+                ) . "'",
+                MYSQLI_ASSOC
             );
         }
         return $id[0]['id'];
@@ -598,20 +677,28 @@ class Timer_Core extends BasePassiveModule
     function create_class_setting($name, $default_class_name, $description)
     {
         $default_id = $this->get_class_id($default_class_name);
-        $class_setting = $this->bot->db->select("SELECT id, current_class FROM #___timer_class_settings WHERE name = '" . $this->bot->db->real_escape_string( $name) . "'", MYSQLI_ASSOC);
+        $class_setting = $this->bot->db->select(
+            "SELECT id, current_class FROM #___timer_class_settings WHERE name = '" . $this->bot->db->real_escape_string(
+                $name
+            ) . "'",
+            MYSQLI_ASSOC
+        );
         if (empty($class_setting)) {
             // Setting doesn't exist, create new one:
             $this->bot->db->query(
-                "INSERT IGNORE INTO #___timer_class_settings (name, current_class, " . "default_class, description) VALUES ('" . $this->bot->db->real_escape_string( $name) . "', '"
-                    . $default_id . "', '" . $default_id . "', '" . $this->bot->db->real_escape_string( $description) . "')"
+                "INSERT IGNORE INTO #___timer_class_settings (name, current_class, " . "default_class, description) VALUES ('" . $this->bot->db->real_escape_string(
+                    $name
+                ) . "', '"
+                . $default_id . "', '" . $default_id . "', '" . $this->bot->db->real_escape_string($description) . "')"
             );
-            $this->settings_cache[strtolower($this->bot->db->real_escape_string( $name))] = $default_id;
-        }
-        else {
+            $this->settings_cache[strtolower($this->bot->db->real_escape_string($name))] = $default_id;
+        } else {
             // UPDATE entry
             $this->bot->db->query(
-                "UPDATE #___timer_class_settings SET default_class = " . $default_id . ", description = '" . $this->bot->db->real_escape_string( $description) . "' WHERE id = "
-                    . $class_setting[0]['id']
+                "UPDATE #___timer_class_settings SET default_class = " . $default_id . ", description = '" . $this->bot->db->real_escape_string(
+                    $description
+                ) . "' WHERE id = "
+                . $class_setting[0]['id']
             );
         }
     }
@@ -621,14 +708,19 @@ class Timer_Core extends BasePassiveModule
     // Returns true on success, returns false if the class doesn't exists.
     function update_class_setting($name, $new_class_name)
     {
-        $class_setting = $this->bot->db->select("SELECT id FROM #___timer_class_settings WHERE name = '" . $this->bot->db->real_escape_string( $name) . "'", MYSQLI_ASSOC);
+        $class_setting = $this->bot->db->select(
+            "SELECT id FROM #___timer_class_settings WHERE name = '" . $this->bot->db->real_escape_string($name) . "'",
+            MYSQLI_ASSOC
+        );
         if (!empty($class_setting)) {
             $class_id = $this->get_class_id($new_class_name);
-            $this->bot->db->query("UPDATE #___timer_class_settings SET current_class = " . $class_id . " WHERE id = " . $class_setting[0]['id']);
-            $this->settings_cache[strtolower($this->bot->db->real_escape_string( $name))] = $class_id;
-            return TRUE;
+            $this->bot->db->query(
+                "UPDATE #___timer_class_settings SET current_class = " . $class_id . " WHERE id = " . $class_setting[0]['id']
+            );
+            $this->settings_cache[strtolower($this->bot->db->real_escape_string($name))] = $class_id;
+            return true;
         }
-        return FALSE;
+        return false;
     }
 
 
@@ -638,7 +730,10 @@ class Timer_Core extends BasePassiveModule
         if (!isset($this->settings_cache[strtolower($name)])) {
             return "";
         }
-        $cname = $this->bot->db->select("SELECT name FROM #___timer_classes WHERE id = " . $this->settings_cache[strtolower($name)], MYSQLI_ASSOC);
+        $cname = $this->bot->db->select(
+            "SELECT name FROM #___timer_classes WHERE id = " . $this->settings_cache[strtolower($name)],
+            MYSQLI_ASSOC
+        );
         if (empty($cname)) {
             return "";
         }

@@ -56,9 +56,12 @@ class Blacklist extends BaseActiveModule
         $this->table_version = 2;
         $this->table_update(); // Update Blacklist table if needed.
         $this->register_command(
-            'all', 'blacklist', 'MEMBER', array(
-                'add' => 'LEADER',
-                'del' => 'LEADER'
+            'all',
+            'blacklist',
+            'MEMBER',
+            array(
+                 'add' => 'LEADER',
+                 'del' => 'LEADER'
             )
         );
         $this->register_event("cron", "5min");
@@ -84,11 +87,9 @@ class Blacklist extends BaseActiveModule
     {
         if (preg_match("/^blacklist add (.+?) (.+)$/i", $msg, $info)) {
             return $this->set_blacklist($name, $info[1], $info[2]);
-        }
-        elseif (preg_match("/^blacklist rem (.+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^blacklist rem (.+)$/i", $msg, $info)) {
             return $this->del_blacklist($name, $info[1]);
-        }
-        else {
+        } else {
             return $this->get_blacklist($name);
         }
     }
@@ -101,12 +102,14 @@ class Blacklist extends BaseActiveModule
     {
         if ($this->bot->guildbot) {
             $title = "Guild";
-        }
-        else {
+        } else {
             $title = "<botname>";
         }
         $inside = "##blob_title##:::: " . $title . " Blacklist ::::##end##\n\n";
-        $result = $this->bot->db->select("SELECT name, noteid, expire FROM #___blacklist WHERE expire >= " . time() . " OR expire = 0 ORDER BY name", MYSQL_ASSOC);
+        $result = $this->bot->db->select(
+            "SELECT name, noteid, expire FROM #___blacklist WHERE expire >= " . time() . " OR expire = 0 ORDER BY name",
+            MYSQL_ASSOC
+        );
         if (!empty($result)) {
             foreach ($result as $val) {
                 // Get the reason from notes.
@@ -117,18 +120,17 @@ class Blacklist extends BaseActiveModule
                 unset($tmp);
                 if ($val['expire'] == 0) {
                     $expire_string = "Never";
-                }
-                else {
+                } else {
                     $expire_string = gmdate(
                         $this->bot->core("settings")
-                            ->get("Time", "FormatString"), $val['expire']
+                            ->get("Time", "FormatString"),
+                        $val['expire']
                     );
                 }
                 $inside
                     .= "##blob_text##" . $val['name'] . " - Set by: ##red##" . $note['author'] . "##end## Reason: " . $note['note'] . " Expires: " . $expire_string . "##end##\n";
             }
-        }
-        else // Nobody on Blacklist.
+        } else // Nobody on Blacklist.
         {
             return "Blacklist is empty.";
         }
@@ -164,12 +166,10 @@ class Blacklist extends BaseActiveModule
                 $this->bot->core("security")
                     ->set_ban($source, $target, "Blacklisted by " . $source);
                 return $target . " has been added to blacklist.";
-            }
-            else {
+            } else {
                 return "Your access level must be LEADER or higher to do this.";
             }
-        }
-        else {
+        } else {
             return "There isn't any person named " . $target . " registered on this server!";
         }
     }
@@ -189,12 +189,10 @@ class Blacklist extends BaseActiveModule
                 $this->bot->db->query($sql);
                 $this->bot->core("security")->rem_ban($admin, $target);
                 return $target . " has been removed from blacklist.";
-            }
-            else {
+            } else {
                 return "Your access level must be LEADER or higher to do this.";
             }
-        }
-        else {
+        } else {
             return $target . " is not active on the blacklist.";
         }
     }
@@ -208,7 +206,7 @@ class Blacklist extends BaseActiveModule
         $sql = "SELECT * FROM #___blacklist WHERE expire > 0 AND expire < " . time();
         $result = $this->bot->db->select($sql, MYSQL_ASSOC);
         if (empty($result)) {
-            return FALSE; // Nothing to do.
+            return false; // Nothing to do.
         }
         foreach ($result as $ban) {
             $sql = "DELETE FROM #___blacklist WHERE id = " . $ban['id'];
@@ -225,21 +223,31 @@ class Blacklist extends BaseActiveModule
     function table_update()
     {
         $this->bot->core("settings")
-            ->create("Blacklist", "table_version", 0, "Table version for Blacklist database table", NULL, TRUE, 99);
+            ->create("Blacklist", "table_version", 0, "Table version for Blacklist database table", null, true, 99);
         switch ($this->bot->core("settings")->get('Blacklist', 'Table_version')) {
-        case 0: // Previous version of BeBot.
-            $this->bot->db->update_table("blacklist", "noteid", "add", "ALTER IGNORE TABLE #___blacklist ADD noteid INT NOT NULL");
-            $this->bot->db->update_table("blacklist", "expire", "add", "ALTER IGNORE TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0");
-            $this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 1.");
-            $this->bot->core("settings")
-                ->save("Blacklist", "table_version", 1);
-        case 1:
-            // db->update_table does not work for indexes, so let's do it manually
-            $this->bot->db->query("ALTER IGNORE TABLE #___blacklist ADD INDEX expire (expire)");
-            $this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 2.");
-            $this->bot->core("settings")
-                ->save("Blacklist", "table_version", 2);
-            $this->bot->log("BLACKLIST", "UPDATE", "Blacklist table update complete.");
+            case 0: // Previous version of BeBot.
+                $this->bot->db->update_table(
+                    "blacklist",
+                    "noteid",
+                    "add",
+                    "ALTER IGNORE TABLE #___blacklist ADD noteid INT NOT NULL"
+                );
+                $this->bot->db->update_table(
+                    "blacklist",
+                    "expire",
+                    "add",
+                    "ALTER IGNORE TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0"
+                );
+                $this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 1.");
+                $this->bot->core("settings")
+                    ->save("Blacklist", "table_version", 1);
+            case 1:
+                // db->update_table does not work for indexes, so let's do it manually
+                $this->bot->db->query("ALTER IGNORE TABLE #___blacklist ADD INDEX expire (expire)");
+                $this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 2.");
+                $this->bot->core("settings")
+                    ->save("Blacklist", "table_version", 2);
+                $this->bot->log("BLACKLIST", "UPDATE", "Blacklist table update complete.");
         }
     }
 }

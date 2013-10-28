@@ -1537,16 +1537,18 @@ class City extends BaseActiveModule
         $result = $this->bot->db->select("SELECT `vark` FROM #___city WHERE `key` = 'progress'");
         if (!empty($result)) {
             $this->progress = explode(",", $result[0][0]);
-        }
-        else {
-            $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')");
+        } else {
+            $this->bot->db->query(
+                "REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')"
+            );
         }
         $result = $this->bot->db->select("SELECT `vark` FROM #___city WHERE `key` = 'stock'");
         if (!empty($result)) {
             $this->stock = explode(",", $result[0][0]);
-        }
-        else {
-            $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",", $this->stock) . "')");
+        } else {
+            $this->bot->db->query(
+                "REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",", $this->stock) . "')"
+            );
         }
         $this->help['description'] = 'Tracks guild city progression and resources management';
         $this->help['command']['city'] = "Displays status of city progression and resource quantities.";
@@ -1564,20 +1566,35 @@ class City extends BaseActiveModule
         $this->bot->core("colors")->define_scheme("city", "resources", "gold");
         $this->bot->core("settings")
             ->create(
-            'City', 'CityLocation', 'LacheishEast', 'Set this to the location of your guild city for accurate wall construction',
-            'LacheishEast;LacheishWest;LacheishNW;SwampSE;SwampNW;PoitainEast;PoitainSouth;PoitainWest'
-        );
-        $this->bot->core("settings")
-            ->create("City", "ShowAllBuildings", TRUE, "On: Shows all tiers of buildings; Off: Only shows current tier your city is working on.");
-        $this->bot->core("settings")
-            ->create("City", "ShowAllWalls", TRUE, "On: Shows all tiers of walls; Off: Only shows current tier your city is working on.");
+                'City',
+                'CityLocation',
+                'LacheishEast',
+                'Set this to the location of your guild city for accurate wall construction',
+                'LacheishEast;LacheishWest;LacheishNW;SwampSE;SwampNW;PoitainEast;PoitainSouth;PoitainWest'
+            );
         $this->bot->core("settings")
             ->create(
-            "City", "UseRefinedNames", FALSE,
-            "On: Uses Brick, Lintel, Block, etc as building requirements and stock; Off: Uses Sandstone, Copper, Granite, etc as building requirements and stock."
-        );
+                "City",
+                "ShowAllBuildings",
+                true,
+                "On: Shows all tiers of buildings; Off: Only shows current tier your city is working on."
+            );
         $this->bot->core("settings")
-            ->create("City", "ShowHelp", TRUE, "On: Adds links to detailed building requirements for each tier.");
+            ->create(
+                "City",
+                "ShowAllWalls",
+                true,
+                "On: Shows all tiers of walls; Off: Only shows current tier your city is working on."
+            );
+        $this->bot->core("settings")
+            ->create(
+                "City",
+                "UseRefinedNames",
+                false,
+                "On: Uses Brick, Lintel, Block, etc as building requirements and stock; Off: Uses Sandstone, Copper, Granite, etc as building requirements and stock."
+            );
+        $this->bot->core("settings")
+            ->create("City", "ShowHelp", true, "On: Adds links to detailed building requirements for each tier.");
         // $this -> bot -> core("settings") -> get("City", "Show All Buildings")
     }
 
@@ -1586,45 +1603,45 @@ class City extends BaseActiveModule
     {
         $vars = explode(' ', strtolower($msg));
         switch ($vars[0]) {
-        case 'city':
-            switch ($vars[1]) {
-            case 'help':
-                return $this->help(substr($msg, 10));
-                break;
-            default:
-                return $this->status();
-                break;
-            }
-            break;
-        case 'build':
-            switch ($vars[1]) {
-            case 'next':
-                return $this->buildnext();
-                break;
-            case 'wall':
-                return $this->buildwall(substr($msg, 11));
-                break;
-            case 'confirm':
-                return $this->dobuild();
-                break;
-            case 'bank':
-                // !build bank grand facade 10, mat name = 2-3 (2 , quantity = 4 (c-1)
-                $c = count($vars);
-                for ($i = 2; $i < ($c - 1); $i++) {
-                    if (strlen($m) > 0) {
-                        $m .= " ";
-                    }
-                    $m .= $vars[$i];
+            case 'city':
+                switch ($vars[1]) {
+                    case 'help':
+                        return $this->help(substr($msg, 10));
+                        break;
+                    default:
+                        return $this->status();
+                        break;
                 }
-                return $this->setmaterial($m, $vars[$c - 1]);
+                break;
+            case 'build':
+                switch ($vars[1]) {
+                    case 'next':
+                        return $this->buildnext();
+                        break;
+                    case 'wall':
+                        return $this->buildwall(substr($msg, 11));
+                        break;
+                    case 'confirm':
+                        return $this->dobuild();
+                        break;
+                    case 'bank':
+                        // !build bank grand facade 10, mat name = 2-3 (2 , quantity = 4 (c-1)
+                        $c = count($vars);
+                        for ($i = 2; $i < ($c - 1); $i++) {
+                            if (strlen($m) > 0) {
+                                $m .= " ";
+                            }
+                            $m .= $vars[$i];
+                        }
+                        return $this->setmaterial($m, $vars[$c - 1]);
+                        break;
+                    default:
+                        return $this->status(true);
+                }
                 break;
             default:
-                return $this->status(true);
-            }
-            break;
-        default:
-            return "Error: City.php was given an unsupported command.";
-            break;
+                return "Error: City.php was given an unsupported command.";
+                break;
         }
         return false;
     }
@@ -1639,12 +1656,12 @@ class City extends BaseActiveModule
         if ($this->bot->core("settings")->get("City", "ShowHelp")) {
             $status .= $this->bot->core("colors")
                 ->colorize(
-                "city_titles", "Guild Bank [" . $this->bot
-                ->core("tools")
-                ->chatcmd("city help Resources", "help") . "]\n  "
-            );
-        }
-        else {
+                    "city_titles",
+                    "Guild Bank [" . $this->bot
+                        ->core("tools")
+                        ->chatcmd("city help Resources", "help") . "]\n  "
+                );
+        } else {
             $status .= $this->bot->core("colors")
                 ->colorize("city_titles", "Guild Bank\n  ");
         }
@@ -1659,24 +1676,26 @@ class City extends BaseActiveModule
         if ($this->bot->core("settings")->get("City", "ShowHelp")) {
             $t1block = $this->bot->core("colors")
                 ->colorize(
-                "city_titles", " First Tier Buildings [" . $this->bot
-                ->core("tools")
-                ->chatcmd("city help First Tier Buildings", "help") . "] \n"
-            );
+                    "city_titles",
+                    " First Tier Buildings [" . $this->bot
+                        ->core("tools")
+                        ->chatcmd("city help First Tier Buildings", "help") . "] \n"
+                );
             $t2block = $this->bot->core("colors")
                 ->colorize(
-                "city_titles", " Second Tier Buildings [" . $this->bot
-                ->core("tools")
-                ->chatcmd("city help Second Tier Buildings", "help") . "]\n"
-            );
+                    "city_titles",
+                    " Second Tier Buildings [" . $this->bot
+                        ->core("tools")
+                        ->chatcmd("city help Second Tier Buildings", "help") . "]\n"
+                );
             $t3block = $this->bot->core("colors")
                 ->colorize(
-                "city_titles", " Third Tier Buildings [" . $this->bot
-                ->core("tools")
-                ->chatcmd("city help Third Tier Buildings", "help") . "]\n"
-            );
-        }
-        else {
+                    "city_titles",
+                    " Third Tier Buildings [" . $this->bot
+                        ->core("tools")
+                        ->chatcmd("city help Third Tier Buildings", "help") . "]\n"
+                );
+        } else {
             $t1block = $this->bot->core("colors")
                 ->colorize("city_titles", " First Tier Buildings\n");
             $t2block = $this->bot->core("colors")
@@ -1737,17 +1756,19 @@ class City extends BaseActiveModule
         );
         for ($w = 0; $w <= 9; $w++) {
             if ($this->progress[$w] > $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 $this->progress[$w] = $this->max[$this->bot->core("settings")
                     ->get("City", "CityLocation")][$w];
-                $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')");
+                $this->bot->db->query(
+                    "REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')"
+                );
             }
             $t1block .= "  " . $this->progress[$w] . " / " . $this->max[$this->bot
-                ->core("settings")
-                ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
+                    ->core("settings")
+                    ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
             if ($this->progress[$w] < $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 for (
                     $m = $this->progress[$w];
@@ -1763,17 +1784,19 @@ class City extends BaseActiveModule
         }
         for ($w = 10; $w <= 19; $w++) {
             if ($this->progress[$w] > $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 $this->progress[$w] = $this->max[$this->bot->core("settings")
                     ->get("City", "CityLocation")][$w];
-                $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')");
+                $this->bot->db->query(
+                    "REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')"
+                );
             }
             $t2block .= "  " . $this->progress[$w] . " / " . $this->max[$this->bot
-                ->core("settings")
-                ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
+                    ->core("settings")
+                    ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
             if ($this->progress[$w] < $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 for (
                     $m = $this->progress[$w];
@@ -1789,17 +1812,19 @@ class City extends BaseActiveModule
         }
         for ($w = 20; $w <= 29; $w++) {
             if ($this->progress[$w] > $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 $this->progress[$w] = $this->max[$this->bot->core("settings")
                     ->get("City", "CityLocation")][$w];
-                $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')");
+                $this->bot->db->query(
+                    "REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')"
+                );
             }
             $t3block .= "  " . $this->progress[$w] . " / " . $this->max[$this->bot
-                ->core("settings")
-                ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
+                    ->core("settings")
+                    ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
             if ($this->progress[$w] < $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 for (
                     $m = $this->progress[$w];
@@ -1815,15 +1840,24 @@ class City extends BaseActiveModule
         }
         if (!$t1complete) {
             $t1status = $this->bot->core("colors")
-                ->colorize("city_titles", " Remaining resources to complete First Tier Buildings:\n  ") . str_replace(", ", "\n  ", $this->reqs($t1mats)) . "\n\n";
+                    ->colorize(
+                        "city_titles",
+                        " Remaining resources to complete First Tier Buildings:\n  "
+                    ) . str_replace(", ", "\n  ", $this->reqs($t1mats)) . "\n\n";
         }
         if (!$t2complete) {
             $t2status = $this->bot->core("colors")
-                ->colorize("city_titles", " Remaining resources to complete Second Tier Buildings:\n  ") . str_replace(", ", "\n  ", $this->reqs($t2mats)) . "\n\n";
+                    ->colorize(
+                        "city_titles",
+                        " Remaining resources to complete Second Tier Buildings:\n  "
+                    ) . str_replace(", ", "\n  ", $this->reqs($t2mats)) . "\n\n";
         }
         if (!$t3complete) {
             $t3status = $this->bot->core("colors")
-                ->colorize("city_titles", " Remaining resources to complete Third Tier Buildings:\n  ") . str_replace(", ", "\n  ", $this->reqs($t3mats)) . "\n\n";
+                    ->colorize(
+                        "city_titles",
+                        " Remaining resources to complete Third Tier Buildings:\n  "
+                    ) . str_replace(", ", "\n  ", $this->reqs($t3mats)) . "\n\n";
         }
         if ((!$t1complete)
             || ($t1complete
@@ -1867,24 +1901,26 @@ class City extends BaseActiveModule
         if ($this->bot->core("settings")->get("City", "ShowHelp")) {
             $w1block = $this->bot->core("colors")
                 ->colorize(
-                "city_titles", " First Tier Walls [" . $this->bot
-                ->core("tools")
-                ->chatcmd("city help First Tier Walls", "help") . "]\n"
-            );
+                    "city_titles",
+                    " First Tier Walls [" . $this->bot
+                        ->core("tools")
+                        ->chatcmd("city help First Tier Walls", "help") . "]\n"
+                );
             $w2block = $this->bot->core("colors")
                 ->colorize(
-                "city_titles", " Second Tier Walls [" . $this->bot
-                ->core("tools")
-                ->chatcmd("city help Second Tier Walls", "help") . "]\n"
-            );
+                    "city_titles",
+                    " Second Tier Walls [" . $this->bot
+                        ->core("tools")
+                        ->chatcmd("city help Second Tier Walls", "help") . "]\n"
+                );
             $w3block = $this->bot->core("colors")
                 ->colorize(
-                "city_titles", " Third Tier Walls [" . $this->bot
-                ->core("tools")
-                ->chatcmd("city help Third Tier Walls", "help") . "]\n"
-            );
-        }
-        else {
+                    "city_titles",
+                    " Third Tier Walls [" . $this->bot
+                        ->core("tools")
+                        ->chatcmd("city help Third Tier Walls", "help") . "]\n"
+                );
+        } else {
             $w1block = $this->bot->core("colors")
                 ->colorize("city_titles", " First Tier Walls\n");
             $w2block = $this->bot->core("colors")
@@ -1945,17 +1981,19 @@ class City extends BaseActiveModule
         );
         for ($w = 30; $w <= 36; $w++) {
             if ($this->progress[$w] > $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 $this->progress[$w] = $this->max[$this->bot->core("settings")
                     ->get("City", "CityLocation")][$w];
-                $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')");
+                $this->bot->db->query(
+                    "REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')"
+                );
             }
             $w1block .= "  " . $this->progress[$w] . " / " . $this->max[$this->bot
-                ->core("settings")
-                ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
+                    ->core("settings")
+                    ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
             if ($this->progress[$w] < $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 for (
                     $m = $this->progress[$w];
@@ -1971,17 +2009,19 @@ class City extends BaseActiveModule
         }
         for ($w = 37; $w <= 43; $w++) {
             if ($this->progress[$w] > $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 $this->progress[$w] = $this->max[$this->bot->core("settings")
                     ->get("City", "CityLocation")][$w];
-                $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')");
+                $this->bot->db->query(
+                    "REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')"
+                );
             }
             $w2block .= "  " . $this->progress[$w] . " / " . $this->max[$this->bot
-                ->core("settings")
-                ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
+                    ->core("settings")
+                    ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
             if ($this->progress[$w] < $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 for (
                     $m = $this->progress[$w];
@@ -1997,17 +2037,19 @@ class City extends BaseActiveModule
         }
         for ($w = 44; $w <= 50; $w++) {
             if ($this->progress[$w] > $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 $this->progress[$w] = $this->max[$this->bot->core("settings")
                     ->get("City", "CityLocation")][$w];
-                $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')");
+                $this->bot->db->query(
+                    "REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')"
+                );
             }
             $w3block .= "  " . $this->progress[$w] . " / " . $this->max[$this->bot
-                ->core("settings")
-                ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
+                    ->core("settings")
+                    ->get("City", "CityLocation")][$w] . "  " . $this->names[$w] . "\n";
             if ($this->progress[$w] < $this->max[$this->bot->core("settings")
-                ->get("City", "CityLocation")][$w]
+                    ->get("City", "CityLocation")][$w]
             ) {
                 for (
                     $m = $this->progress[$w];
@@ -2023,15 +2065,27 @@ class City extends BaseActiveModule
         }
         if (!$w1complete) {
             $w1status = $this->bot->core("colors")
-                ->colorize("city_titles", " Remaining resources to complete First Tier Walls:\n  ") . str_replace(", ", "\n  ", $this->reqs($w1mats)) . "\n\n";
+                    ->colorize("city_titles", " Remaining resources to complete First Tier Walls:\n  ") . str_replace(
+                    ", ",
+                    "\n  ",
+                    $this->reqs($w1mats)
+                ) . "\n\n";
         }
         if (!$w2complete) {
             $w2status = $this->bot->core("colors")
-                ->colorize("city_titles", " Remaining resources to complete Second Tier Walls:\n  ") . str_replace(", ", "\n  ", $this->reqs($w2mats)) . "\n\n";
+                    ->colorize("city_titles", " Remaining resources to complete Second Tier Walls:\n  ") . str_replace(
+                    ", ",
+                    "\n  ",
+                    $this->reqs($w2mats)
+                ) . "\n\n";
         }
         if (!$w3complete) {
             $w3status = $this->bot->core("colors")
-                ->colorize("city_titles", " Remaining resources to complete Third Tier Walls:\n  ") . str_replace(", ", "\n  ", $this->reqs($w3mats)) . "\n\n";
+                    ->colorize("city_titles", " Remaining resources to complete Third Tier Walls:\n  ") . str_replace(
+                    ", ",
+                    "\n  ",
+                    $this->reqs($w3mats)
+                ) . "\n\n";
         }
         if ((!$w1complete)
             || ($w1complete
@@ -2079,121 +2133,120 @@ class City extends BaseActiveModule
             $topic = "Content";
             $guide = $this->bot->core("colors")
                 ->colorize("city_titles", "<center>City Building Guide</center>\n\n");
-        }
-        else {
+        } else {
             $guide = $this->bot->core("colors")
                 ->colorize("city_titles", "<center>City Building Guide: $topic</center>\n\n");
             $guide .= "[" . $this->bot->core("tools")
-                ->chatcmd("city help", "View All Guides") . "]\n\n";
+                    ->chatcmd("city help", "View All Guides") . "]\n\n";
         }
         switch ($topic) {
-        case 'First Tier Buildings':
-            for ($i = 0; $i <= 9; $i++) {
-                $guide .= $this->details($i) . "\n\n";
-            }
-            break;
-        case 'Second Tier Buildings':
-            for ($i = 10; $i <= 19; $i++) {
-                $guide .= $this->details($i) . "\n\n";
-            }
-            break;
-        case 'Third Tier Buildings':
-            for ($i = 20; $i <= 29; $i++) {
-                $guide .= $this->details($i) . "\n\n";
-            }
-            break;
-        case 'First Tier Walls':
-            for ($i = 30; $i <= 36; $i++) {
-                $guide .= $this->details($i) . "\n\n";
-            }
-            break;
-        case 'Second Tier Walls':
-            for ($i = 37; $i <= 43; $i++) {
-                $guide .= $this->details($i) . "\n\n";
-            }
-            break;
-        case 'Third Tier Walls':
-            for ($i = 44; $i <= 50; $i++) {
-                $guide .= $this->details($i) . "\n\n";
-            }
-            break;
-        case 'Resources':
-            $guide .= $this->bot->core("colors")
-                ->colorize("city_titles", "Gathering Basics") . "\n";
-            $guide .= "  Trainers are available for all 6 gathering professions starting at level 20. The gathering skills needed to construct a guild city are Stonecutting, Woodcutting, Mining and Prospecting. Gathering quests can be picked up at:\n Caenna Village in Poitain,\n Brandoc Village in Lacheish Plains or\n Nakaset Village in Purple Lotus Swamp.\n\n\n";
-            $guide .= $this->bot->core("colors")
-                ->colorize("city_titles", "First Tier Resources") . " (Level 20 Gathering)\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(0 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(0 => 1), true)) . "\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(1 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(1 => 1), true)) . "\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(2 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(2 => 1), true)) . "\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(3 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(3 => 1), true)) . "\n\n";
-            $guide .= $this->bot->core("colors")
-                ->colorize("city_titles", "Second Tier Resources") . " (Level 50 Gathering)\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(4 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(4 => 1), true)) . "\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(5 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(5 => 1), true)) . "\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(6 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(6 => 1), true)) . "\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(7 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(7 => 1), true)) . "\n\n";
-            $guide .= $this->bot->core("colors")
-                ->colorize("city_titles", "Third Tier Resources") . " (Level 70 Gathering)\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(8 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(8 => 1), true)) . "\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(9 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(9 => 1), true)) . "\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(10 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(10 => 1), true)) . "\n";
-            $guide .= " " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->reqs(array(11 => 1), false)) . " converts to " . $this->bot
-                ->core("colors")
-                ->colorize("city_resources", $this->reqs(array(11 => 1), true)) . "\n\n";
-            break;
-        case 'Content':
-            $guide .= $this->bot->core("tools")
-                ->chatcmd("city help Resources", "Resources") . "\n";
-            $guide .= $this->bot->core("tools")
-                ->chatcmd("city help First Tier Buildings", "First Tier Buildings") . "\n";
-            $guide .= $this->bot->core("tools")
-                ->chatcmd("city help Second Tier Buildings", "Second Tier Buildings") . "\n";
-            $guide .= $this->bot->core("tools")
-                ->chatcmd("city help Third Tier Buildings", "Third Tier Buildings") . "\n";
-            $guide .= $this->bot->core("tools")
-                ->chatcmd("city help First Tier Walls", "First Tier Walls") . "\n";
-            $guide .= $this->bot->core("tools")
-                ->chatcmd("city help Second Tier Walls", "Second Tier Walls") . "\n";
-            $guide .= $this->bot->core("tools")
-                ->chatcmd("city help Third Tier Walls", "Third Tier Walls") . "\n";
-            break;
-        default:
-            return "No guide on '$topic'";
+            case 'First Tier Buildings':
+                for ($i = 0; $i <= 9; $i++) {
+                    $guide .= $this->details($i) . "\n\n";
+                }
+                break;
+            case 'Second Tier Buildings':
+                for ($i = 10; $i <= 19; $i++) {
+                    $guide .= $this->details($i) . "\n\n";
+                }
+                break;
+            case 'Third Tier Buildings':
+                for ($i = 20; $i <= 29; $i++) {
+                    $guide .= $this->details($i) . "\n\n";
+                }
+                break;
+            case 'First Tier Walls':
+                for ($i = 30; $i <= 36; $i++) {
+                    $guide .= $this->details($i) . "\n\n";
+                }
+                break;
+            case 'Second Tier Walls':
+                for ($i = 37; $i <= 43; $i++) {
+                    $guide .= $this->details($i) . "\n\n";
+                }
+                break;
+            case 'Third Tier Walls':
+                for ($i = 44; $i <= 50; $i++) {
+                    $guide .= $this->details($i) . "\n\n";
+                }
+                break;
+            case 'Resources':
+                $guide .= $this->bot->core("colors")
+                        ->colorize("city_titles", "Gathering Basics") . "\n";
+                $guide .= "  Trainers are available for all 6 gathering professions starting at level 20. The gathering skills needed to construct a guild city are Stonecutting, Woodcutting, Mining and Prospecting. Gathering quests can be picked up at:\n Caenna Village in Poitain,\n Brandoc Village in Lacheish Plains or\n Nakaset Village in Purple Lotus Swamp.\n\n\n";
+                $guide .= $this->bot->core("colors")
+                        ->colorize("city_titles", "First Tier Resources") . " (Level 20 Gathering)\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(0 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(0 => 1), true)) . "\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(1 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(1 => 1), true)) . "\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(2 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(2 => 1), true)) . "\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(3 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(3 => 1), true)) . "\n\n";
+                $guide .= $this->bot->core("colors")
+                        ->colorize("city_titles", "Second Tier Resources") . " (Level 50 Gathering)\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(4 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(4 => 1), true)) . "\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(5 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(5 => 1), true)) . "\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(6 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(6 => 1), true)) . "\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(7 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(7 => 1), true)) . "\n\n";
+                $guide .= $this->bot->core("colors")
+                        ->colorize("city_titles", "Third Tier Resources") . " (Level 70 Gathering)\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(8 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(8 => 1), true)) . "\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(9 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(9 => 1), true)) . "\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(10 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(10 => 1), true)) . "\n";
+                $guide .= " " . $this->bot->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(11 => 1), false)) . " converts to " . $this->bot
+                        ->core("colors")
+                        ->colorize("city_resources", $this->reqs(array(11 => 1), true)) . "\n\n";
+                break;
+            case 'Content':
+                $guide .= $this->bot->core("tools")
+                        ->chatcmd("city help Resources", "Resources") . "\n";
+                $guide .= $this->bot->core("tools")
+                        ->chatcmd("city help First Tier Buildings", "First Tier Buildings") . "\n";
+                $guide .= $this->bot->core("tools")
+                        ->chatcmd("city help Second Tier Buildings", "Second Tier Buildings") . "\n";
+                $guide .= $this->bot->core("tools")
+                        ->chatcmd("city help Third Tier Buildings", "Third Tier Buildings") . "\n";
+                $guide .= $this->bot->core("tools")
+                        ->chatcmd("city help First Tier Walls", "First Tier Walls") . "\n";
+                $guide .= $this->bot->core("tools")
+                        ->chatcmd("city help Second Tier Walls", "Second Tier Walls") . "\n";
+                $guide .= $this->bot->core("tools")
+                        ->chatcmd("city help Third Tier Walls", "Third Tier Walls") . "\n";
+                break;
+            default:
+                return "No guide on '$topic'";
         }
         return $this->bot->core("tools")
             ->make_blob("City Building Guide: $topic", $guide);
@@ -2204,12 +2257,12 @@ class City extends BaseActiveModule
     {
         if (strlen($this->names[$id]) > 1) {
             $det = $this->bot->core("colors")
-                ->colorize("city_buildings", $this->names[$id]) . "\n";
+                    ->colorize("city_buildings", $this->names[$id]) . "\n";
             $det .= " Requires: " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->calcreqs($id)) . "\n";
+                    ->colorize("city_resources", $this->calcreqs($id)) . "\n";
             if ($this->sequence[$id] > -1) {
                 $det .= " Predecessor: " . $this->bot->core("colors")
-                    ->colorize("city_buildings", $this->names[$this->sequence[$id]]) . "\n";
+                        ->colorize("city_buildings", $this->names[$this->sequence[$id]]) . "\n";
             }
             if (strlen($this->bonuslist[$id]) > 1) {
                 $det .= " Benefit: " . $this->bonuslist[$id];
@@ -2230,7 +2283,10 @@ class City extends BaseActiveModule
                 return "Preparing to build " . $this->bot->core("colors")
                     ->colorize("city_buildings", $this->names[$i]) . " using " . $this->bot
                     ->core("colors")
-                    ->colorize("city_resources", $this->calcreqs($i)) . ". Type '!build confirm' within the next 30 seconds to build.";
+                    ->colorize(
+                        "city_resources",
+                        $this->calcreqs($i)
+                    ) . ". Type '!build confirm' within the next 30 seconds to build.";
             }
         }
         return "City buildings are already complete!";
@@ -2251,32 +2307,38 @@ class City extends BaseActiveModule
                 // We have not reached the maximum number of buildings.
                 if ((($this->progress[$this->sequence[$i]] > $this->progress[$i]) || (($this->sequence[$i] == 0) && ($this->progress[0] == 1)))
                     && ($this->progress[$i] < $this->max[$this->bot
-                        ->core("settings")->get("City", "CityLocation")][$i])
+                            ->core("settings")->get("City", "CityLocation")][$i])
                 ) {
                     $this->buildtimer = time();
                     $this->buildid = $i;
                     return "Preparing to build " . $this->bot->core("colors")
                         ->colorize("city_buildings", $this->names[$i]) . " using " . $this->bot
                         ->core("colors")
-                        ->colorize("city_resources", $this->calcreqs($i)) . ". Type '!build confirm' within the next 30 seconds to build.";
-                }
-                else {
+                        ->colorize(
+                            "city_resources",
+                            $this->calcreqs($i)
+                        ) . ". Type '!build confirm' within the next 30 seconds to build.";
+                } else {
                     if ($this->progress[$i] == $this->max[$this->bot
-                        ->core("settings")->get("City", "CityLocation")][$i]
+                            ->core("settings")->get("City", "CityLocation")][$i]
                     ) {
                         return "All " . $this->bot->core("colors")
                             ->colorize("city_buildings", $this->names[$i]) . " have been built.";
-                    }
-                    elseif (($this->sequence[$i] == 0) || ($this->progress[$i] == 0)) {
+                    } elseif (($this->sequence[$i] == 0) || ($this->progress[$i] == 0)) {
                         return "You must build a " . $this->bot->core("colors")
-                            ->colorize("city_buildings", $this->names[$this->sequence[$i]]) . " before you can build a " . $this->bot
+                            ->colorize(
+                                "city_buildings",
+                                $this->names[$this->sequence[$i]]
+                            ) . " before you can build a " . $this->bot
                             ->core("colors")
                             ->colorize("city_buildings", $this->names[$i]) . ".";
-                    }
-                    else {
+                    } else {
                         return "You must build another " . $this->bot
                             ->core("colors")
-                            ->colorize("city_buildings", $this->names[$this->sequence[$i]]) . " before you can build a " . $this->bot
+                            ->colorize(
+                                "city_buildings",
+                                $this->names[$this->sequence[$i]]
+                            ) . " before you can build a " . $this->bot
                             ->core("colors")
                             ->colorize("city_buildings", $this->names[$i]) . ".";
                     }
@@ -2296,13 +2358,16 @@ class City extends BaseActiveModule
             foreach ($this->stock as $i => $q) {
                 if ($this->stock[$i] - $this->resources[$this->buildid][$i] > 0) {
                     $this->stock[$i] = $this->stock[$i] - $this->resources[$this->buildid][$i];
-                }
-                else {
+                } else {
                     $this->stock[$i] = 0;
                 }
             }
-            $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')");
-            $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",", $this->stock) . "')");
+            $this->bot->db->query(
+                "REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')"
+            );
+            $this->bot->db->query(
+                "REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",", $this->stock) . "')"
+            );
             $this->buildtimer = 0;
             return $this->bot->core("colors")
                 ->colorize("city_buildings", $this->names[$this->buildid]) . " has been built. Removed " . $this->bot
@@ -2333,22 +2398,22 @@ class City extends BaseActiveModule
                     $qty = floor($qty / 10);
                 }
                 $this->stock[$i] = $qty;
-                $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",", $this->stock) . "')");
+                $this->bot->db->query(
+                    "REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",", $this->stock) . "')"
+                );
                 if ($i == 12) {
                     return "Stock for " . $this->bot->core("colors")
                         ->colorize("city_resources", $this->refinednames[$i]) . " has been set to " . $this->bot
                         ->core("colors")
                         ->colorize("city_resources", $this->moneyformat($qty)) . ".";
-                }
-                elseif ($this->bot->core("settings")
+                } elseif ($this->bot->core("settings")
                     ->get("City", "UseRefinedNames")
                 ) {
                     return "Stock for " . $this->bot->core("colors")
                         ->colorize("city_resources", $this->refinednames[$i]) . " has been set to " . $this->bot
                         ->core("colors")
                         ->colorize("city_resources", $qty) . ".";
-                }
-                else {
+                } else {
                     return "Stock for " . $this->bot->core("colors")
                         ->colorize("city_resources", $this->gathernames[$i]) . " has been set to " . $this->bot
                         ->core("colors")
@@ -2365,8 +2430,7 @@ class City extends BaseActiveModule
     {
         if (is_array($this->resources[$id])) {
             return $this->reqs($this->resources[$id]);
-        }
-        else {
+        } else {
             return "Invalid building type to calculate requirements.";
         }
     }
@@ -2384,21 +2448,18 @@ class City extends BaseActiveModule
                     if (!is_bool($userefinednames)) {
                         $refnames = $this->bot->core("settings")
                             ->get("City", "UseRefinedNames");
-                    }
-                    else {
+                    } else {
                         $refnames = $userefinednames;
                     }
                     if ($refnames || $i == 12) {
                         $reqs .= $q . " " . $this->refinednames[$i] . ", ";
-                    }
-                    else {
+                    } else {
                         $reqs .= $q * 10 . " " . $this->gathernames[$i] . ", ";
                     }
                 }
             }
             return substr($reqs, 0, -2);
-        }
-        else {
+        } else {
             return "Invalid data to generate requirements.";
         }
     }

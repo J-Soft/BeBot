@@ -40,32 +40,41 @@ class User_Core extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         $this->register_module("user");
         if ($this->bot->guildbot) {
-            $defnot = TRUE;
-        }
-        else {
-            $defnot = FALSE;
+            $defnot = true;
+        } else {
+            $defnot = false;
         }
         $this->bot->core("settings")
             ->create("Members", "Mark_notify", $defnot, "Are members or guests automatically put on notify?");
         $this->bot->core("settings")
-            ->create("Members", "Notify_level", 2, "Are only members (2) or guests too (1) automatically put on notify if Mark_notify is true?", "1;2");
+            ->create(
+                "Members",
+                "Notify_level",
+                2,
+                "Are only members (2) or guests too (1) automatically put on notify if Mark_notify is true?",
+                "1;2"
+            );
         if ($this->bot->core("settings")->exists("Members", "AutoInvite")) {
             // Remove the outdated autoinvite setting if it still exists, this is handled via preferences now:
             $this->bot->core("settings")->del("Members", "AutoInvite");
         }
         $this->bot->core("settings")
             ->create(
-            "Members", "AutoInviteGroup", "guests", "Which user group(s) should be automatically marked for autoinvite if AutoInvite is set to On?", "none;members;guests;both"
-        );
+                "Members",
+                "AutoInviteGroup",
+                "guests",
+                "Which user group(s) should be automatically marked for autoinvite if AutoInvite is set to On?",
+                "none;members;guests;both"
+            );
     }
 
 
     /*
     Add a user to the bot.
     */
-    function add($source, $name, $id = FALSE, $user_level, $silent = 0)
+    function add($source, $name, $id = false, $user_level, $silent = 0)
     {
-        $change_level = FALSE;
+        $change_level = false;
         $name = ucfirst(strtolower($name));
         // Check if we have been passed a name at all
         if (empty($name)) {
@@ -92,16 +101,16 @@ class User_Core extends BasePassiveModule
             if ($result[0][1] == -1 && !($this->bot->guildbot)) {
                 $this->error->set("##highlight##" . $result[0][0] . "##end## is already a member.");
                 return $this->error;
-            }
-            else {
+            } else {
                 if (($result[0][1] != $user_level && $user_level > 0)) {
-                    $change_level = TRUE;
-                }
-                else {
+                    $change_level = true;
+                } else {
                     $this->error->set("##highlight##" . $result[0][0] . "##end## is already a member.");
                     // Make sure correct name is in the table, same ID may have different names after name change.
                     if ($name != $result[0][0]) {
-                        $this->bot->db->query("UPDATE #___users SET nickname = '" . $name . "' where char_id = '" . $id . "'");
+                        $this->bot->db->query(
+                            "UPDATE #___users SET nickname = '" . $name . "' where char_id = '" . $id . "'"
+                        );
                     }
                     return $this->error;
                 }
@@ -112,18 +121,18 @@ class User_Core extends BasePassiveModule
             if ($result[0][1] == -1 && !($this->bot->guildbot)) {
                 $this->error->set("##highlight##" . $name . "##end## is banned and cannot be added.");
                 return $this->error;
-            }
-            else {
+            } else {
                 // Ok, we already have someone with the same name, double check userid's and erase the old user to avoid problems.
                 if ($id != $result[0][0]) {
-                    $this->erase("", $name, TRUE, $result[0][0]);
+                    $this->erase("", $name, true, $result[0][0]);
                 }
             }
-        }
-        // Make sure we have a valid access level for the user.
+        } // Make sure we have a valid access level for the user.
         else {
             if ($user_level < 0) {
-                $this->error->set("##highlight##" . $level . "##end## is not a valid access level. The plugin trying to add a user might be broken.");
+                $this->error->set(
+                    "##highlight##" . $level . "##end## is not a valid access level. The plugin trying to add a user might be broken."
+                );
                 return $this->error;
             }
         }
@@ -145,26 +154,27 @@ class User_Core extends BasePassiveModule
 
         // Mark members for notify in org bots, otherwise no notify as default
         if ($this->bot->core("settings")
-            ->get("Members", "Mark_notify")
+                ->get("Members", "Mark_notify")
             && $user_level >= $this->bot
                 ->core("settings")->get("Members", "Notify_level")
         ) {
             $notifystate = 1;
-        }
-        else {
+        } else {
             $notifystate = 0;
         }
         // Add the user to the users table
         if ($change_level) {
             $this->bot->db->query(
-                "UPDATE #___users SET user_level = '" . $user_level . "', notify = '" . $notifystate . "', added_by = '" . $this->bot->db->real_escape_string($source) . "' WHERE char_id = '"
-                    . $members["id"] . "'"
+                "UPDATE #___users SET user_level = '" . $user_level . "', notify = '" . $notifystate . "', added_by = '" . $this->bot->db->real_escape_string(
+                    $source
+                ) . "' WHERE char_id = '"
+                . $members["id"] . "'"
             );
-        }
-        else {
+        } else {
             $this->bot->db->query(
                 "INSERT INTO #___users (char_id, nickname, added_by, added_at, user_level, notify) VALUES('" . $members["id"] . "', '" . $members["nickname"] . "', '"
-                    . $this->bot->db->real_escape_string($source) . "', '" . time() . "', '" . $user_level . "', '" . $notifystate . "')"
+                . $this->bot->db->real_escape_string($source) . "', '" . time(
+                ) . "', '" . $user_level . "', '" . $notifystate . "')"
             );
         }
         // If character is on notify add to buddy list
@@ -178,19 +188,23 @@ class User_Core extends BasePassiveModule
         }
         // Tell them they have been added.
         if ($silent == 0) {
-            $this->bot->send_tell($name, "##highlight##" . $source . "##end## has added you to the bot." . $autoinvitestring);
+            $this->bot->send_tell(
+                $name,
+                "##highlight##" . $source . "##end## has added you to the bot." . $autoinvitestring
+            );
         }
         // Make sure the security cache is up-to-date:
         if ($user_level > 0) {
             if ($user_level == 1) {
                 $cache = 'guests';
-            }
-            else {
+            } else {
                 $cache = 'members';
             }
             $this->bot->core("security")->cache_mgr("add", $cache, $name);
         }
-        return "Player ##highlight##" . $name . "##end## has been added to the bot as " . $this->access_name($user_level);
+        return "Player ##highlight##" . $name . "##end## has been added to the bot as " . $this->access_name(
+            $user_level
+        );
     }
 
 
@@ -208,72 +222,78 @@ class User_Core extends BasePassiveModule
             return $this->error;
         }
         // Check if we have a member by that name.
-        $result = $this->bot->db->select("SELECT char_id, nickname, user_level FROM #___users WHERE nickname = '" . $name . "'");
+        $result = $this->bot->db->select(
+            "SELECT char_id, nickname, user_level FROM #___users WHERE nickname = '" . $name . "'"
+        );
         if (empty($result)) {
             $this->error->set("##highlight##" . $name . "##end## is not in the user table, and cannot be deleted.");
             return $this->error;
-        }
-        // Check if the member is already deleted.
+        } // Check if the member is already deleted.
         else {
             if ($result[0][2] == 0) {
                 $this->error->set("##highlight##" . $name . "##end## is not a member.");
                 return $this->error;
-            }
-            // Make sure we are not trying to delete a banned member.
+            } // Make sure we are not trying to delete a banned member.
             else {
                 if ($result[0][2] == -1) {
                     $this->error->set("##highlight##" . $name . "##end## is banned and cannot be deleted.");
                     return $this->error;
-                }
-                // Revoke the members
+                } // Revoke the members
                 else {
                     if ($new_id = $this->bot->core("player")->id($name)) {
                         // Make sure we have a sane userid to work with to determine if the user exsists.
                         if ($id == 0) {
                             $id = $result[0][0];
-                        }
-                        // Check if we are dealing with a rerolled character, if thats the case we need to handle it specially since we don't physically delete characters.
+                        } // Check if we are dealing with a rerolled character, if thats the case we need to handle it specially since we don't physically delete characters.
                         else {
                             if ($id != $new_id) {
                                 $reroll = 1;
                             }
                         }
-                    }
-                    else {
+                    } else {
                         $this->erase("Automated delete for invalid userid", $name);
-                        $this->error->set("##highlight##" . $name . "##end## does not appear to be a valid character. You might want to erase this user.");
+                        $this->error->set(
+                            "##highlight##" . $name . "##end## does not appear to be a valid character. You might want to erase this user."
+                        );
                         return $this->error;
                     }
                     // Rerolled character, we need to make sure our information is updated.
                     if ($reroll == 1) {
                         $this->bot->db->query(
-                            "UPDATE #___users SET char_id = '" . $id . "', user_level = '0', deleted_by = '" . $this->bot->db->real_escape_string($source) . "', deleted_at = '" . time()
-                                . "', notify = '0' WHERE nickname = '" . $name . "'"
+                            "UPDATE #___users SET char_id = '" . $id . "', user_level = '0', deleted_by = '" . $this->bot->db->real_escape_string(
+                                $source
+                            ) . "', deleted_at = '" . time()
+                            . "', notify = '0' WHERE nickname = '" . $name . "'"
                         );
-                    }
-                    else {
+                    } else {
                         $this->bot->db->query(
-                            "UPDATE #___users SET user_level = '0', deleted_by = '" . $this->bot->db->real_escape_string($source) . "', deleted_at = '" . time()
-                                . "', notify = '0' WHERE char_id = '"
-                                . $id . "'"
+                            "UPDATE #___users SET user_level = '0', deleted_by = '" . $this->bot->db->real_escape_string(
+                                $source
+                            ) . "', deleted_at = '" . time()
+                            . "', notify = '0' WHERE char_id = '"
+                            . $id . "'"
                         );
                         $this->bot->core("chat")->buddy_remove($id);
                     }
                     if ($rerolled != 1 && $silent == 0) {
-                        $this->bot->send_tell($name, "##highlight##" . $source . "##end## has removed you from the bot.");
+                        $this->bot->send_tell(
+                            $name,
+                            "##highlight##" . $source . "##end## has removed you from the bot."
+                        );
                     }
                     // Make sure the security cache is up-to-date:
                     if ($result[0][2] > 0) {
                         if ($result[0][2] == 1) {
                             $cache = 'guests';
-                        }
-                        else {
+                        } else {
                             $cache = 'members';
                         }
                         $this->bot->core("security")->cache_mgr("rem", $cache, $name);
                     }
                     //Make sure the usr isnt left on the online list
-                    $this->bot->db->query("UPDATE #___online SET status_gc = 0 WHERE botname = '" . $this->bot->botname . "' AND nickname = '" . $name . "'");
+                    $this->bot->db->query(
+                        "UPDATE #___online SET status_gc = 0 WHERE botname = '" . $this->bot->botname . "' AND nickname = '" . $name . "'"
+                    );
                     $this->bot->core("online")->logoff($name);
                     $this->bot->core("notify")->update_cache();
                     return "##highlight##" . $name . "##end## has been removed from member list.";
@@ -296,38 +316,35 @@ class User_Core extends BasePassiveModule
             $this->error->set("You have to give a character name to be erased.");
             return $this->error;
         }
-        $result = $this->bot->db->select("SELECT char_id, nickname, user_level FROM #___users WHERE nickname = '" . $name . "'");
+        $result = $this->bot->db->select(
+            "SELECT char_id, nickname, user_level FROM #___users WHERE nickname = '" . $name . "'"
+        );
         if (empty($result)) {
             $this->error->set("##highlight##" . $name . "##end## is not in the user table, and cannot be erased.");
             return $this->error;
-        }
-        //Make sure we are not trying to delete a banned member.
+        } //Make sure we are not trying to delete a banned member.
         else {
             if ($result[0][1] == -1) {
                 $this->error->set("##highlight##" . $name . "##end## is banned and cannot be deleted.");
                 return $this->error;
-            }
-            else {
+            } else {
                 if ($new_id = $this->bot->core("player")->id($name)) {
                     // Make sure we have a sane userid to work with to determine if the user exsists.
                     if ($id == 0) {
                         $id = $result[0][0];
-                    }
-                    // Check if we are dealing with a rerolled character, if thats the case we need to handle it specially since we don't physically delete characters.
+                    } // Check if we are dealing with a rerolled character, if thats the case we need to handle it specially since we don't physically delete characters.
                     else {
                         if ($id != $new_id) {
                             $reroll = 1;
                         }
                     }
-                }
-                else {
+                } else {
                     $deleted = 1;
                 }
                 // The character
                 if ($reroll == 1 || $deleted == 1) {
                     $this->bot->db->query("DELETE FROM #___users WHERE nickname = '" . $name . "'");
-                }
-                else {
+                } else {
                     $this->bot->db->query("DELETE FROM #___users WHERE char_id = " . $id);
                     $this->bot->core("chat")->buddy_remove($id);
                 }
@@ -338,8 +355,7 @@ class User_Core extends BasePassiveModule
                 if ($result[0][2] > 0) {
                     if ($result[0][2] == 1) {
                         $cache = 'guests';
-                    }
-                    else {
+                    } else {
                         $cache = 'members';
                     }
                     $this->bot->core("security")->cache_mgr("rem", $cache, $name);
@@ -355,17 +371,17 @@ class User_Core extends BasePassiveModule
     function access_name($level)
     {
         switch ($level) {
-        case '1':
-            return "a guest";
-            break;
-        case '2':
-            return "a member";
-            break;
-        case '3':
-            return "an admin";
-            break;
-        default:
-            return "Error, unknown level";
+            case '1':
+                return "a guest";
+                break;
+            case '2':
+                return "a member";
+                break;
+            case '3':
+                return "an admin";
+                break;
+            default:
+                return "Error, unknown level";
         }
     }
 
@@ -373,14 +389,14 @@ class User_Core extends BasePassiveModule
     function admin_group_name($level)
     {
         switch ($level) {
-        case '4':
-            return "owner";
-        case '3':
-            return "superadmin";
-        case '2':
-            return "admin";
-        case '1':
-            return "raidleader";
+            case '4':
+                return "owner";
+            case '3':
+                return "superadmin";
+            case '2':
+                return "admin";
+            case '1':
+                return "raidleader";
         }
     }
 
@@ -388,16 +404,16 @@ class User_Core extends BasePassiveModule
     function admin_group_level($name)
     {
         switch ($name) {
-        case 'owner':
-            return 4;
-        case 'superadmin':
-            return 3;
-        case 'admin':
-            return 2;
-        case 'raidleader':
-            return 1;
-        default:
-            return 0;
+            case 'owner':
+                return 4;
+            case 'superadmin':
+                return 3;
+            case 'admin':
+                return 2;
+            case 'raidleader':
+                return 1;
+            default:
+                return 0;
         }
     }
 
@@ -408,8 +424,7 @@ class User_Core extends BasePassiveModule
         $result = $this->bot->db->select("SELECT char_id FROM #___users WHERE nickname = '" . $name . "'");
         if (!empty($result)) {
             return $result[0][0];
-        }
-        else {
+        } else {
             return 0;
         }
     }

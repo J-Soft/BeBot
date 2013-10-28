@@ -66,13 +66,14 @@ class Chat_Queue_Core extends BasePassiveModule
         $msg = $info[1];
         if ($info[2] == "tell") {
             $this->bot->log(
-                "TELL", "OUT", "-> " . $this->bot->core("chat")
-                ->get_uname($to) . ": " . $msg
+                "TELL",
+                "OUT",
+                "-> " . $this->bot->core("chat")
+                    ->get_uname($to) . ": " . $msg
             );
             $msg = utf8_encode($msg);
             $this->bot->aoc->send_tell($to, $msg);
-        }
-        else {
+        } else {
             $msg = utf8_encode($msg);
             $this->bot->aoc->send_group($to, $msg);
         }

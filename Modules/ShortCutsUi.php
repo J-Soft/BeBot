@@ -49,11 +49,9 @@ class ShortCutGUI extends BaseActiveModule
     {
         if (preg_match("/^shortcuts$/i", $msg)) {
             return $this->show_shortcuts();
-        }
-        elseif (preg_match("/^shortcuts add &quot;(.*)&quot; &quot;(.*)&quot;$/i", $msg, $info)) {
+        } elseif (preg_match("/^shortcuts add &quot;(.*)&quot; &quot;(.*)&quot;$/i", $msg, $info)) {
             return $this->add($info[1], $info[2]);
-        }
-        elseif (preg_match("/^shortcuts del ([01-9]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^shortcuts del ([01-9]+)$/i", $msg, $info)) {
             return $this->del($info[1]);
         }
     }

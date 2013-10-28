@@ -71,10 +71,9 @@ class Nroll extends BaseActiveModule
         if (preg_match("/^nroll (.+)$/i", $msg, $info)) {
             $options_str = $info[1];
             $options = array();
-            if (strpos($options_str, ",") === FALSE) {
+            if (strpos($options_str, ",") === false) {
                 $options = split(" ", $options_str);
-            }
-            else {
+            } else {
                 $options = split(",", $options_str);
             }
             $result = $options[array_rand($options)];
@@ -82,16 +81,16 @@ class Nroll extends BaseActiveModule
             $this->verifytime[] = time();
             $this->verifyname[] = $name;
             end($this->verifyresult);
-            $output = "I choose <font color=yellow>$result</font>.  To verify, /tell <botname> <pre>nverify " . key($this->verifyresult);
+            $output = "I choose <font color=yellow>$result</font>.  To verify, /tell <botname> <pre>nverify " . key(
+                    $this->verifyresult
+                );
             //$this -> bot -> send_output($name, $output, $origin);
-        }
-        elseif (preg_match("/^nverify (.+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^nverify (.+)$/i", $msg, $info)) {
             if (isset($this->verifyresult[$info[1]])) {
                 $output
                     = "I chose <font color=yellow>" . ($this->verifyresult[$info[1]]) . "</font> for <font color=green>" . $this->verifyname[$info[1]] . "</font> <font color=red>"
                     . (time() - $this->verifytime[$info[1]]) . "</font> seconds ago.";
-            }
-            else {
+            } else {
                 $output = "Results not found.  Please check your query and try again.  If that doesn't work, give up, it ain't worth it.";
             }
             //$this -> bot -> send_output($name, $output, $origin);

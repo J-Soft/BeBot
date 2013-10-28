@@ -66,7 +66,7 @@ class Bid extends BaseActiveModule
         $this->bot->core("settings")
             ->create("bid", "timer", 60, "How Long shold a Auction Last?");
         $this->bot->core("settings")
-            ->create("bid", "raid_locked", FALSE, "Should Auction be Locked to Users in Raid?");
+            ->create("bid", "raid_locked", false, "Should Auction be Locked to Users in Raid?");
     }
 
 
@@ -77,32 +77,30 @@ class Bid extends BaseActiveModule
     {
         $msg = explode(" ", $msg, 3);
         Switch ($msg[1]) {
-        case 'start':
-            return $this->start_bid($name, $msg[2]);
-        case 'info':
-            $this->info_bid($name);
-            Break;
-        case 'cancel':
-            Return $this->cancel($name);
-        case 'lock':
-            Return $this->cancel($name, TRUE);
-        case 'unlock':
-            Return $this->lock($name, FALSE);
-        case 'history':
-        case 'list':
-            Return $this->history();
-        Default:
-            if (is_numeric($msg[1]) || strtolower($msg[1]) == "all") {
-                if ($origin == "tell") {
-                    $this->place_bid($name, $msg[1]);
+            case 'start':
+                return $this->start_bid($name, $msg[2]);
+            case 'info':
+                $this->info_bid($name);
+                Break;
+            case 'cancel':
+                Return $this->cancel($name);
+            case 'lock':
+                Return $this->cancel($name, true);
+            case 'unlock':
+                Return $this->lock($name, false);
+            case 'history':
+            case 'list':
+                Return $this->history();
+            Default:
+                if (is_numeric($msg[1]) || strtolower($msg[1]) == "all") {
+                    if ($origin == "tell") {
+                        $this->place_bid($name, $msg[1]);
+                    } else {
+                        Return ("Bids in /tell Only");
+                    }
+                } else {
+                    $this->bot->send_help($name, "bid");
                 }
-                else {
-                    Return ("Bids in /tell Only");
-                }
-            }
-            else {
-                $this->bot->send_help($name, "bid");
-            }
         }
     }
 
@@ -119,7 +117,7 @@ class Bid extends BaseActiveModule
             $itemref = explode(" ", $item, 5);
             if (strtolower($itemref[0]) == "&item&") {
                 $item = $this->bot->core("tools")
-                    ->make_item($itemref[1], $itemref[2], $itemref[3], $itemref[4], TRUE);
+                    ->make_item($itemref[1], $itemref[2], $itemref[3], $itemref[4], true);
             }
             $this->bid = $item;
             $this->maxbid = 0;
@@ -129,7 +127,7 @@ class Bid extends BaseActiveModule
             $this->locked = $this->bot->core("settings")
                 ->get("bid", "raid_locked");
             $this->announce = time() + 15;
-            $this->announced = FALSE;
+            $this->announced = false;
             $timer = $this->bot->core("settings")
                 ->get("Bid", "timer");
             $this->end = time() + $timer;
@@ -140,8 +138,7 @@ class Bid extends BaseActiveModule
             $msg .= "##highlight##$timer seconds##end## to place bids :: " . $this->info();
             $msg .= "\n##highlight##-------------------------------------##end##";
             $this->bot->send_output("", $msg, "both");
-        }
-        else {
+        } else {
             $this->bot->send_tell($name, "You must be a raidleader to do this");
         }
     }
@@ -153,14 +150,12 @@ class Bid extends BaseActiveModule
             if ($this->bid && $this->bid != "") {
                 $this->bot->send_output("", "Auction for item ##highlight##" . $this->bid . "##end## Canceled", "both");
                 $this->bid = "";
-                $this->type = FALSE;
+                $this->type = false;
                 $this->unregister_event("cron", "2sec");
-            }
-            else {
+            } else {
                 Return ("##error##Error: No Auction in Progress##end##");
             }
-        }
-        else {
+        } else {
             $this->bot->send_tell($name, "You must be a raidleader to do this");
         }
     }
@@ -171,44 +166,49 @@ class Bid extends BaseActiveModule
     */
     function place_bid($name, $ammount)
     {
-        $update = TRUE;
+        $update = true;
         if (strtolower($ammount) == "all") {
-            $ammount = $this->bot->db->select("SELECT " . $this->type . "_points FROM #___raid_points WHERE id = " . $this->points_to($name));
+            $ammount = $this->bot->db->select(
+                "SELECT " . $this->type . "_points FROM #___raid_points WHERE id = " . $this->points_to($name)
+            );
             if (!empty($ammount)) {
                 $ammount = $ammount[0][0];
-            }
-            else {
+            } else {
                 $ammount = 0;
             }
         }
         if (empty($this->bid)) {
             $this->bot->send_tell($name, "No auction in progress.");
-            return FALSE;
-        }
-        else {
+            return false;
+        } else {
             if ($ammount < 1) {
                 $this->bot->send_tell($name, "Min bid is set to ####highlight##1##end## raidpoints.");
-                return FALSE;
+                return false;
             }
         }
         if ($this->locked) {
-            if ($this->bot->exists_module("raid") && $this->bot->core("raid")->raid && !isset($this->bot->core("raid")->user[$name])) {
+            if ($this->bot->exists_module("raid") && $this->bot->core("raid")->raid && !isset($this->bot->core(
+                    "raid"
+                )->user[$name])
+            ) {
                 $this->bot->send_tell($name, "This Auction is Locked to Raid Users Only");
-                return FALSE;
+                return false;
             }
         }
         $result = $this->bot->db->select("SELECT points FROM #___raid_points WHERE id = " . $this->points_to($name));
         if (empty($result)) {
             $this->bot->send_tell($name, "You appear to not have any points yet. No points table entry found.");
-            return FALSE;
+            return false;
         }
         $result = $result[0][0];
         $currenthigh = (($this->maxbid == $this->secondbid) ? ($this->maxbid) : ($this->secondbid + 1));
         $currenthighb = $this->highestbidder;
         if ($result < $ammount) {
-            $this->bot->send_tell($name, "You only have ##highlight##" . $result . "##end## raidpoints. Please place bid again.");
-        }
-        else {
+            $this->bot->send_tell(
+                $name,
+                "You only have ##highlight##" . $result . "##end## raidpoints. Please place bid again."
+            );
+        } else {
             if ($this->highestbidder == $name) {
                 if ($this->maxbid < $ammount) {
                     if ($this->secondbid == $this->maxbid) {
@@ -216,22 +216,19 @@ class Bid extends BaseActiveModule
                     }
                     $this->maxbid = $ammount;
                     $this->bot->send_tell($name, "Max bid Changed to ##highlight##$ammount##end##.");
-                    return FALSE;
+                    return false;
                 }
-            }
-            else {
+            } else {
                 if ($this->maxbid == $ammount) {
                     $this->secondbid = $ammount;
-                }
-                else {
+                } else {
                     if ($this->maxbid < $ammount) {
                         if ($name != $this->highestbidder) {
                             $this->secondbid = $this->maxbid;
                             $this->highestbidder = $name;
                         }
                         $this->maxbid = $ammount;
-                    }
-                    else {
+                    } else {
                         if ($currenthigh < $ammount) {
                             if ($name != $this->highestbidder) {
                                 $this->secondbid = $ammount;
@@ -252,8 +249,10 @@ class Bid extends BaseActiveModule
                 $obb = "##highlight##$name##end## tried to outbid with ##highlight##$ammount##end##, ";
             }
             $this->bot->send_output(
-                "", $obb . "##highlight##" . $this->highestbidder . "##end## leads with " . "##highlight##$highest##end## points. Bidding ends "
-                . "in ##highlight##$secs##end## seconds :: " . $this->info(), "both"
+                "",
+                $obb . "##highlight##" . $this->highestbidder . "##end## leads with " . "##highlight##$highest##end## points. Bidding ends "
+                . "in ##highlight##$secs##end## seconds :: " . $this->info(),
+                "both"
             );
         }
     }
@@ -269,7 +268,7 @@ class Bid extends BaseActiveModule
                 foreach ($this->history as $k => $v) {
                     if (!$done) {
                         unset($this->history[$k]);
-                        $done = TRUE;
+                        $done = true;
                     }
                 }
             }
@@ -278,17 +277,18 @@ class Bid extends BaseActiveModule
                 $this->history[] = array(
                     time(),
                     $this->bid,
-                    FALSE
+                    false
                 );
-            }
-            else {
+            } else {
                 $highest = (($this->maxbid == $this->secondbid) ? ($this->maxbid) : ($this->secondbid + 1));
                 $this->bot->send_output(
-                    "", "##highlight##" . $this->highestbidder . "##end## has won the auction for ##highlight##" . $this->bid
-                    . "##end##. ##highlight##$highest##end## points are being deducted from this account.", "both"
+                    "",
+                    "##highlight##" . $this->highestbidder . "##end## has won the auction for ##highlight##" . $this->bid
+                    . "##end##. ##highlight##$highest##end## points are being deducted from this account.",
+                    "both"
                 );
                 $this->bot->core("points")
-                    ->rem_points($this->name, $this->highestbidder, $highest, "Auction: " . $this->bid, TRUE);
+                    ->rem_points($this->name, $this->highestbidder, $highest, "Auction: " . $this->bid, true);
                 //	$this -> bot -> db -> query("UPDATE #___raid_points SET points = points - " . $highest .
                 //	" WHERE id = " . $this -> points_to($this -> highestbidder));
                 $this->history[] = array(
@@ -324,8 +324,9 @@ class Bid extends BaseActiveModule
         $inside .= "So it really does help bidding the max you're willing to spend right from the start instead of trying \n";
         $inside .= "to correct later on.\n";
         $this->bot->send_tell(
-            $name, "Infomation about bidding :: " . $this->bot
-            ->core("tools")->make_blob("click for info", $inside)
+            $name,
+            "Infomation about bidding :: " . $this->bot
+                ->core("tools")->make_blob("click for info", $inside)
         );
     }
 
@@ -360,19 +361,17 @@ class Bid extends BaseActiveModule
         foreach ($ammounts as $am) {
             if ($am == "nl") {
                 $inside .= "\n";
-            }
-            elseif ($am < $highest) {
+            } elseif ($am < $highest) {
                 $inside .= "[ Bid 2 ] | ";
-            }
-            else {
+            } else {
                 $inside .= $this->bot->core("tools")
-                    ->chatcmd("bid 2", "[ Bid 2 ]") . " | ";
+                        ->chatcmd("bid 2", "[ Bid 2 ]") . " | ";
             }
         }
         $inside = substr($inside, 0, -3);
         $inside .= "\n\n";
         $inside .= $this->bot->core("tools")
-            ->chatcmd("points", ":: <font color=#99CC00>Check your points##end## ::") . "\n\n";
+                ->chatcmd("points", ":: <font color=#99CC00>Check your points##end## ::") . "\n\n";
         $inside .= "To place a bid write:\n";
         $inside .= "##highlight##/tell <botname> <pre>bid &lt;points&gt;##end##\n";
         $inside .= "(Replace &lt;points&gt; with the number of points you would like to bid)\n";
@@ -384,34 +383,39 @@ class Bid extends BaseActiveModule
     function lock($name, $lock)
     {
         if ($this->bot->core("security")->check_access(
-            $name, $this->bot
+            $name,
+            $this->bot
                 ->core("settings")->get('Raid', 'Command')
         )
         ) {
             if ($lock) {
                 if ($this->locked) {
                     $this->bot->send_tell($name, "Auction is Already ##highlight##locked##end##");
-                    return FALSE;
-                }
-                else {
-                    $this->locked = TRUE;
-                    $this->bot->send_output("", "##highlight##$name##end## has ##highlight##locked##end## the Auction.", "both");
+                    return false;
+                } else {
+                    $this->locked = true;
+                    $this->bot->send_output(
+                        "",
+                        "##highlight##$name##end## has ##highlight##locked##end## the Auction.",
+                        "both"
+                    );
                     return ("Auction ##highlight##locked##end##");
                 }
-            }
-            else {
+            } else {
                 if (!$this->locked) {
                     $this->bot->send_tell($name, "Auction is Already ##highlight##unlocked##end##");
-                    return FALSE;
-                }
-                else {
-                    $this->locked = FALSE;
-                    $this->bot->send_output("", "##highlight##$name##end## has ##highlight##unlocked##end## the Auction.", "both");
+                    return false;
+                } else {
+                    $this->locked = false;
+                    $this->bot->send_output(
+                        "",
+                        "##highlight##$name##end## has ##highlight##unlocked##end## the Auction.",
+                        "both"
+                    );
                     return ("Auction ##highlight##unlocked##end##");
                 }
             }
-        }
-        else {
+        } else {
             return "You must be a " . $this->bot->core("settings")
                 ->get('Raid', 'Command') . " to do this";
         }
@@ -425,21 +429,20 @@ class Bid extends BaseActiveModule
             $history = array_reverse($this->history);
             foreach ($history as $h) {
                 $inside .= "\n\n" . gmdate(
-                    $this->bot->core("settings")
-                        ->get("Time", "FormatString"), $h[0]
-                ) . " GMT";
+                        $this->bot->core("settings")
+                            ->get("Time", "FormatString"),
+                        $h[0]
+                    ) . " GMT";
                 $inside .= "\nItem: " . $h[1];
                 if ($h[2]) {
                     $inside .= "\nResult: $h[2] for $h[3] points";
-                }
-                else {
+                } else {
                     $inside .= "\nResult: FFA";
                 }
             }
             Return ("Auction History :: " . $this->bot->core("tools")
-                ->make_blob("click to view", $inside));
-        }
-        else {
+                    ->make_blob("click to view", $inside));
+        } else {
             Return ("No Auction History Found");
         }
     }

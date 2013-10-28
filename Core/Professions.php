@@ -60,8 +60,7 @@ class Profession_Core extends BasePassiveModule
                 'Herald of Xotli' => 'hox',
                 'Demonologist' => 'demo'
             );
-        }
-        else {
+        } else {
             $this->cache = array(
                 'Adventurer' => 'adv',
                 'Agent' => 'agent',
@@ -129,12 +128,10 @@ class Profession_Core extends BasePassiveModule
         // Is it a shortcut?
         if ($full_name = array_search($shortcut, $this->cache)) {
             return ($full_name);
-        }
-        // Or a full name?
+        } // Or a full name?
         elseif (isset($lc_cache[$shortcut])) {
             return (array_search($lc_cache[$shortcut], $this->cache));
-        }
-        // error otherwise
+        } // error otherwise
         else {
             $this->error->set("##highlight##'$shortcut'##end## is not a valid profession name or shortcut.");
             return ($this->error);
@@ -152,12 +149,10 @@ class Profession_Core extends BasePassiveModule
         //Is it a valid profession
         if (isset($this->cache[$profession])) {
             return ($this->cache[$profession]);
-        }
-        //Check if $profession is a valid shortcut.
+        } //Check if $profession is a valid shortcut.
         elseif (in_array($profession, $this->cache)) {
             return ($profession);
-        }
-        else {
+        } else {
             $this->error->set("'$profession' is not a valid profession name or shortcut.");
             return ($this->error);
         }

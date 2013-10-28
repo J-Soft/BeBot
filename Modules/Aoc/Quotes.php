@@ -64,24 +64,21 @@ class Quotes extends BaseActiveModule
             if ($origin == 'gc') {
                 $this->bot->send_irc("", "", $msg);
             }
-        }
-        else {
+        } else {
             if (preg_match("/^quotes add (.+)$/i", $msg, $info)) {
                 $msg = $this->add_quote($info[1], $name);
                 $this->bot->send_output($name, $msg, $origin);
                 if ($origin == 'gc') {
                     $this->bot->send_irc("", "", $msg);
                 }
-            }
-            else {
+            } else {
                 if (preg_match("/^quotes (remove|del|rem|delete) ([0-9]+)$/i", $msg, $info)) {
                     $msg = $this->del_quote($info[2], $name);
                     $this->bot->send_output($name, $msg, $origin);
                     if ($origin == 'gc') {
                         $this->bot->send_irc("", "", $this->del_quote($info[2]));
                     }
-                }
-                else {
+                } else {
                     $msg = $this->send_quote(-1);
                     $this->bot->send_output($name, $msg, $origin);
                     if ($origin == 'gc') {
@@ -95,7 +92,9 @@ class Quotes extends BaseActiveModule
 
     function add_quote($strquote, $name)
     {
-        $this->bot->db->query("INSERT INTO #___quotes (quote, contributor) VALUES ('" . addslashes($strquote) . "', '" . $name . "')");
+        $this->bot->db->query(
+            "INSERT INTO #___quotes (quote, contributor) VALUES ('" . addslashes($strquote) . "', '" . $name . "')"
+        );
         $num = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
         $strmsg = "Thank you, your quote has been added as id #" . $num[0][0];
         return $strmsg;
@@ -108,8 +107,7 @@ class Quotes extends BaseActiveModule
         if (!empty($result)) {
             $this->bot->db->query("DELETE FROM #___quotes WHERE id=" . $qnum);
             return "Quote removed.";
-        }
-        else {
+        } else {
             $num = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
             return "Quote with id of " . $qnum . " not found. (Highest quote ID is " . $num[0][0] . ".)";
         }
@@ -123,25 +121,22 @@ class Quotes extends BaseActiveModule
             $num = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
             $result = $this->bot->db->select("SELECT * FROM #___quotes");
             if (!empty($result)) {
-                $found = FALSE;
-                while ($found == FALSE) {
+                $found = false;
+                while ($found == false) {
                     $row = $this->bot->core("tools")->my_rand(0, $num[0][0]);
                     if (!empty($result[$row][0])) {
                         $strquote = "#" . $result[$row][0] . " - " . $result[$row][1] . " [Contributed by: " . $result[$row][2] . "]";
-                        $found = TRUE;
+                        $found = true;
                     }
                 }
-            }
-            else {
+            } else {
                 $strquote = "No quotes exist. Add some!";
             }
-        }
-        else {
+        } else {
             $result = $this->bot->db->select("SELECT * FROM #___quotes WHERE id=" . $qnum);
             if (!empty($result)) {
                 $strquote = "#" . $result[0][0] . " - " . $result[0][1] . " [Contributed by: " . $result[0][2] . "]";
-            }
-            else {
+            } else {
                 $num = $this->bot->db->select("SELECT id FROM #___quotes ORDER BY id DESC");
                 $strquote = "Quote with id of " . $qnum . " not found. (Highest quote ID is " . $num[0][0] . ".)";
             }
@@ -156,16 +151,15 @@ class Quotes extends BaseActiveModule
         $num = $this->bot->db->select("SELECT id FROM #___quotes WHERE quote LIKE '" . $qtext . "'");
         $result = $this->bot->db->select("SELECT * FROM #___quotes");
         if ($num[0][0] > 0) {
-            $found = FALSE;
-            while ($found == FALSE) {
+            $found = false;
+            while ($found == false) {
                 $row = $this->bot->core("tools")->my_rand(0, $num[0][0]);
                 if (!empty($result[$row][0])) {
                     $strquote = "#" . $result[$row][0] . " - " . $result[$row][1] . " [Contributed by: " . $result[$row][2] . "]";
-                    $found = TRUE;
+                    $found = true;
                 }
             }
-        }
-        else {
+        } else {
             $strquote = "No quotes found!";
         }
         return $strquote;

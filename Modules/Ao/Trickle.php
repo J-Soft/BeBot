@@ -315,20 +315,21 @@ class Trickle extends BaseActiveModule
         $this->error->reset();
         $msg = strtolower($msg);
         $com = $this->parse_com(
-            $msg, array(
-                'com',
-                'stat1',
-                'val1',
-                'stat2',
-                'val2',
-                'stat3',
-                'val3',
-                'stat4',
-                'val4',
-                'stat5',
-                'val5',
-                'stat6',
-                'val6'
+            $msg,
+            array(
+                 'com',
+                 'stat1',
+                 'val1',
+                 'stat2',
+                 'val2',
+                 'stat3',
+                 'val3',
+                 'stat4',
+                 'val4',
+                 'stat5',
+                 'val5',
+                 'stat6',
+                 'val6'
             )
         );
         if (empty($com['stat1'])) {

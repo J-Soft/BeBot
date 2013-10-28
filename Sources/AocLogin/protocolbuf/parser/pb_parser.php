@@ -76,8 +76,7 @@ class PBParser
                 $this->_create_class_constructor($classfile['value'], $string, $classname);
                 $this->_create_class_body($classfile['value'], $string, $classname);
                 $this->c_types[$classfile['name']] = 'PBMessage';
-            }
-            else {
+            } else {
                 if ($classfile['type'] == 'enum') {
                     $string .= 'class ' . $classname . " extends PBEnum\n{\n";
                     $this->_create_class_definition($classfile['value'], $string);
@@ -104,8 +103,7 @@ class PBParser
     {
         if (isset($this->scalar_types[$field['value']['type']])) {
             return $this->scalar_types[$field['value']['type']];
-        }
-        else {
+        } else {
             if (isset($this->c_types[$field['value']['namespace']])) {
                 return $this->c_types[$field['value']['namespace']];
             }
@@ -117,7 +115,7 @@ class PBParser
     /**
      * Creates the class body with functions for each field
      *
-     * @param Array  $classfile
+     * @param Array $classfile
      * @param String $string
      * @param String $classname - classname
      */
@@ -133,14 +131,12 @@ class PBParser
             ) {
                 $string .= '  function ' . $field['value']['name'] . '($offset)' . "\n  {\n";
                 $string .= '    $v = $this->_get_arr_value("' . $field['value']['value'] . '", $offset);' . "\n";
-                $string .= '    return $v->get_value();' . "\n";
-                ;
+                $string .= '    return $v->get_value();' . "\n";;
                 $string .= "  }\n";
 
                 $string .= '  function append_' . $field['value']['name'] . '($value)' . "\n  {\n";
                 $string .= '    $v = $this->_add_arr_value("' . $field['value']['value'] . '");' . "\n";
-                $string .= '    $v->set_value($value);' . "\n";
-                ;
+                $string .= '    $v->set_value($value);' . "\n";;
                 $string .= "  }\n";
 
                 $string .= '  function set_' . $field['value']['name'] . '($index, $value)' . "\n  {\n";
@@ -156,8 +152,7 @@ class PBParser
                 $string .= '  function ' . $field['value']['name'] . '_size()' . "\n  {\n";
                 $string .= '    return $this->_get_arr_size("' . $field['value']['value'] . '");' . "\n";
                 $string .= "  }\n";
-            }
-            else {
+            } else {
                 if (isset($field['value']['repeated'])) {
                     $string .= '  function ' . $field['value']['name'] . '($offset)' . "\n  {\n";
                     $string .= '    return $this->_get_arr_value("' . $field['value']['value'] . '", $offset);' . "\n";
@@ -178,8 +173,7 @@ class PBParser
                     $string .= '  function ' . $field['value']['name'] . '_size()' . "\n  {\n";
                     $string .= '    return $this->_get_arr_size("' . $field['value']['value'] . '");' . "\n";
                     $string .= "  }\n";
-                }
-                else {
+                } else {
                     $string .= '  function ' . $field['value']['name'] . "()\n  {\n";
                     $string .= '    return $this->_get_value("' . $field['value']['value'] . '");' . "\n";
                     $string .= "  }\n";
@@ -196,7 +190,7 @@ class PBParser
     /**
      * Creates the class definitions
      *
-     * @param Array  $classfile
+     * @param Array $classfile
      * @param String $string
      */
     private function _create_class_definition($classfile, &$string)
@@ -211,7 +205,7 @@ class PBParser
     /**
      * Creates the class constructor
      *
-     * @param Array  $classfile
+     * @param Array $classfile
      * @param String $string
      * @param String $classname - classname
      */
@@ -229,9 +223,8 @@ class PBParser
             // create the right namespace
             if (isset($this->scalar_types[strtolower($classtype)])) {
                 $classtype = $this->scalar_types[$classtype];
-            }
-            else {
-                if ((strpos($classtype, '_') === FALSE)) {
+            } else {
+                if ((strpos($classtype, '_') === false)) {
                     $classtype = str_replace('.', '_', $field['value']['namespace']);
                 }
             }
@@ -241,8 +234,7 @@ class PBParser
 
             if (isset($field['value']['repeated'])) {
                 $string .= '    $this->values["' . $field['value']['value'] . '"] = array()' . ";\n";
-            }
-            else {
+            } else {
                 //$string .= '    $this->fields["' . $field['value']['value'] . '"] = new ' . $classtype . "();\n";
                 $string .= '    $this->values["' . $field['value']['value'] . '"] = ""' . ";\n";
             }
@@ -254,8 +246,7 @@ class PBParser
                 $string .= '    $this->values["' . $field['value']['value'] . '"] = new ' . $classtype . "();\n";
                 if (isset($this->scalar_types[strtolower($_classtype)])) {
                     $string .= '    $this->values["' . $field['value']['value'] . '"]->value = ' . $field['value']['default'] . '' . ";\n";
-                }
-                // it must be an enum field perhaps type check
+                } // it must be an enum field perhaps type check
                 else {
                     $string .= '    $this->values["' . $field['value']['value'] . '"]->value = ' . $classtype . '::' . $field['value']['default'] . '' . ";\n";
                 }
@@ -292,8 +283,7 @@ class PBParser
                 $this->_parse_message_type($content, $name, trim($path . '.' . $name, '.'));
 
                 $string = '' . trim(substr($string, $offset['end']));
-            }
-            else {
+            } else {
                 if (strtolower($next) == 'enum') {
                     $string = trim(substr($string, strlen($next)));
                     $name = $this->_next($string);
@@ -308,8 +298,7 @@ class PBParser
                     );
                     // removing it from string
                     $string = '' . trim(substr($string, $offset['end']));
-                }
-                else {
+                } else {
                     // now a normal field
                     $match = preg_match('/(.*);\s?/', $string, $matches, PREG_OFFSET_CAPTURE);
                     if (!$match) {
@@ -354,36 +343,31 @@ class PBParser
         if ($match) {
             $myarray['value'] = trim($matches[1][0]);
             $content = trim(substr($content, 0, $matches[0][1]));
-        }
-        else {
+        } else {
             throw new Exception('Protofile no value at ' . $content);
         }
 
         // parse all modifier
         $content = trim(trim(trim($content), ';'));
-        $typeset = FALSE;
+        $typeset = false;
         while (strlen($content) > 0) {
-            $matches = $this->_next($content, TRUE);
+            $matches = $this->_next($content, true);
             $name = $matches[0][0];
             if (strtolower($name) == 'optional') {
-                $myarray['optional'] = TRUE;
-            }
-            else {
+                $myarray['optional'] = true;
+            } else {
                 if (strtolower($name) == 'required') {
-                    $myarray['required'] = TRUE;
-                }
-                else {
+                    $myarray['required'] = true;
+                } else {
                     if (strtolower($name) == 'repeated') {
-                        $myarray['repeated'] = TRUE;
-                    }
-                    else {
-                        if ($typeset == FALSE) {
+                        $myarray['repeated'] = true;
+                    } else {
+                        if ($typeset == false) {
                             $type = $this->_check_type($name, $array, $path);
                             $myarray['type'] = $type[0];
                             $myarray['namespace'] = $type[1];
-                            $typeset = TRUE;
-                        }
-                        else {
+                            $typeset = true;
+                        } else {
                             $myarray['name'] = $name;
                         }
                     }
@@ -473,7 +457,7 @@ class PBParser
     /**
      * Gets the next String
      */
-    private function _next($string, $reg = FALSE)
+    private function _next($string, $reg = false)
     {
         $match = preg_match('/([^\s^\{}]*)/', $string, $matches, PREG_OFFSET_CAPTURE);
         if (!$match) {
@@ -481,8 +465,7 @@ class PBParser
         }
         if (!$reg) {
             return (trim($matches[0][0]));
-        }
-        else {
+        } else {
             return $matches;
         }
     }
@@ -501,7 +484,7 @@ class PBParser
     {
         $offset_begin = strpos($string, $char);
 
-        if ($offset_begin === FALSE) {
+        if ($offset_begin === false) {
             return array(
                 'begin' => -1,
                 'end' => -1
@@ -514,16 +497,14 @@ class PBParser
             // now search after the end nested { }
             $offset_open = strpos($string, $char, $_offset);
             $offset_close = strpos($string, $charend, $_offset);
-            if ($offset_open < $offset_close && !($offset_open === FALSE)) {
+            if ($offset_open < $offset_close && !($offset_open === false)) {
                 $_offset = $offset_open + 1;
                 $_offset_number++;
-            }
-            else {
-                if (!($offset_close === FALSE)) {
+            } else {
+                if (!($offset_close === false)) {
                     $_offset = $offset_close + 1;
                     $_offset_number--;
-                }
-                else {
+                } else {
                     $_offset = -1;
                 }
             }

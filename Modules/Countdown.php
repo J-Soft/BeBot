@@ -59,7 +59,13 @@ class Countdown extends BaseActiveModule
         $nextid = $this->bot->core("timer")
             ->create_timer_class_entry($classid, $nextid, 5, "", "[##red##--------&gt; 5 &lt;-------##end##]");
         $this->bot->core("settings")
-            ->create("Countdown", "Channel", "both", "In which channel should a countdown be shown? In the channel of origin, or in both gc and pgmsg?", "both;gc;pgmsg;origin");
+            ->create(
+                "Countdown",
+                "Channel",
+                "both",
+                "In which channel should a countdown be shown? In the channel of origin, or in both gc and pgmsg?",
+                "both;gc;pgmsg;origin"
+            );
         $this->help['description'] = "A simple countdown plugin.";
         $this->help['command']['countdown'] = "Counts down to zero.";
         $this->help['notes'] = "<pre>cd is a synonym for <pre>countdown.";
@@ -74,8 +80,7 @@ class Countdown extends BaseActiveModule
         $out = $this->bot->core("settings")->get("Countdown", "Channel");
         if (strtolower($out) == 'origin') {
             $this->bot->send_output($user, $prefix . $suffix, $origin);
-        }
-        else {
+        } else {
             $this->bot->send_output($user, $prefix . $suffix, $out);
         }
     }
@@ -87,7 +92,7 @@ class Countdown extends BaseActiveModule
     function command_handler($name, $msg, $origin)
     {
         $ret = $this->bot->core("timer")
-            ->add_timer(FALSE, "countdown", 6, $name . " " . $origin, "internal", 0, "Countdown");
+            ->add_timer(false, "countdown", 6, $name . " " . $origin, "internal", 0, "Countdown");
         return "Countdown started!";
     }
 }

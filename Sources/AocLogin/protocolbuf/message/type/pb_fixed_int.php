@@ -14,10 +14,10 @@ class PBFixedInt extends PBScalar
      */
     public function ParseFromArray()
     {
-        $b1 = $this->reader->next(TRUE);
-        $b2 = $this->reader->next(TRUE);
-        $b3 = $this->reader->next(TRUE);
-        $b4 = $this->reader->next(TRUE);
+        $b1 = $this->reader->next(true);
+        $b2 = $this->reader->next(true);
+        $b3 = $this->reader->next(true);
+        $b4 = $this->reader->next(true);
 
         // Todo, unpack the value in case someone wants to read it
     }

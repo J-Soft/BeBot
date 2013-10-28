@@ -76,9 +76,21 @@ class Vote extends BaseActiveModule
         $this->register_event('disconnect');
         $this->register_event('cron', '1hour');
         $this->bot->core("settings")
-            ->create('Vote', 'New', 'ADMIN', 'Who should be able to start new votes', 'GUEST;MEMBER;LEADER;ADMIN;SUPERADMIN;OWNER');
+            ->create(
+                'Vote',
+                'New',
+                'ADMIN',
+                'Who should be able to start new votes',
+                'GUEST;MEMBER;LEADER;ADMIN;SUPERADMIN;OWNER'
+            );
         $this->bot->core("settings")
-            ->create('Vote', 'End', 'ADMIN', 'Who should be able to end votes', 'GUEST;MEMBER;LEADER;ADMIN;SUPERADMIN;OWNER');
+            ->create(
+                'Vote',
+                'End',
+                'ADMIN',
+                'Who should be able to end votes',
+                'GUEST;MEMBER;LEADER;ADMIN;SUPERADMIN;OWNER'
+            );
         $this->bot->core("settings")
             ->create('Vote', 'Spam', 'Yes', 'Should players who haven\'t voted be spammed when logging on', 'No;Yes');
         $this->help['description'] = 'This module enables the guild to arrange votes.';
@@ -115,66 +127,66 @@ class Vote extends BaseActiveModule
         $subcom = $vars[1];
         unset($vars[0], $vars[1]);
         switch ($command) {
-        case 'vote':
-            switch ($subcom) {
-            case '':
-                return $this->vote_interface($source);
-                break;
-            case 'show':
-                return $this->vote_interface($source, $vars[2]);
-                break;
-            case 'all':
-                return $this->vote_interface($source, 'all');
-                break;
-            case 'cast':
-                $vote_no = $vars[2];
-                $option_no = $vars[3];
-                return $this->cast_vote($source, $vote_no, $option_no);
-                break;
-            case 'new':
-                return $this->new_vote($source, implode(' ', $vars));
-                break;
-            case 'restrict':
-                $vote_no = $vars[2];
-                unset($vars[2]);
-                return $this->restrict_vote($source, $vote_no, implode(' ', $vars));
-                break;
-            case 'addopt':
-                $vote_no = $vars[2];
-                unset($vars[2]);
-                return $this->add_option($source, $vote_no, implode(' ', $vars));
-                break;
-            case 'delopt':
-                $option_id = $vars[2];
-                unset($vars[2]);
-                return $this->del_option($source, implode(' ', $vars));
-                break;
-            case 'edit':
-                $option_no = $vars[2];
-                unset($vars[2]);
-                return $this->edit_option($source, $option_no, implode(' ', $vars));
-                break;
-            case 'time':
-                $vote_no = $vars[2];
-                unset($vars[2]);
-                return $this->set_time($source, $vote_no, implode(' ', $vars));
-                break;
-            case 'start':
-                $vote_no = $vars[2];
-                return $this->start_vote($source, $vote_no);
-                break;
-            case 'end':
-                $vote_no = $vars[2];
-                return $this->end_vote($source, $vote_no);
+            case 'vote':
+                switch ($subcom) {
+                    case '':
+                        return $this->vote_interface($source);
+                        break;
+                    case 'show':
+                        return $this->vote_interface($source, $vars[2]);
+                        break;
+                    case 'all':
+                        return $this->vote_interface($source, 'all');
+                        break;
+                    case 'cast':
+                        $vote_no = $vars[2];
+                        $option_no = $vars[3];
+                        return $this->cast_vote($source, $vote_no, $option_no);
+                        break;
+                    case 'new':
+                        return $this->new_vote($source, implode(' ', $vars));
+                        break;
+                    case 'restrict':
+                        $vote_no = $vars[2];
+                        unset($vars[2]);
+                        return $this->restrict_vote($source, $vote_no, implode(' ', $vars));
+                        break;
+                    case 'addopt':
+                        $vote_no = $vars[2];
+                        unset($vars[2]);
+                        return $this->add_option($source, $vote_no, implode(' ', $vars));
+                        break;
+                    case 'delopt':
+                        $option_id = $vars[2];
+                        unset($vars[2]);
+                        return $this->del_option($source, implode(' ', $vars));
+                        break;
+                    case 'edit':
+                        $option_no = $vars[2];
+                        unset($vars[2]);
+                        return $this->edit_option($source, $option_no, implode(' ', $vars));
+                        break;
+                    case 'time':
+                        $vote_no = $vars[2];
+                        unset($vars[2]);
+                        return $this->set_time($source, $vote_no, implode(' ', $vars));
+                        break;
+                    case 'start':
+                        $vote_no = $vars[2];
+                        return $this->start_vote($source, $vote_no);
+                        break;
+                    case 'end':
+                        $vote_no = $vars[2];
+                        return $this->end_vote($source, $vote_no);
+                        break;
+                    default:
+                        return $this->bot->send_help($source, 'vote');
+                }
                 break;
             default:
-                return $this->bot->send_help($source, 'vote');
-            }
-            break;
-        default:
-            // Just a safety net to allow you to catch errors where a module has registered  a command, but fails to actually do anything about it
-            // $this -> bot -> send_output($source, $text, $type) will send $text to $source by tell if $type is 1 (tell) or to the apropriate channel if $type is 2 or 3.
-            $this->bot->send_output($source, "Broken plugin, received unhandled command: $command", $type);
+                // Just a safety net to allow you to catch errors where a module has registered  a command, but fails to actually do anything about it
+                // $this -> bot -> send_output($source, $text, $type) will send $text to $source by tell if $type is 1 (tell) or to the apropriate channel if $type is 2 or 3.
+                $this->bot->send_output($source, "Broken plugin, received unhandled command: $command", $type);
         }
     }
 
@@ -231,7 +243,8 @@ class Vote extends BaseActiveModule
         if (!empty($description)) {
             //Check if this person is allowed to start a new vote.
             if ($this->bot->core("security")->check_access(
-                $name, $this->bot
+                $name,
+                $this->bot
                     ->core("settings")->get('Vote', 'New')
             )
             ) {
@@ -245,8 +258,7 @@ class Vote extends BaseActiveModule
                 $query = "INSERT INTO #___votes (description, votestarter) VALUES('$description', '$name')";
                 if (!$this->bot->db->query($query)) {
                     return ("Error running query: $query");
-                }
-                else {
+                } else {
                     //Get the ID of the vote.
                     $vote_id = mysql_insert_id($this->bot->db->CONN);
                     var_dump($args);
@@ -259,8 +271,7 @@ class Vote extends BaseActiveModule
             }
             //Show vote interface for the new vote.
             return $this->vote_interface($name, $vote_id);
-        }
-        else {
+        } else {
             return ("##error##You need to specify a description for your vote.##end##");
         }
     }
@@ -289,21 +300,19 @@ class Vote extends BaseActiveModule
     function set_time($name, $vote_no, $time)
     {
         $timestamp = strtotime($time);
-        if (($timestamp === FALSE) or ($timestamp === -1)) {
+        if (($timestamp === false) or ($timestamp === -1)) {
             return "Illegal time: $time";
-        }
-        else {
+        } else {
             $query = "UPDATE #___votes SET endtime = $timestamp WHERE id = $vote_no";
         }
     }
 
 
-    function restrict_vote($name, $vote_no, $level = FALSE)
+    function restrict_vote($name, $vote_no, $level = false)
     {
-        if ($level === FALSE) {
+        if ($level === false) {
             //Show a list of ranks as listed in $this -> bot -> core("security") -> cache[orgranks] and guest, member, leader. admin.
-        }
-        else {
+        } else {
             //Set restricted level to given level
         }
     }
@@ -331,10 +340,11 @@ class Vote extends BaseActiveModule
             if (($name !== $vote['vote_starter'])
                 && (!$this->bot
                     ->core("security")->check_access(
-                    $name, $this->bot
-                        ->core("settings")
-                        ->get('Vote', 'End')
-                ))
+                        $name,
+                        $this->bot
+                            ->core("settings")
+                            ->get('Vote', 'End')
+                    ))
                 && ($name !== $this->bot->botname)
             ) {
                 return ("You have got insufficient privileges to end this vote.");
@@ -382,18 +392,22 @@ class Vote extends BaseActiveModule
         //Check its a valid option id
         //Check the highest rank of this player to determine if he can vote
         //Add the vote to the ballots table
-        $this->bot->db->query("INSERT INTO #___vote_ballots (vote_id, player, option_id) VALUES ($vote_no, $name, $option_no)");
+        $this->bot->db->query(
+            "INSERT INTO #___vote_ballots (vote_id, player, option_id) VALUES ($vote_no, $name, $option_no)"
+        );
         //Update the number of votes received by the option
-        $this->bot->db->query("UPDATE #___vote_options SET votes = votes + 1 WHERE vote_id = $vote_no AND id = " . $option_no);
+        $this->bot->db->query(
+            "UPDATE #___vote_options SET votes = votes + 1 WHERE vote_id = $vote_no AND id = " . $option_no
+        );
         //Update the number of votes on the vote
         $this->bot->db->query("UPDATE #___votes SET votes_total = votes_total + 1 WHERE id = " . $vote_no);
         return "vote cast!";
     }
 
 
-    function vote_interface($name, $vote = FALSE)
+    function vote_interface($name, $vote = false)
     {
-        if ($vote === FALSE) {
+        if ($vote === false) {
             //Get the highest rank of this players toons
             //List all active votes that the person can vote on
             $rank = 2;
@@ -412,18 +426,15 @@ class Vote extends BaseActiveModule
                 }
                 return $this->bot->core("tools")
                     ->make_blob("Available votes", $window);
-            }
-            else {
+            } else {
                 return ("votes = Empty");
             }
-        }
-        elseif ($vote == 'all') {
+        } elseif ($vote == 'all') {
             //List all votes, even ones inactive and already voted on.
             $query = "SELECT * FROM #___votes WHERE minlevel <= $rank";
-        }
-        else {
+        } else {
             //Check that the vote is started.
-            if (TRUE) {
+            if (true) {
                 //Check that the player hasn't voted on this vote.
                 //list options for vote $vote
                 $query = " SELECT id, description FROM #___votes WHERE id=$vote UNION SELECT id, description FROM #___vote_options WHERE vote_id=$vote";
@@ -433,12 +444,11 @@ class Vote extends BaseActiveModule
                 $window = "Vote {$votedesc['id']}: {$votedesc['description']}<br><br>";
                 foreach ($descriptions as $option) {
                     $window .= $option['id'] . ": " . $this->bot->core("tools")
-                        ->chatcmd("vote cast " . $option['id'], $option['description']) . "<br>";
+                            ->chatcmd("vote cast " . $option['id'], $option['description']) . "<br>";
                 }
                 return ("Vote " . $votedesc['id'] . " :: " . $this->bot
-                    ->core("tools")->make_blob("click to view", $window));
-            }
-            else {
+                        ->core("tools")->make_blob("click to view", $window));
+            } else {
                 //Check if this person is the starter of the vote and show management options
             }
         }

@@ -53,7 +53,11 @@ class TimerGUI extends BaseActiveModule
         $this->register_alias('tset', 'timersettings');
         $this->register_alias('tset', 'tsettings');
         $this->bot->core("timer")
-            ->create_class_setting("PublicTimer", "LowSpam", "The default class used for timers in a public channel (org, pgroup).");
+            ->create_class_setting(
+                "PublicTimer",
+                "LowSpam",
+                "The default class used for timers in a public channel (org, pgroup)."
+            );
         $this->bot->core("timer")
             ->create_class_setting("PrivateTimer", "Standard", "The default class used for timer in tells.");
         $this->help['description'] = 'Setting and removing of timers..';
@@ -76,68 +80,65 @@ class TimerGUI extends BaseActiveModule
     {
         $command = explode(" ", $msg, 2);
         Switch (strtolower($command[0])) {
-        case 'timer':
-            $classused = $this->bot->core("timer")
-                ->get_class_setting("PublicTimer");
-            if ($channel == "tell") {
+            case 'timer':
                 $classused = $this->bot->core("timer")
-                    ->get_class_setting("PrivateTimer");
-            }
-            if (preg_match("/^timer ([a-z]+ )?([1-9][0-9]*[mshd]?) (.*)/i", $msg, $info)) {
-                if ($info[1] != "") {
-                    $classused = $info[1];
+                    ->get_class_setting("PublicTimer");
+                if ($channel == "tell") {
+                    $classused = $this->bot->core("timer")
+                        ->get_class_setting("PrivateTimer");
                 }
-                return $this->add_timer($name, $info[2], $info[3], $classused, 0, $channel);
-            }
-            elseif (preg_match("/^timer ([a-z]+ )?([0-9]+(:[0-9][0-9]){0,3}) (.*)/i", $msg, $info)) {
-                if ($info[1] != "") {
-                    $classused = $info[1];
+                if (preg_match("/^timer ([a-z]+ )?([1-9][0-9]*[mshd]?) (.*)/i", $msg, $info)) {
+                    if ($info[1] != "") {
+                        $classused = $info[1];
+                    }
+                    return $this->add_timer($name, $info[2], $info[3], $classused, 0, $channel);
+                } elseif (preg_match("/^timer ([a-z]+ )?([0-9]+(:[0-9][0-9]){0,3}) (.*)/i", $msg, $info)) {
+                    if ($info[1] != "") {
+                        $classused = $info[1];
+                    }
+                    return $this->add_timer($name, $info[2], $info[4], $classused, 0, $channel);
+                } elseif (preg_match("/^timer$/i", $msg)) {
+                    return $this->show_timer($name, $channel);
+                } else {
+                    return "Correct Format: ##highlight##<pre>timer [class] #[mshd] title##end## or ##highlight##<pre>timer [class] #[:##[:##[:##]]] title##end## [class] is an optional parameter";
                 }
-                return $this->add_timer($name, $info[2], $info[4], $classused, 0, $channel);
-            }
-            elseif (preg_match("/^timer$/i", $msg)) {
-                return $this->show_timer($name, $channel);
-            }
-            else {
-                return "Correct Format: ##highlight##<pre>timer [class] #[mshd] title##end## or ##highlight##<pre>timer [class] #[:##[:##[:##]]] title##end## [class] is an optional parameter";
-            }
-        case 'rtimer':
-            if (preg_match("/^rtimer ([a-z]+ )?([1-9][0-9]*[mshd]?) ([1-9][0-9]*[mshd]?) (.*)/i", $msg, $info)) {
-                if ($info[1] != "") {
-                    $classused = $info[1];
+            case 'rtimer':
+                if (preg_match("/^rtimer ([a-z]+ )?([1-9][0-9]*[mshd]?) ([1-9][0-9]*[mshd]?) (.*)/i", $msg, $info)) {
+                    if ($info[1] != "") {
+                        $classused = $info[1];
+                    }
+                    return $this->add_timer($name, $info[2], $info[4], $classused, $info[3], $channel);
+                } elseif (preg_match(
+                    "/^rtimer ([a-z]+ )?([0-9]+(:[0-9][0-9]){0,3}) ([0-9]+(:[0-9][0-9]){0,3}) (.*)/i",
+                    $msg,
+                    $info
+                )
+                ) {
+                    if ($info[1] != "") {
+                        $classused = $info[1];
+                    }
+                    return $this->add_timer($name, $info[2], $info[6], $classused, $info[4], $channel);
+                } else {
+                    return "Correct Format: ##highlight##<pre>rtimer [class] <dur>[mshd] <repeat>[mshd] title##end## or ##highlight##<pre>rtimer [class] <dur>[:##[:##[:##]]] <repeat>[:##[:##[:##]]] title##end## [class] is an optional parameter";
                 }
-                return $this->add_timer($name, $info[2], $info[4], $classused, $info[3], $channel);
-            }
-            elseif (preg_match("/^rtimer ([a-z]+ )?([0-9]+(:[0-9][0-9]){0,3}) ([0-9]+(:[0-9][0-9]){0,3}) (.*)/i", $msg, $info)) {
-                if ($info[1] != "") {
-                    $classused = $info[1];
+            case 'remtimer':
+                return $this->rem_timer($name, $command[1]);
+            case 'ptimer':
+                if (isset($command[1])) {
+                    return $this->command_handler($name, 'timer ' . $command[1], 'gc');
+                } else {
+                    return $this->command_handler($name, 'timer', 'gc');
                 }
-                return $this->add_timer($name, $info[2], $info[6], $classused, $info[4], $channel);
-            }
-            else {
-                return "Correct Format: ##highlight##<pre>rtimer [class] <dur>[mshd] <repeat>[mshd] title##end## or ##highlight##<pre>rtimer [class] <dur>[:##[:##[:##]]] <repeat>[:##[:##[:##]]] title##end## [class] is an optional parameter";
-            }
-        case 'remtimer':
-            return $this->rem_timer($name, $command[1]);
-        case 'ptimer':
-            if (isset($command[1])) {
-                return $this->command_handler($name, 'timer ' . $command[1], 'gc');
-            }
-            else {
-                return $this->command_handler($name, 'timer', 'gc');
-            }
-        case 'tset':
-            if (preg_match("/^tset$/i", $msg)) {
-                return $this->show_timer_settings();
-            }
-            elseif (preg_match("/^tset show ([01-9]+)/i", $msg, $info)) {
-                return $this->change_timer_setting($info[1]);
-            }
-            elseif (preg_match("/^tset update ([01-9]+) ([01-9]+)/i", $msg, $info)) {
-                return $this->update_timer_setting($info[1], $info[2]);
-            }
-        default:
-            return FALSE;
+            case 'tset':
+                if (preg_match("/^tset$/i", $msg)) {
+                    return $this->show_timer_settings();
+                } elseif (preg_match("/^tset show ([01-9]+)/i", $msg, $info)) {
+                    return $this->change_timer_setting($info[1]);
+                } elseif (preg_match("/^tset update ([01-9]+) ([01-9]+)/i", $msg, $info)) {
+                    return $this->update_timer_setting($info[1], $info[2]);
+                }
+            default:
+                return false;
         }
     }
 
@@ -155,13 +156,13 @@ class TimerGUI extends BaseActiveModule
                 ->get("Timer", "MinRepeatInterval") . "##end## seconds!";
         }
         $this->bot->core("timer")
-            ->add_timer(FALSE, $owner, $duration, $name, $channel, $repeat, $class);
+            ->add_timer(false, $owner, $duration, $name, $channel, $repeat, $class);
         $msg = "Timer ##highlight##" . $name . " ##end##with ##highlight##" . $this->bot
-            ->core("time")
-            ->format_seconds($duration) . " ##end##runtime started!";
+                ->core("time")
+                ->format_seconds($duration) . " ##end##runtime started!";
         if ($repeat > 0) {
             $msg .= " The timer has a repeat interval of##highlight## " . $this->bot
-                ->core("time")->format_seconds($repeat) . " ##end##";
+                    ->core("time")->format_seconds($repeat) . " ##end##";
         }
         return $msg;
     }
@@ -172,9 +173,8 @@ class TimerGUI extends BaseActiveModule
         $channelstr = "channel = '" . $channel . "'";
         if ($this->bot->core("settings")->get("timer", "global")) {
             $channelstr = "channel = 'global'";
-        }
-        elseif ($this->bot->core("settings")
-            ->get("timer", "guestchannel") == "both"
+        } elseif ($this->bot->core("settings")
+                ->get("timer", "guestchannel") == "both"
             && ($channel == "pgmsg" || $channel == "gc")
         ) {
             $channelstr = "(channel = 'both' OR channel = '" . $channel . "')";
@@ -183,7 +183,10 @@ class TimerGUI extends BaseActiveModule
         if ($channel == "tell") {
             $namestr = " AND owner = '" . $name . "'";
         }
-        $timers = $this->bot->db->select("SELECT * FROM #___timer WHERE " . $channelstr . $namestr . " ORDER BY endtime ASC", MYSQL_ASSOC);
+        $timers = $this->bot->db->select(
+            "SELECT * FROM #___timer WHERE " . $channelstr . $namestr . " ORDER BY endtime ASC",
+            MYSQL_ASSOC
+        );
         if (empty($timers)) {
             return "No timers defined!";
         }
@@ -196,8 +199,8 @@ class TimerGUI extends BaseActiveModule
             $listing .= " ##blob_text##remaining";
             if ($timer['repeatinterval'] > 0) {
                 $listing .= " and is repeated every ##end##" . $this->bot
-                    ->core("time")
-                    ->format_seconds($timer['repeatinterval']) . "##blob_text##";
+                        ->core("time")
+                        ->format_seconds($timer['repeatinterval']) . "##blob_text##";
             }
             $listing .= ". Owner:##end## " . $timer['owner'] . " ";
             $listing .= $this->bot->core("tools")
@@ -210,7 +213,7 @@ class TimerGUI extends BaseActiveModule
 
     function rem_timer($name, $id)
     {
-        return $this->bot->core("timer")->del_timer($name, $id, FALSE);
+        return $this->bot->core("timer")->del_timer($name, $id, false);
     }
 
 
@@ -219,7 +222,8 @@ class TimerGUI extends BaseActiveModule
     {
         $tsets = $this->bot->db->select(
             'SELECT a.id AS id, a.name AS name, b.name AS class, a.description as description '
-                . 'FROM #___timer_class_settings AS a, #___timer_classes AS b WHERE a.current_class = b.id ORDER BY name ASC', MYSQL_ASSOC
+            . 'FROM #___timer_class_settings AS a, #___timer_classes AS b WHERE a.current_class = b.id ORDER BY name ASC',
+            MYSQL_ASSOC
         );
         if (empty($tsets)) {
             return 'No timer class settings existing!';
@@ -245,8 +249,9 @@ class TimerGUI extends BaseActiveModule
     {
         $tsets = $this->bot->db->select(
             'SELECT a.id AS id, a.name AS name, b.name AS current_class, ' . 'c.name AS default_class, c.id AS default_id, a.description as description '
-                . 'FROM #___timer_class_settings AS a, #___timer_classes AS b, #___timer_classes AS c ' . 'WHERE a.current_class = b.id AND a.default_class = c.id AND a.id = '
-                . $tsetid, MYSQL_ASSOC
+            . 'FROM #___timer_class_settings AS a, #___timer_classes AS b, #___timer_classes AS c ' . 'WHERE a.current_class = b.id AND a.default_class = c.id AND a.id = '
+            . $tsetid,
+            MYSQL_ASSOC
         );
         if (empty($tsets)) {
             return "Illegal ID!";

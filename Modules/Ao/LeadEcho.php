@@ -44,11 +44,11 @@ class LeadEcho extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->core("settings")
-            ->create("Leader", "Name", "", "The name of the character that took lead.", "", TRUE);
+            ->create("Leader", "Name", "", "The name of the character that took lead.", "", true);
         $this->bot->core("settings")
-            ->create("Leader", "Echo", FALSE, "Is the chat echo for the leader activated or nor?");
+            ->create("Leader", "Echo", false, "Is the chat echo for the leader activated or nor?");
         $this->bot->core("settings")
-            ->create("Leader", "LeaderAccess", TRUE, "Does being leader give you at least LEADER access in the bot?");
+            ->create("Leader", "LeaderAccess", true, "Does being leader give you at least LEADER access in the bot?");
         $this->register_command("pgmsg", "leader", "LEADER");
         $this->register_command("pgmsg", "repeat", "LEADER");
         $this->register_event("privgroup");
@@ -70,28 +70,23 @@ class LeadEcho extends BaseActiveModule
         $repeatstring = "<br>Repeat is ";
         if ($this->bot->core("settings")->get("Leader", "Echo")) {
             $repeatstring .= "##green##activated##end##!";
-        }
-        else {
+        } else {
             $repeatstring .= "##red##deactivated##end##!";
         }
         $repeatstring .= " Use !repeat on|off to toggle it.";
         if (preg_match("/^leader$/i", $msg)) {
             if ($this->bot->core("settings")->get("Leader", "Name") != $name) {
                 return $this->set_leader($name, $name, $repeatstring);
-            }
-            else {
+            } else {
                 return $this->set_leader($name, "", $repeatstring);
             }
-        }
-        elseif (preg_match("/^leader ?(.*)/i", $msg, $info)) {
+        } elseif (preg_match("/^leader ?(.*)/i", $msg, $info)) {
             return $this->set_leader($name, ucfirst(strtolower($info[1])), $repeatstring);
-        }
-        elseif (preg_match("/^repeat on$/i", $msg)) {
-            $this->bot->core("settings")->save("leader", "echo", TRUE);
+        } elseif (preg_match("/^repeat on$/i", $msg)) {
+            $this->bot->core("settings")->save("leader", "echo", true);
             return "Repeat is ##green##activated##end##!";
-        }
-        elseif (preg_match("/^repeat off$/i", $msg)) {
-            $this->bot->core("settings")->save("leader", "echo", FALSE);
+        } elseif (preg_match("/^repeat off$/i", $msg)) {
+            $this->bot->core("settings")->save("leader", "echo", false);
             return "Repeat is ##red##deactivated##end##!";
         }
     }
@@ -116,13 +111,13 @@ class LeadEcho extends BaseActiveModule
         // You can only claim or set leader if it's free or your access level is equal or higher then that of the current leader
         // IMPORTANT: if the setting LeaderAccess is On then the current leader is always at least LEADER!
         if ($this->bot->core("settings")
-            ->get("Leader", "Name") != ''
+                ->get("Leader", "Name") != ''
             && ($this->bot->core("security")
-                ->get_access_level($caller) < $this->bot
-                ->core("security")->get_access_level(
-                $this->bot->core("settings")
-                    ->get("Leader", "Name")
-            ))
+                    ->get_access_level($caller) < $this->bot
+                    ->core("security")->get_access_level(
+                        $this->bot->core("settings")
+                            ->get("Leader", "Name")
+                    ))
         ) {
             return "##error##" . $caller . ", you can't take lead from " . $this->bot
                 ->core("settings")->get("Leader", "Name") . "##end##";
@@ -139,7 +134,7 @@ class LeadEcho extends BaseActiveModule
     function privgroup($name, $msg)
     {
         if ($name == $this->bot->core("settings")
-            ->get("Leader", "Name")
+                ->get("Leader", "Name")
             && $this->bot->core("settings")
                 ->get("Leader", "Echo")
         ) {

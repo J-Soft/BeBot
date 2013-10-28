@@ -249,8 +249,7 @@ class FunFilters extends BasePassiveModule
         if (preg_match("/(\.( |\t|$))/", $text, $info)) {
             $win = $this->winner(2);
             $stub = $info[1];
-        }
-        else {
+        } else {
             if (preg_match("/([!\?]( \t|$))/", $text, $info)) {
                 $win = $this->winner(3);
                 $stub = $info[1];
@@ -433,20 +432,19 @@ class FunFilters extends BasePassiveModule
     */
     function winner($chance)
     { // Start function winner()
-        $win = FALSE;
+        $win = false;
         $rand_max = mt_getrandmax();
         $rand_int = mt_rand();
         $highlow = mt_rand(0, 1); // Pick high or low for the winning range. 0 = low, 1 = high.
         if ($highlow) {
             $split = round(0 + $rand_max / $chance);
             if ($rand_int >= $split) {
-                $win = TRUE;
+                $win = true;
             }
-        }
-        else {
+        } else {
             $split = round($rand_max - $rand_max / $chance);
             if ($rand_int <= $split) {
-                $win = TRUE;
+                $win = true;
             }
         }
         return $win;

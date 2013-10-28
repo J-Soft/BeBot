@@ -58,8 +58,7 @@ class ping extends BaseActiveModule
     {
         if (preg_match("/^ping$/i", $msg)) {
             return $this->ping_server();
-        }
-        else {
+        } else {
             if (preg_match("/^tracert$/i", $msg)) {
                 return $this->tracert_server();
             }
@@ -78,8 +77,7 @@ class ping extends BaseActiveModule
         if ($this->bot->core("settings")->get("Ping", "Server") == "Linux") {
             $results = system("ping -c$count -w$count $host", $details);
             system("killall ping");
-        }
-        else {
+        } else {
             $results = exec("ping -n $count $host", $details);
         }
         $msg = "<b>Server:</b> " . $host . "\n";
@@ -87,8 +85,7 @@ class ping extends BaseActiveModule
         $msg .= "<b>Results:</b>\n";
         if (empty($results)) {
             $msg .= "Could not find results.  Please check <i>!settings ping</i> and verify you have the correct system type selected.";
-        }
-        else {
+        } else {
             foreach ($details as $key => $value) {
                 $msg .= $value . "\n";
             }
@@ -109,16 +106,14 @@ class ping extends BaseActiveModule
         if ($this->bot->core("settings")->get("Ping", "Server") == "Linux") {
             $results = system("traceroute $host", $details);
             system("killall -q traceroute");
-        }
-        else {
+        } else {
             $results = exec("tracert $host", $details);
         }
         $msg = "<b>Server:</b> " . $host . "\n";
         $msg .= "<b>Results:</b>\n";
         if (empty($results)) {
             $msg .= "Could not find results.  Please check <i>!settings ping</i> and verify you have the correct system type selected.";
-        }
-        else {
+        } else {
             foreach ($details as $key => $value) {
                 $msg .= $value . "\n";
             }
@@ -134,16 +129,16 @@ class ping extends BaseActiveModule
     function select_dimension()
     {
         switch ($this->bot->dimension) {
-        case 0:
-            return "chat.dt.funcom.com";
-        case 1:
-            return "chat.d1.funcom.com";
-        case 2:
-            return "chat.d2.funcom.com";
-        case 3:
-            return "chat.d3.funcom.com";
-        default:
-            return FALSE;
+            case 0:
+                return "chat.dt.funcom.com";
+            case 1:
+                return "chat.d1.funcom.com";
+            case 2:
+                return "chat.d2.funcom.com";
+            case 3:
+                return "chat.d3.funcom.com";
+            default:
+                return false;
         }
     }
 }

@@ -58,9 +58,12 @@ class Roster_Handler extends BaseActiveModule
         $this->help['command']['buddylist clear'] = "Wipes all of the bots buddies from the bots buddylist.";
         $this->bot->core("settings")
             ->create(
-            "Roster", "Buddylistupdate", 10,
-            "What difference is allowed between the bots buddylist and the number of members who should be on it before a roster update is forced?", "10;20;30;40;50"
-        );
+                "Roster",
+                "Buddylistupdate",
+                10,
+                "What difference is allowed between the bots buddylist and the number of members who should be on it before a roster update is forced?",
+                "10;20;30;40;50"
+            );
         // 		$infos = $this -> bot -> db -> select("SELECT * FROM #___professions ORDER BY profession ASC");
         // 		foreach ($infos as $info)
         // 		{
@@ -74,87 +77,86 @@ class Roster_Handler extends BaseActiveModule
     */
     function command_handler($source, $msg, $type)
     {
-        $return = FALSE;
+        $return = false;
         /*
         This should really be moved to the bot core.. but until i get the time to modify every single module... :\
         */
         $vars = explode(' ', strtolower($msg));
         $command = $vars[0];
         switch ($command) {
-        case 'member':
-            switch ($vars[1]) {
-            case 'del':
-            case 'rem':
-                return $this->bot->core("user")
-                    ->del($source, $vars[2], 0, 0);
+            case 'member':
+                switch ($vars[1]) {
+                    case 'del':
+                    case 'rem':
+                        return $this->bot->core("user")
+                            ->del($source, $vars[2], 0, 0);
+                        break;
+                    case 'add':
+                        return $this->bot->core("user")
+                            ->add($source, $vars[2], 0, MEMBER, 0);
+                        break;
+                    case 'list':
+                        return $this->memberslist();
+                    default:
+                        return $this->memberscount();
+                }
+            case 'guest':
+                switch ($vars[1]) {
+                    case 'del':
+                    case 'rem':
+                        $return = $this->bot->core("user")
+                            ->del($source, $vars[2], 0, 0);
+                        if (!($return instanceof BotError)) {
+                            $this->bot->core('notify')->del($vars[2]);
+                        }
+                        return $return;
+                    case 'add':
+                        $userlevel = $this->bot->db->select(
+                            "SELECT user_level FROM #___users WHERE nickname = '" . $vars[2] . "'"
+                        );
+                        if (!empty($userlevel)) {
+                            $userlevel = $userlevel[0][0];
+                        } else {
+                            $userlevel = 0;
+                        }
+                        if ($userlevel == 2) {
+                            return "##highlight##" . $vars[2] . " ##end##is already a MEMBER and connot be added as GUEST!";
+                        }
+                        if ($userlevel == 1) {
+                            return "##highlight##" . $vars[2] . " ##end##is already a GUEST!";
+                        }
+                        $return = $this->bot->core("user")
+                            ->add($source, $vars[2], 0, GUEST, 0);
+                        //if (!($return instanceof BotError))
+                        //{
+                        //	$this -> bot -> core('notify') -> add ($source, $vars[2]);
+                        //}
+                        return $return;
+                    case 'list':
+                    default:
+                        return $this->guest_list();
+                }
+            case 'rosterupdate':
+                if ($this->bot->guildbot) {
+                    $this->output_destination($source, "Starting roster update.");
+                    $this->bot->core("roster_core")->update_guild(true);
+                    return false;
+                } else {
+                    $this->output_destination($source, "Starting roster update.");
+                    $this->bot->core("roster_core")->update_raid(true);
+                    return false;
+                }
                 break;
-            case 'add':
-                return $this->bot->core("user")
-                    ->add($source, $vars[2], 0, MEMBER, 0);
+            case 'buddylist':
+                if ($vars[1] == 'clear') {
+                    return $this->clear_buddies();
+                } else {
+                    return $this->list_buddies();
+                }
                 break;
-            case 'list':
-                return $this->memberslist();
             default:
-                return $this->memberscount();
-            }
-        case 'guest':
-            switch ($vars[1]) {
-            case 'del':
-            case 'rem':
-                $return = $this->bot->core("user")
-                    ->del($source, $vars[2], 0, 0);
-                if (!($return instanceof BotError)) {
-                    $this->bot->core('notify')->del($vars[2]);
-                }
-                return $return;
-            case 'add':
-                $userlevel = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '" . $vars[2] . "'");
-                if (!empty($userlevel)) {
-                    $userlevel = $userlevel[0][0];
-                }
-                else {
-                    $userlevel = 0;
-                }
-                if ($userlevel == 2) {
-                    return "##highlight##" . $vars[2] . " ##end##is already a MEMBER and connot be added as GUEST!";
-                }
-                if ($userlevel == 1) {
-                    return "##highlight##" . $vars[2] . " ##end##is already a GUEST!";
-                }
-                $return = $this->bot->core("user")
-                    ->add($source, $vars[2], 0, GUEST, 0);
-                //if (!($return instanceof BotError))
-                //{
-                //	$this -> bot -> core('notify') -> add ($source, $vars[2]);
-                //}
-                return $return;
-            case 'list':
-            default:
-                return $this->guest_list();
-            }
-        case 'rosterupdate':
-            if ($this->bot->guildbot) {
-                $this->output_destination($source, "Starting roster update.");
-                $this->bot->core("roster_core")->update_guild(TRUE);
-                return FALSE;
-            }
-            else {
-                $this->output_destination($source, "Starting roster update.");
-                $this->bot->core("roster_core")->update_raid(TRUE);
-                return FALSE;
-            }
-            break;
-        case 'buddylist':
-            if ($vars[1] == 'clear') {
-                return $this->clear_buddies();
-            }
-            else {
-                return $this->list_buddies();
-            }
-            break;
-        default:
-            return "Broken plugin, received unhandled command: $command";
-            break;
+                return "Broken plugin, received unhandled command: $command";
+                break;
         }
     }
 
@@ -166,21 +168,26 @@ class Roster_Handler extends BaseActiveModule
     {
         $inside = "##blob_title##:::: <botname>'s Guest List ::::##end##\n\n";
         $count = 0;
-        $result = $this->bot->db->select("SELECT id, nickname, added_at, added_by FROM #___users WHERE user_level = " . GUEST . " ORDER BY nickname ASC");
+        $result = $this->bot->db->select(
+            "SELECT id, nickname, added_at, added_by FROM #___users WHERE user_level = " . GUEST . " ORDER BY nickname ASC"
+        );
         if (!empty($result)) {
             foreach ($result as $val) {
                 if (!empty($val[1])) {
                     $count++;
                     $inside .= "##blob_text##&#8226; " . $val[1] . "##end## " . $this->bot
-                        ->core("tools")
-                        ->chatcmd("whois " . $val[1], "[Whois]") . " " . $this->bot
-                        ->core("tools")
-                        ->chatcmd("guest del " . $val[1], "[Remove]") . "\n";
+                            ->core("tools")
+                            ->chatcmd("whois " . $val[1], "[Whois]") . " " . $this->bot
+                            ->core("tools")
+                            ->chatcmd("guest del " . $val[1], "[Remove]") . "\n";
                     $inside .= "##blob_title##Added:##end## ##blob_text##" . gmdate(
-                        $this->bot
-                            ->core("settings")
-                            ->get("Time", "FormatString"), $val[2]
-                    ) . " GMT##end## :: ##blob_title##By:##end####blob_text## " . stripslashes($val[3]) . "##end##\n\n";
+                            $this->bot
+                                ->core("settings")
+                                ->get("Time", "FormatString"),
+                            $val[2]
+                        ) . " GMT##end## :: ##blob_title##By:##end####blob_text## " . stripslashes(
+                            $val[3]
+                        ) . "##end##\n\n";
                 }
             }
         }
@@ -193,7 +200,9 @@ class Roster_Handler extends BaseActiveModule
     {
         $blob = "";
         $count = 0;
-        $result = $this->bot->db->select("SELECT nickname, last_seen FROM #___users WHERE user_level = " . MEMBER . " ORDER BY nickname ASC");
+        $result = $this->bot->db->select(
+            "SELECT nickname, last_seen FROM #___users WHERE user_level = " . MEMBER . " ORDER BY nickname ASC"
+        );
         if (!empty($result)) {
             $inside = "##blob_title##:::: <botname>'s Member List ::::##end##\n\n";
             foreach ($result as $val) {
@@ -201,19 +210,19 @@ class Roster_Handler extends BaseActiveModule
                 $inside .= "##blob_text##&#8226; " . $val[0];
                 if ($val[1] > 0) {
                     $inside .= ", last seen at " . gmdate(
-                        $this->bot
-                            ->core("settings")
-                            ->get("Time", "FormatString"), $val[1]
-                    );
-                }
-                else {
+                            $this->bot
+                                ->core("settings")
+                                ->get("Time", "FormatString"),
+                            $val[1]
+                        );
+                } else {
                     $inside .= ", never seen online";
                 }
                 $inside .= "##end## " . $this->bot->core("tools")
-                    ->chatcmd("whois " . $val[0], "[Whois]") . "\n";
+                        ->chatcmd("whois " . $val[0], "[Whois]") . "\n";
             }
             $blob = " :: " . $this->bot->core("tools")
-                ->make_blob("click to view", $inside);
+                    ->make_blob("click to view", $inside);
         }
         return $count . " members in <botname>" . $blob;
     }
@@ -225,14 +234,13 @@ class Roster_Handler extends BaseActiveModule
         $total = 0;
         if (strtolower($this->bot->game) == 'aoc') {
             $cp = "class";
-        }
-        else {
+        } else {
             $cp = "profession";
         }
         $buddies = count($this->bot->aoc->buddies);
         //Get a list of professions
         $profession_list = "'" . $this->bot->core('professions')
-            ->get_professions("', '") . "'";
+                ->get_professions("', '") . "'";
         $counts = $this->bot->db->select(
             "SELECT t2." . $cp . ", COUNT(DISTINCT t1.nickname)
 				FROM #___users AS t1 LEFT JOIN #___whois AS t2 ON t1.nickname = t2.nickname
@@ -256,7 +264,7 @@ class Roster_Handler extends BaseActiveModule
             $inside .= "\n&#8226; " . $key . " = ##blob_title##" . $value . "##end##";
         }
         $blob = " :: " . $this->bot->core("tools")
-            ->make_blob("click to view", $inside);
+                ->make_blob("click to view", $inside);
         return $total . " members in <botname>" . $blob;
     }
 
@@ -303,15 +311,14 @@ class Roster_Handler extends BaseActiveModule
         $notify_db = $this->bot->db->select("SELECT count(notify) FROM #___users WHERE notify = 1");
         $notify_count = $notify_db[0][0];
         if ($notify_count - $buddy_count >= $this->bot->core("settings")
-            ->get("Roster", "Buddylistupdate")
+                ->get("Roster", "Buddylistupdate")
             || $buddy_count - $notify_count >= $this->bot
                 ->core("settings")->get("Roster", "Buddylistupdate")
         ) {
-            $force = TRUE;
+            $force = true;
             if ($this->bot->guildbot) {
                 $this->bot->core("roster_core")->update_guild($force);
-            }
-            else {
+            } else {
                 $this->bot->core("roster_core")->update_raid($force);
             }
         }

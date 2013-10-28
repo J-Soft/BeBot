@@ -34,19 +34,19 @@
 class sfEvent implements ArrayAccess
 {
     protected
-        $value = NULL,
-        $processed = FALSE,
-        $subject = NULL,
+        $value = null,
+        $processed = false,
+        $subject = null,
         $name = '',
-        $parameters = NULL;
+        $parameters = null;
 
 
     /**
      * Constructs a new sfEvent.
      *
-     * @param mixed   $subject      The subject
-     * @param string  $name         The event name
-     * @param array   $parameters   An array of parameters
+     * @param mixed $subject      The subject
+     * @param string $name         The event name
+     * @param array $parameters   An array of parameters
      */
     public function __construct($subject, $name, $parameters = array())
     {
@@ -137,7 +137,7 @@ class sfEvent implements ArrayAccess
     /**
      * Returns true if the parameter exists (implements the ArrayAccess interface).
      *
-     * @param  string  $name  The parameter name
+     * @param  string $name  The parameter name
      *
      * @return Boolean true if the parameter exists, false otherwise
      */
@@ -150,7 +150,7 @@ class sfEvent implements ArrayAccess
     /**
      * Returns a parameter value (implements the ArrayAccess interface).
      *
-     * @param  string  $name  The parameter name
+     * @param  string $name  The parameter name
      *
      * @return mixed  The parameter value
      */
@@ -167,8 +167,8 @@ class sfEvent implements ArrayAccess
     /**
      * Sets a parameter (implements the ArrayAccess interface).
      *
-     * @param string  $name   The parameter name
-     * @param mixed   $value  The parameter value
+     * @param string $name   The parameter name
+     * @param mixed $value  The parameter value
      */
     public function offsetSet($name, $value)
     {

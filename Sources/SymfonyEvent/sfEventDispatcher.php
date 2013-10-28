@@ -44,8 +44,8 @@ class sfEventDispatcher
     /**
      * Connects a listener to a given event name.
      *
-     * @param string  $name      An event name
-     * @param mixed   $listener  A PHP callable
+     * @param string $name      An event name
+     * @param mixed $listener  A PHP callable
      */
     public function connect($name, $listener)
     {
@@ -60,15 +60,15 @@ class sfEventDispatcher
     /**
      * Disconnects a listener for a given event name.
      *
-     * @param string   $name      An event name
-     * @param mixed    $listener  A PHP callable
+     * @param string $name      An event name
+     * @param mixed $listener  A PHP callable
      *
      * @return mixed false if listener does not exist, null otherwise
      */
     public function disconnect($name, $listener)
     {
         if (!isset($this->listeners[$name])) {
-            return FALSE;
+            return false;
         }
 
         foreach ($this->listeners[$name] as $i => $callable) {
@@ -107,7 +107,7 @@ class sfEventDispatcher
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             if (call_user_func($listener, $event)) {
-                $event->setProcessed(TRUE);
+                $event->setProcessed(true);
                 break;
             }
         }
@@ -119,8 +119,8 @@ class sfEventDispatcher
     /**
      * Filters a value by calling all listeners of a given event.
      *
-     * @param  sfEvent  $event   A sfEvent instance
-     * @param  mixed    $value   The value to be filtered
+     * @param  sfEvent $event   A sfEvent instance
+     * @param  mixed $value   The value to be filtered
      *
      * @return sfEvent The sfEvent instance
      */
@@ -128,9 +128,10 @@ class sfEventDispatcher
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             $value = call_user_func_array(
-                $listener, array(
-                    $event,
-                    $value
+                $listener,
+                array(
+                     $event,
+                     $value
                 )
             );
         }
@@ -144,7 +145,7 @@ class sfEventDispatcher
     /**
      * Returns true if the given event name has some listeners.
      *
-     * @param  string   $name    The event name
+     * @param  string $name    The event name
      *
      * @return Boolean true if some listeners are connected, false otherwise
      */
@@ -161,7 +162,7 @@ class sfEventDispatcher
     /**
      * Returns all listeners associated with a given event name.
      *
-     * @param  string   $name    The event name
+     * @param  string $name    The event name
      *
      * @return array  An array of listeners
      */

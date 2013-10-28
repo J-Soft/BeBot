@@ -42,14 +42,15 @@ class BotError
 
     function __construct(&$bot, $module)
     {
-        $this->status = FALSE;
-        $this->is_fatal = FALSE;
+        $this->status = false;
+        $this->is_fatal = false;
         $this->description = '';
         $this->source = $module;
         $this->bot = $bot;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->description;
     }
 
@@ -62,16 +63,16 @@ class BotError
 
     function reset()
     {
-        $this->status = FALSE;
-        $this->is_fatal = FALSE;
+        $this->status = false;
+        $this->is_fatal = false;
         $this->description = '';
     }
 
 
-    function set($description, $log = TRUE, $fatal = FALSE)
+    function set($description, $log = true, $fatal = false)
     {
         $this->description = $description;
-        $this->is_error = TRUE;
+        $this->is_error = true;
         $this->is_fatal = $fatal;
         if ($log) {
             $this->bot->log('ERROR', $this->source, $description);
