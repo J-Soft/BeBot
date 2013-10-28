@@ -311,23 +311,23 @@ class tools extends BasePassiveModule
             $inside .= "##blob_title##:::::::::::##end## ##blob_text##BeBot Client Terminal##end## ##blob_title##::::::::::::##end##\n";
             $inside .= $this->chatcmd(
                     'about',
-                    '##blob_title##�##end## ##blob_text##About##end## ##blob_title##�##end##',
+                    '##blob_title##«##end## ##blob_text##About##end## ##blob_title##»##end##',
                     false,
                     true
                 ) . "     ";
             $inside .= $this->chatcmd(
                     'help',
-                    '##blob_title##�##end## ##blob_text##Help##end## ##blob_title##�##end##',
+                    '##blob_title##«##end## ##blob_text##Help##end## ##blob_title##»##end##',
                     false,
                     true
                 ) . "     ";
             $inside .= $this->chatcmd(
                 'close InfoView',
-                '##blob_title##�##end## ##blob_text##Close Terminal##end## ##blob_title##�##end##',
+                '##blob_title##«##end## ##blob_text##Close Terminal##end## ##blob_title##»##end##',
                 '/',
                 true
             );
-            $inside .= "\n##blob_title##������������������������������������##end##\n";
+            $inside .= "\n##blob_title##¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯##end##\n";
         }
         // Using " inside a blob will end the blob.
         // Convert opening and closing tags with " to '
