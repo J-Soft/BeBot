@@ -48,6 +48,7 @@ class Maintenance extends BaseActiveModule
         $this->register_event("cron", "5sec");
         $this->register_event("connect");
         $this->register_module("maintenance");
+        $this->croncount = 0;
         // TODO: help
     }
 

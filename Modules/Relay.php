@@ -48,7 +48,14 @@ class Relay extends BaseActiveModule
         $this->register_command('extpgmsg', 'gcrc', 'MEMBER');
         $this->register_event("privgroup");
         $this->register_event("gmsg", "org");
-        $this->register_event("pginvite");
+
+        $this->bot->dispatcher->connect(
+            'Core.on_group_invite', array(
+                $this,
+                'pginvite'
+            )
+        );
+
         $this->register_event("connect");
         $this->register_event("cron", "5min");
         $this->register_event("cron", "2sec");
@@ -141,13 +148,16 @@ class Relay extends BaseActiveModule
     }
 
 
-    function pginvite($group)
+    public function pginvite($data)
     {
+        $group = $data['source'];
+        echo "Debug received group invite: " . $group . "\n";
         if (strtolower(
             $this->bot->core("settings")
                 ->get('Relay', 'Relay')
         ) == strtolower($group)
         ) {
+            echo "Debug: joining " . $group . "\n";
             $this->bot->core("chat")->pgroup_join($group);
         }
     }
@@ -386,6 +396,10 @@ class Relay extends BaseActiveModule
     // If $chat is false $msg will be relayed as it is without any addon, this can be used to relay commands to the other bot(s).
     function relay_to_bot($msg, $chat = TRUE, $alt = FALSE, $type = "notchat")
     {
+         if (!$this->bot->core("settings")->get('Relay', 'Status')) {
+             return;
+         }
+
         $type = strtolower($type);
         if ($alt) {
             $prefix = "<pre>$alt ";
@@ -405,44 +419,18 @@ class Relay extends BaseActiveModule
         else {
             $prefix = "";
         }
-        if ($this->bot->core("settings")->get('Relay', 'Status')
-            && ($this->bot
-                ->core("settings")
-                ->get("Relay", "Relay") != ''
-                || strtoupper(
-                    $this->bot
-                        ->core("settings")->get("Relay", "Type")
-                ) == "DB")
-        ) {
-            $color = $this->bot->core("settings")->get('Relay', 'Color');
-            if (strtolower(
-                $this->bot->core("settings")
-                    ->get('Relay', 'Type')
-            ) == "tells"
-            ) {
-                $this->bot->send_tell(
-                    $this->bot->core("settings")
-                        ->get('Relay', 'Relay'), $prefix . $msg, 0, FALSE, TRUE, $color
-                );
-            }
-            elseif (strtolower(
-                $this->bot->core("settings")
-                    ->get('Relay', 'Type')
-            ) == "pgroup"
-            ) {
-                if (!$alt
-                    && $this->bot->core("settings")
-                        ->get('Relay', 'Encrypt')
-                ) {
-                    $msg = $this->enc($msg);
-                    $msg = '&$enc$& ' . $msg;
-                }
-                $this->bot->send_pgroup(
-                    $prefix . $msg, $this->bot
-                        ->core("settings")->get('Relay', 'Relay'), TRUE, $color
-                );
-            }
-            else {
+
+        $dest = $this->bot->core("settings")->get('Relay', 'Relay');
+        $relayType = strtolower($this->bot->core("settings")->get("Relay", "Type"));
+        $color = $this->bot->core("settings")->get('Relay', 'Color');
+
+        if (empty($dest) && $relayType != 'db') {
+            return;
+        }
+
+
+        switch($relayType) {
+            case 'db':
                 if ($alt) {
                     $prefix = $alt;
                 }
@@ -450,9 +438,18 @@ class Relay extends BaseActiveModule
                     $prefix = "gcr";
                 }
                 $this->bot->db->query(
-                    "INSERT INTO #___relay (time, type, botname, msg) VALUES (" . time() . ", '$prefix', '" . $this->bot->botname . "', '" . mysql_real_escape_string($msg) . "')"
-                );
-            }
+                    "INSERT INTO #___relay (time, type, botname, msg) VALUES (" . time() . ", '$prefix', '" . $this->bot->botname . "', '" . mysql_real_escape_string($msg) . "')");
+                break;
+            case 'tells':
+                $this->bot->send_tell($dest, $prefix . $msg, 0, FALSE, TRUE, $color);
+                break;
+            case 'pgroup':
+                if (!$alt && $this->bot->core("settings")->get('Relay', 'Encrypt')) {
+                    $msg = $this->enc($msg);
+                    $msg = '&$enc$& ' . $msg;
+                }
+                $this->bot->send_pgroup($prefix . $msg, $dest, TRUE, $color);
+                break;
         }
     }
 
@@ -617,7 +614,7 @@ class Relay extends BaseActiveModule
                 }
             }
             else {
-                $members = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level > 0");
+                $members = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level > 0 AND notify > 0");
                 if (!empty($members)) {
                     foreach ($members as $member) {
                         if ($this->bot->core('prefs')

@@ -603,13 +603,13 @@ class AOChat
      *
      * @param $uname user name of the user, for which we just asked the server to lookup
      */
-    function wait_for_lookup_user($uname)
+    function wait_for_lookup_user($uname, $timeout)
     {
         $args = array(
             NULL,
             $uname
         );
-        return $this->wait_for_certain_packet(AOCP_CLIENT_LOOKUP, $args);
+        return $this->wait_for_certain_packet(AOCP_CLIENT_LOOKUP, $args, $timeout);
     }
 
 
@@ -695,6 +695,7 @@ class AOChat
             $this->grp[$gid] = $status;
             $this->gid[$gid] = $name;
             $this->gid[strtolower($name)] = $gid;
+
             // Deprecated call: Should listen to the event already sendt.
             $bot->inc_gannounce($packet->args);
             break;
@@ -702,11 +703,15 @@ class AOChat
         case AOCP_PRIVGRP_INVITE:
             // Event is a privgroup invite
             list ($gid) = $packet->args;
-            //$signal = new signal_message('aochat', $gid, 'invite');
-            //$dispatcher->post($signal, 'onGroupInvite');
+
+            $name = $this->bot->core("player")->name($gid);
+
+            $this->gid[$gid] = $name;
+            $this->gid[strtolower($name)] = $gid;
 
             $event = new sfEvent($this, 'Core.on_group_invite', array(
-                'source' => $gid,
+                'source' => $name,
+                'gid' => $gid,
                 'message' => 'invite'
             ));
             $this->bot->dispatcher->notify($event);
@@ -749,7 +754,7 @@ class AOChat
                 $id = -1;
             }
 
-            // echo "Debug: Firing event Core.on_player_id ($id, $name)\n";
+            //echo "Debug: Firing event Core.on_player_id ($id, $name)\n";
 
             $event = new sfEvent($this, 'Core.on_player_id', array(
                 'id' => $id,
@@ -985,50 +990,18 @@ class AOChat
     /* User and group lookup functions */
     function lookup_user($u)
     {
-        //		$stack = array();
-        $i = 0;
-        $timeout = time() + 15;
-        $p = FALSE;
-        // put the user on the call stack.
+        $timeout = time() + 20;
         $u = ucfirst(strtolower($u));
-        //		$timelimit = time() + $timeout;
-        //		array_unshift($stack, array('user' => $u , 'timeout' => $timelimit));
         $pq = new AOChatPacket("out", AOCP_CLIENT_LOOKUP, $u);
         $this->send_packet($pq);
 
-        while ($p == FALSE) {
-            $i++;
-            $pr = $this->get_packet();
-            if ($pr->type == AOCP_CLIENT_LOOKUP) {
-                $p = TRUE;
-            }
-            if ($timeout <= time()) {
-                echo "Debug: lookup_user timed out while looking up $u\n";
-                $p = TRUE;
-            }
-        }
-
-        //echo "Debug: lookup_user for $u completed in $i iterations\n";
-
-        /*** FIXME ***/
-        // This is really ugly, and we really need to detect if we receive a Client Lookup packet as the lookup could be negative or null.
-        // In those cases this loop would run 200 times or for 15 seconds even if we have gotten a reply.
-        // We now detect when we receive the AOCP_CLIENT_LOOKUP package so we don't loop uneccecary. Maybe add some error catching in the event we do complete 200 loops?
-        /*** FIXME no. 2 ***/
-        // Maybe the new function $this->wait_for_lookup_user(...) could be used.
-        // But its still untested and forbidden recursive calls are likely!
-
-        /*
-        for ($i = 0; ($i < 200) && (!$this->bot->Core('player')->exists($stack[0]['user'])) && ($stack[0]['timeout'] > time()) && (!$p); $i ++)
+        for ($i = 0; ($i < 200) && (!$this->bot->Core('player')->exists($u)); $i ++)
         {
-            $pr = $this->get_packet();
-            if ($pr->type == AOCP_CLIENT_LOOKUP)
-            {
-                $p = true;
+            $pr = $this->wait_for_packet(1);
+            if ($pr->type == AOCP_CLIENT_LOOKUP) {
+                break;
             }
         }
-        array_shift($stack);
-        */
 
         if (!$this->bot->core('player')->exists($u)) {
             return false;
@@ -1046,7 +1019,8 @@ class AOChat
         if (!$is_gid) {
             $arg = strtolower($arg);
         }
-        return isset($this->gid[$arg]) ? $this->gid[$arg] : false;
+        $ret = isset($this->gid[$arg]) ? $this->gid[$arg] : false;
+        return $ret;
     }
 
 
@@ -1175,7 +1149,9 @@ class AOChat
 
     function privategroup_join($group)
     {
+        // FIXME We are not getting a GID back!
         $gid = $this->get_gid($group);
+        echo "Debug: Sending join packet for privategroup: " . $gid . " (". $group . ")\n";
         return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_JOIN, $gid));
     }
 

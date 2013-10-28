@@ -192,6 +192,9 @@ class Preferences_core extends BasePassiveModule
         }
         else {
             $uid = $this->bot->core('player')->id($name);
+            if ($uid instanceof BotError) {
+                return FALSE;
+            }
         }
         if ($module == FALSE && $setting == FALSE) {
             //We're fetching a list of all preferences for a user

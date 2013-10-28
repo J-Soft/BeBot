@@ -44,7 +44,7 @@ class BuddyList extends BasePassiveModule
 
         if (strtolower($this->bot->game) == 'aoc') {
             $this->bot->dispatcher->connect(
-                'core.on_buddy_onoff', array(
+                'Core.on_buddy_onoff', array(
                     $this,
                     'buddy_aoc'
                 )
@@ -52,7 +52,7 @@ class BuddyList extends BasePassiveModule
         }
         else {
             $this->bot->dispatcher->connect(
-                'core.on_buddy_onoff', array(
+                'Core.on_buddy_onoff', array(
                     $this,
                     'buddy_ao'
                 )

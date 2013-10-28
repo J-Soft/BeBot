@@ -318,6 +318,7 @@ class Roster_Core extends BasePassiveModule
             $this->added = 0;
             $this->removed = 0;
             $this->rerolled = 0;
+            $this->skipped = 0;
             $db_members_sql = $this->bot->db->select("SELECT char_id, nickname, user_level, updated_at FROM #___users");
             if (!empty($db_members_sql)) {
                 foreach ($db_members_sql as $db_member) {
@@ -338,6 +339,10 @@ class Roster_Core extends BasePassiveModule
                         if ($this->add("Roster-XML", $member["id"], $member["nickname"], "from XML") == true) {
                             $this->added++;
                         }
+                        else {
+                            $this->skipped++;
+                            continue;
+                        }
                     }
                     else {
                         $db_member = $db_members[$member["nickname"]];
@@ -345,6 +350,10 @@ class Roster_Core extends BasePassiveModule
                             if ($this->add("Roster-XML", $member["id"], $member["nickname"], "from XML") == true)
                             {
                                 $this->added++;
+                            }
+                            else {
+                                $this->skipped++;
+                                continue;
                             }
                         }
                         /*
@@ -360,8 +369,11 @@ class Roster_Core extends BasePassiveModule
                                     $this->removed++;
                                     if ($this->bot->guildid == $member["org_id"]) {
                                         if ($this->add("Roster-XML-Reroll", $member["id"], $member["nickname"], "after reroll (ID: " . $member["id"] . ")") == true) {
-                                            $this->added++;
                                             $this->rerolled++;
+                                        }
+                                        else {
+                                            $this->skipped++;
+                                            continue;
                                         }
                                     }
                                 }
@@ -544,7 +556,12 @@ class Roster_Core extends BasePassiveModule
             $buddylist = $this->bot->db->select("SELECT nickname FROM #___users WHERE notify = 1");
             if (!empty($buddylist)) {
                 foreach ($buddylist as $user) {
-                    if (!$this->bot->core("chat")->buddy_exists($user[0])) {
+                    // Do some sanity checking since funcom has broken chatserver
+                    $uid = $this->bot->core("player")->id($user[0]);
+                    if ($uid instanceof BotError) {
+                         $this->bot->db->query("UPDATE #___users SET notify = 0 WHERE nickname = '" . $user[0] . "'");
+                    }
+                    else if (!$this->bot->core("chat")->buddy_exists($user[0])) {
                         $this->bot->core("chat")->buddy_add($user[0]);
                     }
                 }
@@ -558,6 +575,9 @@ class Roster_Core extends BasePassiveModule
             }
             if ($this->rerolled > 0) {
                 $msg .= "::: " . $this->rerolled . " members was found to have rerolled ";
+            }
+            if ($this->skipped > 0) {
+                $msg .= "::: " . $this->skipped . " members was skipped due to errors "; 
             }
             $this->bot->core("settings")
                 ->save("members", "LastRosterUpdate", time());
@@ -766,15 +786,15 @@ class Roster_Core extends BasePassiveModule
                         ->xmlparse($xml_member, "photo_url");
                     $member["id"] = $this->bot->core("player")
                         ->id($member["nickname"]); // Hey, don't get the character ID before you have a nickname!
-                    if ($member['nickname'] !== ucfirst(strtolower($this->bot->botname))) {
-                        $members[] = $member;
-                    }
 
                     // If we cannot lookup the player, just ignore it here already
                     if ($member["id"] instanceof BotError) {
                         $j++;
                     }
                     else {
+                        if ($member['nickname'] !== ucfirst(strtolower($this->bot->botname))) {
+                            $members[] = $member;
+                        }
                         $i++;
                     }
                 }

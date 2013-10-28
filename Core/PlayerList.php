@@ -43,13 +43,13 @@ class PlayerList extends BasePassiveModule
         //$dispatcher = Event_Dispatcher2::getInstance();
         //$dispatcher->addObserver(array($this , 'signal_handle'), 'onPlayerName');
         $this->bot->dispatcher->connect(
-            'core.on_player_name', array(
+            'Core.on_player_name', array(
                 $this,
                 'signal_handle'
             )
         );
         $this->bot->dispatcher->connect(
-            'core.on_player_id', array(
+            'Core.on_player_id', array(
                 $this,
                 'signal_handle'
             )
@@ -67,12 +67,13 @@ class PlayerList extends BasePassiveModule
         var_dump($data['id']);
         echo " " . $data['name'];
         echo "\n";
-        */
-        if ((!$data['id'] < 1) && !empty($data['name'])) {
+         */
+        //echo "signal_handle: id: " . $data['id'] . " name: " . $data['name'] . "\n";
+        if (($data['id'] > 1) && !empty($data['name'])) {
             $this->add($data['id'], $data['name']);
         }
         else {
-            echo "Was NOT added due to invalid userID\n";
+          //  echo "Was NOT added due to invalid userID\n";
         }
 
         return TRUE;
@@ -83,7 +84,7 @@ class PlayerList extends BasePassiveModule
     {
         $name = ucfirst(strtolower($name));
 
-        /*echo "Debug caching $name ($id)\n";*/
+        //echo "Debug caching $name ($id)\n";
         if ($id == 0 || $id == -1) {
             $this->bot->log("DEBUG", "PlayerList", "Debug " . $name . " has an userid less than 1!!!\n");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
@@ -151,7 +152,7 @@ class PlayerList extends BasePassiveModule
         else if (isset($this->namecache[$uname])) { // so we HAVE the player in cache...
             return $this->namecache[$uname]['id'];
         }
-        $this->error->set("Unable to find player '$uname' and all lookups have failed. The player might have been deleted.");
+        $this->error->set("Unable to find player '$uname' and all lookups have failed. The player might have been deleted.", FALSE);
         return $this->error;
     }
 
@@ -206,8 +207,8 @@ class PlayerList extends BasePassiveModule
                 return $return;
             }
         }
-
-        $this->error->set("name() unable to find player '$uid'");
+        $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
+        $this->error->set("name() unable to find player with userid: $uid");
         return ($this->error);
     }
 
