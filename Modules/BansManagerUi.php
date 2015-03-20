@@ -35,9 +35,11 @@
 *  USA
 */
 $banmanager = new BanManager($bot);
+
 /*
 The Class itself...
 */
+
 class BanManager extends BaseActiveModule
 {
 
@@ -45,10 +47,10 @@ class BanManager extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->register_command(
-            "all", "ban", "GUEST", array(
-                "add" => "ADMIN",
-                "del" => "ADMIN"
-            )
+          "all", "ban", "GUEST", array(
+            "add" => "ADMIN",
+            "del" => "ADMIN"
+          )
         );
         $this->help['description'] = "Handling the bans for <botname>.";
         $this->help['command']['banlist'] = "Shows the list of all currently banned characters.";
@@ -56,14 +58,14 @@ class BanManager extends BaseActiveModule
         $this->help['command']['ban list'] = $this->help['command']['banlist'];
         $this->help['command']['ban add <name> <reason>'] = "Bans <name> for <reason> from the bot forever - or until manually unbanned.";
         $this->help['command']['ban add <name> <time> <reason>']
-            = "Bans <name> for <reason> from the bot for <time>. <time> has a base unit of days. Using 'm' for minutes, 'h' for hours and 'd' for days directly behind the number you can change the time unit. '6h' as time would ban the character for 6h, after which the ban will be automatically deleted. The bot checks every minute for bans that have run out.";
+          = "Bans <name> for <reason> from the bot for <time>. <time> has a base unit of days. Using 'm' for minutes, 'h' for hours and 'd' for days directly behind the number you can change the time unit. '6h' as time would ban the character for 6h, after which the ban will be automatically deleted. The bot checks every minute for bans that have run out.";
         $this->help['command']['ban del <name>'] = "Unbans <name>.";
         $this->help['command']['ban rem <name>'] = "Unbans <name>.";
         $this->bot->core("command_alias")->register("ban list", "banlist");
         $this->bot->core("command_alias")->register("ban", "blacklist");
         $this->register_event("cron", "5min");
         $this->bot->core("settings")
-            ->create("Ban", "ReqReason", FALSE, "is a Reason Required?");
+          ->create("Ban", "ReqReason", false, "is a Reason Required?");
     }
 
 
@@ -73,7 +75,7 @@ class BanManager extends BaseActiveModule
         if (!empty($unbans)) {
             foreach ($unbans as $unban) {
                 $this->bot->core("security")
-                    ->rem_ban("Cron", $unban[0], "Temporary ban ran out,");
+                  ->rem_ban("Cron", $unban[0], "Temporary ban ran out,");
             }
         }
     }
@@ -83,23 +85,17 @@ class BanManager extends BaseActiveModule
     {
         if (preg_match("/^ban$/i", $msg) || preg_match("/^ban list$/i", $msg)) {
             return $this->show_ban_list();
-        }
-        elseif (preg_match("/^ban add ([a-z0-9]+) ([0-9]+[mhd]?)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban add ([a-z0-9]+) ([0-9]+[mhd]?)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], $info[2], "");
-        }
-        elseif (preg_match("/^ban add ([a-z0-9]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban add ([a-z0-9]+)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], "0", "");
-        }
-        elseif (preg_match("/^ban add ([a-z0-9]+) ([0-9]+[mhd]?) (.+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban add ([a-z0-9]+) ([0-9]+[mhd]?) (.+)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], $info[2], $info[3]);
-        }
-        elseif (preg_match("/^ban add ([a-z0-9]+) (.+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban add ([a-z0-9]+) (.+)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], "0", $info[2]);
-        }
-        elseif (preg_match("/^ban del ([a-z0-9]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban del ([a-z0-9]+)$/i", $msg, $info)) {
             return $this->del_ban($name, $info[1]);
-        }
-        elseif (preg_match("/^ban rem ([a-z0-9]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban rem ([a-z0-9]+)$/i", $msg, $info)) {
             return $this->del_ban($name, $info[1]);
         }
         return $this->bot->send_help($name, "ban");
@@ -124,24 +120,23 @@ class BanManager extends BaseActiveModule
             $blob .= $this->bot->core("colors")
                 ->colorize("blob_text", "Banned at: ") . gmdate(
                 $this->bot
-                    ->core("settings")
-                    ->get("Time", "FormatString"), $ban[2]
-            ) . "\n";
+                  ->core("settings")
+                  ->get("Time", "FormatString"), $ban[2]
+              ) . "\n";
             $blob .= $this->bot->core("colors")
                 ->colorize("blob_text", "Reason: ") . stripslashes($ban[3]) . "\n";
             if ($ban[4] > 0) {
                 $blob .= $this->bot->core("colors")
-                    ->colorize(
+                  ->colorize(
                     "blob_text", "Temporary ban until " . gmdate(
-                    $this->bot
+                      $this->bot
                         ->core("settings")
                         ->get("Time", "FormatString"), $ban[4]
-                ) . ".\n"
-                );
-            }
-            else {
+                    ) . ".\n"
+                  );
+            } else {
                 $blob .= $this->bot->core("colors")
-                    ->colorize("blob_text", "Permanent ban.\n");
+                  ->colorize("blob_text", "Permanent ban.\n");
             }
             $banlist .= $blob;
             $total++;
@@ -166,23 +161,20 @@ class BanManager extends BaseActiveModule
         }
         if ($duration == "0") {
             $endtime = 0;
-        }
-        else {
+        } else {
             $timesize = 60 * 60 * 24;
             if (stristr($duration, 'm')) {
                 $timesize = 60;
-            }
-            elseif (stristr($duration, 'h')) {
+            } elseif (stristr($duration, 'h')) {
                 $timesize = 60 * 60;
-            }
-            elseif (stristr($duration, 'd')) {
+            } elseif (stristr($duration, 'd')) {
                 $timesize = 60 * 60 * 24;
             }
             settype($duration, "integer");
             $endtime = time() + $duration * $timesize;
         }
         $ban = $this->bot->core("security")
-            ->set_ban($source, $user, $source, $reason, $endtime);
+          ->set_ban($source, $user, $source, $reason, $endtime);
         if (!($ban instanceof BotError)) {
             if ($this->bot->core("online")->in_chat($user)) {
                 $this->bot->core("chat")->pgroup_kick($user);

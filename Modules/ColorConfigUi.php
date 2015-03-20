@@ -30,9 +30,11 @@
 *  USA
 */
 $colorconfig = new ColorConfig($bot);
+
 /*
 The Class itself...
 */
+
 class ColorConfig extends BaseActiveModule
 {
 
@@ -57,35 +59,26 @@ class ColorConfig extends BaseActiveModule
     {
         if (preg_match("/^color$/i", $msg)) {
             return $this->show_colors();
-        }
-        elseif (preg_match("/^color menu$/i", $msg)) {
+        } elseif (preg_match("/^color menu$/i", $msg)) {
             return $this->color_menu();
-        }
-        elseif (preg_match("/^color module ([A-Za-z_]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^color module ([A-Za-z_]+)$/i", $msg, $info)) {
             return $this->module_menu($info[1]);
-        }
-        elseif (preg_match("/^color select ([A-Za-z_]+) ([A-Za-z_]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^color select ([A-Za-z_]+) ([A-Za-z_]+)$/i", $msg, $info)) {
             return $this->select_color($info[1], $info[2]);
-        }
-        elseif (preg_match("/^color set ([A-Za-z_]+) ([A-Za-z_]+) ([A-Za-z_]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^color set ([A-Za-z_]+) ([A-Za-z_]+) ([A-Za-z_]+)$/i", $msg, $info)) {
             return $this->set_color($info[1], $info[2], $info[3]);
-        }
-        elseif (preg_match("/^theme$/i", $msg)) {
+        } elseif (preg_match("/^theme$/i", $msg)) {
             return $this->show_themes();
-        }
-        elseif (preg_match("/^theme select (.*)$/i", $msg, $info)) {
+        } elseif (preg_match("/^theme select (.*)$/i", $msg, $info)) {
             return $this->select_theme($info[1]);
-        }
-        elseif (preg_match("/^theme export ([a-z01-9_-]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^theme export ([a-z01-9_-]+)$/i", $msg, $info)) {
             return $this->export_schemes($info[1], $name);
-        }
-        elseif (preg_match("/^theme import$/i", $msg)) {
+        } elseif (preg_match("/^theme import$/i", $msg)) {
             return $this->show_scheme_files();
-        }
-        elseif (preg_match("/^theme import ([a-z01-9_-]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^theme import ([a-z01-9_-]+)$/i", $msg, $info)) {
             return $this->import_schemes($info[1]);
         }
-        return FALSE;
+        return false;
     }
 
 
@@ -120,7 +113,7 @@ class ColorConfig extends BaseActiveModule
                 ->chatcmd("color module " . $mod[0], $mod[0]);
         }
         return $this->bot->core("tools")
-            ->make_blob("Color modules", $blob_text);
+          ->make_blob("Color modules", $blob_text);
     }
 
 
@@ -139,7 +132,7 @@ class ColorConfig extends BaseActiveModule
                 ->chatcmd("color select " . $module . " " . $scheme[0], $scheme[0]);
         }
         return $this->bot->core("tools")
-            ->make_blob("Select a scheme to update", $blob_text);
+          ->make_blob("Select a scheme to update", $blob_text);
     }
 
 
@@ -157,12 +150,12 @@ class ColorConfig extends BaseActiveModule
         foreach ($this->bot->core("colors")->get_theme() as $color => $code) {
             $blob .= "\n##" . $color . "##" . $color . " ##end##";
             $blob .= $this->bot->core("tools")
-                ->chatcmd("color set " . $module . " " . $scheme . " " . $color, "Select!");
+              ->chatcmd("color set " . $module . " " . $scheme . " " . $color, "Select!");
         }
         foreach ($cols as $col) {
             $blob .= "\n##" . $col[0] . "##" . $col[0] . " ##end##";
             $blob .= $this->bot->core("tools")
-                ->chatcmd("color set " . $module . " " . $scheme . " " . $col[0], "Select!");
+              ->chatcmd("color set " . $module . " " . $scheme . " " . $col[0], "Select!");
         }
         return $this->bot->core("tools")->make_blob("Pick a color!", $blob);
     }
@@ -179,7 +172,7 @@ class ColorConfig extends BaseActiveModule
             return "##error##You have to select an existing color name!##end##";
         }
         $res = $this->bot->db->select(
-            "SELECT * FROM #___color_schemes WHERE module = '" . mysql_real_escape_string($module) . "' AND name = '" . mysql_real_escape_string($scheme) . "'"
+          "SELECT * FROM #___color_schemes WHERE module = '" . mysql_real_escape_string($module) . "' AND name = '" . mysql_real_escape_string($scheme) . "'"
         );
         if (empty($res)) {
             return "##error##You have to select an existing color scheme!##end##";
@@ -197,12 +190,11 @@ class ColorConfig extends BaseActiveModule
             if (!is_dir($themefile) && preg_match("/(.*)\.colors\.xml$/i", $themefile, $info)) {
                 if (strcasecmp(
                     $info[1], $this->bot->core("settings")
-                        ->get("Color", "Theme")
-                ) == 0
+                    ->get("Color", "Theme")
+                  ) == 0
                 ) {
                     $blob .= "\n##blob_text##" . $info[1] . " (currently in use)##end##";
-                }
-                else {
+                } else {
                     $blob .= "\n" . $this->bot->core("tools")
                         ->chatcmd("theme select " . $info[1], $info[1]);
                 }
@@ -237,7 +229,7 @@ class ColorConfig extends BaseActiveModule
             }
         }
         return $this->bot->core("tools")
-            ->make_blob("Select a scheme file!", $blob);
+          ->make_blob("Select a scheme file!", $blob);
     }
 
 

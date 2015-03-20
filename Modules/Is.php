@@ -32,9 +32,11 @@
 *  USA
 */
 $is = new Is($bot);
+
 /*
 The Class itself...
 */
+
 class Is extends BaseActiveModule
 {
     /*
@@ -52,11 +54,11 @@ class Is extends BaseActiveModule
     */
     private $is_queue = array();
     private $special_entries
-        = array(
-            'trg',
-            'tmo',
-            'chn'
-        );
+      = array(
+        'trg',
+        'tmo',
+        'chn'
+      );
     //Counter holding how big part of the buddy queue we are currently using.
     private $queue_counter = 0;
 
@@ -68,16 +70,19 @@ class Is extends BaseActiveModule
         $this->register_event("buddy");
         $this->register_event("cron", "3sec");
         $this->bot->core("settings")
-            ->create(
-            "Is", "Errormsg", TRUE, "Display error message on invalid username? (Turning this off is reccomended when you are not using a command prefix.)", "On;Off", FALSE, 5
-        );
+          ->create(
+            "Is", "Errormsg", true,
+            "Display error message on invalid username? (Turning this off is reccomended when you are not using a command prefix.)",
+            "On;Off", false, 5
+          );
         //This setting controls how big part of the buddy list is allocated to checking online status.
         $this->bot->core("settings")
-            ->create("Is", "Buddy_slots", 20, "How big portion of the buddy list should be reserved for lookups?", "5;10;15;20;25;30;50");
+          ->create("Is", "Buddy_slots", 20, "How big portion of the buddy list should be reserved for lookups?",
+            "5;10;15;20;25;30;50");
         $this->bot->core("settings")
-            ->create("Is", "Timeout", 15, "How long should we wait for lookups to complete?", "10;15;20;25;30;60");
+          ->create("Is", "Timeout", 15, "How long should we wait for lookups to complete?", "10;15;20;25;30;60");
         $this->bot->core("settings")
-            ->create("Is", "CheckAlts", TRUE, "Should Alts be Checked?");
+          ->create("Is", "CheckAlts", true, "Should Alts be Checked?");
         $this->help['description'] = 'Shows online status for a player.';
         $this->help['command']['is <name>'] = "Shows if player <name> is online or offline";
     }
@@ -90,10 +95,10 @@ class Is extends BaseActiveModule
             return ('Please wait until your previous lookup is completed');
         }
         $com = $this->parse_com(
-            $msg, array(
-                'com',
-                'player'
-            )
+          $msg, array(
+            'com',
+            'player'
+          )
         );
         $player = $this->bot->core('tools')->validate_player($com['player']);
         if ($player instanceof BotError) {
@@ -110,8 +115,7 @@ class Is extends BaseActiveModule
             $alts = $this->bot->core("alts")->get_alts($main);
             //Add the main to the list so we've got everybody in one list.
             $alts[] = $main;
-        }
-        else {
+        } else {
             //Not checking alts, but we use the same code to check the single player
             $alts[] = $player;
         }
@@ -129,8 +133,7 @@ class Is extends BaseActiveModule
                 //If they are, check if they are online
                 if ($this->bot->core('chat')->buddy_online($alt)) {
                     $this->is_queue[$name][$alt] = 'Online';
-                }
-                else {
+                } else {
                     $this->is_queue[$name][$alt] = 'Offline';
                 }
                 //Alt processed. We don't need to do anything else with it.
@@ -140,8 +143,7 @@ class Is extends BaseActiveModule
         //If the alts list is empty all alts have been processed. Return the result.
         if (empty($alts)) {
             $this->send($name);
-        }
-        else {
+        } else {
             //The names now remaining in the list of alts need to be checked further
             foreach ($alts as &$alt) {
                 //And add to buddy list unless we've already used the alotted space
@@ -152,8 +154,7 @@ class Is extends BaseActiveModule
                     $this->bot->core('chat')->buddy_add($alt);
                     $this->queue_counter++;
                     unset($alt);
-                }
-                else {
+                } else {
                     //Put him on hold if the alotted space is used.
                     $this->is_queue[$name][$alt] = 'Waiting';
                 }
@@ -165,6 +166,56 @@ class Is extends BaseActiveModule
     /*
     This gets called if a buddy logs on/off
     */
+
+    function send($name)
+    {
+        foreach ($this->is_queue[$name] as $player => $status) {
+            if ($status == 'Online') {
+                $online_list[] = $player;
+            }
+            if ($status == 'Timeout') {
+                $timeout_list[] = $player;
+            }
+        }
+        if (empty($online_list)) {
+            $reply = "{$this->is_queue[$name]['trg']} is ##red##Offline##end##";
+            $reply .= $this->last_seen($this->is_queue[$name]['trg']);
+        } else {
+            $online = implode(', ', $online_list);
+            $reply = "{$this->is_queue[$name]['trg']} is ##lime##Online##end## with $online.";
+        }
+        if (!empty($timeout_list)) {
+            $timeout = implode(', ', $timeout_list);
+            $reply .= "\n ##red##WARNING:##end## The following entries timed out: $timeout.";
+        }
+        $this->bot->send_output($name, $reply, $this->is_queue[$name]['chn']);
+        unset($this->is_queue[$name]);
+    }
+
+    function last_seen($name)
+    {
+        $seen = $this->bot->core("online")->get_last_seen(
+          $name, $this->bot
+          ->core("settings")->get("Is", "Checkalts")
+        );
+        if ($seen) {
+            if ($this->bot->core("settings")->get("Is", "Checkalts")) {
+                $msg = ", last seen at ##highlight##" . gmdate(
+                    $this->bot
+                      ->core("settings")
+                      ->get("Time", "FormatString"), $seen[0]
+                  ) . "##end## on ##highlight##" . $seen[1] . "##end##";
+            } else {
+                $msg = ", last seen at ##highlight##" . gmdate(
+                    $this->bot
+                      ->core("settings")
+                      ->get("Time", "FormatString"), $seen
+                  ) . "##end##";
+            }
+        }
+        return $msg;
+    }
+
     function buddy($name, $msg)
     {
         if ($msg == 1 || $msg == 0) {
@@ -176,8 +227,7 @@ class Is extends BaseActiveModule
                         if ($name == $player) {
                             if ($msg == 1) {
                                 $this->is_queue[$source][$name] = 'Online';
-                            }
-                            else {
+                            } else {
                                 $this->is_queue[$source][$name] = 'Offline';
                             }
                             // This toon is removed by the inc_buddy() function of the buddy list already.
@@ -186,10 +236,11 @@ class Is extends BaseActiveModule
                         }
                     }
                     //Check if all alts of this toon has been checked.
-                    $complete = TRUE;
+                    $complete = true;
                     foreach ($targets as $player => $status) {
-                        if (!in_array($player, $this->special_entries) && $status !== 'Online' && $status !== 'Offline') {
-                            $complete = FALSE;
+                        if (!in_array($player, $this->special_entries) && $status !== 'Online' && $status !== 'Offline'
+                        ) {
+                            $complete = false;
                         }
                     }
                     if ($complete) {
@@ -200,7 +251,6 @@ class Is extends BaseActiveModule
             }
         }
     }
-
 
     function cron()
     {
@@ -214,16 +264,15 @@ class Is extends BaseActiveModule
                     foreach ($targets as $player => $status) {
                         //Check if people are waiting in queue and add them if there's room
                         if ($targets[$player] == 'Waiting'
-                            && $this->queue_counter < $this->bot
-                                ->core('settings')->get('Is', 'Buddy_slots')
+                          && $this->queue_counter < $this->bot
+                            ->core('settings')->get('Is', 'Buddy_slots')
                         ) {
                             $this->is_queue[$source][$player] = 'Queued';
                             $this->bot->core('chat')->buddy_add($player);
                             $this->queue_counter++;
                         }
                     }
-                }
-                else {
+                } else {
                     //Timeout has occured!!
                     foreach ($targets as $player => $status) {
                         //Set people waiting or in queue as timed out
@@ -241,59 +290,6 @@ class Is extends BaseActiveModule
                 }
             }
         }
-    }
-
-
-    function send($name)
-    {
-        foreach ($this->is_queue[$name] as $player => $status) {
-            if ($status == 'Online') {
-                $online_list[] = $player;
-            }
-            if ($status == 'Timeout') {
-                $timeout_list[] = $player;
-            }
-        }
-        if (empty($online_list)) {
-            $reply = "{$this->is_queue[$name]['trg']} is ##red##Offline##end##";
-            $reply .= $this->last_seen($this->is_queue[$name]['trg']);
-        }
-        else {
-            $online = implode(', ', $online_list);
-            $reply = "{$this->is_queue[$name]['trg']} is ##lime##Online##end## with $online.";
-        }
-        if (!empty($timeout_list)) {
-            $timeout = implode(', ', $timeout_list);
-            $reply .= "\n ##red##WARNING:##end## The following entries timed out: $timeout.";
-        }
-        $this->bot->send_output($name, $reply, $this->is_queue[$name]['chn']);
-        unset($this->is_queue[$name]);
-    }
-
-
-    function last_seen($name)
-    {
-        $seen = $this->bot->core("online")->get_last_seen(
-            $name, $this->bot
-                ->core("settings")->get("Is", "Checkalts")
-        );
-        if ($seen) {
-            if ($this->bot->core("settings")->get("Is", "Checkalts")) {
-                $msg = ", last seen at ##highlight##" . gmdate(
-                    $this->bot
-                        ->core("settings")
-                        ->get("Time", "FormatString"), $seen[0]
-                ) . "##end## on ##highlight##" . $seen[1] . "##end##";
-            }
-            else {
-                $msg = ", last seen at ##highlight##" . gmdate(
-                    $this->bot
-                        ->core("settings")
-                        ->get("Time", "FormatString"), $seen
-                ) . "##end##";
-            }
-        }
-        return $msg;
     }
 }
 

@@ -32,9 +32,11 @@
 *  USA
 */
 $rally = new Rally($bot);
+
 /*
 The Class itself...
 */
+
 class Rally extends BaseActiveModule
 {
     var $rallyinfo;
@@ -44,7 +46,7 @@ class Rally extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
 
-        $this->rallyinfo = FALSE;
+        $this->rallyinfo = false;
 
         $this->register_command('all', 'rally', 'MEMBER');
 
@@ -60,7 +62,7 @@ class Rally extends BaseActiveModule
 
 
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("rally", "true") . "
+          "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("rally", "true") . "
 		            (name varchar(50) NOT NULL,
 		             rally VARCHAR(200) NOT NULL,
 		             PRIMARY KEY (name))"
@@ -77,49 +79,46 @@ class Rally extends BaseActiveModule
         $msg = trim($msg[1]);
         $msg = explode(" ", $msg, 2);
         Switch (strtolower($msg[0])) {
-        case 'rem':
-        case 'del':
-            return $this->del_rally($name, $msg[1]);
-        case 'clear':
-            return $this->clear_rally($name);
-        case 'list':
-            return $this->list_rally($name);
-        case 'load':
-            return $this->load_rally($name, $msg[1]);
-        case 'save':
-            return $this->save_rally($name, $msg[1]);
-        case '':
-            return $this->get_rally();
-        case 'set':
-            $noadd = TRUE;
-        Default:
-            if (!$noadd) {
-                $msg = implode(" ", $msg);
-            }
-            else {
-                $msg = $msg[1];
-            }
-            if (preg_match("/^([ a-zA-Z0-9]+) ([0-9]+) ([0-9]+)$/i", $msg, $info)) {
-                return $this->set_rally($info[1], $info[2], $info[3], "");
-            }
-            else {
-                if (preg_match("/^([ a-zA-Z0-9]+) ([0-9]+) ([0-9]+) (.*)$/i", $msg, $info)) {
-                    return $this->set_rally($info[1], $info[2], $info[3], $info[4]);
+            case 'rem':
+            case 'del':
+                return $this->del_rally($name, $msg[1]);
+            case 'clear':
+                return $this->clear_rally($name);
+            case 'list':
+                return $this->list_rally($name);
+            case 'load':
+                return $this->load_rally($name, $msg[1]);
+            case 'save':
+                return $this->save_rally($name, $msg[1]);
+            case '':
+                return $this->get_rally();
+            case 'set':
+                $noadd = true;
+            Default:
+                if (!$noadd) {
+                    $msg = implode(" ", $msg);
+                } else {
+                    $msg = $msg[1];
                 }
-                else {
-                    if (preg_match("/^- ([0-9].+), ([0-9].+), ([0-9].+) \(([0-9].+) ([0-9].+) y ([0-9].+) ([0-9]+)\)$/i", $msg, $info)) {
-                        return $this->set_rally($info[7], $info[1], $info[2], "");
-                    }
-                    else {
-                        if (preg_match("/^- ([0-9].+), ([0-9].+), ([0-9].+) \(([0-9].+) ([0-9].+) y ([0-9].+) ([0-9]+)\) (.*)$/i", $msg, $info)) {
-                            return $this->set_rally($info[7], $info[1], $info[2], $info[8]);
-                        }
-                        else {
-                            return ("To set Rally: <pre>rally &lt;playfield&gt; &lt;x-coord&gt; &lt;y-coord&gt; &lt;notes&gt;");
+                if (preg_match("/^([ a-zA-Z0-9]+) ([0-9]+) ([0-9]+)$/i", $msg, $info)) {
+                    return $this->set_rally($info[1], $info[2], $info[3], "");
+                } else {
+                    if (preg_match("/^([ a-zA-Z0-9]+) ([0-9]+) ([0-9]+) (.*)$/i", $msg, $info)) {
+                        return $this->set_rally($info[1], $info[2], $info[3], $info[4]);
+                    } else {
+                        if (preg_match("/^- ([0-9].+), ([0-9].+), ([0-9].+) \(([0-9].+) ([0-9].+) y ([0-9].+) ([0-9]+)\)$/i",
+                          $msg, $info)) {
+                            return $this->set_rally($info[7], $info[1], $info[2], "");
+                        } else {
+                            if (preg_match("/^- ([0-9].+), ([0-9].+), ([0-9].+) \(([0-9].+) ([0-9].+) y ([0-9].+) ([0-9]+)\) (.*)$/i",
+                              $msg, $info)) {
+                                return $this->set_rally($info[7], $info[1], $info[2], $info[8]);
+                            } else {
+                                return ("To set Rally: <pre>rally &lt;playfield&gt; &lt;x-coord&gt; &lt;y-coord&gt; &lt;notes&gt;");
+                            }
                         }
                     }
                 }
-            }
         }
     }
 
@@ -127,62 +126,31 @@ class Rally extends BaseActiveModule
     /*
     Make the rally info
     */
-    function set_rally($zone, $x, $y, $note)
+
+    function del_rally($name, $msg)
     {
-        if (is_numeric($zone)) {
-            $zonenumc = $this->bot->db->select("SELECT area FROM #___land_control_zones WHERE zoneid = $zone");
-            if (!empty($zonenumc)) {
-                $zonenum = $zone;
-                $zone = $zonenumc[0][0];
-                $e = "and Way";
+        if ($this->bot->core("security")->check_access($name, "LEADER")) {
+            if (empty($msg)) {
+                Return ("Name needed to delete saved rally");
             }
-            else {
-                $zonenum = FALSE;
+            $check = $this->bot->db->select("SELECT name FROM #___rally WHERE name = '" . mysql_real_escape_string($msg) . "'");
+            if (empty($check)) {
+                Return ("Rally not found");
             }
+            $this->bot->db->query("DELETE FROM #___rally WHERE name = '" . mysql_real_escape_string($msg) . "'");
+            Return "Rally ##highlight##$msg##end## has been deleted.";
+        } else {
+            return "You must be a ##highlight##LEADER##end## or higher to delete saved rally points.";
         }
-        else {
-            $zonenum = $this->bot->db->select(
-                "SELECT zoneid FROM #___land_control_zones WHERE area = '" . mysql_real_escape_string($zone) . "' OR short = '" . mysql_real_escape_string($zone) . "'"
-            );
-            if (!empty($zonenum)) {
-                $zonenum = $zonenum[0][0];
-                $e = "and Way";
-            }
-            else {
-                $zonenum = FALSE;
-            }
-        }
-        $this->rallyinfo = array(
-            $zone,
-            $x,
-            $y,
-            $note,
-            $zonenum
-        );
-        return "Rally " . $e . "point has been set.";
     }
 
-
-    function get_rally()
+    function clear_rally($name)
     {
-        $rally = $this->rallyinfo;
-        if ($rally) {
-            $return = "Rally info: [<font color=#ffffff>Zone:</font> <font color=#ffff00>$rally[0]</font>] " .
-                "[<font color=#ffffff>Coords:</font> <font color=#ffff00>$rally[1], $rally[2]</font>] " .
-                "[<font color=#ffffff>Note:</font><font color=#ffff00> $rally[3]</font>]";
-            if ($rally[4]) {
-                $inside = " :: Rally info::<br><font color=#ffffff>Zone:</font> <font color=#ffff00>$rally[0]</font><Br>" .
-                    "<font color=#ffffff>Coords:</font> <font color=#ffff00>$rally[1], $rally[2]</font><br>" .
-                    "<font color=#ffffff>Note:</font><font color=#ffff00> $rally[3]</font><br><br>" .
-                    $this->bot->core("tools")
-                        ->chatcmd($rally[1] . " " . $rally[2] . " " . $rally[4], "Set Waypoint", "waypoint");
-                $return .= " :: " . $this->bot->core("tools")
-                    ->make_blob("Click for Waypoint", $inside);
-            }
-            Return ($return);
-        }
-        else {
-            Return "No rally point has been set.";
+        if ($this->bot->core("security")->check_access($name, "LEADER")) {
+            $this->rallyinfo = false;
+            return "Rally has been cleared.";
+        } else {
+            return "You must be a ##highlight##LEADER##end## or higher to clear the rally point.";
         }
     }
 
@@ -190,17 +158,6 @@ class Rally extends BaseActiveModule
     /*
     Remove the rally info
     */
-    function clear_rally($name)
-    {
-        if ($this->bot->core("security")->check_access($name, "LEADER")) {
-            $this->rallyinfo = FALSE;
-            return "Rally has been cleared.";
-        }
-        else {
-            return "You must be a ##highlight##LEADER##end## or higher to clear the rally point.";
-        }
-    }
-
 
     function list_rally($name)
     {
@@ -216,16 +173,30 @@ class Rally extends BaseActiveModule
                 }
                 Return ("Saved rally points :: " . $this->bot->core("tools")
                     ->make_blob("click to view", $inside));
-            }
-            else {
+            } else {
                 Return ("No Saved Rally's Found");
             }
-        }
-        else {
+        } else {
             return "You must be a ##highlight##LEADER##end## or higher to view the saved rally points.";
         }
     }
 
+    function load_rally($name, $msg)
+    {
+        if ($this->bot->core("security")->check_access($name, "LEADER")) {
+            if (empty($msg)) {
+                Return ("Name needed to save rally as");
+            }
+            $check = $this->bot->db->select("SELECT rally FROM #___rally WHERE name = '" . mysql_real_escape_string($msg) . "'");
+            if (empty($check)) {
+                Return ("Rally not found");
+            }
+            $this->rallyinfo = explode(";", $check[0][0], 5);
+            Return "Rally ##highlight##$msg##end## has been loaded.";
+        } else {
+            return "You must be a ##highlight##LEADER##end## or higher to load a rally point.";
+        }
+    }
 
     function save_rally($name, $msg)
     {
@@ -241,52 +212,66 @@ class Rally extends BaseActiveModule
                 $rally = implode(";", $this->rallyinfo);
                 $this->bot->db->query("INSERT INTO #___rally (name, rally) VALUES ('" . mysql_real_escape_string($msg) . "', '" . mysql_real_escape_string($rally) . "')");
                 Return "Rally has been saved as ##highlight##$msg##end##.";
-            }
-            else {
+            } else {
                 Return "No rally point has been set.";
             }
-        }
-        else {
+        } else {
             return "You must be a ##highlight##LEADER##end## or higher to save the rally point.";
         }
     }
 
-
-    function load_rally($name, $msg)
+    function get_rally()
     {
-        if ($this->bot->core("security")->check_access($name, "LEADER")) {
-            if (empty($msg)) {
-                Return ("Name needed to save rally as");
+        $rally = $this->rallyinfo;
+        if ($rally) {
+            $return = "Rally info: [<font color=#ffffff>Zone:</font> <font color=#ffff00>$rally[0]</font>] " .
+              "[<font color=#ffffff>Coords:</font> <font color=#ffff00>$rally[1], $rally[2]</font>] " .
+              "[<font color=#ffffff>Note:</font><font color=#ffff00> $rally[3]</font>]";
+            if ($rally[4]) {
+                $inside = " :: Rally info::<br><font color=#ffffff>Zone:</font> <font color=#ffff00>$rally[0]</font><Br>" .
+                  "<font color=#ffffff>Coords:</font> <font color=#ffff00>$rally[1], $rally[2]</font><br>" .
+                  "<font color=#ffffff>Note:</font><font color=#ffff00> $rally[3]</font><br><br>" .
+                  $this->bot->core("tools")
+                    ->chatcmd($rally[1] . " " . $rally[2] . " " . $rally[4], "Set Waypoint", "waypoint");
+                $return .= " :: " . $this->bot->core("tools")
+                    ->make_blob("Click for Waypoint", $inside);
             }
-            $check = $this->bot->db->select("SELECT rally FROM #___rally WHERE name = '" . mysql_real_escape_string($msg) . "'");
-            if (empty($check)) {
-                Return ("Rally not found");
-            }
-            $this->rallyinfo = explode(";", $check[0][0], 5);
-            Return "Rally ##highlight##$msg##end## has been loaded.";
-        }
-        else {
-            return "You must be a ##highlight##LEADER##end## or higher to load a rally point.";
+            Return ($return);
+        } else {
+            Return "No rally point has been set.";
         }
     }
 
-
-    function del_rally($name, $msg)
+    function set_rally($zone, $x, $y, $note)
     {
-        if ($this->bot->core("security")->check_access($name, "LEADER")) {
-            if (empty($msg)) {
-                Return ("Name needed to delete saved rally");
+        if (is_numeric($zone)) {
+            $zonenumc = $this->bot->db->select("SELECT area FROM #___land_control_zones WHERE zoneid = $zone");
+            if (!empty($zonenumc)) {
+                $zonenum = $zone;
+                $zone = $zonenumc[0][0];
+                $e = "and Way";
+            } else {
+                $zonenum = false;
             }
-            $check = $this->bot->db->select("SELECT name FROM #___rally WHERE name = '" . mysql_real_escape_string($msg) . "'");
-            if (empty($check)) {
-                Return ("Rally not found");
+        } else {
+            $zonenum = $this->bot->db->select(
+              "SELECT zoneid FROM #___land_control_zones WHERE area = '" . mysql_real_escape_string($zone) . "' OR short = '" . mysql_real_escape_string($zone) . "'"
+            );
+            if (!empty($zonenum)) {
+                $zonenum = $zonenum[0][0];
+                $e = "and Way";
+            } else {
+                $zonenum = false;
             }
-            $this->bot->db->query("DELETE FROM #___rally WHERE name = '" . mysql_real_escape_string($msg) . "'");
-            Return "Rally ##highlight##$msg##end## has been deleted.";
         }
-        else {
-            return "You must be a ##highlight##LEADER##end## or higher to delete saved rally points.";
-        }
+        $this->rallyinfo = array(
+          $zone,
+          $x,
+          $y,
+          $note,
+          $zonenum
+        );
+        return "Rally " . $e . "point has been set.";
     }
 }
 

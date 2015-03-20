@@ -32,9 +32,11 @@
 *  USA
 */
 $modulecontrol_gui = new ModuleControlGUI($bot);
+
 /*
 The Class itself...
 */
+
 class ModuleControlGUI extends BaseActiveModule
 {
 
@@ -55,16 +57,13 @@ class ModuleControlGUI extends BaseActiveModule
     {
         if (preg_match("/^modules$/i", $msg)) {
             return $this->show_stuff();
-        }
-        elseif (preg_match("/^modules d ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^modules d ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info)) {
             return $this->disable($name, $info[1], $info[2]);
-        }
-        elseif (preg_match("/^modules e ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^modules e ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info)) {
             return $this->enable($name, $info[1], $info[2]);
-        }
-        else {
+        } else {
             $this->bot->send_help($name);
-            return FALSE;
+            return false;
         }
     }
 
@@ -86,14 +85,13 @@ class ModuleControlGUI extends BaseActiveModule
                     $blob .= "-<font color='green'>" . $key;
                     $blob .= "</font> [";
                     $blob .= $this->bot->core("tools")
-                        ->chatcmd("modules d " . $key . " " . $section, "Disable");
+                      ->chatcmd("modules d " . $key . " " . $section, "Disable");
                     $blob .= "]";
-                }
-                else {
+                } else {
                     $blob .= "-<font color='red'>" . $key;
                     $blob .= "</font> [";
                     $blob .= $this->bot->core("tools")
-                        ->chatcmd("modules e " . $key . " " . $section, "Enable");
+                      ->chatcmd("modules e " . $key . " " . $section, "Enable");
                     $blob .= "]";
                 }
                 $blob .= "\n";

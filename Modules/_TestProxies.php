@@ -34,6 +34,7 @@
 *  USA
 */
 $testproxy = new testproxy($bot);
+
 class testproxy extends BaseActiveModule
 {
 
@@ -53,17 +54,16 @@ class testproxy extends BaseActiveModule
         $url = "http://people.anarchy-online.com/character/bio/d/2/name/ebagmp/bio.xml";
         foreach ($this->bot->proxy_server_address as $proxy) {
             $result = $this->bot->core("tools")
-                ->get_site_data($url, $strip_headers, $server_timeout, $read_timeout, $proxy);
-            if ($result["error"] == TRUE || $result["error"] == 1) {
+              ->get_site_data($url, $strip_headers, $server_timeout, $read_timeout, $proxy);
+            if ($result["error"] == true || $result["error"] == 1) {
                 $status = "Failed\n" . $result["errordesc"];
-            }
-            else {
+            } else {
                 $status = "Good";
             }
             $blob .= $proxy . " - " . $status . "\n\n";
         }
         return "Results for Proxies :: " . $this->bot->core("tools")
-            ->make_blob("click to view", $blob);
+          ->make_blob("click to view", $blob);
     }
 }
 

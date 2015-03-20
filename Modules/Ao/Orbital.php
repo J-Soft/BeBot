@@ -32,6 +32,7 @@
 *  USA
 */
 $orbital = new Orbital($bot);
+
 class Orbital extends BasePassiveModule
 {
 
@@ -40,17 +41,17 @@ class Orbital extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         $this->register_event("gmsg", "Org Msg");
         $classid = $this->bot->core("timer")
-            ->create_timer_class("OrbitalWarning", "Notify class used for timer on orbitals.");
+          ->create_timer_class("OrbitalWarning", "Notify class used for timer on orbitals.");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, -2, 0, "", ", hit them again");
+          ->create_timer_class_entry($classid, -2, 0, "", ", hit them again");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 60, "", "in one minute");
+          ->create_timer_class_entry($classid, $nextid, 60, "", "in one minute");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 300, "", "in five minutes");
+          ->create_timer_class_entry($classid, $nextid, 300, "", "in five minutes");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 600, "", "in 10 minutes");
+          ->create_timer_class_entry($classid, $nextid, 600, "", "in 10 minutes");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 900, "", "in 15 minutes");
+          ->create_timer_class_entry($classid, $nextid, 900, "", "in 15 minutes");
     }
 
 
@@ -58,11 +59,11 @@ class Orbital extends BasePassiveModule
     {
         if (preg_match('/Blammo! (.+) has launched an orbital attack!/i', $msg, $info)) {
             $this->bot->core("timer")
-                ->add_timer(
-                FALSE, $info[1], 60 * 15 + 1, "One type of orbital strike is ready again for " . $this->bot
-                ->core("shortcuts")
-                ->get_short($this->bot->guildname), "gc", 0, "OrbitalWarning"
-            );
+              ->add_timer(
+                false, $info[1], 60 * 15 + 1, "One type of orbital strike is ready again for " . $this->bot
+                  ->core("shortcuts")
+                  ->get_short($this->bot->guildname), "gc", 0, "OrbitalWarning"
+              );
         }
     }
 }

@@ -32,9 +32,11 @@
 *  USA
 */
 $about = new About($bot);
+
 /*
 The Class itself...
 */
+
 class About extends BaseActiveModule
 {
 
@@ -58,18 +60,18 @@ class About extends BaseActiveModule
     */
     function command_handler($name, $msg, $origin)
     {
-        $return = FALSE;
+        $return = false;
         /*
         This should really be moved to the bot core.. but until i get the time to modify every single module... :\
         */
         $vars = explode(' ', strtolower($msg));
         $command = $vars[0];
         switch ($command) {
-        case 'about':
-            return $this->about_blob();
-            break;
-        default:
-            return "Broken plugin, received unhandled command: $command";
+            case 'about':
+                return $this->about_blob();
+                break;
+            default:
+                return "Broken plugin, received unhandled command: $command";
         }
     }
 

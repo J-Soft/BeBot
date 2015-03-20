@@ -32,9 +32,11 @@
 *  USA
  */
 $notify = new Notify($bot);
+
 /*
 The Class itself...
 */
+
 class Notify extends BaseActiveModule
 {
 
@@ -55,41 +57,49 @@ class Notify extends BaseActiveModule
     function command_handler($name, $msg, $origin)
     {
         $com = $this->parse_com(
-            $msg, array(
-                'com',
-                'sub',
-                'arg'
-            )
+          $msg, array(
+            'com',
+            'sub',
+            'arg'
+          )
         );
         Switch ($com['sub']) {
-        case 'on':
-            return $this->add_notify($name, $com['arg']);
-        case 'off':
-            return $this->del_notify($com['arg']);
-        case 'cache':
-            Switch (strtolower($com['arg'])) {
-            case 'clear':
-                return $this->bot->core("notify")->clear_cache();
-            case 'update':
-                $this->bot->core("notify")->update_cache();
-                return "Updating notify cache.";
+            case 'on':
+                return $this->add_notify($name, $com['arg']);
+            case 'off':
+                return $this->del_notify($com['arg']);
+            case 'cache':
+                Switch (strtolower($com['arg'])) {
+                    case 'clear':
+                        return $this->bot->core("notify")->clear_cache();
+                    case 'update':
+                        $this->bot->core("notify")->update_cache();
+                        return "Updating notify cache.";
+                    Default:
+                        return $this->bot->core("notify")->list_cache();
+                }
+            case 'list':
+            case '':
+                return $this->show_notify_list();
             Default:
-                return $this->bot->core("notify")->list_cache();
-            }
-        case 'list':
-        case '':
-            return $this->show_notify_list();
-        Default:
-            if (strtolower($com['arg']) == "on" || strtolower($com['arg']) == "off") // asume they want to turn notify on or off but did wrong order
-            {
-                Return $this->command_handler($name, $com['com'] . " " . $com['arg'] . " " . $com['sub'], $origin);
-            }
-            else {
-                Return ("##error##Error: Unknown Sub Command ##highlight##" . $com['sub'] . "##end####end##");
-            }
+                if (strtolower($com['arg']) == "on" || strtolower($com['arg']) == "off") // asume they want to turn notify on or off but did wrong order
+                {
+                    Return $this->command_handler($name, $com['com'] . " " . $com['arg'] . " " . $com['sub'], $origin);
+                } else {
+                    Return ("##error##Error: Unknown Sub Command ##highlight##" . $com['sub'] . "##end####end##");
+                }
         }
     }
 
+    function add_notify($source, $user)
+    {
+        return $this->bot->core("notify")->add($source, $user);
+    }
+
+    function del_notify($user)
+    {
+        return $this->bot->core("notify")->del($user);
+    }
 
     function show_notify_list()
     {
@@ -111,34 +121,20 @@ class Notify extends BaseActiveModule
             if ($notuser[1] >= 2) {
                 $member .= $blob;
                 $membercount++;
-            }
-            elseif ($notuser[1] == 1) {
+            } elseif ($notuser[1] == 1) {
                 $guest .= $blob;
                 $guestcount++;
-            }
-            else {
+            } else {
                 $other .= $blob;
                 $othercount++;
             }
             $total++;
         }
         return $total . " Characters on notify: " . $this->bot->core("tools")
-            ->make_blob($membercount . " Member", $member) . ", " . $this->bot
-            ->core("tools")
-            ->make_blob($guestcount . " Guests", $guest) . ", " . $this->bot
-            ->core("tools")->make_blob($othercount . " Others", $other);
-    }
-
-
-    function add_notify($source, $user)
-    {
-        return $this->bot->core("notify")->add($source, $user);
-    }
-
-
-    function del_notify($user)
-    {
-        return $this->bot->core("notify")->del($user);
+          ->make_blob($membercount . " Member", $member) . ", " . $this->bot
+          ->core("tools")
+          ->make_blob($guestcount . " Guests", $guest) . ", " . $this->bot
+          ->core("tools")->make_blob($othercount . " Others", $other);
     }
 }
 

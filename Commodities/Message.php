@@ -1,4 +1,5 @@
 <?php
+
 /*
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -29,6 +30,7 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
+
 class message
 {
     public $source;
@@ -45,14 +47,13 @@ class message
     }
 
 
-    function set_destination($destination, $overwrite = FALSE)
+    function set_destination($destination, $overwrite = false)
     {
         if (empty($this->destination)) {
             $this->destination[] = $destination;
-            return TRUE;
-        }
-        else {
-            return FALSE;
+            return true;
+        } else {
+            return false;
         }
     }
 

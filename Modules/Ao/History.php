@@ -36,9 +36,11 @@
 *  USA
 */
 $history = new History($bot);
+
 /*
 The Class itself...
 */
+
 class History extends BaseActiveModule
 {
 
@@ -56,13 +58,12 @@ class History extends BaseActiveModule
     {
         if (preg_match("/^history (.+)$/i", $msg, $info)) {
             return $this->player_history($info[1]);
-        }
-        else {
+        } else {
             if (preg_match("/^history$/i", $msg, $info)) {
                 return "No name specified";
             }
         }
-        return FALSE;
+        return false;
     }
 
 
@@ -76,28 +77,26 @@ class History extends BaseActiveModule
         if (!empty($id)) {
             $output = "##blob_title##::: Character history for " . $name . " :::##end##\n\n";
             $content = $this->bot->core("tools")
-                ->get_site("http://auno.org/ao/char.php?output=xml&dimension=" . $this->bot->dimension . "&name=" . $name . " ");
+              ->get_site("http://auno.org/ao/char.php?output=xml&dimension=" . $this->bot->dimension . "&name=" . $name . " ");
             if (!($content instanceof BotError)) {
                 $history = $this->bot->core("tools")
-                    ->xmlparse($content, "history");
+                  ->xmlparse($content, "history");
                 $events = explode("<entry", $history);
                 for ($i = 1; $i < count($events); $i++) {
-                    if (preg_match("/date=\"(.+)\" level=\"([0-9]+)\" ailevel=\"([0-9]*)\" faction=\"(.+)\" guild=\"(.*)\" rank=\"(.*)\"/i", $events[$i], $result)) {
+                    if (preg_match("/date=\"(.+)\" level=\"([0-9]+)\" ailevel=\"([0-9]*)\" faction=\"(.+)\" guild=\"(.*)\" rank=\"(.*)\"/i",
+                      $events[$i], $result)) {
                         if (empty($result[5])) {
                             $result[5] = "##white##Not in guild##end##";
                         }
                         if (empty($result[4])) {
                             $result[4] = "##white##No faction##end##";
-                        }
-                        else {
+                        } else {
                             if ($result[4] == 'Omni') {
                                 $result[4] = "##omni##Omni ##end##";
-                            }
-                            else {
+                            } else {
                                 if ($result[4] == 'Clan') {
                                     $result[4] = "##clan##Clan ##end##";
-                                }
-                                else {
+                                } else {
                                     if ($result[4] == 'Neutral') {
                                         $result[4] = "##neutral##Neutral ##end##";
                                     }
@@ -114,13 +113,11 @@ class History extends BaseActiveModule
                     }
                 }
                 return "History for " . $name . " :: " . $this->bot
-                    ->core("tools")->make_blob("click to view", $output);
-            }
-            else {
+                  ->core("tools")->make_blob("click to view", $output);
+            } else {
                 return $content;
             }
-        }
-        else {
+        } else {
             return "Player ##highlight##" . $name . "##end## does not exist.";
         }
     }

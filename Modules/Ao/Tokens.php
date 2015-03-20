@@ -33,9 +33,11 @@
 *  USA
 */
 $tokens = new tokens($bot);
+
 /*
 The Class itself...
 */
+
 class tokens extends BaseActiveModule
 {
 
@@ -46,9 +48,9 @@ class tokens extends BaseActiveModule
         $this->help['description'] = "Token calculator";
         $this->help['command']['tokens'] = "Displays how many side tokens you get per token disk at various levels";
         $this->help['command']['tokens <target/current> <target/current>']
-            = "Calculates the amount of tokens, token bags or VP tokens (and price) based on your current level, <target> and <current> tokens";
+          = "Calculates the amount of tokens, token bags or VP tokens (and price) based on your current level, <target> and <current> tokens";
         $this->help['command']['tokens <level > <target/current> <target/current>']
-            = "Calculates the amount of tokens, token bags or VP tokens (and price) based on your <level>, <target> and <current> tokens";
+          = "Calculates the amount of tokens, token bags or VP tokens (and price) based on your <level>, <target> and <current> tokens";
     }
 
 
@@ -65,66 +67,61 @@ class tokens extends BaseActiveModule
         $vars = explode(' ', strtolower($msg));
         $command = $vars[0];
         switch ($command) {
-        case 'tokens':
-            $count = count($vars);
-            if ($count == 3) {
-                if (!ctype_digit($vars[1]) || !ctype_digit($vars[2])) {
-                    $this->error->set("Values given are not numerical");
-                    return $this->error;
-                }
-                else {
-                    $who = $this->bot->core("whois")->lookup($source);
-                    if (!($who instanceof BotError)) {
-                        $level = $who["level"];
-                        if ($who["faction"] == 'Clan') {
-                            $clan = true;
-                        }
-                    }
-                    $return = $this->ShowTokens($level, $vars[1], $vars[2], $clan);
-                }
-            }
-            else {
-                if ($count == 4) {
-                    if (!ctype_digit($vars[1]) || !ctype_digit($vars[2]) || !ctype_digit($vars[3])) {
+            case 'tokens':
+                $count = count($vars);
+                if ($count == 3) {
+                    if (!ctype_digit($vars[1]) || !ctype_digit($vars[2])) {
                         $this->error->set("Values given are not numerical");
                         return $this->error;
-                    }
-                    else {
+                    } else {
                         $who = $this->bot->core("whois")->lookup($source);
                         if (!($who instanceof BotError)) {
+                            $level = $who["level"];
                             if ($who["faction"] == 'Clan') {
                                 $clan = true;
                             }
                         }
-                        $return = $this->ShowTokens($vars[1], $vars[2], $vars[3], $clan);
+                        $return = $this->ShowTokens($level, $vars[1], $vars[2], $clan);
+                    }
+                } else {
+                    if ($count == 4) {
+                        if (!ctype_digit($vars[1]) || !ctype_digit($vars[2]) || !ctype_digit($vars[3])) {
+                            $this->error->set("Values given are not numerical");
+                            return $this->error;
+                        } else {
+                            $who = $this->bot->core("whois")->lookup($source);
+                            if (!($who instanceof BotError)) {
+                                if ($who["faction"] == 'Clan') {
+                                    $clan = true;
+                                }
+                            }
+                            $return = $this->ShowTokens($vars[1], $vars[2], $vars[3], $clan);
+                        }
+                    } else {
+                        if ($count == 1) {
+                            $inside = "##normal##::: ##highlight##Token overview##end## :::\n\n";
+                            $inside .= "Level 1-14: ##highlight##1##end## tokens per level\n";
+                            $inside .= "Level 15-49: ##highlight##2##end## tokens per level\n";
+                            $inside .= "Level 50-74: ##highlight##3##end## tokens per level (Please note that Clan aligned characters will not get 3 tokens until level 51)\n";
+                            $inside .= "Level 75-99: ##highlight##4##end## tokens per level\n";
+                            $inside .= "Level 100-124: ##highlight##5##end## tokens per level\n";
+                            $inside .= "Level 124-149: ##highlight##6##end## tokens per level\n";
+                            $inside .= "Level 150-174: ##highlight##7##end## tokens per level\n";
+                            $inside .= "Level 175-189: ##highlight##8##end## tokens per level\n";
+                            $inside .= "Level 190-220: ##highlight##9##end## tokens per level\n\n";
+                            $inside .= "Veteran tokens give ##highlight##50##end## tokens and cost ##highlight##7##end## veteran points\n";
+                            $inside .= "OFAB tokens give ##highlight##10##end##/##highlight##100##end## tokens and cost ##highlight##1000##end##/##highlight##10000##end## victory points\n";
+                            return "##normal##::: ##highlight##Token overview##end## ::: " . $this->bot
+                              ->core("tools")->make_blob("click to view", $inside);
+                        } else {
+                            $this->error->set("##highlight##$msg##end## is not valid input. Please see <pre>help tokens ");
+                            return $this->error;
+                        }
                     }
                 }
-                else {
-                    if ($count == 1) {
-                        $inside = "##normal##::: ##highlight##Token overview##end## :::\n\n";
-                        $inside .= "Level 1-14: ##highlight##1##end## tokens per level\n";
-                        $inside .= "Level 15-49: ##highlight##2##end## tokens per level\n";
-                        $inside .= "Level 50-74: ##highlight##3##end## tokens per level (Please note that Clan aligned characters will not get 3 tokens until level 51)\n";
-                        $inside .= "Level 75-99: ##highlight##4##end## tokens per level\n";
-                        $inside .= "Level 100-124: ##highlight##5##end## tokens per level\n";
-                        $inside .= "Level 124-149: ##highlight##6##end## tokens per level\n";
-                        $inside .= "Level 150-174: ##highlight##7##end## tokens per level\n";
-                        $inside .= "Level 175-189: ##highlight##8##end## tokens per level\n";
-                        $inside .= "Level 190-220: ##highlight##9##end## tokens per level\n\n";
-                        $inside .= "Veteran tokens give ##highlight##50##end## tokens and cost ##highlight##7##end## veteran points\n";
-                        $inside .= "OFAB tokens give ##highlight##10##end##/##highlight##100##end## tokens and cost ##highlight##1000##end##/##highlight##10000##end## victory points\n";
-                        return "##normal##::: ##highlight##Token overview##end## ::: " . $this->bot
-                            ->core("tools")->make_blob("click to view", $inside);
-                    }
-                    else {
-                        $this->error->set("##highlight##$msg##end## is not valid input. Please see <pre>help tokens ");
-                        return $this->error;
-                    }
-                }
-            }
-            break;
-        default:
-            return "Broken plugin, received unhandled command: $command";
+                break;
+            default:
+                return "Broken plugin, received unhandled command: $command";
         }
         return false;
     }
@@ -137,8 +134,7 @@ class tokens extends BaseActiveModule
         if ($goal == $current) {
             $this->error->set("Your goal tokens can not be the same as your current tokens!");
             return $this->error;
-        }
-        elseif ($goal < $current) {
+        } elseif ($goal < $current) {
             $tempgoal = $goal;
             $goal = $current;
             $current = $tempgoal;
@@ -155,37 +151,29 @@ class tokens extends BaseActiveModule
         }
         if ($level > 189) {
             $tpl = 9;
-        }
-        else {
+        } else {
             if ($level > 174) {
                 $tpl = 8;
-            }
-            else {
+            } else {
                 if ($level > 149) {
                     $tpl = 7;
-                }
-                else {
+                } else {
                     if ($level > 124) {
                         $tpl = 6;
-                    }
-                    else {
+                    } else {
                         if ($level > 99) {
                             $tpl = 5;
-                        }
-                        else {
+                        } else {
                             if ($level > 74) {
                                 $tpl = 4;
-                            }
-                            // Heres the odd one out. According to amongst others http://wiki.aodevs.com/wiki/Token_and_Tokenboards, Omni will get 3 TPL from level 50, but clan will only get from level 51. Rounding error anyone?
+                            } // Heres the odd one out. According to amongst others http://wiki.aodevs.com/wiki/Token_and_Tokenboards, Omni will get 3 TPL from level 50, but clan will only get from level 51. Rounding error anyone?
                             else {
                                 if ($level > 49) {
                                     $tpl = 3;
-                                }
-                                else {
+                                } else {
                                     if ($level > 14) {
                                         $tpl = 2;
-                                    }
-                                    else {
+                                    } else {
                                         $tpl = 1;
                                     }
                                 }
@@ -217,15 +205,15 @@ class tokens extends BaseActiveModule
         $inside .= "Token bags needed: ##highlight##" . number_format($bags) . "##end##\n";
         $inside .= "Token discs needed: ##highlight##" . number_format($Step1) . "##end##\n";
         $inside
-            .= "Veteran tokens(##highlight##*##end##): ##highlight##" . number_format($VetToke) . "##end## for ##highlight##" . number_format($Vet) . "##end## veteran points.\n";
+          .= "Veteran tokens(##highlight##*##end##): ##highlight##" . number_format($VetToke) . "##end## for ##highlight##" . number_format($Vet) . "##end## veteran points.\n";
         $inside .= "OFAB tokens(##highlight##**##end##): ##highlight##" . number_format($VPtoke) . "##end## for ##highlight##" . number_format($VP) . "##end## victory points.\n\n";
         $inside
-            .= "##highlight##*##end## One veteran token is a set of 50 tokens, thus ##highlight##" . number_format($VetToke) . "##end## will equal ##highlight##" . number_format(
+          .= "##highlight##*##end## One veteran token is a set of 50 tokens, thus ##highlight##" . number_format($VetToke) . "##end## will equal ##highlight##" . number_format(
             $Vet2
-        ) . " tokens.##end##\n";
+          ) . " tokens.##end##\n";
         $inside
-            .= "##highlight##**##end## OFAB tokens listed are the set of 10, thus ##highlight##" . number_format($VPtoke) . "##end## will equal ##highlight##" . number_format($VP2)
-            . " tokens.##end####end##";
+          .= "##highlight##**##end## OFAB tokens listed are the set of 10, thus ##highlight##" . number_format($VPtoke) . "##end## will equal ##highlight##" . number_format($VP2)
+          . " tokens.##end####end##";
         $info = "Token calculator ::: " . $this->bot->core("tools")
             ->make_blob('Click for results', $inside);
         return $info;

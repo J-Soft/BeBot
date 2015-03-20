@@ -42,11 +42,11 @@ $addons = "whois-update.addons";
 // Default values:
 $hours = 72;
 $delaytime = 10;
-$do_unorged_users = FALSE;
-$delete_not_updated = FALSE;
-$show_org_names = TRUE;
-$show_character_names = FALSE;
-require ('whois-update.conf');
+$do_unorged_users = false;
+$delete_not_updated = false;
+$show_org_names = true;
+$show_character_names = false;
+require('whois-update.conf');
 // disable execution timeout:
 set_time_limit(0);
 
@@ -55,8 +55,7 @@ if (!extension_loaded("curl")) {
     if ($os_windows) {
         if (@!dl("php_curl.dll")) {
             echo "Curl not available\n";
-        }
-        else {
+        } else {
             echo "Curl extension loaded\n";
             if (!extension_loaded("sockets")) {
                 if (!dl("php_sockets.dll")) {
@@ -64,12 +63,10 @@ if (!extension_loaded("curl")) {
                 }
             }
         }
-    }
-    else {
+    } else {
         if (function_exists('curl_init')) {
             echo "Curl extension loaded\n";
-        }
-        else {
+        } else {
             echo "Curl not available\n";
             if (!extension_loaded("sockets")) {
                 die("Sockets extention required to run this script");
@@ -83,8 +80,7 @@ if (!extension_loaded("mysql")) {
         if (!dl("php_mysql.dll")) {
             die("Loading php_mysql.dll failed. MySQL extention required to run this script");
         }
-    }
-    else {
+    } else {
         die("MySQL support required to run this script");
     }
 }
@@ -108,13 +104,13 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
     if ($show_org_names) {
         echo gmdate("H:i:s") . " - Querying roster for " . $orgid['org_name'] . " (" . $orgid['org_id'] . ")...\n";
     }
-    $org_cont = get_site($baseurl . "/org/stats/d/" . $dimension . "/name/" . $orgid['org_id'] . "/basicstats.xml", 0, 60, 60);
+    $org_cont = get_site($baseurl . "/org/stats/d/" . $dimension . "/name/" . $orgid['org_id'] . "/basicstats.xml", 0,
+      60, 60);
     $httpqueries++;
     if (!$org_cont) {
         echo "     Could not get roster for " . $orgid['org_name'] . " (" . $orgid['org_id'] . ")!\n";
         $failedrosterlookup++;
-    }
-    else {
+    } else {
         $starttime = time();
         $orgname = mysql_real_escape_string(xmlparse($org_cont, "name"));
         $orgfaction = xmlparse($org_cont, "side");
@@ -142,66 +138,57 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
             if (empty($who["nickname"])) {
                 echo "     Warning! Missing members nickname!\n";
                 $failedpersonlookup++;
-            }
-            else {
+            } else {
                 if (empty($who["level"])) {
                     echo "     Warning! Missing members level! (" . $who["nickname"] . ")\n";
                     $failedpersonlookup++;
-                }
-                else {
+                } else {
                     if (empty($who["gender"])) {
                         echo "     Warning! Missing members gender! (" . $who["nickname"] . ")\n";
                         $failedpersonlookup++;
-                    }
-                    else {
+                    } else {
                         if (empty($who["breed"])) {
                             echo "     Warning! Missing members breed! (" . $who["nickname"] . ")\n";
                             $failedpersonlookup++;
-                        }
-                        else {
+                        } else {
                             if (empty($who["profession"])) {
                                 echo "     Warning! Missing members profession! (" . $who["nickname"] . ")\n";
                                 $failedpersonlookup++;
-                            }
-                            else {
+                            } else {
                                 if (empty($who["faction"])) {
                                     echo "     Warning! Missing members faction! (" . $who["nickname"] . ")\n";
                                     $failedpersonlookup++;
-                                }
-                                else {
+                                } else {
                                     if (empty($who["rank"])) {
                                         echo "     Warning! Missing members rank! (" . $who["nickname"] . ")\n";
                                         $failedpersonlookup++;
-                                    }
-                                    else {
+                                    } else {
                                         if (empty($who["org"])) {
                                             echo "     Warning! Missing members organization name! (" . $who["nickname"] . ")\n";
                                             $failedpersonlookup++;
-                                        }
-                                        else {
+                                        } else {
                                             if (empty($who["org_id"])) {
                                                 echo "     Warning! Missing members organization ID! (" . $who["nickname"] . ")\n";
                                                 $failedpersonlookup++;
-                                            }
-                                            else {
+                                            } else {
                                                 // INSERT new entries into DB, UPDATE existing ones:
                                                 $query = "INSERT INTO " . $tablename . " (nickname, firstname, lastname, level, gender, breed, faction,"
-                                                    . " profession, defender_rank_id, org_id, org_name, org_rank, org_rank_id, pictureurl, updated)" . " VALUES ('"
-                                                    . $who["nickname"]
-                                                    . "', '"
-                                                    . $who["firstname"]
-                                                    . "', '" . $who["lastname"] . "', '" . $who["level"] . "', '" . $who["gender"] . "', '" . $who["breed"] . "', '"
-                                                    . $who["faction"]
-                                                    . "', '"
-                                                    . $who["profession"]
-                                                    . "', '" . $who["at_id"] . "', '" . $who["org_id"] . "', '" . $who["org"] . "', '" . $who["rank"] . "', '" . $who["rank_id"]
-                                                    . "', '"
-                                                    . $who["pictureurl"]
-                                                    . "','" . $thistime . "') ON DUPLICATE KEY UPDATE firstname = VALUES(firstname), lastname = "
-                                                    . "VALUES(lastname), level = VALUES(level), gender = VALUES(gender), breed = VALUES(breed), "
-                                                    . "faction = VALUES(faction), profession = VALUES(profession), org_id = VALUES(org_id), "
-                                                    . "defender_rank_id = VALUES(defender_rank_id), pictureurl = VALUES(pictureurl), updated = "
-                                                    . "VALUES(updated), org_name = VALUES(org_name), org_rank = VALUES(org_rank), org_rank_id = " . "VALUES(org_rank_id)";
+                                                  . " profession, defender_rank_id, org_id, org_name, org_rank, org_rank_id, pictureurl, updated)" . " VALUES ('"
+                                                  . $who["nickname"]
+                                                  . "', '"
+                                                  . $who["firstname"]
+                                                  . "', '" . $who["lastname"] . "', '" . $who["level"] . "', '" . $who["gender"] . "', '" . $who["breed"] . "', '"
+                                                  . $who["faction"]
+                                                  . "', '"
+                                                  . $who["profession"]
+                                                  . "', '" . $who["at_id"] . "', '" . $who["org_id"] . "', '" . $who["org"] . "', '" . $who["rank"] . "', '" . $who["rank_id"]
+                                                  . "', '"
+                                                  . $who["pictureurl"]
+                                                  . "','" . $thistime . "') ON DUPLICATE KEY UPDATE firstname = VALUES(firstname), lastname = "
+                                                  . "VALUES(lastname), level = VALUES(level), gender = VALUES(gender), breed = VALUES(breed), "
+                                                  . "faction = VALUES(faction), profession = VALUES(profession), org_id = VALUES(org_id), "
+                                                  . "defender_rank_id = VALUES(defender_rank_id), pictureurl = VALUES(pictureurl), updated = "
+                                                  . "VALUES(updated), org_name = VALUES(org_name), org_rank = VALUES(org_rank), org_rank_id = " . "VALUES(org_rank_id)";
                                                 mysql_query($query) or die("Query failed : " . mysql_error());
                                                 $sqlquerycount++;
                                             }
@@ -276,9 +263,9 @@ if ($do_unorged_users) {
                 }
                 // add into DB:
                 $query = "UPDATE " . $tablename . " SET " . "firstname='" . $who["firstname"] . "', lastname='" . $who["lastname"] . "', level='" . $who["level"] . "', gender='"
-                    . $who["gender"] . "', breed='" . $who["breed"] . "', faction='" . $who["faction"] . "', profession='" . $who["profession"] . "', defender_rank_id='"
-                    . $who["at"] . "', org_id='" . $who["org_id"] . "', org_name='" . $who["org"] . "', org_rank='" . $who["rank"] . "', org_rank_id='" . $who["rank_id"]
-                    . "', updated='" . $thistime . "', pictureurl = '" . $who["pictureurl"] . "'" . " WHERE nickname='" . $who["nick"] . "';";
+                  . $who["gender"] . "', breed='" . $who["breed"] . "', faction='" . $who["faction"] . "', profession='" . $who["profession"] . "', defender_rank_id='"
+                  . $who["at"] . "', org_id='" . $who["org_id"] . "', org_name='" . $who["org"] . "', org_rank='" . $who["rank"] . "', org_rank_id='" . $who["rank_id"]
+                  . "', updated='" . $thistime . "', pictureurl = '" . $who["pictureurl"] . "'" . " WHERE nickname='" . $who["nick"] . "';";
                 mysql_query($query) or die("Query failed : " . mysql_error());
                 $sqlquerycount++;
             }
@@ -319,34 +306,32 @@ echo $orgmins . "min " . $orgsec . "sec runtime for org updates!\n";
 echo $mins . "min " . $sec . "sec total runtime!\n";
 echo "================================================\n";
 if (file_exists($addons) && is_readable($addons)) {
-    include ($addons);
+    include($addons);
 }
 mysql_close($link);
 
 
-function get_site($url, $strip_headers = FALSE, $read_timeout = FALSE)
+function get_site($url, $strip_headers = false, $read_timeout = false)
 {
     echo "     Fetching $url";
     $starttime = time();
 
     if (!function_exists('curl_init')) {
         $return = get_site_sock($url, $strip_headers, $read_timeout);
-    }
-    else {
+    } else {
         $return = get_site_curl($url, $strip_headers, $read_timeout);
     }
 
     if ($return) {
         echo " .... completed in " . (time() - $starttime) . " seconds\n";
-    }
-    else {
+    } else {
         echo "\n";
     }
 
     return $return;
 }
 
-function get_site_sock($url, $strip_headers = FALSE, $read_timeout = FALSE)
+function get_site_sock($url, $strip_headers = false, $read_timeout = false)
 {
     $return = get_site_data($url, $strip_headers, $read_timeout);
 
@@ -361,18 +346,18 @@ function get_site_sock($url, $strip_headers = FALSE, $read_timeout = FALSE)
     Gets the data from a URL
     */
 function get_site_data(
-    $url, $strip_headers = FALSE, $read_timeout = FALSE,
-    $proxy = ''
-)
-{
+  $url,
+  $strip_headers = false,
+  $read_timeout = false,
+  $proxy = ''
+) {
     $get_url = parse_url($url);
     // Check to see if we're using a proxy, and get the IP address for the target host.
     if (!empty($proxy)) {
         $proxy_address = explode(":", $proxy);
         $address = gethostbyname($proxy_address[0]);
         $service_port = $proxy_address[1];
-    }
-    else {
+    } else {
         $address = gethostbyname($get_url['host']);
         /* Get the port for the WWW service. */
         $service_port = getservbyname('www', 'tcp');
@@ -380,9 +365,9 @@ function get_site_data(
     /* Create a TCP/IP socket. */
     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
     // Check to see if the socket failed to create.
-    if ($socket === FALSE) {
+    if ($socket === false) {
         echo "Failed to create socket. Error was: " . socket_strerror(socket_last_error());
-        return FALSE;
+        return false;
     }
 
     // Set some sane read timeouts to prevent the bot from hanging forever.
@@ -391,18 +376,18 @@ function get_site_data(
     }
 
     socket_set_option(
-        $socket, SOL_SOCKET, SO_RCVTIMEO, array(
-            "sec" => $read_timeout,
-            "usec" => 0
-        )
+      $socket, SOL_SOCKET, SO_RCVTIMEO, array(
+        "sec" => $read_timeout,
+        "usec" => 0
+      )
     );
 
     $connect_result = @socket_connect($socket, $address, $service_port);
 
     // Make sure we have a connection
-    if ($connect_result === FALSE) {
+    if ($connect_result === false) {
         echo "Failed to connect to server " . $address . ":" . $service_port . " (" . $url . ") Error was: " . socket_strerror(socket_last_error());
-        return FALSE;
+        return false;
     }
     // Rebuild the full query after parse_url
     $url = $get_url["path"];
@@ -415,26 +400,26 @@ function get_site_data(
     $in .= "User-Agent: \r\n\r\n";
     $write_result = @socket_write($socket, $in, strlen($in));
     // Make sure we wrote to the server okay.
-    if ($write_result === FALSE) {
+    if ($write_result === false) {
         echo "Failed to write to server: " . socket_strerror(socket_last_error());
-        return FALSE;
+        return false;
     }
     $return["content"] = "";
     $read_result = @socket_read($socket, 2048);
-    while ($read_result != "" && $read_result !== FALSE) {
+    while ($read_result != "" && $read_result !== false) {
         $return .= $read_result;
         $read_result = @socket_read($socket, 2048);
     }
     // Make sure we got a response back from the server.
-    if ($read_result === FALSE) {
+    if ($read_result === false) {
         echo "Failed to read response: " . socket_strerror(socket_last_error());
-        return FALSE;
+        return false;
     }
     $close_result = @socket_close($socket);
     // Make sure we closed our socket properly.  Open sockets are bad!
-    if ($close_result === FALSE) {
+    if ($close_result === false) {
         echo "Failed to close socket: " . socket_strerror(socket_last_error());
-        return FALSE;
+        return false;
     }
     // Did the calling function want http headers stripped?
     if ($strip_headers) {
@@ -446,9 +431,11 @@ function get_site_data(
 
 
 function get_site_curl(
-    $url, $strip_headers = FALSE, $timeout = FALSE,
-    $post = NULL,
-    $login = NULL
+  $url,
+  $strip_headers = false,
+  $timeout = false,
+  $post = null,
+  $login = null
 ) // login should be username:password
 {
     $ch = curl_init();
@@ -474,7 +461,7 @@ function get_site_curl(
     // CURLOPT_SSL_VERIFYHOST may also need to be TRUE or FALSE if
     // CURLOPT_SSL_VERIFYPEER is disabled (it defaults to 2 - check the existence of a
     // common name and also verify that it matches the hostname provided)
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     // Optional: Return the result instead of printing it
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     // Specify a timeout

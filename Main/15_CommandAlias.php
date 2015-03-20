@@ -35,6 +35,7 @@
 *  USA
 */
 $commandalias_core = new CommandAlias_Core($bot);
+
 class CommandAlias_Core extends BasePassiveModule
 {
     private $alias;
@@ -45,7 +46,7 @@ class CommandAlias_Core extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         $this->register_module("command_alias");
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("command_alias", "false") . " (
+          "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("command_alias", "false") . " (
 						alias VARCHAR(100) NOT NULL,
 						command VARCHAR(30) NOT NULL
 					)"
@@ -75,8 +76,7 @@ class CommandAlias_Core extends BasePassiveModule
         $alias = explode(" ", $alias, 3);
         if (!empty($alias[1])) {
             $this->alias_sub[strtolower($alias[0])][strtolower($alias[1])] = $command;
-        }
-        else {
+        } else {
             $this->alias[strtolower($alias[0])] = $command;
         }
     }
@@ -88,10 +88,9 @@ class CommandAlias_Core extends BasePassiveModule
         $get = $this->bot->db->select("SELECT alias, command FROM #___command_alias WHERE alias = '" . mysql_real_escape_string($alias) . "'");
         if (empty($get) && isset($this->alias[$alias])) {
             unset($this->alias[$alias]);
-            Return TRUE;
-        }
-        else {
-            Return FALSE;
+            Return true;
+        } else {
+            Return false;
         }
     }
 
@@ -102,8 +101,7 @@ class CommandAlias_Core extends BasePassiveModule
         if (!empty($msg[1]) && isset($this->alias_sub[strtolower($msg[0])][strtolower($msg[1])])) {
             $msg[0] = $this->alias_sub[strtolower($msg[0])][strtolower($msg[1])];
             unset($msg[1]);
-        }
-        elseif (isset($this->alias[strtolower($msg[0])])) {
+        } elseif (isset($this->alias[strtolower($msg[0])])) {
             $msg[0] = $this->alias[strtolower($msg[0])];
         }
         $msg = implode(" ", $msg);
@@ -121,16 +119,14 @@ class CommandAlias_Core extends BasePassiveModule
         if (!isset($this->alias[$var[0]])) {
             if ($var[0] !== "comalias") {
                 $this->bot->db->query(
-                    "INSERT INTO #___command_alias (alias, command) VALUES ('" . mysql_real_escape_string($var[0]) . "', '" . mysql_real_escape_string($var[1]) . "')"
+                  "INSERT INTO #___command_alias (alias, command) VALUES ('" . mysql_real_escape_string($var[0]) . "', '" . mysql_real_escape_string($var[1]) . "')"
                 );
                 $this->alias[$var[0]] = $var[1];
                 Return ("##highlight##" . $var[0] . "##end## is now an alias of ##highlight##" . $this->alias[$var[0]] . "##end##!");
-            }
-            else {
+            } else {
                 Return ("##highlight##" . $var[0] . "##end## Cannot be set as an alias!");
             }
-        }
-        else {
+        } else {
             Return ("##highlight##" . $var[0] . "##end## is already an alias of ##highlight##" . $this->alias[$var[0]] . "##end##!");
         }
     }
@@ -155,9 +151,8 @@ class CommandAlias_Core extends BasePassiveModule
                 $inside .= "\n";
             }
             Return "Command aliases :: " . $this->bot->core("tools")
-                ->make_blob("click to view", $inside);
-        }
-        else {
+              ->make_blob("click to view", $inside);
+        } else {
             Return "No command aliases set!";
         }
     }
@@ -167,10 +162,9 @@ class CommandAlias_Core extends BasePassiveModule
     {
         $alias = strtolower($alias);
         if (isset($this->alias[$alias])) {
-            Return TRUE;
-        }
-        else {
-            Return FALSE;
+            Return true;
+        } else {
+            Return false;
         }
     }
 
@@ -183,12 +177,10 @@ class CommandAlias_Core extends BasePassiveModule
             $this->bot->db->query("DELETE FROM #___command_alias WHERE alias = '" . mysql_real_escape_string($alias) . "'");
             unset($this->alias[$alias]);
             Return "Alias ##highlight##" . $alias . "##end## deleted.";
-        }
-        else {
+        } else {
             if (isset($this->alias[$alias])) {
                 Return "Alias ##highlight##" . $alias . "##end## cannot be deleted.";
-            }
-            else {
+            } else {
                 Return "Alias ##highlight##" . $alias . "##end## not found.";
             }
         }

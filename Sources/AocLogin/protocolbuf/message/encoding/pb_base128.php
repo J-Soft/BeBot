@@ -67,6 +67,20 @@ class base128varint
         return $hexstring;
     }
 
+    /**
+     * Converts hex 2 ascii
+     *
+     * @param String $hex - the hex string
+     */
+    public function hex_to_str($hex)
+    {
+        $str = '';
+
+        for ($i = 0; $i < strlen($hex); $i += 2) {
+            $str .= chr(hexdec(substr($hex, $i, 2)));
+        }
+        return $str;
+    }
 
     /**
      * Returns the dec value of an base128
@@ -89,22 +103,6 @@ class base128varint
 
         // now interprete it
         return bindec($valuestring);
-    }
-
-
-    /**
-     * Converts hex 2 ascii
-     *
-     * @param String $hex - the hex string
-     */
-    public function hex_to_str($hex)
-    {
-        $str = '';
-
-        for ($i = 0; $i < strlen($hex); $i += 2) {
-            $str .= chr(hexdec(substr($hex, $i, 2)));
-        }
-        return $str;
     }
 
 }

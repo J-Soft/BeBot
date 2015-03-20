@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abstract class for an input reader
  */

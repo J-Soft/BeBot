@@ -42,9 +42,11 @@
 	- nofont (removes font tags)
 */
 $funfilters = new FunFilters($bot);
+
 /*
 The Class itself...
 */
+
 class FunFilters extends BasePassiveModule
 {
 
@@ -158,84 +160,84 @@ class FunFilters extends BasePassiveModule
     { // Start function pirate.
         $text = trim($text);
         $trans_table = array(
-            '\bmy\b' => 'me',
-            '\bboss\b' => 'admiral',
-            '\bmanager\b' => 'admiral',
-            '\b[Cc]aptain\b' => "Cap'n",
-            '\bmyself\b' => 'meself',
-            '\byour\b' => 'yer',
-            '\byou\b' => 'ye',
-            '\bfriend\b' => 'matey',
-            '\bfriends\b' => 'maties',
-            '\bco[-]?worker\b' => 'shipmate',
-            '\bco[-]?workers\b' => 'shipmates',
-            '\bearlier\b' => 'afore',
-            '\bold\b' => 'auld',
-            '\bthe\b' => "th'",
-            '\bof\b' => "o'",
-            '\bdon\'t\b' => "dern't",
-            '\bdo not\b' => "dern't",
-            '\bnever\b' => "ne'er",
-            '\bever\b' => "e'er",
-            '\bover\b' => "o'er",
-            '\bYes\b' => 'Aye',
-            '\bNo\b' => 'Nay',
-            '\bdon\'t know\b' => "dinna",
-            '\bhadn\'t\b' => "ha'nae",
-            '\bdidn\'t\b' => "di'nae",
-            '\bwasn\'t\b' => "weren't",
-            '\bhaven\'t\b' => "ha'nae",
-            '\bfor\b' => 'fer',
-            '\bbetween\b' => 'betwixt',
-            '\baround\b' => "aroun'",
-            '\bto\b' => "t'",
-            '\bit\'s\b' => "'tis",
-            '\bwoman\b' => 'wench',
-            '\blady\b' => 'wench',
-            '\bwife\b' => 'lady',
-            '\bgirl\b' => 'lass',
-            '\bgirls\b' => 'lassies',
-            '\bguy\b' => 'lubber',
-            '\bman\b' => 'lubber',
-            '\bfellow\b' => 'lubber',
-            '\bdude\b' => 'lubber',
-            '\bboy\b' => 'lad',
-            '\bboys\b' => 'laddies',
-            '\bchildren\b' => 'minnows',
-            '\bkids\b' => 'minnows',
-            '\bhim\b' => 'that scurvey dog',
-            '\bher\b' => 'that comely wench',
-            '\bhim\.\b' => 'that drunken sailor',
-            '\bHe\b' => 'The ornery cuss',
-            '\bShe\b' => 'The winsome lass',
-            '\bhe\'s\b' => 'he be',
-            '\bshe\'s\b' => 'she be',
-            '\bwas\b' => "were bein'",
-            '\bHey\b' => 'Avast',
-            '\bher\.\b' => 'that lovely lass',
-            '\bfood\b' => 'chow',
-            '\broad\b' => 'sea',
-            '\broads\b' => 'seas',
-            '\bstreet\b' => 'river',
-            '\bstreets\b' => 'rivers',
-            '\bhighway\b' => 'ocean',
-            '\bhighways\b' => 'oceans',
-            '\bcar\b' => 'boat',
-            '\bcars\b' => 'boats',
-            '\btruck\b' => 'schooner',
-            '\btrucks\b' => 'schooners',
-            '\bSUV\b' => 'ship',
-            '\bmachine\b' => 'contraption',
-            '\bairplane\b' => 'flying machine',
-            '\bjet\b' => 'flying machine',
-            '\yalm\b' => 'flying machine',
-            '\yalmaha\b' => 'flying machine',
-            '\Yalmaha\b' => 'flying machine',
-            '\Yalm\b' => 'flying machine',
-            '\bdriving\b' => 'sailing',
-            '\bdrive\b' => 'sail',
-            '\bloot\b' => 'booty',
-            '\blooting\b' => 'plunderin'
+          '\bmy\b' => 'me',
+          '\bboss\b' => 'admiral',
+          '\bmanager\b' => 'admiral',
+          '\b[Cc]aptain\b' => "Cap'n",
+          '\bmyself\b' => 'meself',
+          '\byour\b' => 'yer',
+          '\byou\b' => 'ye',
+          '\bfriend\b' => 'matey',
+          '\bfriends\b' => 'maties',
+          '\bco[-]?worker\b' => 'shipmate',
+          '\bco[-]?workers\b' => 'shipmates',
+          '\bearlier\b' => 'afore',
+          '\bold\b' => 'auld',
+          '\bthe\b' => "th'",
+          '\bof\b' => "o'",
+          '\bdon\'t\b' => "dern't",
+          '\bdo not\b' => "dern't",
+          '\bnever\b' => "ne'er",
+          '\bever\b' => "e'er",
+          '\bover\b' => "o'er",
+          '\bYes\b' => 'Aye',
+          '\bNo\b' => 'Nay',
+          '\bdon\'t know\b' => "dinna",
+          '\bhadn\'t\b' => "ha'nae",
+          '\bdidn\'t\b' => "di'nae",
+          '\bwasn\'t\b' => "weren't",
+          '\bhaven\'t\b' => "ha'nae",
+          '\bfor\b' => 'fer',
+          '\bbetween\b' => 'betwixt',
+          '\baround\b' => "aroun'",
+          '\bto\b' => "t'",
+          '\bit\'s\b' => "'tis",
+          '\bwoman\b' => 'wench',
+          '\blady\b' => 'wench',
+          '\bwife\b' => 'lady',
+          '\bgirl\b' => 'lass',
+          '\bgirls\b' => 'lassies',
+          '\bguy\b' => 'lubber',
+          '\bman\b' => 'lubber',
+          '\bfellow\b' => 'lubber',
+          '\bdude\b' => 'lubber',
+          '\bboy\b' => 'lad',
+          '\bboys\b' => 'laddies',
+          '\bchildren\b' => 'minnows',
+          '\bkids\b' => 'minnows',
+          '\bhim\b' => 'that scurvey dog',
+          '\bher\b' => 'that comely wench',
+          '\bhim\.\b' => 'that drunken sailor',
+          '\bHe\b' => 'The ornery cuss',
+          '\bShe\b' => 'The winsome lass',
+          '\bhe\'s\b' => 'he be',
+          '\bshe\'s\b' => 'she be',
+          '\bwas\b' => "were bein'",
+          '\bHey\b' => 'Avast',
+          '\bher\.\b' => 'that lovely lass',
+          '\bfood\b' => 'chow',
+          '\broad\b' => 'sea',
+          '\broads\b' => 'seas',
+          '\bstreet\b' => 'river',
+          '\bstreets\b' => 'rivers',
+          '\bhighway\b' => 'ocean',
+          '\bhighways\b' => 'oceans',
+          '\bcar\b' => 'boat',
+          '\bcars\b' => 'boats',
+          '\btruck\b' => 'schooner',
+          '\btrucks\b' => 'schooners',
+          '\bSUV\b' => 'ship',
+          '\bmachine\b' => 'contraption',
+          '\bairplane\b' => 'flying machine',
+          '\bjet\b' => 'flying machine',
+          '\yalm\b' => 'flying machine',
+          '\yalmaha\b' => 'flying machine',
+          '\Yalmaha\b' => 'flying machine',
+          '\Yalm\b' => 'flying machine',
+          '\bdriving\b' => 'sailing',
+          '\bdrive\b' => 'sail',
+          '\bloot\b' => 'booty',
+          '\blooting\b' => 'plunderin'
         );
         foreach ($trans_table as $search => $replace) {
             // PHP4 way of doing case insensitive replacments.
@@ -249,8 +251,7 @@ class FunFilters extends BasePassiveModule
         if (preg_match("/(\.( |\t|$))/", $text, $info)) {
             $win = $this->winner(2);
             $stub = $info[1];
-        }
-        else {
+        } else {
             if (preg_match("/([!\?]( \t|$))/", $text, $info)) {
                 $win = $this->winner(3);
                 $stub = $info[1];
@@ -258,26 +259,26 @@ class FunFilters extends BasePassiveModule
         }
         if ($win) {
             $shouts = array(
-                ", avast$stub",
-                "$stub Ahoy!",
-                ", and a bottle of rum!",
-                ", by Blackbeard's sword$stub",
-                ", by Davy Jones' locker$stub",
-                "$stub Walk the plank!",
-                "$stub Aarrr!",
-                "$stub Yaaarrrrr!",
-                ", pass the grog!",
-                ", and dinna spare the whip!",
-                ", with a chest full of booty$stub",
-                ", and a bucket o' chum$stub",
-                ", we'll keel-haul ye!",
-                "$stub Shiver me timbers!",
-                "$stub And hoist the mainsail!",
-                "$stub And swab the deck!",
-                ", ye scurvey dog$stub",
-                "$stub Fire the cannons!",
-                ", to be sure$stub",
-                ", I'll warrant ye$stub"
+              ", avast$stub",
+              "$stub Ahoy!",
+              ", and a bottle of rum!",
+              ", by Blackbeard's sword$stub",
+              ", by Davy Jones' locker$stub",
+              "$stub Walk the plank!",
+              "$stub Aarrr!",
+              "$stub Yaaarrrrr!",
+              ", pass the grog!",
+              ", and dinna spare the whip!",
+              ", with a chest full of booty$stub",
+              ", and a bucket o' chum$stub",
+              ", we'll keel-haul ye!",
+              "$stub Shiver me timbers!",
+              "$stub And hoist the mainsail!",
+              "$stub And swab the deck!",
+              ", ye scurvey dog$stub",
+              "$stub Fire the cannons!",
+              ", to be sure$stub",
+              ", I'll warrant ye$stub"
             );
             $text = rtrim($text, $stub);
             $text = $text . $shouts[array_rand($shouts, 1)];
@@ -285,64 +286,84 @@ class FunFilters extends BasePassiveModule
         return $text;
     } // End function pirate()
 
+    function winner($chance)
+    { // Start function winner()
+        $win = false;
+        $rand_max = mt_getrandmax();
+        $rand_int = mt_rand();
+        $highlow = mt_rand(0, 1); // Pick high or low for the winning range. 0 = low, 1 = high.
+        if ($highlow) {
+            $split = round(0 + $rand_max / $chance);
+            if ($rand_int >= $split) {
+                $win = true;
+            }
+        } else {
+            $split = round($rand_max - $rand_max / $chance);
+            if ($rand_int <= $split) {
+                $win = true;
+            }
+        }
+        return $win;
+    } // End function eleet()
+
     function eleet($text)
     { // Start function eleet()
         $text = strtolower($text);
         $norm = array(
-            "porn",
-            "elite",
-            "eleet",
-            "your",
-            "you're",
-            "are",
-            "fool",
-            "you",
-            "newbie",
-            "noobie",
-            "hoot",
-            "loot",
-            "hacker",
-            "fear",
-            "skill",
-            "skills",
-            "dude",
-            "sucks",
-            "suck",
-            "a",
-            "e",
-            "i",
-            "o",
-            "s",
-            "t",
-            "for"
+          "porn",
+          "elite",
+          "eleet",
+          "your",
+          "you're",
+          "are",
+          "fool",
+          "you",
+          "newbie",
+          "noobie",
+          "hoot",
+          "loot",
+          "hacker",
+          "fear",
+          "skill",
+          "skills",
+          "dude",
+          "sucks",
+          "suck",
+          "a",
+          "e",
+          "i",
+          "o",
+          "s",
+          "t",
+          "for"
         );
         $trans = array(
-            "pr0n",
-            "l33t",
-            "l33t",
-            "l33t",
-            "ur",
-            "r",
-            "f00",
-            "j00",
-            "n00b",
-            "n00b",
-            "w00t",
-            "13wt",
-            "h4x0r",
-            "ph33r",
-            "sk1llz",
-            "sk1llz",
-            "d00d",
-            "sux0r",
-            "sux0r",
-            "4",
-            "3",
-            "1",
-            "0",
-            "5",
-            "7",
-            "4"
+          "pr0n",
+          "l33t",
+          "l33t",
+          "l33t",
+          "ur",
+          "r",
+          "f00",
+          "j00",
+          "n00b",
+          "n00b",
+          "w00t",
+          "13wt",
+          "h4x0r",
+          "ph33r",
+          "sk1llz",
+          "sk1llz",
+          "d00d",
+          "sux0r",
+          "sux0r",
+          "4",
+          "3",
+          "1",
+          "0",
+          "5",
+          "7",
+          "4"
         );
         // Translate most of it.
         $text = str_replace($norm, $trans, $text);
@@ -353,23 +374,6 @@ class FunFilters extends BasePassiveModule
         $text = str_replace("1337", "l33t", $text);
         // Add some other wierdness.
         $text = str_replace("h07", "h4Wt", $text);
-        return $text;
-    } // End function eleet()
-
-    function fudd($text)
-    { // Start function fudd()
-        $text = preg_replace("/[rl]/", "w", $text);
-        $text = preg_replace("/qu/", "qw", $text);
-        $text = preg_replace("/th\b/", "f", $text);
-        $text = preg_replace("/th\B/", "d", $text);
-        $text = preg_replace("/n\./", "n, uh-hah-hah-hah.", $text);
-        $text = preg_replace("/[RL]/", "W", $text);
-        $text = preg_replace("/Qu/", "Qw", $text);
-        $text = preg_replace("/QU/", "QW", $text);
-        $text = preg_replace("/TH\b/", "F", $text);
-        $text = preg_replace("/TH\B/", "D", $text);
-        $text = preg_replace("/Th/", "D", $text);
-        $text = preg_replace("/N\./", "N, uh-hah-hah-hah.", $text);
         return $text;
     } // End function fudd()
 
@@ -431,25 +435,22 @@ class FunFilters extends BasePassiveModule
     if $chance is and it was determend that high was the winning range:
         spilt would be 33 so that a high number would be 34-100.
     */
-    function winner($chance)
-    { // Start function winner()
-        $win = FALSE;
-        $rand_max = mt_getrandmax();
-        $rand_int = mt_rand();
-        $highlow = mt_rand(0, 1); // Pick high or low for the winning range. 0 = low, 1 = high.
-        if ($highlow) {
-            $split = round(0 + $rand_max / $chance);
-            if ($rand_int >= $split) {
-                $win = TRUE;
-            }
-        }
-        else {
-            $split = round($rand_max - $rand_max / $chance);
-            if ($rand_int <= $split) {
-                $win = TRUE;
-            }
-        }
-        return $win;
+
+function fudd($text)
+    { // Start function fudd()
+        $text = preg_replace("/[rl]/", "w", $text);
+        $text = preg_replace("/qu/", "qw", $text);
+        $text = preg_replace("/th\b/", "f", $text);
+        $text = preg_replace("/th\B/", "d", $text);
+        $text = preg_replace("/n\./", "n, uh-hah-hah-hah.", $text);
+        $text = preg_replace("/[RL]/", "W", $text);
+        $text = preg_replace("/Qu/", "Qw", $text);
+        $text = preg_replace("/QU/", "QW", $text);
+        $text = preg_replace("/TH\b/", "F", $text);
+        $text = preg_replace("/TH\B/", "D", $text);
+        $text = preg_replace("/Th/", "D", $text);
+        $text = preg_replace("/N\./", "N, uh-hah-hah-hah.", $text);
+        return $text;
     } // End function winner()
 }
 

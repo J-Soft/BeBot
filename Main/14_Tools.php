@@ -34,6 +34,7 @@
 *  USA
 */
 $tools = new tools($bot);
+
 class tools extends BasePassiveModule
 {
 
@@ -43,73 +44,29 @@ class tools extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         $this->register_module("tools");
         $this->bot->core("settings")
-            ->create("tools", "force_sockets", FALSE, "Should we force the usage of Sockets in get_site() even if Curl is available?");
+          ->create("tools", "force_sockets", false,
+            "Should we force the usage of Sockets in get_site() even if Curl is available?");
         $this->bot->core("settings")
-            ->create("tools", "connect_timeout", 25, "How long in seconds should we wait for data to be returned from the webserver when making get_data calls?");
+          ->create("tools", "connect_timeout", 25,
+            "How long in seconds should we wait for data to be returned from the webserver when making get_data calls?");
         // Please do not change this string.
         $this->useragent = BOT_VERSION_NAME . "/" . BOT_VERSION . " (Originating bot: " . $this->bot->botname . "; Dimension: " . $this->bot->dimension . ";)";
         $this->randomsource = "";
     }
 
-
-    function chatcmd($link, $title, $origin = FALSE, $strip = FALSE)
-    {
-        $origin = strtolower($origin);
-        $msgstrip = "";
-        switch ($origin) {
-        case 'gc':
-        case 'o':
-        case 'gu':
-        case '3':
-            if ($this->bot->game == "aoc") {
-                $chatcmd = "gu <pre>";
-            }
-            else {
-                $chatcmd = "o <pre>";
-            }
-            Break;
-        case 'pgmsg':
-        case 'pg':
-        case '2':
-            $chatcmd = "group " . $this->bot->botname . " <pre>";
-            Break;
-        case 'start':
-            $chatcmd = "start ";
-            Break;
-        case 'tell':
-        case '0':
-        case '1':
-        case FALSE:
-            $chatcmd = "tell " . $this->bot->botname . " <pre>";
-            Break;
-        case '/':
-            $chatcmd = "";
-            Break;
-        Default:
-            $chatcmd = $origin . " ";
-        }
-        if ($strip) {
-            $msgstrip = "style=text-decoration:none ";
-        }
-        Return ('<a ' . $msgstrip . 'href=\'chatcmd:///' . $chatcmd . $link . '\'>' . $title . '</a>');
-    }
-
-
-    function get_site($url, $strip_headers = FALSE, $read_timeout = FALSE)
+    function get_site($url, $strip_headers = false, $read_timeout = false)
     {
         if (!function_exists('curl_init')
-            || ($this->bot->core("settings")
-                ->get("tools", "force_sockets") == TRUE)
+          || ($this->bot->core("settings")
+              ->get("tools", "force_sockets") == true)
         ) {
             Return $this->get_site_sock($url, $strip_headers, $read_timeout);
-        }
-        else {
+        } else {
             Return $this->get_site_curl($url, $strip_headers, $read_timeout);
         }
     }
 
-
-    function get_site_sock($url, $strip_headers = FALSE, $read_timeout = FALSE)
+    function get_site_sock($url, $strip_headers = false, $read_timeout = false)
     {
         $return = $this->get_site_data($url, $strip_headers, $read_timeout);
         if (($return instanceof BotError) && $this->use_proxy_server && !empty($this->proxy_server_address)) {
@@ -130,23 +87,19 @@ class tools extends BasePassiveModule
         return $return;
     }
 
-
-    /*
-    Gets the data from a URL
-    */
     function get_site_data(
-        $url, $strip_headers = FALSE, $read_timeout = FALSE,
-        $proxy = ''
-    )
-    {
+      $url,
+      $strip_headers = false,
+      $read_timeout = false,
+      $proxy = ''
+    ) {
         $get_url = parse_url($url);
         // Check to see if we're using a proxy, and get the IP address for the target host.
         if (!empty($proxy)) {
             $proxy_address = explode(":", $proxy);
             $address = gethostbyname($proxy_address[0]);
             $service_port = $proxy_address[1];
-        }
-        else {
+        } else {
             $address = gethostbyname($get_url['host']);
             /* Get the port for the WWW service. */
             $service_port = getservbyname('www', 'tcp');
@@ -154,7 +107,7 @@ class tools extends BasePassiveModule
         /* Create a TCP/IP socket. */
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         // Check to see if the socket failed to create.
-        if ($socket === FALSE) {
+        if ($socket === false) {
             $this->error->set("Failed to create socket. Error was: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
@@ -162,20 +115,20 @@ class tools extends BasePassiveModule
         // Set some sane read timeouts to prevent the bot from hanging forever.
         if (!$read_timeout) {
             $read_timeout = $this->bot->core("settings")
-                ->get("tools", "connect_timeout");
+              ->get("tools", "connect_timeout");
         }
 
         socket_set_option(
-            $socket, SOL_SOCKET, SO_RCVTIMEO, array(
-                "sec" => $read_timeout,
-                "usec" => 0
-            )
+          $socket, SOL_SOCKET, SO_RCVTIMEO, array(
+            "sec" => $read_timeout,
+            "usec" => 0
+          )
         );
 
         $connect_result = @socket_connect($socket, $address, $service_port);
 
         // Make sure we have a connection
-        if ($connect_result === FALSE) {
+        if ($connect_result === false) {
             $this->error->set("Failed to connect to server " . $address . ":" . $service_port . " (" . $url . ") Error was: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
@@ -190,24 +143,24 @@ class tools extends BasePassiveModule
         $in .= "User-Agent:" . $this->useragent . "\r\n\r\n";
         $write_result = @socket_write($socket, $in, strlen($in));
         // Make sure we wrote to the server okay.
-        if ($write_result === FALSE) {
+        if ($write_result === false) {
             $this->error->set("Failed to write to server: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
         $return["content"] = "";
         $read_result = @socket_read($socket, 2048);
-        while ($read_result != "" && $read_result !== FALSE) {
+        while ($read_result != "" && $read_result !== false) {
             $return .= $read_result;
             $read_result = @socket_read($socket, 2048);
         }
         // Make sure we got a response back from the server.
-        if ($read_result === FALSE) {
+        if ($read_result === false) {
             $this->error->set("Failed to read response: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
         $close_result = @socket_close($socket);
         // Make sure we closed our socket properly.  Open sockets are bad!
-        if ($close_result === FALSE) {
+        if ($close_result === false) {
             $this->error->set("Failed to close socket: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
@@ -220,10 +173,16 @@ class tools extends BasePassiveModule
     }
 
 
+    /*
+    Gets the data from a URL
+    */
+
     function get_site_curl(
-        $url, $strip_headers = FALSE, $timeout = FALSE,
-        $post = NULL,
-        $login = NULL
+      $url,
+      $strip_headers = false,
+      $timeout = false,
+      $post = null,
+      $login = null
     ) // login should be username:password
     {
         $ch = curl_init();
@@ -249,13 +208,13 @@ class tools extends BasePassiveModule
         // CURLOPT_SSL_VERIFYHOST may also need to be TRUE or FALSE if
         // CURLOPT_SSL_VERIFYPEER is disabled (it defaults to 2 - check the existence of a
         // common name and also verify that it matches the hostname provided)
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         // Optional: Return the result instead of printing it
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         // Specify a timeout
         if (!$timeout) {
             $timeout = $this->bot->core("settings")
-                ->get("tools", "connect_timeout");
+              ->get("tools", "connect_timeout");
         }
 
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
@@ -271,10 +230,6 @@ class tools extends BasePassiveModule
         Return $return;
     }
 
-
-    /*
-    Parse XML crap
-    */
     function xmlparse($xml, $tag)
     {
         $tmp = explode("<" . $tag . ">", $xml);
@@ -286,15 +241,22 @@ class tools extends BasePassiveModule
     }
 
 
-    function make_blob($title, $content, $header = TRUE)
+    /*
+    Parse XML crap
+    */
+
+    function make_blob($title, $content, $header = true)
     {
         $inside = "";
         if ($header) {
             // Generic header for all info windows, shamelessly borrowed from VhaBot
             $inside .= "##blob_title##:::::::::::##end## ##blob_text##BeBot Client Terminal##end## ##blob_title##::::::::::::##end##\n";
-            $inside .= $this->chatcmd('about', '##blob_title##�##end## ##blob_text##About##end## ##blob_title##�##end##', FALSE, TRUE) . "     ";
-            $inside .= $this->chatcmd('help', '##blob_title##�##end## ##blob_text##Help##end## ##blob_title##�##end##', FALSE, TRUE) . "     ";
-            $inside .= $this->chatcmd('close InfoView', '##blob_title##�##end## ##blob_text##Close Terminal##end## ##blob_title##�##end##', '/', TRUE);
+            $inside .= $this->chatcmd('about',
+                '##blob_title##�##end## ##blob_text##About##end## ##blob_title##�##end##', false, true) . "     ";
+            $inside .= $this->chatcmd('help', '##blob_title##�##end## ##blob_text##Help##end## ##blob_title##�##end##',
+                false, true) . "     ";
+            $inside .= $this->chatcmd('close InfoView',
+              '##blob_title##�##end## ##blob_text##Close Terminal##end## ##blob_title##�##end##', '/', true);
             $inside .= "\n##blob_title##������������������������������������##end##\n";
         }
         // Using " inside a blob will end the blob.
@@ -307,15 +269,60 @@ class tools extends BasePassiveModule
         return "<a href=\"text://" . $inside . "\">" . $title . "</a>";
     }
 
+    function chatcmd($link, $title, $origin = false, $strip = false)
+    {
+        $origin = strtolower($origin);
+        $msgstrip = "";
+        switch ($origin) {
+            case 'gc':
+            case 'o':
+            case 'gu':
+            case '3':
+                if ($this->bot->game == "aoc") {
+                    $chatcmd = "gu <pre>";
+                } else {
+                    $chatcmd = "o <pre>";
+                }
+                Break;
+            case 'pgmsg':
+            case 'pg':
+            case '2':
+                $chatcmd = "group " . $this->bot->botname . " <pre>";
+                Break;
+            case 'start':
+                $chatcmd = "start ";
+                Break;
+            case 'tell':
+            case '0':
+            case '1':
+            case false:
+                $chatcmd = "tell " . $this->bot->botname . " <pre>";
+                Break;
+            case '/':
+                $chatcmd = "";
+                Break;
+            Default:
+                $chatcmd = $origin . " ";
+        }
+        if ($strip) {
+            $msgstrip = "style=text-decoration:none ";
+        }
+        Return ('<a ' . $msgstrip . 'href=\'chatcmd:///' . $chatcmd . $link . '\'>' . $title . '</a>');
+    }
+
 
     /*
     Creates a text blob.
     */
+
     function make_item(
-        $lowid, $highid, $ql, $name, $alt = FALSE,
-        $strip = FALSE
-    )
-    {
+      $lowid,
+      $highid,
+      $ql,
+      $name,
+      $alt = false,
+      $strip = false
+    ) {
         $msgstrip = "";
         if ($strip) {
             $msgstrip = "style=text-decoration:none ";
@@ -355,9 +362,9 @@ class tools extends BasePassiveModule
         $pattern = '|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
         preg_match($pattern, $item, $parts);
         if (empty($parts)) {
-            return FALSE;
+            return false;
         }
-        return TRUE;
+        return true;
     }
 
 
@@ -393,7 +400,7 @@ class tools extends BasePassiveModule
     Returns BotError on failure
     Returns ucfirst(strtolower($name)) if the player exists.
     */
-    function validate_player($name, $check_exists = TRUE)
+    function validate_player($name, $check_exists = true)
     {
         $name = trim(ucfirst(strtolower($name)));
         if (strlen($name) < 3 || strlen($name) > 14) {
@@ -415,14 +422,13 @@ class tools extends BasePassiveModule
     }
 
 
-    function my_rand($min = FALSE, $max = FALSE)
+    function my_rand($min = false, $max = false)
     {
         // For now we only support Mersienne Twister, but this can be changed.
         $this->randomsource = "Mersenne Twister";
         if (isset($min)) {
             return mt_rand($min, $max);
-        }
-        else {
+        } else {
             return mt_rand();
         }
     }
@@ -437,11 +443,11 @@ class tools extends BasePassiveModule
             foreach ($in as $compare) {
                 similar_text($find, $compare, $percentage);
                 if ($percentage >= $perc
-                    && $percentage > $use[0]
+                  && $percentage > $use[0]
                 ) {
                     $use = array(
-                        $percentage,
-                        $compare
+                      $percentage,
+                      $compare
                     );
                 }
             }
@@ -456,10 +462,9 @@ class tools extends BasePassiveModule
         if (is_array($a) && is_array($b)) {
             $dif = array_diff_assoc($a, $b);
             if (!empty($dif)) {
-                Return (FALSE);
-            }
-            else {
-                $check = TRUE;
+                Return (false);
+            } else {
+                $check = true;
                 foreach ($a as $k => $v) {
                     if (is_array($v) && $check) {
                         $check = $this->compare($v, $b[$k]);
@@ -469,9 +474,8 @@ class tools extends BasePassiveModule
             }
         }
         if (is_array($a) || is_array($b)) {
-            Return (FALSE);
-        }
-        else {
+            Return (false);
+        } else {
             Return ($a == $b);
         }
     }

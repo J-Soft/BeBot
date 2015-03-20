@@ -32,6 +32,7 @@
 *  USA
 */
 $items_core = new Items_Core($bot);
+
 class Items_Core extends BasePassiveModule
 {
     var $server = 'http://aocdb.lunevo.net/';
@@ -70,18 +71,17 @@ class Items_Core extends BasePassiveModule
     /*
     Creates a text blob.  Alternate uses ' instead of ".
     */
-    function make_item($item, $alternate = FALSE)
+    function make_item($item, $alternate = false)
     {
         if (empty($item)) {
             return '';
         }
         if ($alternate) {
             return '<a style="text-decoration:none" href="itemref://' . $item['lowid'] . '/' . $item['highid'] . '/' . $item['ql'] . '/' . $item['lowcrc'] . '/' . $item['highcrc']
-                . '"><font color=#' . $item['colour'] . '>[' . $item['name'] . ']</font></a>';
-        }
-        else {
+            . '"><font color=#' . $item['colour'] . '>[' . $item['name'] . ']</font></a>';
+        } else {
             return "<a style='text-decoration:none' href='itemref://" . $item['lowid'] . "/" . $item['highid'] . "/" . $item['ql'] . "/" . $item['lowcrc'] . "/" . $item['highcrc']
-                . "'><font color=#" . $item['colour'] . ">[" . $item['name'] . "]</font></a>";
+            . "'><font color=#" . $item['colour'] . ">[" . $item['name'] . "]</font></a>";
         }
     }
 
@@ -90,9 +90,9 @@ class Items_Core extends BasePassiveModule
     function is_item($item)
     {
         if (1 > preg_match('/' . $this->itemPattern . '/i', $item)) {
-            return FALSE;
+            return false;
         }
-        return TRUE;
+        return true;
     }
 
 
@@ -102,8 +102,8 @@ class Items_Core extends BasePassiveModule
             return -1;
         }
         $checksum = md5(
-            'aocitems' + $item['lowid'] + $item['highid'] + $item['ql'] + $item['lowcrc'] + $item['highcrc'] + $item['colour'] + $item['itemname'] + $this->bot->dimension
-                + $this->bot->guild + $name
+          'aocitems' + $item['lowid'] + $item['highid'] + $item['ql'] + $item['lowcrc'] + $item['highcrc'] + $item['colour'] + $item['itemname'] + $this->bot->dimension
+          + $this->bot->guild + $name
         );
         $url = $this->server . "botsubmit/v3/";
         $url .= '?lowid=' . urlencode($item['lowid']);
@@ -128,7 +128,7 @@ class Items_Core extends BasePassiveModule
         $url .= '&id=' . $words;
         $result = $this->bot->core("tools")->get_site($url, 1);
         //A comment explaining the logic of this check would be appreciated! Why are we looking for mysql_real_escape_string here?
-        if (strstr($result, 'mysql_real_escape_string') !== FALSE) {
+        if (strstr($result, 'mysql_real_escape_string') !== false) {
             return ("Error in query to database");
         }
         return $result;

@@ -32,9 +32,11 @@
 *  USA
 */
 $chat_queue_core = new Chat_Queue_Core($bot);
+
 /*
 The Class itself...
 */
+
 class Chat_Queue_Core extends BasePassiveModule
 {
     private $que;
@@ -53,7 +55,7 @@ class Chat_Queue_Core extends BasePassiveModule
         $this->register_module("chat_queue");
 
         $this->bot->core("queue")
-            ->register($this, "chat", ($this->bot->telldelay / 1000), 4);
+          ->register($this, "chat", ($this->bot->telldelay / 1000), 4);
     }
 
 
@@ -66,13 +68,12 @@ class Chat_Queue_Core extends BasePassiveModule
         $msg = $info[1];
         if ($info[2] == "tell") {
             $this->bot->log(
-                "TELL", "OUT", "-> " . $this->bot->core("chat")
+              "TELL", "OUT", "-> " . $this->bot->core("chat")
                 ->get_uname($to) . ": " . $msg
             );
             $msg = utf8_encode($msg);
             $this->bot->aoc->send_tell($to, $msg);
-        }
-        else {
+        } else {
             $msg = utf8_encode($msg);
             $this->bot->aoc->send_group($to, $msg);
         }
@@ -94,9 +95,9 @@ class Chat_Queue_Core extends BasePassiveModule
     function into_queue($to, $msg, $type, $priority)
     {
         $info = array(
-            $to,
-            $msg,
-            $type
+          $to,
+          $msg,
+          $type
         );
         $this->bot->core("queue")->into_queue("chat", $info, $priority);
     }

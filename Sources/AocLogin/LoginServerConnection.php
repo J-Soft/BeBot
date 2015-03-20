@@ -25,15 +25,18 @@ class LoginServerConnection extends ServerConnection
 
 
     public function LoginServerConnection(
-        $parent, $username, $password,
-        $serverAddress, $serverPort,
-        $loginType
-    )
-    {
+      $parent,
+      $username,
+      $password,
+      $serverAddress,
+      $serverPort,
+      $loginType
+    ) {
         $clientEndpoint = new Endpoints(0x0C384054, "UniverseInterface", 1, 0);
         $serverEndpoint = new Endpoints(0x604DDBA0, "UniverseAgent", 0, 0);
 
-        parent::ServerConnection("Conan Login Server", $serverAddress, $serverPort, $clientEndpoint, $serverEndpoint, $loginType);
+        parent::ServerConnection("Conan Login Server", $serverAddress, $serverPort, $clientEndpoint, $serverEndpoint,
+          $loginType);
 
         $this->m_LoginCookie = 0;
         $this->m_AccountID = 0;
@@ -91,9 +94,9 @@ class LoginServerConnection extends ServerConnection
     {
         if (parent::Connect()) {
             $this->SendAuthentication();
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
 
 
@@ -108,8 +111,7 @@ class LoginServerConnection extends ServerConnection
             $stream->WriteString("");
             $stream->WriteString($key);
             $stream->WriteUInt32(1);
-        }
-        else {
+        } else {
             if ($this->m_EndpointType == LOGIN_TYPE_PROTOBUF) {
                 $stream->WriteString($this->m_Username);
                 $stream->WriteUInt32(1);
@@ -125,6 +127,86 @@ class LoginServerConnection extends ServerConnection
     /// we get from the server and then sends it back to the server to log in with
     /// @arg uint32 [in] Login seed
     /// @author Chaoz
+
+    public function HandlePackets()
+    {
+        do {
+            $stream = parent::HandlePackets();
+            if ($stream == null) {
+                continue;
+            }
+            $rpcID = parent::GetRpcID($stream);
+
+            switch ($rpcID) {
+                case RPC_UNIVERSE_CHALLENGE: {
+                    $seed = $stream->ReadString();
+                    $this->AnswerChallenge($seed);
+                }
+                    break;
+
+                case RPC_UNIVERSE_AUTHENTICATED: {
+                    $authStatus = $stream->ReadUInt32();
+                    $playerType = $stream->ReadUInt32();
+                    $this->m_AccountID = $stream->ReadUInt32();
+                    $tmAddress = $stream->ReadString();
+                    $this->m_LoginCookie = $stream->ReadUInt32();
+                    $loginStatus = $stream->ReadUInt32();
+
+                    if ($authStatus != 1) {
+                        echo("[" . $this->m_LogName . "] Failed to authenticate [auth:$authStatus] \n");
+                        return false;
+                    }
+
+                    if ($loginStatus != 0) {
+                        echo("[" . $this->m_LogName . "] Failed to log in [login error:$loginStatus] : " . parent::displayConanError($loginStatus) . "\n");
+                        return false;
+                    }
+
+                    // Split the server address up from address:port
+                    if (strlen($tmAddress) != 0) {
+                        list($this->m_CharacterServerAddress, $this->m_CharacterServerPort) = split(":", $tmAddress);
+                        echo "[" . $this->m_LogName . "] Received character server address [ " . $this->m_CharacterServerAddress . ":" . $this->m_CharacterServerPort . " ]\n";
+                        return true;
+                    }
+                    echo("[" . $this->m_LogName . "] Failed to receive the character server address\n");
+                    return false;
+                }
+
+                case RPC_UNIVERSE_INTERNAL_ERROR: {
+                    trigger_error("RPC_UNIVERSE_INTERNAL_ERROR: Internal error", E_USER_WARNING);
+                    $this->Disconnect("Internal error");
+                }
+                    return false;
+
+                case RPC_UNIVERSE_ERROR: {
+                    //trigger_error("RPC_UNIVERSE_ERROR: Error while authenticating to universe [Err:".$this->displayConanError($packet->args[0])."]",E_USER_WARNING);
+                    $this->Disconnect("Universe Error");
+                }
+                    return false;
+
+                case RPC_UNIVERSE_SETREGION:
+                    break;
+
+                case -1:
+                    trigger_error("RPC_LOGINSERVER_ERROR: Error while reading message header [Err:Unknown RPC ID]",
+                      E_USER_WARNING);
+                    return false;
+
+                default:
+                    echo("[" . $this->m_LogName . "] Unhandled RPC : $rpcID\n");
+                    break;
+            }
+
+        } while (true);
+
+        return true;
+    }
+
+
+    /// HandlePackets
+    /// Handles all incoming messages from the loginserver.
+    /// @author Chaoz
+
     public function AnswerChallenge($seed)
     {
         $response = $this->m_Parent->generate_login_key($seed, $this->m_Username, $this->m_Password);
@@ -132,88 +214,6 @@ class LoginServerConnection extends ServerConnection
         $stream = parent::CreateBinaryStream(RPC_UNIVERSE_ANSWERCHALLENGE);
         $stream->WriteString($response);
         parent::EncryptAndSend($stream, RPC_UNIVERSE_ANSWERCHALLENGE);
-    }
-
-
-    /// HandlePackets
-    /// Handles all incoming messages from the loginserver.
-    /// @author Chaoz
-    public function HandlePackets()
-    {
-        do {
-            $stream = parent::HandlePackets();
-            if ($stream == NULL) {
-                continue;
-            }
-            $rpcID = parent::GetRpcID($stream);
-
-            switch ($rpcID) {
-            case RPC_UNIVERSE_CHALLENGE:
-                {
-                $seed = $stream->ReadString();
-                $this->AnswerChallenge($seed);
-                }
-                break;
-
-            case RPC_UNIVERSE_AUTHENTICATED:
-                {
-                $authStatus = $stream->ReadUInt32();
-                $playerType = $stream->ReadUInt32();
-                $this->m_AccountID = $stream->ReadUInt32();
-                $tmAddress = $stream->ReadString();
-                $this->m_LoginCookie = $stream->ReadUInt32();
-                $loginStatus = $stream->ReadUInt32();
-
-                if ($authStatus != 1) {
-                    echo("[" . $this->m_LogName . "] Failed to authenticate [auth:$authStatus] \n");
-                    return FALSE;
-                }
-
-                if ($loginStatus != 0) {
-                    echo("[" . $this->m_LogName . "] Failed to log in [login error:$loginStatus] : " . parent::displayConanError($loginStatus) . "\n");
-                    return FALSE;
-                }
-
-                // Split the server address up from address:port
-                if (strlen($tmAddress) != 0) {
-                    list($this->m_CharacterServerAddress, $this->m_CharacterServerPort) = split(":", $tmAddress);
-                    echo "[" . $this->m_LogName . "] Received character server address [ " . $this->m_CharacterServerAddress . ":" . $this->m_CharacterServerPort . " ]\n";
-                    return TRUE;
-                }
-                echo("[" . $this->m_LogName . "] Failed to receive the character server address\n");
-                return FALSE;
-                }
-
-            case RPC_UNIVERSE_INTERNAL_ERROR:
-                {
-                trigger_error("RPC_UNIVERSE_INTERNAL_ERROR: Internal error", E_USER_WARNING);
-                $this->Disconnect("Internal error");
-                }
-                return FALSE;
-
-            case RPC_UNIVERSE_ERROR:
-                {
-                //trigger_error("RPC_UNIVERSE_ERROR: Error while authenticating to universe [Err:".$this->displayConanError($packet->args[0])."]",E_USER_WARNING);
-                $this->Disconnect("Universe Error");
-                }
-                return FALSE;
-
-            case RPC_UNIVERSE_SETREGION:
-                break;
-
-            case -1:
-                trigger_error("RPC_LOGINSERVER_ERROR: Error while reading message header [Err:Unknown RPC ID]", E_USER_WARNING);
-                return FALSE;
-
-            default:
-                echo("[" . $this->m_LogName . "] Unhandled RPC : $rpcID\n");
-                break;
-            }
-
-        }
-        while (TRUE);
-
-        return TRUE;
     }
 }
 

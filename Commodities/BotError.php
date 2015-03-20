@@ -1,4 +1,5 @@
 <?php
+
 /*
 * BotError.php - Error handling class
 *
@@ -31,10 +32,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
+
 class BotError
 {
-    private $bot;
     protected $status;
+    private $bot;
     private $is_fatal;
     private $description;
     private $source;
@@ -42,8 +44,8 @@ class BotError
 
     function __construct(&$bot, $module)
     {
-        $this->status = FALSE;
-        $this->is_fatal = FALSE;
+        $this->status = false;
+        $this->is_fatal = false;
         $this->description = '';
         $this->source = $module;
         $this->bot = $bot;
@@ -58,16 +60,16 @@ class BotError
 
     function reset()
     {
-        $this->status = FALSE;
-        $this->is_fatal = FALSE;
+        $this->status = false;
+        $this->is_fatal = false;
         $this->description = '';
     }
 
 
-    function set($description, $log = TRUE, $fatal = FALSE)
+    function set($description, $log = true, $fatal = false)
     {
         $this->description = $description;
-        $this->is_error = TRUE;
+        $this->is_error = true;
         $this->is_fatal = $fatal;
         if ($log) {
             $this->bot->log('ERROR', $this->source, $description);

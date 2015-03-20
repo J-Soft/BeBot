@@ -32,6 +32,7 @@
 *  USA
 */
 $shortcut_gui = new ShortCutGUI($bot);
+
 class ShortCutGUI extends BaseActiveModule
 {
 
@@ -49,11 +50,9 @@ class ShortCutGUI extends BaseActiveModule
     {
         if (preg_match("/^shortcuts$/i", $msg)) {
             return $this->show_shortcuts();
-        }
-        elseif (preg_match("/^shortcuts add &quot;(.*)&quot; &quot;(.*)&quot;$/i", $msg, $info)) {
+        } elseif (preg_match("/^shortcuts add &quot;(.*)&quot; &quot;(.*)&quot;$/i", $msg, $info)) {
             return $this->add($info[1], $info[2]);
-        }
-        elseif (preg_match("/^shortcuts del ([01-9]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^shortcuts del ([01-9]+)$/i", $msg, $info)) {
             return $this->del($info[1]);
         }
     }
@@ -70,7 +69,7 @@ class ShortCutGUI extends BaseActiveModule
             $blob .= "\n##ao_infotext##" . stripslashes($shortcut[0]) . " ##end##short for##ao_infotext## ";
             $blob .= stripslashes($shortcut[1]) . "##end## ";
             $blob .= $this->bot->core("tools")
-                ->chatcmd("shortcuts del " . $shortcut[2], "[DELETE]");
+              ->chatcmd("shortcuts del " . $shortcut[2], "[DELETE]");
         }
         return $this->bot->core("tools")->make_blob("Defined shortcuts", $blob);
     }

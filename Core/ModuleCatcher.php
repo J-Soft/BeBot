@@ -32,9 +32,11 @@
 *  USA
 */
 $modulecatcher_core = new ModuleCatcher_Core($bot, $bot->core_directories, $bot->module_directories);
+
 /*
 The Class itself...
 */
+
 class ModuleCatcher_Core extends BasePassiveModule
 {
     var $core_directories;
@@ -90,7 +92,7 @@ class ModuleCatcher_Core extends BasePassiveModule
                     $value = $this->bot->core("ini")->get($mod, "Custom_Core");
                     if (empty($value)) {
                         $this->bot->core("ini")
-                            ->set($mod, "TRUE", "Custom_Core");
+                          ->set($mod, "TRUE", "Custom_Core");
                     }
                 }
             }
@@ -108,7 +110,7 @@ class ModuleCatcher_Core extends BasePassiveModule
                         $value = $this->bot->core("ini")->get($mod, $sec_name);
                         if (empty($value)) {
                             $this->bot->core("ini")
-                                ->set($mod, "TRUE", $sec_name);
+                              ->set($mod, "TRUE", $sec_name);
                         }
                     }
                 }
@@ -142,10 +144,10 @@ class ModuleCatcher_Core extends BasePassiveModule
             while ($mod = $folder->read()) {
                 if (!is_dir($mod) && !preg_match("/^_/", $mod) && preg_match("/\.php$/i", $mod)) {
                     $value = $this->bot->core("ini")
-                        ->get($mod, "Custom_Modules");
+                      ->get($mod, "Custom_Modules");
                     if (empty($value)) {
                         $this->bot->core("ini")
-                            ->set($mod, "TRUE", "Custom_Modules");
+                          ->set($mod, "TRUE", "Custom_Modules");
                     }
                 }
             }
@@ -163,7 +165,7 @@ class ModuleCatcher_Core extends BasePassiveModule
                         $value = $this->bot->core("ini")->get($mod, $sec_name);
                         if (empty($value)) {
                             $this->bot->core("ini")
-                                ->set($mod, "TRUE", $sec_name);
+                              ->set($mod, "TRUE", $sec_name);
                         }
                     }
                 }

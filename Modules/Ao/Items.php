@@ -36,6 +36,7 @@
  *  USA
  */
 $VhItems = new VhItems($bot);
+
 class VhItems extends BaseActiveModule
 {
     var $icons = 'true';
@@ -66,8 +67,7 @@ class VhItems extends BaseActiveModule
                     $ql = $parts[0];
                     unset($parts[0]);
                     $search = implode(' ', $parts);
-                }
-                else {
+                } else {
                     $ql = 0;
                     $search = $words;
                 }
@@ -89,16 +89,14 @@ class VhItems extends BaseActiveModule
                 }
                 $result = $this->bot->core("tools")->get_site($url, 1);
                 //Again I do not see why we're looking for mysql_real_escape_string
-                if (strstr($result, 'mysql_real_escape_string') !== FALSE) {
+                if (strstr($result, 'mysql_real_escape_string') !== false) {
                     return ("received garbled reply from vhabot!");
                 }
                 return $result;
-            }
-            else {
+            } else {
                 return "Usage: items [quality] [item]";
             }
-        }
-        else {
+        } else {
             $this->bot->send_help($name);
         }
     }

@@ -32,9 +32,11 @@
 *  USA
 */
 $setdebug = new SetDebug($bot);
+
 /*
 The Class itself...
 */
+
 class SetDebug extends BaseActiveModule
 {
 

@@ -32,9 +32,11 @@
 *  USA
 */
 $sdrs = new Shutdown($bot);
+
 /*
 The Class itself...
 */
+
 class Shutdown extends BaseActiveModule
 {
 
@@ -48,7 +50,8 @@ class Shutdown extends BaseActiveModule
         $this->help['command']['restart'] = "Restarts the bot.";
         $this->help['notes'] = "If the bot is started in debug mode input _might_ be required in the console for the bot to restart.";
         $this->bot->core("settings")
-            ->create("Shutdown", "QuietShutdown", FALSE, "Do shutdown/restart quietly without spamming the guild channel?");
+          ->create("Shutdown", "QuietShutdown", false,
+            "Do shutdown/restart quietly without spamming the guild channel?");
     }
 
 
@@ -63,16 +66,16 @@ class Shutdown extends BaseActiveModule
         }
         $msg = explode(" ", $msg, 2);
         Switch ($msg[0]) {
-        case 'shutdown':
-            $this->stop($name, "has been shutdown.", $msg[1]);
-            Break;
-        case 'restart':
-            $this->stop($name, "is restarting.", $msg[1]);
-            Break;
-        Default:
-            return "##error##Error: Shutdown Module received Unknown Command ##highlight##$msg[0]##end####end##";
+            case 'shutdown':
+                $this->stop($name, "has been shutdown.", $msg[1]);
+                Break;
+            case 'restart':
+                $this->stop($name, "is restarting.", $msg[1]);
+                Break;
+            Default:
+                return "##error##Error: Shutdown Module received Unknown Command ##highlight##$msg[0]##end####end##";
         }
-        return FALSE;
+        return false;
     }
 
 
@@ -88,8 +91,8 @@ class Shutdown extends BaseActiveModule
         }
         $this->bot->send_tell($name, "The bot " . $text);
         $this->crontime = array(
-            time() + 2,
-            "The bot " . $text
+          time() + 2,
+          "The bot " . $text
         );
         $this->register_event("cron", "1sec");
     }

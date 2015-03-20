@@ -1,4 +1,5 @@
 <?php
+
 /************************************************************************
  * Project     : BeBot Authentication 2010-2011
  * Author      : Chaoz ( Rayek Level 80 Priest Of Mitra @ Crom )
@@ -13,7 +14,6 @@
  *               to and from a binary data blob. Also to make it more clear
  *               how many bytes we are reading and writing.
  *************************************************************************/
-
 class BinaryStream
 {
     private $m_Data = "";
@@ -50,8 +50,7 @@ class BinaryStream
     {
         if ($this->m_DataLen > $this->m_WritePtr) {
             return $this->m_DataLen;
-        }
-        else {
+        } else {
             $this->m_WritePtr;
         }
     }
@@ -113,35 +112,7 @@ class BinaryStream
     /// Skip
     /// Skips n bytes in the read buffer
     /// @author Chaoz
-    public function Skip($len)
-    {
-        $this->m_ReadPtr += $len;
-    }
 
-
-    /// ReadUInt16
-    /// Reads two bytes from the buffer and returns the uint16 value
-    /// @return uint16 - The uint16 value
-    /// @author Chaoz
-    public function ReadUInt16()
-    {
-        $tmp1 = $this->m_Data[$this->m_ReadPtr++];
-        $tmp2 = $this->m_Data[$this->m_ReadPtr++];
-        $tmp = $tmp1 . $tmp2;
-
-        $data = unpack("n", $tmp);
-        $res = array_pop($data);
-
-        //echo("[BinaryStream][ReadUInt16] " . $res . " [pos:" . ($this->m_ReadPtr-2) . " -> " . ($this->m_ReadPtr ) . "]\n");
-
-        return $res;
-    }
-
-
-    /// ReadUInt32
-    /// Reads four bytes from the buffer and returns the uint32 value
-    /// @return uint32 - The uint32 value
-    /// @author Chaoz
     public function ReadUInt32()
     {
         $tmp1 = $this->m_Data[$this->m_ReadPtr++];
@@ -164,16 +135,28 @@ class BinaryStream
     }
 
 
-    /// ReadString
-    /// Reads first the length of the string, and then the string from the buffer
-    /// @return string - The string in the buffer
+    /// ReadUInt16
+    /// Reads two bytes from the buffer and returns the uint16 value
+    /// @return uint16 - The uint16 value
     /// @author Chaoz
+
+    public function Skip($len)
+    {
+        $this->m_ReadPtr += $len;
+    }
+
+
+    /// ReadUInt32
+    /// Reads four bytes from the buffer and returns the uint32 value
+    /// @return uint32 - The uint32 value
+    /// @author Chaoz
+
     public function ReadString()
     {
         $len = $this->ReadUInt16();
         if ($this->m_ReadPtr + $len > $this->m_DataLen) {
             echo("[BinaryStream][ReadString] " . $str . " [pos:" . ($this->m_ReadPtr) . "] invalid length :" . $len . " since it will read outside of buffer.\n");
-            return NULL;
+            return null;
         }
 
         $str = substr($this->m_Data, $this->m_ReadPtr, $len);
@@ -184,15 +167,36 @@ class BinaryStream
     }
 
 
+    /// ReadString
+    /// Reads first the length of the string, and then the string from the buffer
+    /// @return string - The string in the buffer
+    /// @author Chaoz
+
+    public function ReadUInt16()
+    {
+        $tmp1 = $this->m_Data[$this->m_ReadPtr++];
+        $tmp2 = $this->m_Data[$this->m_ReadPtr++];
+        $tmp = $tmp1 . $tmp2;
+
+        $data = unpack("n", $tmp);
+        $res = array_pop($data);
+
+        //echo("[BinaryStream][ReadUInt16] " . $res . " [pos:" . ($this->m_ReadPtr-2) . " -> " . ($this->m_ReadPtr ) . "]\n");
+
+        return $res;
+    }
+
+
     /// ReadRaw
     /// Reads n number of bytes from the read buffer
     /// @return string - The string in the buffer
     /// @author Chaoz
+
     public function ReadRaw($len)
     {
         if ($this->m_ReadPtr + $len > $this->m_DataLen) {
             echo("[BinaryStream][ReadRaw] " . $str . " [pos:" . ($this->m_ReadPtr) . "] invalid length :" . $len . " since it will read outside of buffer.\n");
-            return NULL;
+            return null;
         }
 
         $str = substr($this->m_Data, $this->m_ReadPtr, $len);
@@ -218,19 +222,7 @@ class BinaryStream
     /// Writes 2 byte to the write buffer
     /// @param data [int] The data we want to write
     /// @author Chaoz
-    public function WriteUInt16($data)
-    {
-        $packedData = pack("n", $data);
-        $this->m_Data[$this->m_WritePtr++] = $packedData[0];
-        $this->m_Data[$this->m_WritePtr++] = $packedData[1];
-        //echo("[BinaryStream][WriteUInt16] " . $data . " [pos:" . ($this->m_WritePtr-2) . " -> " . ($this->m_WritePtr ) . "] \n");
-    }
 
-
-    /// WriteUInt32
-    /// Writes 4 bytes to the write buffer
-    /// @param data [int] The data we want to write
-    /// @author Chaoz
     public function WriteUInt32($data)
     {
         $packedData = pack("N", $data);
@@ -242,17 +234,31 @@ class BinaryStream
     }
 
 
+    /// WriteUInt32
+    /// Writes 4 bytes to the write buffer
+    /// @param data [int] The data we want to write
+    /// @author Chaoz
+
+    public function WriteString($str)
+    {
+        $len = strlen($str);
+        $this->WriteUInt16($len);
+        $this->WriteRaw($str, $len);
+    }
+
+
     /// WriteRaw
     /// Writes n byte to the write buffer
     /// @param str [String] The data we want to write
     /// @param len [int] Length of the data we want to write
     /// @author Chaoz
-    public function WriteRaw($str, $len)
+
+    public function WriteUInt16($data)
     {
-        //echo("[BinaryStream][WriteRaw] " . $str . " [pos:" . ($this->m_WritePtr) . " to " . ($this->m_WritePtr + $len) . "] len:" . $len . "]\n");
-        for ($i = 0; $i < $len; $i++) {
-            $this->m_Data[$this->m_WritePtr++] = $str[$i];
-        }
+        $packedData = pack("n", $data);
+        $this->m_Data[$this->m_WritePtr++] = $packedData[0];
+        $this->m_Data[$this->m_WritePtr++] = $packedData[1];
+        //echo("[BinaryStream][WriteUInt16] " . $data . " [pos:" . ($this->m_WritePtr-2) . " -> " . ($this->m_WritePtr ) . "] \n");
     }
 
 
@@ -260,11 +266,13 @@ class BinaryStream
     /// Writes a string to the write buffer
     /// @param str [String] The data we want to write
     /// @author Chaoz
-    public function WriteString($str)
+
+    public function WriteRaw($str, $len)
     {
-        $len = strlen($str);
-        $this->WriteUInt16($len);
-        $this->WriteRaw($str, $len);
+        //echo("[BinaryStream][WriteRaw] " . $str . " [pos:" . ($this->m_WritePtr) . " to " . ($this->m_WritePtr + $len) . "] len:" . $len . "]\n");
+        for ($i = 0; $i < $len; $i++) {
+            $this->m_Data[$this->m_WritePtr++] = $str[$i];
+        }
     }
 }
 

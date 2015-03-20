@@ -35,6 +35,7 @@
 *  USA
 */
 $commandaliasinterface = new CommandAliasInterface($bot);
+
 class CommandAliasInterface extends BaseActiveModule
 {
 
@@ -54,13 +55,13 @@ class CommandAliasInterface extends BaseActiveModule
     {
         $var = explode(" ", $msg, 3);
         switch ($var[1]) {
-        case 'add':
-            Return ($this->bot->core("command_alias")->add($var[2]));
-        case 'del':
-        case 'rem':
-            Return ($this->bot->core("command_alias")->del($var[2]));
-        default:
-            Return ($this->bot->core("command_alias")->get_list());
+            case 'add':
+                Return ($this->bot->core("command_alias")->add($var[2]));
+            case 'del':
+            case 'rem':
+                Return ($this->bot->core("command_alias")->del($var[2]));
+            default:
+                Return ($this->bot->core("command_alias")->get_list());
         }
     }
 }

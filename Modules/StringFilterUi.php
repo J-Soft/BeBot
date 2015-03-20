@@ -33,9 +33,11 @@
 *  USA
 */
 $stringfilter_interface = new StringFilter_Interface($bot);
+
 /*
 The Class itself...
 */
+
 class StringFilter_Interface extends BaseActiveModule
 {
 
@@ -56,16 +58,13 @@ class StringFilter_Interface extends BaseActiveModule
         // preg_match just works better than explode for string based input that may have spaces.
         if (preg_match("/^filter add (.+?) replace: (.+)$/i", $msg, $info)) {
             return $this->add($info[1], $info[2]);
-        }
-        else {
+        } else {
             if (preg_match("/^filter add (.+?)$/i", $msg, $info)) {
                 return $this->add($info[1]);
-            }
-            else {
+            } else {
                 if (preg_match("/^filter rem (.+)$/i", $msg, $info)) {
                     return $this->rem($info[1]);
-                }
-                else {
+                } else {
                     return $this->show($name);
                 }
             }
@@ -73,7 +72,7 @@ class StringFilter_Interface extends BaseActiveModule
     }
 
 
-    function add($string, $new = NULL)
+    function add($string, $new = null)
     {
         return $this->bot->core("stringfilter")->add_string($string, $new);
     }
@@ -95,7 +94,7 @@ class StringFilter_Interface extends BaseActiveModule
             $inside .= "\n";
         }
         return $this->bot->core("tools")
-            ->make_blob("Filtered String List", $inside);
+          ->make_blob("Filtered String List", $inside);
     }
 }
 

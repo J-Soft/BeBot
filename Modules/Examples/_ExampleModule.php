@@ -37,9 +37,11 @@
 Add a "_" at the beginning of the file (_ClassName.php) if you do not want it to be loaded.
 */
 $thisClass = new ClassName($bot);
+
 /*
 The Class itself...
 */
+
 class ClassName extends BaseActiveModule
 {
 
@@ -116,7 +118,7 @@ class ClassName extends BaseActiveModule
             'option1;option2;option3' are the availible options for the setting.
         */
         $this->bot->core("settings")
-            ->create('module', 'setting', 'default', 'description of setting', 'option1;option2;option3');
+          ->create('module', 'setting', 'default', 'description of setting', 'option1;option2;option3');
         /*
             Create preferences for this module. The preferences contains six parts
             'module' is the module or preference group in which the preference should be placed
@@ -127,7 +129,7 @@ class ClassName extends BaseActiveModule
             'access' is the access level required to acces the setting. This can be one of GUEST, MEMBER, ADMIN, SUPERADMIN or OWNER
         */
         $this->bot->core("prefs")
-            ->create("module", "name", "description", "default", "option1;option2", "access");
+          ->create("module", "name", "description", "default", "option1;option2", "access");
         /*
             Create help for this module
             'description' is a brief description of what the module does
@@ -157,23 +159,23 @@ class ClassName extends BaseActiveModule
         //The default is to split the command to com, sub and args. If you want to split it some other way change the pattern for it
         //parse_com() returns an array where the pattern is the keys and the values are split out from $msg
         $com = $this->parse_com(
-            $msg, array(
-                'com',
-                'sub',
-                'args'
-            )
+          $msg, array(
+            'com',
+            'sub',
+            'args'
+          )
         );
         $command = $vars[0];
         switch ($com['com']) {
-        case 'command1':
-            return ($this->somefunction($name, $com));
-            break;
-        case 'command2':
-            return ($this->someotherfunction($name, $com));
-        default:
-            // Just a safety net to allow you to catch errors where a module has registered  a command, but fails to actually do anything about it
-            $this->error->set("Broken plugin, received unhandled command: $command");
-            return ($this->error->message());
+            case 'command1':
+                return ($this->somefunction($name, $com));
+                break;
+            case 'command2':
+                return ($this->someotherfunction($name, $com));
+            default:
+                // Just a safety net to allow you to catch errors where a module has registered  a command, but fails to actually do anything about it
+                $this->error->set("Broken plugin, received unhandled command: $command");
+                return ($this->error->message());
         }
     }
 

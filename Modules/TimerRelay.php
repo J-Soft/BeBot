@@ -32,9 +32,11 @@
 *  USA
 */
 $timerrelay = new TimerRelay($bot);
+
 /*
 The Class itself...
 */
+
 class TimerRelay extends BaseActiveModule
 {
 
@@ -56,23 +58,24 @@ class TimerRelay extends BaseActiveModule
     {
         if ($this->bot->core("settings")
             ->get('Relay', 'Status')
-            && strtolower(
-                $this->bot
-                    ->core("settings")->get('Relay', 'Relay')
-            ) == strtolower($name)
+          && strtolower(
+            $this->bot
+              ->core("settings")->get('Relay', 'Relay')
+          ) == strtolower($name)
         ) {
-            if (preg_match("/^relaytimer class:(.*) endtime:(.*) owner:(.*) repeat:(.*) channel:(.*) name:(.*)/$i", $msg, $info)) {
+            if (preg_match("/^relaytimer class:(.*) endtime:(.*) owner:(.*) repeat:(.*) channel:(.*) name:(.*)/$i",
+              $msg, $info)) {
                 $this->add_timer($info[3], $info[2], $info[6], $info[1], $info[4], $info[5]);
             }
         }
-        return FALSE;
+        return false;
     }
 
 
     function add_timer($owner, $endtime, $name, $class, $repeat, $channel)
     {
         $this->bot->core("timer")
-            ->add_timer(TRUE, $owner, $endtime - time(), $name, $channel, $repeat, $class);
+          ->add_timer(true, $owner, $endtime - time(), $name, $channel, $repeat, $class);
     }
 }
 

@@ -1,4 +1,5 @@
 <?php
+
 /*
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -29,10 +30,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
+
 class BasePassiveModule
 {
-    protected $bot; // A reference to the bot
-    public $module_name; //Name of the module extending this class.
+    public $module_name; // A reference to the bot
+    protected $bot; //Name of the module extending this class.
     protected $error; //This holds an error class.
     protected $link_name;
 
@@ -42,12 +44,34 @@ class BasePassiveModule
         //Save reference to bot
         $this->bot = &$bot;
         $this->module_name = $module_name;
-        $this->link_name = NULL;
+        $this->link_name = null;
         $this->error = new BotError($bot, $module_name);
     }
 
+    public function __call($name, $args)
+    {
+        foreach ($args as $i => $arg) {
+            if (is_object($arg)) {
+                $args[$i] = "::object::";
+            }
+        }
+        $args = implode(', ', $args);
+        $msg = "Undefined function $name($args)!";
+        $this->error->set($msg);
+        return $this->error->message();
+    }
 
-    protected function register_event($event, $target = FALSE)
+    public function debug_output($title)
+    {
+        if ($this->bot->debug) {
+            if ($title != "") {
+                echo $title . "\n";
+            }
+            $this->bot->log("DEBUG", "BasePassive", $this->bot->debug_bt());
+        }
+    }
+
+    protected function register_event($event, $target = false)
     {
         $ret = $this->bot->register_event($event, $target, $this);
         if ($ret) {
@@ -55,8 +79,7 @@ class BasePassiveModule
         }
     }
 
-
-    protected function unregister_event($event, $target = FALSE)
+    protected function unregister_event($event, $target = false)
     {
         $ret = $this->bot->unregister_event($event, $target, $this);
         if ($ret) {
@@ -64,37 +87,32 @@ class BasePassiveModule
         }
     }
 
-
     protected function register_module($name)
     {
-        if ($this->link_name == NULL) {
+        if ($this->link_name == null) {
             $this->link_name = strtolower($name);
             $this->bot->register_module($this, strtolower($name));
         }
     }
 
-
     protected function unregister_module()
     {
-        if ($this->link_name != NULL) {
+        if ($this->link_name != null) {
             $this->bot->unregister_module($this->link_name);
         }
     }
 
-
-    protected function output_destination($name, $msg, $channel = FALSE)
+    protected function output_destination($name, $msg, $channel = false)
     {
-        if ($channel !== FALSE) {
+        if ($channel !== false) {
             if ($channel & SAME) {
                 if ($channel & $this->source) {
                     $channel -= SAME;
-                }
-                else {
+                } else {
                     $channel += $this->source;
                 }
             }
-        }
-        else {
+        } else {
             $channel += $this->source;
         }
         if ($channel & TELL) {
@@ -111,31 +129,6 @@ class BasePassiveModule
         }
         if ($channel & IRC) {
             $this->bot->send_irc($this->module_name, $name, $msg);
-        }
-    }
-
-
-    public function __call($name, $args)
-    {
-        foreach ($args as $i => $arg) {
-            if (is_object($arg)) {
-                $args[$i] = "::object::";
-            }
-        }
-        $args = implode(', ', $args);
-        $msg = "Undefined function $name($args)!";
-        $this->error->set($msg);
-        return $this->error->message();
-    }
-
-
-    public function debug_output($title)
-    {
-        if ($this->bot->debug) {
-            if ($title != "") {
-                echo $title . "\n";
-            }
-            $this->bot->log("DEBUG", "BasePassive", $this->bot->debug_bt());
         }
     }
 }

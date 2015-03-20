@@ -48,8 +48,7 @@ if (!extension_loaded("sockets")) {
         if (!dl("php_sockets.dll")) {
             die("Loading php_sockets.dll failed. Sockets extention required to run this bot");
         }
-    }
-    else {
+    } else {
         die("Sockets extention required to run this bot");
     }
 }
@@ -58,8 +57,7 @@ if (!extension_loaded("mysql")) {
         if (!dl("php_mysql.dll")) {
             die("Loading php_mysql.dll failed. MySQL extention required to run this bot");
         }
-    }
-    else {
+    } else {
         die("MySQL support required to run this bot");
     }
 }
@@ -81,16 +79,13 @@ if (!extension_loaded("curl")) {
     if (OS_WINDOWS) {
         if (@!dl("php_curl.dll")) {
             echo "Curl not available\n";
-        }
-        else {
+        } else {
             echo "Curl extension loaded\n";
         }
-    }
-    else {
+    } else {
         if (function_exists('curl_init')) {
             echo "Curl extension loaded\n";
-        }
-        else {
+        } else {
             echo "Curl not available\n";
         }
     }

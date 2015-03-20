@@ -32,6 +32,7 @@
 *  USA
 */
 $conf = new Conf($argv, $confc);
+
 class Conf
 {
     private $conf;
@@ -47,29 +48,13 @@ class Conf
         $this->load();
     }
 
-
-    function load($argv = FALSE)
-    {
-        if (file_exists("./conf/" . $this->cf)) {
-            require "./conf/" . $this->cf;
-            if (empty($ao_password) || $ao_password == "") {
-                fwrite(STDOUT, "Password for $ao_username:");
-                system('stty -echo');
-                $this->pw = trim(fgets(STDIN));
-                system('stty echo');
-            }
-        }
-    }
-
-
-    function check($argv = FALSE)
+    function check($argv = false)
     {
         if (!isset($this->cf)) {
             // If an argument is given, use that to create the config file name.
             if (is_array($argv) && count($argv) > 1) {
                 $this->cf = ucfirst(strtolower($argv[1])) . ".Bot.conf";
-            }
-            else {
+            } else {
                 $this->cf = "Bot.conf";
             }
         }
@@ -78,8 +63,7 @@ class Conf
         }
     }
 
-
-    function todo($rep = FALSE)
+    function todo($rep = false)
     {
         if (!$rep) {
             echo $this->cf . " Does not Exist\n What do you want to do?\n(r=Retry, n=new, c=Change, q=quit)\n";
@@ -88,31 +72,33 @@ class Conf
         $do = strtolower($do);
         if ($do == "q") {
             Die("The bot has been shutdown\n");
-        }
-        elseif ($do == "c") {
+        } elseif ($do == "c") {
             echo "Please Enter a New Value to use:\n";
             $newarg = $this->ask("");
             if ($newarg == "") {
-                $this->argv = FALSE;
+                $this->argv = false;
                 $this->cf = "Bot.conf";
-            }
-            else {
+            } else {
                 $this->argv = $newarg;
                 $this->cf = ucfirst(strtolower($newarg)) . ".Bot.conf";
             }
             Return $this->check();
-        }
-        elseif ($do == "r") {
+        } elseif ($do == "r") {
             Return $this->check();
-        }
-        elseif ($do == "n") {
+        } elseif ($do == "n") {
             Return $this->set_conf();
-        }
-        else {
-            $this->todo(TRUE);
+        } else {
+            $this->todo(true);
         }
     }
 
+    function ask($ask)
+    {
+        // ask for input
+        fwrite(STDOUT, $ask);
+        // get input
+        Return (trim(fgets(STDIN)));
+    }
 
     function set_conf()
     {
@@ -131,35 +117,33 @@ class Conf
             $gb = strtolower($gb);
             if ($gb == "y" || $gb == "yes") {
                 $guildbot = "TRUE";
-            }
-            elseif ($gb == "n" || $gb == "no") {
+            } elseif ($gb == "n" || $gb == "no") {
                 $guildbot = "FALSE";
             }
         }
         echo "Superadmins enter nothing when done.\n";
         $sa[0]
-            = '
+          = '
 	// $super_admin["Superadmin1"] = true;';
         $sa[1]
-            = '
+          = '
 	// $super_admin["Superadmin2"] = true;';
         $san = 0;
         while (!$sac) {
             $saask = $this->ask("SuperAdmin:");
             if ($saask != "") {
                 $sa[$san]
-                    = '
+                  = '
 	$super_admin["' . $saask . '"] = true;';
                 $san++;
-            }
-            else {
-                $sac = TRUE;
+            } else {
+                $sac = true;
             }
         }
         $sa[0] .= '// Bot superadmins.';
         $sa = implode("", $sa);
         $file
-            = '<?php
+          = '<?php
 	//These are the general settings of the bot:
 
 	$ao_username = "' . $ao_username . '";				// Account username
@@ -237,22 +221,20 @@ class Conf
     function mysql_check()
     {
         //get botname
-        include ("./conf/" . $this->cf);
+        include("./conf/" . $this->cf);
         $botname = ucfirst(strtolower($bot_name));
         $botname_mysql_conf = "conf/" . $botname . ".MySQL.conf";
         if (file_exists($botname_mysql_conf)) {
             Return;
-        }
-        elseif (file_exists("conf/MySQL.conf")) {
+        } elseif (file_exists("conf/MySQL.conf")) {
             Return;
-        }
-        else {
+        } else {
             $this->mysql_todo($botname);
         }
     }
 
 
-    function mysql_todo($botname, $rep = FALSE)
+    function mysql_todo($botname, $rep = false)
     {
         if (!$rep) {
             echo $botname . ".MySQL.conf and MySQL.conf Does not Exist\n What do you want to do?\n(r=Retry, n=new, q=quit)\n";
@@ -261,15 +243,12 @@ class Conf
         $do = strtolower($do);
         if ($do == "q") {
             Die("The bot has been shutdown\n");
-        }
-        elseif ($do == "r") {
+        } elseif ($do == "r") {
             Return $this->mysql_check();
-        }
-        elseif ($do == "n") {
+        } elseif ($do == "n") {
             Return $this->mysql_set_conf($botname);
-        }
-        else {
-            $this->mysql_todo(TRUE);
+        } else {
+            $this->mysql_todo(true);
         }
     }
 
@@ -283,8 +262,7 @@ class Conf
             $ubn = strtolower($ubn);
             if ($ubn == "y" || $ubn == "yes") {
                 $filename = $botname . ".MySQL.conf";
-            }
-            elseif ($ubn == "n" || $ubn == "no") {
+            } elseif ($ubn == "n" || $ubn == "no") {
                 $filename = "MySQL.conf";
             }
         }
@@ -303,8 +281,7 @@ class Conf
             $ubn = strtolower($ubn);
             if ($ubn == "y" || $ubn == "yes") {
                 $prefix = '//$table_prefix = "";';
-            }
-            elseif ($ubn == "n" || $ubn == "no") {
+            } elseif ($ubn == "n" || $ubn == "no") {
                 $prefix = "ask";
             }
         }
@@ -318,8 +295,7 @@ class Conf
             $mtq = strtolower($mtq);
             if ($mtq == "y" || $mtq == "yes") {
                 $mt = '//$master_tablename = "botname_tablenames";';
-            }
-            elseif ($mtq == "n" || $mtq == "no") {
+            } elseif ($mtq == "n" || $mtq == "no") {
                 $mt = "ask";
             }
         }
@@ -328,7 +304,7 @@ class Conf
             $mt = '$master_tablename = "' . $mt . '";';
         }
         $file
-            = '<?php
+          = '<?php
 	/*
 	Database name
 	*/
@@ -373,13 +349,17 @@ class Conf
         echo $filename . " Created\n";
     }
 
-
-    function ask($ask)
+    function load($argv = false)
     {
-        // ask for input
-        fwrite(STDOUT, $ask);
-        // get input
-        Return (trim(fgets(STDIN)));
+        if (file_exists("./conf/" . $this->cf)) {
+            require "./conf/" . $this->cf;
+            if (empty($ao_password) || $ao_password == "") {
+                fwrite(STDOUT, "Password for $ao_username:");
+                system('stty -echo');
+                $this->pw = trim(fgets(STDIN));
+                system('stty echo');
+            }
+        }
     }
 }
 

@@ -33,6 +33,7 @@
 *  USA
 */
 $shortcuts_core = new ShortCuts_Core($bot);
+
 class ShortCuts_Core extends BasePassiveModule
 {
     var $short; // cache of shortcuts indexed by long descriptions
@@ -42,15 +43,16 @@ class ShortCuts_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("shortcuts", "false") . " (id INT NOT NULL AUTO_INCREMENT UNIQUE, "
-                . " shortcut VARCHAR(20) NOT NULL PRIMARY KEY, " . " long_desc VARCHAR(255) NOT NULL UNIQUE)"
+          "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("shortcuts",
+            "false") . " (id INT NOT NULL AUTO_INCREMENT UNIQUE, "
+          . " shortcut VARCHAR(20) NOT NULL PRIMARY KEY, " . " long_desc VARCHAR(255) NOT NULL UNIQUE)"
         );
         $this->bot->db->query(
-            "INSERT IGNORE INTO #___shortcuts (`shortcut`, `long_desc`) VALUES "
-                . "('Pres', 'President'), ('Gen', 'General'), ('SC', 'Squad Commander'), ('UC', 'Unit Commander'), "
-                . "('UL', 'Unit Leader'), ('UM', 'Unit Member'), ('App', 'Applicant'), ('Dir', 'Director'), ('BM', 'Board Member'), "
-                . "('Exec', 'Executive'), ('Mem', 'Member'), ('Adv', 'Advisor'), ('Vet', 'Veteran'), ('Mon', 'Monarch'), "
-                . "('Coun', 'Counsel'), ('Fol', 'Follower'), ('Anar', 'Anarchist'), ('Lord', 'Lord'), ('Knght', 'Knight'), " . "('Vas', 'Vassal '), ('Peas', 'Peasant')"
+          "INSERT IGNORE INTO #___shortcuts (`shortcut`, `long_desc`) VALUES "
+          . "('Pres', 'President'), ('Gen', 'General'), ('SC', 'Squad Commander'), ('UC', 'Unit Commander'), "
+          . "('UL', 'Unit Leader'), ('UM', 'Unit Member'), ('App', 'Applicant'), ('Dir', 'Director'), ('BM', 'Board Member'), "
+          . "('Exec', 'Executive'), ('Mem', 'Member'), ('Adv', 'Advisor'), ('Vet', 'Veteran'), ('Mon', 'Monarch'), "
+          . "('Coun', 'Counsel'), ('Fol', 'Follower'), ('Anar', 'Anarchist'), ('Lord', 'Lord'), ('Knght', 'Knight'), " . "('Vas', 'Vassal '), ('Peas', 'Peasant')"
         );
         $this->register_module("shortcuts");
         $this->register_event("cron", "1hour");

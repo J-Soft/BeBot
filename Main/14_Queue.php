@@ -39,6 +39,7 @@ $queue_core = new Queue_Core($bot);
 /*
 The Class itself...
 */
+
 class Queue_Core extends BasePassiveModule
 {
     private $que;
@@ -68,7 +69,7 @@ class Queue_Core extends BasePassiveModule
     $delay = min time between each in seconds
     $max = max count on items before que
     */
-    function register(&$module, $name, $delay, $max = 0, $filter = TRUE)
+    function register(&$module, $name, $delay, $max = 0, $filter = true)
     {
         $name = strtolower($name);
         $this->link[$name] = $module;
@@ -120,8 +121,7 @@ class Queue_Core extends BasePassiveModule
         if ($add > 0) {
             if (!isset($this->queue_left[$name])) {
                 $this->queue_left[$name] = $add;
-            }
-            else {
+            } else {
                 $this->queue_left[$name] += $add;
             }
             $this->last_call[$name] = $time;
@@ -141,9 +141,9 @@ class Queue_Core extends BasePassiveModule
         $this->set_queue($name);
         if (($this->queue_left[$name] >= 1) && empty($this->queue[$name]) && empty($this->queue_low[$name])) {
             $this->queue_left[$name] -= 1;
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
 
 
@@ -166,8 +166,7 @@ class Queue_Core extends BasePassiveModule
                 }
             }
             $this->queue[$name][] = $info;
-        }
-        else {
+        } else {
             // Filter duplicate messages.
             if ($this->filter[$name]) {
                 foreach ($this->queue_low[$name] as $item) {

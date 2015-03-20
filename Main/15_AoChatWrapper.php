@@ -32,9 +32,11 @@
 *  USA
 */
 $aochat_wrapper_core = new AOChatWrapper_Core($bot);
+
 /*
 The Class itself...
 */
+
 class AOChatWrapper_Core extends BasePassiveModule
 {
 
@@ -65,6 +67,90 @@ class AOChatWrapper_Core extends BasePassiveModule
     /*
     This is a wrapper function for aoc->get_uname() that checks the whois cache if aoc->get_uname() failes
     */
+
+    function buddy_add($user, $que = true)
+    {
+        $add = true;
+        if (is_numeric($user)) {
+            $uid = $user;
+        } else {
+            $uid = $this->bot->core('player')->id($user);
+        }
+
+        if ($uid instanceof BotError) {
+            return $uid;
+        } else {
+            // FIXME
+            // Currently checking specifically for 4294967295 as userid to ensure we never ever send an add buddy
+            // packet to AoC as it will disconnect the player.
+            if ($uid > 4294967294 && $uid < 4294967296) {
+                $this->bot->log(
+                  "BUDDY", "BUDDY-ADD",
+                  "Received add request for " . $user . "(" . $uid . ") This user is likely in the userlist and might need to be manually removed if this error persists."
+                );
+                return false;
+            }
+
+            if ($uid < 1) {
+                $this->bot->log("BUDDY", "BUDDY-ADD",
+                  "Received add request for " . $user . " but user appears to not exist!!");
+                return false;
+            }
+
+
+            if (!($this->bot->aoc->buddy_exists($uid))
+              && $uid != $this->bot
+                ->core('player')->id($this->bot->botname)
+              && !($this->bot
+                  ->core('player')
+                  ->name($uid) instanceof BotError)
+            ) {
+                if (!$que || $this->bot->core("buddy_queue")->check_queue()) {
+                    $this->bot->aoc->buddy_add($uid);
+                    $this->bot->log(
+                      "BUDDY", "BUDDY-ADD", $this->bot
+                      ->core('player')->name($uid)
+                    );
+                    return true;
+                } else {
+                    $return = $this->bot->core("buddy_queue")
+                      ->into_queue($uid, $add);
+                    return $return;
+                }
+            } else {
+                return false;
+            }
+        }
+    }
+
+
+    /* Buddies */
+
+    function buddy_remove($user)
+    {
+        $add = false;
+        if (empty($user)
+          || ($uid = $this->bot->core('player')
+            ->id($user)) === false
+        ) {
+            return false;
+        } else {
+            if (($this->bot->aoc->buddy_exists($uid))) {
+                if ($this->bot->core("buddy_queue")->check_queue()) {
+                    $this->bot->aoc->buddy_remove($uid);
+                    $this->bot->log("BUDDY", "BUDDY-DEL", $this->get_uname($uid));
+                    return true;
+                } else {
+                    $return = $this->bot->core("buddy_queue")
+                      ->into_queue($uid, $add);
+                    return $return;
+                }
+            } else {
+                return false;
+            }
+        }
+    }
+
     function get_uname($user)
     {
         $user = ucfirst(strtolower($user));
@@ -73,96 +159,6 @@ class AOChatWrapper_Core extends BasePassiveModule
         $this->bot->log("DEBUG", "BACKTRACE", $this->bot->debug_bt());
         return $this->bot->core('player')->name($user);
     }
-
-
-    /* Buddies */
-    function buddy_add($user, $que = TRUE)
-    {
-        $add = TRUE;
-        if (is_numeric($user)) {
-            $uid = $user;
-        }
-        else {
-            $uid = $this->bot->core('player')->id($user);
-        }
-
-        if ($uid instanceof BotError) {
-            return $uid;
-        }
-        else {
-            // FIXME
-            // Currently checking specifically for 4294967295 as userid to ensure we never ever send an add buddy
-            // packet to AoC as it will disconnect the player.
-            if ($uid > 4294967294 && $uid < 4294967296) {
-                $this->bot->log(
-                    "BUDDY", "BUDDY-ADD",
-                    "Received add request for " . $user . "(" . $uid . ") This user is likely in the userlist and might need to be manually removed if this error persists."
-                );
-                return FALSE;
-            }
-
-            if ($uid < 1) {
-                $this->bot->log("BUDDY", "BUDDY-ADD", "Received add request for " . $user . " but user appears to not exist!!");
-                return FALSE;
-            }
-
-
-            if (!($this->bot->aoc->buddy_exists($uid))
-                && $uid != $this->bot
-                    ->core('player')->id($this->bot->botname)
-                && !($this->bot
-                    ->core('player')
-                    ->name($uid) instanceof BotError)
-            ) {
-                if (!$que || $this->bot->core("buddy_queue")->check_queue()) {
-                    $this->bot->aoc->buddy_add($uid);
-                    $this->bot->log(
-                        "BUDDY", "BUDDY-ADD", $this->bot
-                            ->core('player')->name($uid)
-                    );
-                    return TRUE;
-                }
-                else {
-                    $return = $this->bot->core("buddy_queue")
-                        ->into_queue($uid, $add);
-                    return $return;
-                }
-            }
-            else {
-                return FALSE;
-            }
-        }
-    }
-
-
-    function buddy_remove($user)
-    {
-        $add = FALSE;
-        if (empty($user)
-            || ($uid = $this->bot->core('player')
-                ->id($user)) === FALSE
-        ) {
-            return FALSE;
-        }
-        else {
-            if (($this->bot->aoc->buddy_exists($uid))) {
-                if ($this->bot->core("buddy_queue")->check_queue()) {
-                    $this->bot->aoc->buddy_remove($uid);
-                    $this->bot->log("BUDDY", "BUDDY-DEL", $this->get_uname($uid));
-                    return TRUE;
-                }
-                else {
-                    $return = $this->bot->core("buddy_queue")
-                        ->into_queue($uid, $add);
-                    return $return;
-                }
-            }
-            else {
-                return FALSE;
-            }
-        }
-    }
-
 
     function buddy_exists($who)
     {
@@ -181,8 +177,8 @@ class AOChatWrapper_Core extends BasePassiveModule
     */
     function pgroup_join($group)
     {
-        if ($group == NULL) {
-            return FALSE;
+        if ($group == null) {
+            return false;
         }
         $this->bot->log("PGRP", "ACCEPT", "Accepting Invite for Private Group [" . $group . "]");
         return $this->bot->aoc->privategroup_join($group);
@@ -194,8 +190,8 @@ class AOChatWrapper_Core extends BasePassiveModule
     */
     function pgroup_leave($group)
     {
-        if ($group == NULL) {
-            return FALSE;
+        if ($group == null) {
+            return false;
         }
         $this->bot->log("PGRP", "LEAVE", "Leaving Private Group [" . $group . "]");
         return $this->bot->aoc->privategroup_leave($group);
@@ -217,7 +213,7 @@ class AOChatWrapper_Core extends BasePassiveModule
     */
     function pgroup_status($group)
     {
-        if ($group == NULL) {
+        if ($group == null) {
             $group = $this->bot->botname;
         }
         return $this->bot->aoc->group_status($group);

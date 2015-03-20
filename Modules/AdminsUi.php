@@ -57,7 +57,7 @@ class admins extends BaseActiveModule
     function admins_blob($msg)
     {
         if (preg_match("/^admins all$/i", $msg, $info)) {
-            $all = TRUE;
+            $all = true;
         }
         $sql = "SELECT gid, name, description, access_level FROM #___security_groups ";
         $sql .= "ORDER BY access_level DESC, gid ASC, name";
@@ -70,13 +70,13 @@ class admins extends BaseActiveModule
         //$guests = "GUEST:\n";
         //$anon = "ANONYMOUS:\n";
         $temp = "";
-        $online2 = FALSE;
+        $online2 = false;
         $ow = $this->bot->core("security")->owner;
         $main = $this->bot->core("alts")->main($ow);
         $online = $this->bot->core("online")->get_online_state($main);
         $temp .= "\n- ##highlight##$main##end## is " . $online["content"];
         if ($online['status'] == 1) {
-            $online2 = TRUE;
+            $online2 = true;
         }
         $alts = $this->bot->core("alts")->get_alts($main);
         if (!empty($alts)) {
@@ -86,7 +86,7 @@ class admins extends BaseActiveModule
                     $temp .= "\n   - $alt is " . $online["content"];
                 }
                 if ($online['status'] == 1) {
-                    $online2 = TRUE;
+                    $online2 = true;
                 }
             }
         }
@@ -100,30 +100,30 @@ class admins extends BaseActiveModule
                 if (!empty($users)) {
                     foreach ($users as $user) {
                         $main = $this->bot->core("alts")
-                            ->main($user);
-                        $mains['SA'][$main] = TRUE;
+                          ->main($user);
+                        $mains['SA'][$main] = true;
                     }
                     ksort($mains['SA']);
                     foreach ($mains['SA'] as $main => $v) {
                         $temp = "";
-                        $online2 = FALSE;
+                        $online2 = false;
                         //$admins .= " + ".$group['name']." (".stripslashes($group['description']).") ";
                         $online = $this->bot->core("online")
-                            ->get_online_state($main);
+                          ->get_online_state($main);
                         $temp .= "\n- ##highlight##$main##end## is " . $online["content"];
                         if ($online['status'] == 1) {
-                            $online2 = TRUE;
+                            $online2 = true;
                         }
                         $alts = $this->bot->core("alts")->get_alts($main);
                         if (!empty($alts)) {
                             foreach ($alts as $alt) {
                                 $online = $this->bot->core("online")
-                                    ->get_online_state($alt);
+                                  ->get_online_state($alt);
                                 if ($online['status'] == 1 || $all) {
                                     $temp .= "\n   - $alt is " . $online["content"];
                                 }
                                 if ($online['status'] == 1) {
-                                    $online2 = TRUE;
+                                    $online2 = true;
                                 }
                             }
                         }
@@ -133,35 +133,34 @@ class admins extends BaseActiveModule
                         }
                     }
                 }
-            }
-            elseif ($group['access_level'] == ADMIN) {
+            } elseif ($group['access_level'] == ADMIN) {
                 $users = $this->bot->core("security")->cache['groups'][$group['gid']]['members'];
                 if (!empty($users)) {
                     foreach ($users as $user) {
                         $main = $this->bot->core("alts")
-                            ->main($user);
-                        $mains['A'][$main] = TRUE;
+                          ->main($user);
+                        $mains['A'][$main] = true;
                     }
                     ksort($mains['A']);
                     foreach ($mains['A'] as $main => $v) {
                         $temp = "";
-                        $online2 = FALSE;
+                        $online2 = false;
                         $online = $this->bot->core("online")
-                            ->get_online_state($main);
+                          ->get_online_state($main);
                         if ($online['status'] == 1) {
-                            $online2 = TRUE;
+                            $online2 = true;
                         }
                         $temp .= "\n- ##highlight##$main##end## is " . $online["content"];
                         $alts = $this->bot->core("alts")->get_alts($main);
                         if (!empty($alts)) {
                             foreach ($alts as $alt) {
                                 $online = $this->bot->core("online")
-                                    ->get_online_state($alt);
+                                  ->get_online_state($alt);
                                 if ($online['status'] == 1 || $all) {
                                     $temp .= "\n   - $alt is " . $online["content"];
                                 }
                                 if ($online['status'] == 1) {
-                                    $online2 = TRUE;
+                                    $online2 = true;
                                 }
                             }
                         }
@@ -171,35 +170,34 @@ class admins extends BaseActiveModule
                         }
                     }
                 }
-            }
-            elseif ($group['access_level'] == LEADER) {
+            } elseif ($group['access_level'] == LEADER) {
                 $users = $this->bot->core("security")->cache['groups'][$group['gid']]['members'];
                 if (!empty($users)) {
                     foreach ($users as $user) {
                         $main = $this->bot->core("alts")
-                            ->main($user);
-                        $mains['L'][$main] = TRUE;
+                          ->main($user);
+                        $mains['L'][$main] = true;
                     }
                     ksort($mains['L']);
                     foreach ($mains['L'] as $main => $v) {
                         $temp = "";
-                        $online2 = FALSE;
+                        $online2 = false;
                         $online = $this->bot->core("online")
-                            ->get_online_state($main);
+                          ->get_online_state($main);
                         if ($online['status'] == 1) {
-                            $online2 = TRUE;
+                            $online2 = true;
                         }
                         $temp .= "\n- ##highlight##$main##end## is " . $online["content"];
                         $alts = $this->bot->core("alts")->get_alts($main);
                         if (!empty($alts)) {
                             foreach ($alts as $alt) {
                                 $online = $this->bot->core("online")
-                                    ->get_online_state($alt);
+                                  ->get_online_state($alt);
                                 if ($online['status'] == 1 || $all) {
                                     $temp .= "\n   - $alt is " . $online["content"];
                                 }
                                 if ($online['status'] == 1) {
-                                    $online2 = TRUE;
+                                    $online2 = true;
                                 }
                             }
                         }
@@ -246,7 +244,7 @@ class admins extends BaseActiveModule
         }
         $inside .= "##end##";
         return "Admins list " . $this->bot->core("tools")
-            ->make_blob("click to view", $inside);
+          ->make_blob("click to view", $inside);
         //else
         //{
         //	$blob .= "<font color=CCWhite>Online Admins:##end##\n\n";
