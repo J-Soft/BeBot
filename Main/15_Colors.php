@@ -533,6 +533,10 @@ class Colors_Core extends BasePassiveModule
             }
         }
         $text = str_ireplace("##end##", "</font>", $text);
+	foreach ($this -> color_tags as $tag => $font)
+	{
+		$text = str_ireplace($tag, $font, $text);
+	}	    
         return $text;
     }
 
