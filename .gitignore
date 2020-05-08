@@ -1,3 +1,5 @@
+.gitignore
+
 *.org
 Conf/*.conf
 Conf/*.ini
