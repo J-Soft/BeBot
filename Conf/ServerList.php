@@ -1,29 +1,11 @@
 <?php
 // AO
-$server_list['Ao']['Testlive'] = array(
-    'server' => 'chat.dt.funcom.com',
-    'port' => 7109
-);
-$server_list['Ao']['Atlantean'] = array(
-    'server' => 'chat.d1.funcom.com',
-    'port' => 7101
-);
-$server_list['Ao']['Rimor'] = array(
-    'server' => 'chat.d2.funcom.com',
-    'port' => 7102
-);
-$server_list['Ao']['Die neue welt'] = array(
-    'server' => 'chat.d3.funcom.com',
-    'port' => 7103
-);
-
-
+$server_list['Ao']['Testlive'] = array('server' => 'chat.dt.funcom.com', 'port' => 7109);
 $server_list['Ao']['Rubi-Ka'] = array('server' => 'chat.d1.funcom.com', 'port' => 7105);
-
+$server_list['Ao']['Rubi-Ka-2019'] = array('server' => 'chat.d1.funcom.com', 'port' => 7106);
+$server_list['Ao']['0'] = $server_list['Ao']['Testlive'];
 $server_list['Ao']['5'] = $server_list['Ao']['Rubi-Ka'];
-$server_list['Ao']['5'] = $server_list['Ao']['Rubi-Ka'];
-$server_list['Ao']['5'] = $server_list['Ao']['Rubi-Ka'];
-$server_list['Ao']['5'] = $server_list['Ao']['Rubi-Ka'];
+$server_list['Ao']['6'] = $server_list['Ao']['Rubi-Ka-2019'];
 
 // AOC
 $server_list['Aoc']['EU'] = array(
