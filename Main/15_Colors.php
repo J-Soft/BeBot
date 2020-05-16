@@ -526,17 +526,26 @@ class Colors_Core extends BasePassiveModule
             return $text;
         }
         // Go ahead and replace all tags
-        foreach ($this -> color_tags as $tag => $font)
-        {
-            if (preg_match("/".$tag."[^#]+##end##/i", $text)) {
-                $text = str_ireplace($tag, $font, $text);
-            }
-        }
-        $text = str_ireplace("##end##", "</font>", $text);
-	foreach ($this -> color_tags as $tag => $font)
-	{
-		$text = str_ireplace($tag, $font, $text);
-	}	    
+		$maxpass = 3;
+		$stop = "##end##";
+		$trig = "[^#]+";
+		for($i=1;$i<$maxpass+1;$i++) {
+			foreach ($this -> color_tags as $tag => $font)
+			{
+				if ($tag != $stop) {
+					if (preg_match("/(".$tag.$trig.$stop.")/i", $text, $matches, PREG_OFFSET_CAPTURE))
+					{
+						$prev = substr($text, 0, $matches[1][1]);
+						$repl = str_ireplace($tag, $font, $matches[1][0]);
+						$repl = preg_replace("/".$stop."/", "</font>", $repl, 1);
+						$post = substr($text, $matches[1][1] + strlen($matches[1][0]));
+						$text = $prev.$repl.$post;
+					}			
+				}
+			}
+			$trig = "(?:.*)";
+		}
+	$text = str_ireplace("##end##", "</font>", $text);
         return $text;
     }
 
