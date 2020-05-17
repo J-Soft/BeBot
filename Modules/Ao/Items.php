@@ -42,7 +42,7 @@ class VhItems extends BaseActiveModule
     var $color_header = 'DFDF00';
     var $color_highlight = '97BE37';
     var $color_normal = 'CCF0AD';
-    var $server = 'http://cidb.xyphos.com/';
+    var $server = 'http://cidb.botsharp.net/';
     var $max = 50;
 
 
