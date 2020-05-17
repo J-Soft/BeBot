@@ -525,28 +525,25 @@ class Colors_Core extends BasePassiveModule
         if (strpos($text, "##") === false) {
             return $text;
         }
-        // Go ahead and replace all tags
-		$maxpass = 3;
-		$stop = "##end##";
-		$trig = "[^#]+";
-		for($i=1;$i<$maxpass+1;$i++) {
-			foreach ($this -> color_tags as $tag => $font)
-			{
-				if ($tag != $stop) {
-					if (preg_match("/(".$tag.$trig.$stop.")/i", $text, $matches, PREG_OFFSET_CAPTURE))
-					{
-						$prev = substr($text, 0, $matches[1][1]);
-						$repl = str_ireplace($tag, $font, $matches[1][0]);
-						$repl = preg_replace("/".$stop."/", "</font>", $repl, 1);
-						$post = substr($text, $matches[1][1] + strlen($matches[1][0]));
-						$text = $prev.$repl.$post;
-					}			
+	// Go ahead and replace all tags
+	$maxpass = 3; // Increase for more sublevels only if needed
+	$stop = "##end##";
+	$trig = "(?:(?!#{2}).)+";
+	for($i=1;$i<$maxpass+1;$i++) {
+		foreach ($this -> color_tags as $tag => $font) {
+			if ($tag != $stop) {
+				while (preg_match("/(".$tag.$trig.$stop.")/i", $text, $match, PREG_OFFSET_CAPTURE)) {
+					  $prev = substr($text, 0, $match[1][1]);
+					  $repl = preg_replace("/".$tag."/i", $font, $match[1][0], 1);
+					  $repl = preg_replace("/".$stop."/i", "</font>", $repl, 1);
+					  $post = substr($text, $match[1][1] + strlen($match[1][0]));
+					  $text = $prev.$repl.$post;
 				}
 			}
-			$trig = "(?:.*)";
 		}
-	$text = str_ireplace("##end##", "</font>", $text);
-        return $text;
+	}
+	$text = preg_replace("/##[^#]+##/i", "", $text);
+	return $text;
     }
 
 
