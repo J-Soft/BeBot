@@ -317,20 +317,15 @@ class Bot
         $this->cron_activated = false;
         // Get dimension server
         switch ($this->dimension) {
-            case "4":
-                $dimension = "Testlive";
-                break;
-            case "1":
-                $dimension = "Rubi-Ka";
-                break;
-            case "2":
-                $dimension = "Rubi-Ka";
-                break;
-            case "3":
-                $dimension = "Rubi-Ka";
-                break;
-            case "5":
-                $dimension = "Rubi-Ka";
+			case "0":
+				$dimension = "Testlive";
+				break;
+			case "5";
+				$dimension = "Rubi-Ka";
+				break;
+			case "6";
+				$dimension = "Rubi-Ka-2019";
+				break;				
             Default:
                 $dimension = ucfirst(strtolower($this->dimension));
         }
