@@ -209,7 +209,7 @@ class tools extends BasePassiveModule
             $this->error->set("Failed to write to server: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
-        $return["content"] = "";
+        $return = "";
         $read_result = @socket_read($socket, 2048);
         while ($read_result != "" && $read_result !== false && is_string($read_result)) {
             $return .= $read_result;
