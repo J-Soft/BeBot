@@ -192,7 +192,7 @@ class MySQL
     function select($sql, $result_form = MYSQLI_NUM)
     {
         $this->connect();
-        $data = "";
+        $data = array();
         $sql = $this->add_prefix($sql);
         $result = mysqli_query($this->CONN, $sql);
         if (!$result) {

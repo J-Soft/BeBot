@@ -209,9 +209,9 @@ class tools extends BasePassiveModule
             $this->error->set("Failed to write to server: " . socket_strerror(socket_last_error()));
             return $this->error;
         }
-        $return["content"] = "";
+        $return = "";
         $read_result = @socket_read($socket, 2048);
-        while ($read_result != "" && $read_result !== false) {
+        while ($read_result != "" && $read_result !== false && is_string($read_result)) {
             $return .= $read_result;
             $read_result = @socket_read($socket, 2048);
         }
@@ -311,23 +311,23 @@ class tools extends BasePassiveModule
             $inside .= "##blob_title##:::::::::::##end## ##blob_text##BeBot Client Terminal##end## ##blob_title##::::::::::::##end##\n";
             $inside .= $this->chatcmd(
                     'about',
-                    '##blob_title##«##end## ##blob_text##About##end## ##blob_title##»##end##',
+                    ' ##blob_text##About##end## ',
                     false,
                     true
                 ) . "     ";
             $inside .= $this->chatcmd(
                     'help',
-                    '##blob_title##«##end## ##blob_text##Help##end## ##blob_title##»##end##',
+                    ' ##blob_text##Help##end## ',
                     false,
                     true
                 ) . "     ";
             $inside .= $this->chatcmd(
                 'close InfoView',
-                '##blob_title##«##end## ##blob_text##Close Terminal##end## ##blob_title##»##end##',
+                ' ##blob_text##Close Terminal##end## ',
                 '/',
                 true
             );
-            $inside .= "\n##blob_title##¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯##end##\n";
+			$inside .= "\n____________________________________\n";
         }
         // Using " inside a blob will end the blob.
         // Convert opening and closing tags with " to '

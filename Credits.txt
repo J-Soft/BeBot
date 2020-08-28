@@ -55,5 +55,5 @@ The following people have written code that have made it into BeBot in one form 
 	- Xenixa (RK1)
 	- Zacix (RK2)
 	- Zarkingu (RK2)
-	
+	- Bitnykk (RK5)
 Special thanks go out to the best MMORPG community in existence and Auno for writing and maintaining the PHP AOChat library.

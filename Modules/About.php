@@ -102,6 +102,7 @@ class About extends BaseActiveModule
         $inside .= "Xenixa (RK1)\n";
         $inside .= "Zacix (RK2)\n";
         $inside .= "Zarkingu (RK2)\n";
+        $inside .= "Bitnykk (RK5)\n";		
         $inside .= "Auno for writing and maintaining the PHP AOChat library\n";
         $inside .= "And last but not least, the greatest MMORPG community in existence.\n\n";
         $inside .= "##blob_text##Links:##end##\n";
