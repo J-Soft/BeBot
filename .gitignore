@@ -3,8 +3,13 @@
 *.org
 Conf/*.conf
 Conf/*.ini
-php.ini
+*.dll
+php.*
 
 .idea/workspace.xml
 .idea/tasks.xml
 *.iws
+
+log/*
+Logs/*
+Themes/Default.colors.xml
