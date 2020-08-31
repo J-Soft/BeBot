@@ -114,7 +114,6 @@ class Bot
     var $dimension;
     var $botversion;
     var $botversionname;
-    var $other_bots;
     var $aoc;
     var $irc;
     var $db;
@@ -211,7 +210,7 @@ class Bot
         self::$instance[$bothandle]->dimension = ucfirst(strtolower($dimension));
         self::$instance[$bothandle]->botversion = 'BOT_VERSION';
         self::$instance[$bothandle]->botversionname = 'BOT_VERSION_NAME';
-        self::$instance[$bothandle]->other_bots = $other_bots;
+        self::$instance[$bothandle]->other_bots = array();
         self::$instance[$bothandle]->commands = array();
         self::$instance[$bothandle]->commpre = $command_prefix;
         self::$instance[$bothandle]->crondelay = $cron_delay;

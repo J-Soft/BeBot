@@ -477,12 +477,12 @@ class Whois_Core extends BasePassiveModule
                 ->get("Whois", "LookupOrder") == "auno_only"
         ) {
             $site1NAME = "Auno";
-            $site2URL = $aunourl;
+            $site1URL = $aunourl;
             $site2NAME = false;
         } else {
             $site1NAME = "Auno";
-            $site2URL = $aunourl;
-            $site2NAME = "Anarchy-Online";
+            $site1URL = $aunourl;
+            $site1NAME = "Anarchy-Online";
             $site1URL = $fcurl;
         }
         $xml = $this->bot->core("tools")->get_site($site1URL);
@@ -556,7 +556,7 @@ class Whois_Core extends BasePassiveModule
         if ($who["id"] instanceof BotError) {
             $this->bot->log("DEBUG", "WHOIS", "update() encountered instanceof BotError for " . $who["nickname"]);
             return false;
-        } else if ($who[""]) {
+        } else if ($who["id"]) {
 
         } else {
             if ($who["id"] < 1) {
@@ -764,17 +764,12 @@ class Whois_Core extends BasePassiveModule
             $funcomURL = "http://people.anarchy-online.com/character/bio/d/" . $this->bot->dimension . "/name/" . strtolower(
                     $whois['nickname']
                 );
-            $vhabotURL = "http://characters.vhabot.net/character.php?character=" . strtolower(
-                    $whois['nickname']
-                ) . "&dimension=" . $this->bot->dimension;
             $aunoURL = "http://auno.org/ao/char.php?dimension=" . $this->bot->dimension . "&name=" . strtolower(
                     $whois['nickname']
                 );
             $window .= "\n##normal##::: Links :::##end##\n";
             $window .= $this->bot->core("tools")
                     ->chatcmd($funcomURL, 'Official character bio', 'start') . "\n";
-            $window .= $this->bot->core("tools")
-                    ->chatcmd($vhabotURL, 'Vhab\'s character info (beta)', 'start') . "\n";
             $window .= $this->bot->core("tools")
                     ->chatcmd($aunoURL, 'Auno\'s character info', 'start') . "\n";
         }

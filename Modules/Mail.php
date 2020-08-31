@@ -53,7 +53,7 @@ class Mail extends BaseActiveModule
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("mail_message", "true") . "
 						(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 						received TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-						expires TIMESTAMP,
+						expires TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 						is_read BOOL DEFAULT false,
 						mailbox VARCHAR(13),
 						recipient VARCHAR(13),

@@ -81,7 +81,7 @@ if ($argc > 1) {
     $systemcommand .= " " . $argv[1];
 }
 while (true) {
-    if ($pw) {
+    if (isset($pw)) {
         $fp = fopen('./Conf/pw', 'w');
         fwrite($fp, $pw);
         fclose($fp);
