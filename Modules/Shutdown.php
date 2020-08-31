@@ -67,12 +67,13 @@ class Shutdown extends BaseActiveModule
             Return;
         }
         $msg = explode(" ", $msg, 2);
+		if (isset($msg[1])) { $why = $msg[1]; } else { $why = "no reason"; }
         Switch ($msg[0]) {
             case 'shutdown':
-                $this->stop($name, "has been shutdown.", $msg[1]);
+                $this->stop($name, "has been shutdown.", $why);
                 Break;
             case 'restart':
-                $this->stop($name, "is restarting.", $msg[1]);
+                $this->stop($name, "is restarting.", $why);
                 Break;
             Default:
                 return "##error##Error: Shutdown Module received Unknown Command ##highlight##$msg[0]##end####end##";
@@ -84,7 +85,7 @@ class Shutdown extends BaseActiveModule
     function stop($name, $text, $why)
     {
         if (!empty($why)) {
-            $why = " (" . $why . ")";
+            $why = " (for " . $why . ")";
         }
         if (!$this->bot->core("settings")->get("Shutdown", "QuietShutdown")) {
             $this->bot->send_irc("", "", "The bot " . $text . $why);

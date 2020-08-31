@@ -171,4 +171,4 @@ INSERT INTO `pocketbosses` (`ID`, `is_pocket`, `name`, `level`, `playfield`, `pl
   (155, 1, 'Anansi', 255, 'Inferno', 'Sorrow', 'Anansi''s Lhand,Anansi''s Rhand,Nyame''s Drudge'),
   (156, 1, 'Bia', 255, 'Inferno', 'WSW from QL 255 Incarnator', 'Bia''s Favorite, Anansi''s Favorite');
 UNLOCK TABLES;
-/*!40000 ALTER TABLE `#___pocketbosses` ENABLE KEYS */;
+/*!40000 ALTER TABLE `pocketbosses` ENABLE KEYS */;

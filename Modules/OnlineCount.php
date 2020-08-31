@@ -131,7 +131,7 @@ class OnlineCounting extends BaseActiveModule
                 ->core("online")->otherbots("t3.") . " AND " . $this->bot
                 ->core("online")
                 ->channels("t3.") . " GROUP BY org ORDER BY t1.count DESC, t1.org ASC";
-        return $this->bot->db->select($sql, MYSQL_ASSOC);
+        return $this->bot->db->select($sql, MYSQLI_ASSOC);
     }
 
 
@@ -166,7 +166,7 @@ class OnlineCounting extends BaseActiveModule
                 ->core("online")
                 ->full_tablename(
                 ) . " WHERE t2." . $this->cp . " IN (" . $profession_list . ") GROUP BY " . $this->cp . "";
-        $online_count = $this->bot->db->select($query, MYSQL_ASSOC);
+        $online_count = $this->bot->db->select($query, MYSQLI_ASSOC);
         $total_online = 0;
         if (!empty($online_count)) {
             foreach ($online_count as $profession) {
@@ -227,7 +227,7 @@ class OnlineCounting extends BaseActiveModule
             "SELECT count(DISTINCT nickname) as count FROM #___online WHERE " . $this->bot
                 ->core("online")->otherbots("") . " AND " . $this->bot
                 ->core("online")->channels(""),
-            MYSQL_ASSOC
+            MYSQLI_ASSOC
         );
         $totalcount = $tcount[0]['count'];
         $orgs = array();

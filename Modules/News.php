@@ -288,7 +288,7 @@ class News extends BaseActiveModule
     function get_last_headline()
     {
         $query = "SELECT name, news from #___news WHERE type = '2' ORDER BY time DESC LIMIT 1";
-        $news = $this->bot->db->select($query, MYSQL_ASSOC);
+        $news = $this->bot->db->select($query, MYSQLI_ASSOC);
         if (empty($news)) {
             return false;
         } else {

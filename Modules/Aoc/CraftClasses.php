@@ -142,7 +142,7 @@ class craftclasses extends BaseActiveModule
         } elseif (preg_match("/^craft$/i", $msg, $info)) {
             $lookup = $this->bot->db->select(
                 "SELECT * FROM #___craftingclass WHERE name = '" . $name . "'",
-                MYSQL_ASSOC
+                MYSQLI_ASSOC
             );
             if (!empty($lookup)) {
                 $output = "Your crafting classes are: " . $lookup[0]['class1'] . " and " . $lookup[0]['class2'];

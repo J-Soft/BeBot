@@ -565,19 +565,6 @@ class OnlineDisplay extends BaseActiveModule
     */
     function sm_msg($what)
     {
-        if ($param == "all") {
-            $param = "";
-        }
-        // If any search parameter is added try to get the profession name
-        $profstring = "";
-        if ($param != "") {
-            if (($profname = $this->bot->core("professions")
-                    ->full_name($param)) instanceof BotError
-            ) {
-                return $profname;
-            }
-            $profstring = " AND t2." . $this->cp . " = '" . $profname . "' ";
-        }
         $countonline = $this->bot->db->select(
             "SELECT count(DISTINCT t1.nickname) FROM " . $this->bot
                 ->core("online")->full_tablename() . " WHERE t2.level >= 1"

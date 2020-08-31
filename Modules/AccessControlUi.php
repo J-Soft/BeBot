@@ -238,7 +238,7 @@ class AccessControlGUI extends BaseActiveModule
         }
         $result = $this->bot->db->select(
             "SELECT command, subcommand, channel, minlevel FROM #___access_control WHERE minlevel != 'DELETED' " . $sql . "ORDER BY command ASC",
-            MYSQL_ASSOC
+            MYSQLI_ASSOC
         );
         if (empty($result)) {
             if ($channel !== "all") {
@@ -297,7 +297,7 @@ class AccessControlGUI extends BaseActiveModule
         $result = $this->bot->db->select(
             "SELECT subcommand, channel, minlevel FROM #___access_control WHERE command = '" . $command
             . "' AND subcommand != '*' AND minlevel != 'DELETED' ORDER BY subcommand ASC",
-            MYSQL_ASSOC
+            MYSQLI_ASSOC
         );
         if (empty($result)) {
             return "No Subcommand access levels defined for ##highlight##" . $command . "##end##!";

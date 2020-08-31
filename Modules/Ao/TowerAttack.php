@@ -272,7 +272,7 @@ class TowerAttack extends BaseActiveModule
             . " lose_side as def_side, zone FROM #___tower_result ORDER BY time DESC LIMIT 0, " . $this->bot
                 ->core("settings")
                 ->get("TowerAttack", "VictoryBlobSize"),
-            MYSQL_ASSOC
+            MYSQLI_ASSOC
         );
         if (empty($result)) {
             return "No tower victories noticed yet!";
@@ -302,7 +302,7 @@ class TowerAttack extends BaseActiveModule
             . "def_guild, def_side, zone, x_coord, y_coord FROM #___tower_attack ORDER BY time DESC LIMIT 0, " . $this->bot
                 ->core("settings")
                 ->get("TowerAttack", "AttacksPerBlob"),
-            MYSQL_ASSOC
+            MYSQLI_ASSOC
         );
         if (empty($result)) {
             return "No tower attacks noticed yet!";

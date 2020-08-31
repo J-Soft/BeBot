@@ -208,7 +208,7 @@ class Vote extends BaseActiveModule
         //Check for expired votes
         $now = time();
         $query = "SELECT id FROM #___votes WHERE endtime > $now AND endtime <> 0";
-        if ($votes = $this->bot->db->select($query, MYSQL_ASSOC)) {
+        if ($votes = $this->bot->db->select($query, MYSQLI_ASSOC)) {
             foreach ($votes as $vote) {
                 $this->end_vote($this->bot->name, $vote['id']);
             }
@@ -412,13 +412,13 @@ class Vote extends BaseActiveModule
             //List all active votes that the person can vote on
             $rank = 2;
             $query = "SELECT id, description FROM #___votes WHERE endtime > -1 AND started = 1 AND min_level >= $rank";
-            $votes = $this->bot->db->select($query, MYSQL_ASSOC);
+            $votes = $this->bot->db->select($query, MYSQLI_ASSOC);
             if (!empty($votes)) {
                 echo "found a vote";
                 foreach ($votes as $vote) {
                     //Check that the player hasn't voted on this vote yet.
                     $query = "SELECT * FROM #___vote_ballots WHERE vote_id  = {$vote['id']} AND player = '$name'";
-                    $ballots = $this->bot->db->select($query, MYSQL_ASSOC);
+                    $ballots = $this->bot->db->select($query, MYSQLI_ASSOC);
                     if (empty($ballots)) {
                         //Add the vote to the list of votes to show.
                         $window .= "{$vote['id']}: <a href='chat:///tell <botname> <pre>vote show {$vote['id']}'>{$vote['description']}</a><br>";
@@ -438,7 +438,7 @@ class Vote extends BaseActiveModule
                 //Check that the player hasn't voted on this vote.
                 //list options for vote $vote
                 $query = " SELECT id, description FROM #___votes WHERE id=$vote UNION SELECT id, description FROM #___vote_options WHERE vote_id=$vote";
-                $descriptions = $this->bot->db->select($query, MYSQL_ASSOC);
+                $descriptions = $this->bot->db->select($query, MYSQLI_ASSOC);
                 $votedesc = $descriptions[0];
                 unset($descriptions[0]);
                 $window = "Vote {$votedesc['id']}: {$votedesc['description']}<br><br>";

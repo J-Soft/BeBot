@@ -61,7 +61,7 @@ class admins extends BaseActiveModule
         }
         $sql = "SELECT gid, name, description, access_level FROM #___security_groups ";
         $sql .= "ORDER BY access_level DESC, gid ASC, name";
-        $result = $this->bot->db->select($sql, MYSQL_ASSOC);
+        $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
         $owner = "##highlight##Owner (O)##end##\n";
         $superadmins = "##highlight##Superadmin (SA)##end##\n";
         $admins = "##highlight##Admin (A)##end##\n";
