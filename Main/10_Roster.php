@@ -672,6 +672,7 @@ class Roster_Core extends BasePassiveModule
 
     function update_raid($force = false)
     {
+		$msg = "";
         if ($this->running) {
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_pgroup("Roster update is already running");
