@@ -46,13 +46,13 @@ $do_unorged_users = false;
 $delete_not_updated = false;
 $show_org_names = true;
 $show_character_names = false;
-require('whois-update.conf');
+require('WhoisUpdate.conf');
 // disable execution timeout:
 set_time_limit(0);
 
 // Check if we have curl available
 if (!extension_loaded("curl")) {
-    if ($os_windows) {
+    if ('OS_WINDOWS') {
         if (@!dl("php_curl.dll")) {
             echo "Curl not available\n";
         } else {
@@ -75,13 +75,13 @@ if (!extension_loaded("curl")) {
     }
 }
 
-if (!extension_loaded("mysql")) {
-    if ($os_windows) {
-        if (!dl("php_mysql.dll")) {
-            die("Loading php_mysql.dll failed. MySQL extention required to run this script");
+if (!extension_loaded("mysqli")) {
+    if ('OS_WINDOWS') {
+        if (!dl("php_mysqli.dll")) {
+            die("Loading php_mysqli.dll failed. MySQLi extention required to run this script");
         }
     } else {
-        die("MySQL support required to run this script");
+        die("MySQLi support required to run this script");
     }
 }
 

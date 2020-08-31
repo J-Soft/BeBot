@@ -39,6 +39,7 @@ class Raid extends BaseActiveModule
 {
     var $raid;
     var $user;
+	var $user2;
     var $announce;
     var $start;
     var $locked;
@@ -50,6 +51,7 @@ class Raid extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->raid = false;
         $this->user = array();
+		$this->user2 = array();
         $this->announce = 0;
         $this->locked = false;
         $this->register_command("all", "c", "LEADER");
@@ -340,7 +342,7 @@ class Raid extends BaseActiveModule
             && $this->bot->core("settings")
                 ->get("Raid", "AddOnRejoin")
         ) {
-            if ($this->user2[$name] == "Left PrivGroup" || $this->user2[$name] == "Bot Restart") {
+            if (isset($this->user2[$name]) && ($this->user2[$name] == "Left PrivGroup" || $this->user2[$name] == "Bot Restart")) {
                 if (empty($this->user)) {
                     $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
                 }

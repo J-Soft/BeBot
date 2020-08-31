@@ -82,11 +82,11 @@ class Symb_sql extends BaseActiveModule
 
     function tables()
     {
-        $this->bot->db->define_tablename("symbiants", "false");
+        $this->bot->db->define_tablename("symbiants", "true");
         Switch ($this->bot->db->get_version("symbiants")) {
             case 1:
             case 2:
-                $filename = "./extra/symbiants/symbiants.sql";
+                $filename = "./Extras/Symbiants/Symbiants.sql";
                 $handle = fopen($filename, "r");
                 $query = fread($handle, filesize($filename));
                 fclose($handle);
@@ -190,10 +190,10 @@ class Symb_sql extends BaseActiveModule
             } //Check if $arg is a number and thus a QL
             elseif (is_numeric($arg)) {
                 if ($query_ql === false) {
-                    $query_ql = "ql = $arg";
+                    $query_ql = "QL = $arg";
                     $readable_ql = "$arg";
                 } else {
-                    $query_ql .= " OR ql = $arg";
+                    $query_ql .= " OR QL = $arg";
                     $readable_ql .= " or $arg";
                 }
             } //Check if $arg is a QL-range
@@ -207,19 +207,19 @@ class Symb_sql extends BaseActiveModule
                     $high = $pql[1];
                 }
                 if ($query_ql === false) {
-                    $query_ql = " (ql >= $low AND ql <= $high)";
+                    $query_ql = " (QL >= $low AND QL <= $high)";
                     $readable_ql = "between $low and $high";
                 } else {
-                    $query_ql .= " OR (ql >= $low and ql <= $high)";
+                    $query_ql .= " OR (QL >= $low and QL <= $high)";
                     $readable_ql .= " or between $low and $high";
                 }
             } //Assume that $arg is name since it's none of the above
             else {
                 if ($query_name === false) {
-                    $query_name = "t1.name like '%$arg%'";
+                    $query_name = "t1.Name like '%$arg%'";
                     $readable_name = "'$arg'";
                 } else {
-                    $query_name .= " or t1.name like '%$arg%'";
+                    $query_name .= " or t1.Name like '%$arg%'";
                     $readable_name .= " or '$arg'";
                 }
             }
@@ -262,21 +262,23 @@ class Symb_sql extends BaseActiveModule
             $where_string .= "($query_name)";
         }
         $query
-            = "SELECT ql, slot, unit, t1.name AS symb, itemref, t2.name as boss FROM symbiants AS t1 JOIN pocketbosses AS t2 ON t1.boss_id = t2.id WHERE $where_string ORDER BY ql, unit";
-        $symbiants = $this->bot->db->select($query, MYSQL_ASSOC);
+            = "SELECT t1.QL as ql, t1.slot as slot, t1.unit as unit, t1.Name AS symb, t1.itemref as itemref, t2.Name AS boss FROM symbiants AS t1 JOIN pocketbosses AS t2 ON t1.boss_id = t2.ID WHERE $where_string ORDER BY QL, unit";
+        $symbiants = $this->bot->db->select($query);
         if (empty($symbiants)) {
             $readable_output .= 'No matches...';
             return ($this->bot->core('tools')
                 ->make_blob('Symbiants', $readable_output));
         } else {
-            foreach ($symbiants as $symb) {
-                $title = "QL {$symb['ql']} {$symb['symb']} " . array_search(
-                        $symb['slot'],
+            foreach ($symbiants as $symbiant) {
+                $title = "QL ".$symbiant[0]." ".$symbiant[3]." " . array_search(
+                        $symbiant[1],
                         $this->slots
-                    ) . " symbiant, {$symb['unit']} unit aban";
+                    ) . " symbiant, ".$symbiant[2]." unit aban";
                 $title = ucwords($title);
-                $link = "<a href='itemref://{$symb['itemref']}/{$symb['itemref']}/{$symb['ql']}'>$title</a>";
-                $readable_output .= "$link\n";
+                $link = "<a href='itemref://".$symbiant[4]."/".$symbiant[4]."/".$symbiant[0]."'>".$title."</a>";
+				$bot = $this->bot->botname;
+				$pb = "<a href='chatcmd:///tell ".$bot." !pb ".$symbiant[5]."'>".$symbiant[5]."</a>\n";
+                $readable_output .= "$link from $pb\n";
             }
         }
         return ($this->bot->core('tools')

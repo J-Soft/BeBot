@@ -39,7 +39,7 @@ class LandControlZones extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("land_control_zones", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("land_control_zones", "true") . " (
 			`id` int(11) default NULL,
 			`lrange` int(10) default NULL,
 			`hrange` int(10) default NULL,
@@ -92,7 +92,7 @@ class LandControlZones extends BaseActiveModule
                     "ALTER IGNORE TABLE #___land_control_zones ADD zoneid INT(11) DEFAULT NULL"
                 );
                 $this->bot->db->query("truncate table #___land_control_zones");
-                $filename = "./extra/table_data/lc_zones.sql";
+                $filename = "./Extras/TableData/LcZones.sql";
                 $handle = fopen($filename, "r");
                 $query = fread($handle, filesize($filename));
                 fclose($handle);
@@ -129,6 +129,7 @@ class LandControlZones extends BaseActiveModule
 
     function show_lc($iarea = null, $lrange = 0, $hrange = 300)
     {
+		$return = "";
         if ($iarea == "--all--") {
             $areas = $this->bot->db->select(
                 "select distinct(area),count(area) from #___land_control_zones group by area"
@@ -157,6 +158,7 @@ class LandControlZones extends BaseActiveModule
             if (!empty($areas)) {
                 foreach ($areas as $area) {
                     unset($temp);
+					$temp = "";
                     if (isset($return)) {
                         $temp = "<br><br>";
                     }

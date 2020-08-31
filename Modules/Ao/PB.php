@@ -108,7 +108,6 @@ class PB extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "pb", "GUEST");
-        //$this -> register_command("all", "symb", "GUEST");
         $this->help['description'] = "Shows know pocket bosses and their loot.";
         $this->help['command']['pb <name>'] = "Shows the known loot of the pocket boss <name>.";
         $this->help['command']['symb <type> <slot>'] = "Shows all known drops of symbs of <type> in <slot>.";
@@ -125,27 +124,11 @@ class PB extends BaseActiveModule
 
     function tables()
     {
-        /*$this -> bot -> db -> define_tablename("symbiants", "false");
-Switch($this -> bot -> db -> get_version("symbiants"))
-{
-case 1:
-$filename = "./extra/symbiants/symbiants.sql";
-$handle = fopen($filename, "r");
-$query = fread($handle, filesize($filename));
-fclose($handle);
-$query = explode(";
-", $query);
-foreach($query as $q)
-{
-    $this -> bot -> db -> query($q);
-}
-}
-$this -> bot -> db -> set_version("symbiants", 2); */
-        $this->bot->db->define_tablename("pocketbosses", "false");
+        $this->bot->db->define_tablename("pocketbosses", "true");
         Switch ($this->bot->db->get_version("pocketbosses")) {
             case 1:
             case 2:
-                $filename = "./extra/symbiants/pocketbosses.sql";
+                $filename = "./Extras/Symbiants/PocketBosses.sql";
                 $handle = fopen($filename, "r");
                 $query = fread($handle, filesize($filename));
                 fclose($handle);
@@ -180,20 +163,6 @@ $this -> bot -> db -> set_version("symbiants", 2); */
                         break;
                 }
                 break;
-            /*	case 'symb':
-           //Condition professions
-           foreach($this->profs as $prof => $name)
-           {
-               $com['args']=str_replace($prof, $name, $com['args']);
-           }
-           //Condition slots
-           foreach($this->slots as $slot => $name)
-           {
-               $com['args']=str_replace($slot, $name, $com['args']);
-           }
-           $args = $this -> parse_com($com['args'], array('unit', 'slot'));
-           return $this -> SearchSymb($args['unit'], $args['slot']);
-           break; */
             Default:
                 Return "##error##Error: Unknown Command ##highlight##" . $com['com'] . "##end## in PB module##end##";
         }
@@ -221,23 +190,12 @@ $this -> bot -> db -> set_version("symbiants", 2); */
         }
         return $this->bot->core("tools")
             ->make_blob("Remains of " . $pb[1], $msg);
-        /*	}
-       else
-       {
-           $msg = "##lightyellow##::::: Result of your search :::::##end##\n\n";
-           ksort($data);
-           foreach($data as $symb) {
-               $msg .= "<a href='itemref://".$symb[8]."/".$symb[8]."/".$symb[0]."'>".$symb[9]."</a>\n";
-               $msg .= "##normal##   Found on ##end##".$this -> bot -> core("tools") -> chatcmd("pb ".$symb[3], $symb[3])."\n\n";
-           }
-           return $this -> bot -> core("tools") -> make_blob("Found ".count($data)." matches", $msg);
-       } */
     }
 
 
     function best_match($search)
     {
-        $haystack = $this->bot->db->select("SELECT name FROM #___pocketbosses");
+        $haystack = $this->bot->db->select("SELECT name FROM pocketbosses");
         // 1st lets check for pocketbosses that contain the string
         foreach ($haystack as $straw) {
             //echo "is $search in ".$straw[0]."\n";
@@ -255,57 +213,31 @@ $this -> bot -> db -> set_version("symbiants", 2); */
         return (array_shift($distance));
     }
 
-
-    /*function SearchSymb($unit, $slot)
-    {
-        //Check if we're passed a profession instead of a units
-        if(in_array($unit, $this->profs))
-        {
-            $unit = implode("' or unit='", $this->units[$unit]);
-        }
-        else
-        {
-            $unit = "'$unit'";
-        }
-
-        $query="SELECT * FROM #___symbiants WHERE slot='$slot' AND (unit='$unit') ORDER BY ql, unit";
-        $symbdata=$this->bot->db->select($query);
-        if(empty($symbdata))
-        {
-            $unit = str_replace ('unit=', '', $unit);
-            return "No matches found for '$unit' in '$slot'";
-        }
-        return $this -> CreateBlob($symbdata, "symb");
-    }*/
     function SearchPB($search)
     {
         $boss = $this->best_match($search);
         if ($boss === false) {
             return ("I found no pocket boss like '$search'");
         }
-        $query = "SELECT ID, name, level, Playfield, Place, pattern_mobs FROM #___pocketbosses WHERE name LIKE '$boss'";
+        $query = "SELECT ID, name, level, Playfield, Place, pattern_mobs FROM pocketbosses WHERE name LIKE '$boss'";
         $boss = $this->bot->db->select($query);
         if (empty($boss)) {
             return 'Could not find the Pocketboss "##highlight##' . $search . '##end##"';
         }
-        //	foreach ($bosslist as $pb)
-        //{
-        //	$return[] = $pb;
-        //}
         return $this->CreateBlob($boss[0], $this->get_symbs($boss[0][0]));
     }
 
 
     function get_symbs($id)
     {
-        $symbs = $this->bot->db->select("SELECT QL, slot, unit, Name, itemref FROM #___symbiants WHERE boss_id = $id");
+        $symbs = $this->bot->db->select("SELECT QL, slot, unit, Name, itemref FROM symbiants WHERE boss_id = $id");
         Return $symbs;
     }
 
 
     function list_all($name)
     {
-        $query = "SELECT Playfield, name FROM #___pocketbosses ORDER BY Playfield, level, name";
+        $query = "SELECT Playfield, name FROM pocketbosses ORDER BY Playfield, level, name";
         $bosslist = $this->bot->db->select($query);
         $window = "##blob_title## :::  Pocket Bosses  :::##end####blob_text##\n";
         $area = false;
