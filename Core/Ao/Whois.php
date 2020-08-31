@@ -456,7 +456,7 @@ class Whois_Core extends BasePassiveModule
         $name = strtolower($name);
         $fcurl = "http://people.anarchy-online.com/character/bio/d/" . $this->bot->dimension . "/name/" . strtolower(
                 $name
-            ) . "/bio.xml"; error_log($this->bot->dimension);
+            ) . "/bio.xml";
         $aunourl = "http://auno.org/ao/char.php?output=xml&dimension=" . $this->bot->dimension . "&name=" . strtolower(
                 $name
             );
