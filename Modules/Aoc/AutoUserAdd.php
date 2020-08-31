@@ -53,7 +53,7 @@ class AutoUserAdd extends BasePassiveModule
             ->create("Autouseradd", "Notify", true, "Should the User be Notified that he was added to the Bot?");
         // Fill checked array with current members, we won't need to readd them:
         $this->checked = array();
-        $mems = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level = 2", MYSQL_ASSOC);
+        $mems = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level = 2", MYSQLI_ASSOC);
         if (!empty($mems)) {
             foreach ($mems as $mem) {
                 $this->checked[$mem['nickname']] = true;

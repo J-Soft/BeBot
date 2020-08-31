@@ -108,7 +108,7 @@ class Blacklist extends BaseActiveModule
         $inside = "##blob_title##:::: " . $title . " Blacklist ::::##end##\n\n";
         $result = $this->bot->db->select(
             "SELECT name, noteid, expire FROM #___blacklist WHERE expire >= " . time() . " OR expire = 0 ORDER BY name",
-            MYSQL_ASSOC
+            MYSQLI_ASSOC
         );
         if (!empty($result)) {
             foreach ($result as $val) {
@@ -204,7 +204,7 @@ class Blacklist extends BaseActiveModule
     function clean_blacklist()
     { // Start function clean_blacklist()
         $sql = "SELECT * FROM #___blacklist WHERE expire > 0 AND expire < " . time();
-        $result = $this->bot->db->select($sql, MYSQL_ASSOC);
+        $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
         if (empty($result)) {
             return false; // Nothing to do.
         }

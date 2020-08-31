@@ -101,7 +101,7 @@ class Points extends BaseActiveModule
         }
         switch ($this->bot->db->get_version("raid_points")) {
             case 1:
-                $fields = $this->bot->db->select("EXPLAIN #___raid_points");
+                $fields = $this->bot->db->select("EXPLAIN #___raid_points", MYSQLI_ASSOC);
                 foreach ($fields as $field) {
                     if (isset($field['Field']) && $field['Field'] == "points") {
                         if (isset($field['Type']) && $field['Type'] == "int(11)") {

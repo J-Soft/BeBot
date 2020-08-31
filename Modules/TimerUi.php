@@ -185,7 +185,7 @@ class TimerGUI extends BaseActiveModule
         }
         $timers = $this->bot->db->select(
             "SELECT * FROM #___timer WHERE " . $channelstr . $namestr . " ORDER BY endtime ASC",
-            MYSQL_ASSOC
+            MYSQLI_ASSOC
         );
         if (empty($timers)) {
             return "No timers defined!";
@@ -223,7 +223,7 @@ class TimerGUI extends BaseActiveModule
         $tsets = $this->bot->db->select(
             'SELECT a.id AS id, a.name AS name, b.name AS class, a.description as description '
             . 'FROM #___timer_class_settings AS a, #___timer_classes AS b WHERE a.current_class = b.id ORDER BY name ASC',
-            MYSQL_ASSOC
+            MYSQLI_ASSOC
         );
         if (empty($tsets)) {
             return 'No timer class settings existing!';
@@ -251,7 +251,7 @@ class TimerGUI extends BaseActiveModule
             'SELECT a.id AS id, a.name AS name, b.name AS current_class, ' . 'c.name AS default_class, c.id AS default_id, a.description as description '
             . 'FROM #___timer_class_settings AS a, #___timer_classes AS b, #___timer_classes AS c ' . 'WHERE a.current_class = b.id AND a.default_class = c.id AND a.id = '
             . $tsetid,
-            MYSQL_ASSOC
+            MYSQLI_ASSOC
         );
         if (empty($tsets)) {
             return "Illegal ID!";
@@ -266,7 +266,7 @@ class TimerGUI extends BaseActiveModule
         $blob .= "\n\nClick on the name of one of the following classes to change this setting to the selected class.\n\n";
         $blob .= "Make sure the timer setting is compatible, otherwise you may get unexpected behavior and output of the timers. ";
         $blob .= "Try to go by the descriptions for this.\nYou can always go back to the default class by picking that above.\n\n";
-        $classes = $this->bot->db->select("SELECT * FROM #___timer_classes ORDER BY name ASC", MYSQL_ASSOC);
+        $classes = $this->bot->db->select("SELECT * FROM #___timer_classes ORDER BY name ASC", MYSQLI_ASSOC);
         if (empty($classes)) {
             return "No timer classes defined!";
         }
@@ -284,12 +284,12 @@ class TimerGUI extends BaseActiveModule
     // Sets $tset to $newclassid if $tsetid is valid
     function update_timer_setting($tsetid, $newclassid)
     {
-        $tsets = $this->bot->db->select('SELECT name FROM #___timer_class_settings WHERE id = ' . $tsetid, MYSQL_ASSOC);
+        $tsets = $this->bot->db->select('SELECT name FROM #___timer_class_settings WHERE id = ' . $tsetid, MYSQLI_ASSOC);
         if (empty($tsets)) {
             return "Illegal ID of timer class setting!";
         }
         $tset = $tsets[0];
-        $classes = $this->bot->db->select('SELECT name FROM #___timer_classes WHERE id = ' . $newclassid, MYSQL_ASSOC);
+        $classes = $this->bot->db->select('SELECT name FROM #___timer_classes WHERE id = ' . $newclassid, MYSQLI_ASSOC);
         if (empty($classes)) {
             return "Illegal ID of timer class!";
         }

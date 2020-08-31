@@ -211,7 +211,7 @@ class Mail extends BaseActiveModule
     {
         //Getting the number of new mail (obviously)
         $query = "SELECT COUNT(id) AS no_of_messages FROM #___mail_message WHERE mailbox='$mailbox' AND is_read=0";
-        $result = $this->bot->db->select($query, MYSQL_ASSOC);
+        $result = $this->bot->db->select($query, MYSQLI_ASSOC);
         if (empty($result)) {
             return 0;
         } else {
@@ -226,7 +226,7 @@ class Mail extends BaseActiveModule
         $mailbox = $this->bot->core("alts")->main($user);
         $window = "##yellow##:::##end## Mail for ##highlight##$user##end## ($mailbox) ##yellow##:::##end##<br><br>";
         $query = "SELECT * FROM #___mail_message WHERE mailbox='$mailbox' ORDER BY is_read, received DESC";
-        $messages = $this->bot->db->select($query, MYSQL_ASSOC);
+        $messages = $this->bot->db->select($query, MYSQLI_ASSOC);
         if (!empty($messages)) {
             foreach ($messages as $message) {
                 $message['message'] = base64_decode($message['message']);
@@ -264,7 +264,7 @@ class Mail extends BaseActiveModule
         $mailbox = $this->bot->core("alts")->main($user);
         $window = "##yellow##:::##end## Mail for ##highlight##$user##end## ($mailbox) ##yellow##:::##end##<br><br>";
         $query = "SELECT * FROM #___mail_message WHERE id=$id AND mailbox='$mailbox'";
-        $messages = $this->bot->db->select($query, MYSQL_ASSOC);
+        $messages = $this->bot->db->select($query, MYSQLI_ASSOC);
         if (!empty($messages)) {
             $message = $messages[0];
             $window .= "##highlight##To:##end## {$message['recipient']}<br>";

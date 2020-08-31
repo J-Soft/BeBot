@@ -123,7 +123,7 @@ class AutoInv extends BaseActiveModule
     // Compare the user level of $name with the setting for who should be autoinvited
     function check_access($name)
     {
-        $userlevel = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '$name'", MYSQL_ASSOC);
+        $userlevel = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '$name'", MYSQLI_ASSOC);
         if (empty($userlevel)) {
             return false;
         }
