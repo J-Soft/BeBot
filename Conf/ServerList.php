@@ -8,59 +8,59 @@ $server_list['Ao']['5'] = $server_list['Ao']['Rubi-Ka'];
 $server_list['Ao']['6'] = $server_list['Ao']['Rubi-Ka-2019'];
 
 // AOC
-$server_list['aoc']['EU'] = array(
+$server_list['Aoc']['EU'] = array(
     'server' => 'dm10-nj4.ageofconan.com',
     'port' => 7000
 );
-$server_list['aoc']['US'] = array(
+$server_list['Aoc']['US'] = array(
     'server' => 'aoc-us-um.live.ageofconan.com',
     'port' => 7010
 );
-$server_list['aoc']['Aoctestlive'] = array(
+$server_list['Aoc']['Aoctestlive'] = array(
     'server' => 'testlive.ageofconan.com',
     'port' => 7010
 );
 
 // all EU servers use the same login server
- $server_list['aoc']['Bloodbrand']  = $server_list['aoc']['EU'];
- $server_list['aoc']['Ahriman']   = $server_list['aoc']['EU'];
- $server_list['aoc']['Bori']   = $server_list['aoc']['EU'];
- $server_list['aoc']['Dagon']   = $server_list['aoc']['EU'];
- $server_list['aoc']['Ymir']   = $server_list['aoc']['EU'];
- $server_list['aoc']['Hyrkania']  = $server_list['aoc']['EU'];
- $server_list['aoc']['Aquilonia']  = $server_list['aoc']['EU'];
- $server_list['aoc']['Twilight']  = $server_list['aoc']['EU'];
- $server_list['aoc']['Corinthia']  = $server_list['aoc']['EU'];
+ $server_list['Aoc']['Bloodbrand']  = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Ahriman']   = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Bori']   = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Dagon']   = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Ymir']   = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Hyrkania']  = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Aquilonia']  = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Twilight']  = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Corinthia']  = $server_list['Aoc']['EU'];
 
  // Merged Servers
- $server_list['aoc']['Crom']             = $server_list['aoc']['US'];
- $server_list['aoc']['Fury']             = $server_list['aoc']['US'];
+ $server_list['Aoc']['Crom']             = $server_list['Aoc']['US'];
+ $server_list['Aoc']['Fury']             = $server_list['Aoc']['US'];
 
 
  // Spanish Servers
- $server_list['aoc']['Zingara']      = $server_list['aoc']['EU'];
- $server_list['aoc']['Indomitus']    = $server_list['aoc']['EU'];
+ $server_list['Aoc']['Zingara']      = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Indomitus']    = $server_list['Aoc']['EU'];
 
  // French Servers
- $server_list['aoc']['Ishtar']       = $server_list['aoc']['EU'];
- $server_list['aoc']['Ferox']        = $server_list['aoc']['EU'];
- $server_list['aoc']['Stygia']       = $server_list['aoc']['EU'];
- $server_list['aoc']['Strix']        = $server_list['aoc']['EU'];
+ $server_list['Aoc']['Ishtar']       = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Ferox']        = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Stygia']       = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Strix']        = $server_list['Aoc']['EU'];
 
  // German Servers
- $server_list['aoc']['Asura']        = $server_list['aoc']['EU'];
- $server_list['aoc']['Ibis']         = $server_list['aoc']['EU'];
- $server_list['aoc']['Aries']        = $server_list['aoc']['EU'];
- $server_list['aoc']['Titus']        = $server_list['aoc']['EU'];
- $server_list['aoc']['Asgard']       = $server_list['aoc']['EU'];
+ $server_list['Aoc']['Asura']        = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Ibis']         = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Aries']        = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Titus']        = $server_list['Aoc']['EU'];
+ $server_list['Aoc']['Asgard']       = $server_list['Aoc']['EU'];
 
  // all US servers use the same login server
- $server_list['aoc']['Gwahlur']      = $server_list['aoc']['US'];
- $server_list['aoc']['Wiccana']      = $server_list['aoc']['US'];
- $server_list['aoc']['Bloodspire']   = $server_list['aoc']['US'];
- $server_list['aoc']['Ironspine']    = $server_list['aoc']['US'];
- $server_list['aoc']['Tyranny']      = $server_list['aoc']['US'];
- $server_list['aoc']['Cimmeria']     = $server_list['aoc']['US'];
- $server_list['aoc']['Agony']        = $server_list['aoc']['US'];
+ $server_list['Aoc']['Gwahlur']      = $server_list['Aoc']['US'];
+ $server_list['Aoc']['Wiccana']      = $server_list['Aoc']['US'];
+ $server_list['Aoc']['Bloodspire']   = $server_list['Aoc']['US'];
+ $server_list['Aoc']['Ironspine']    = $server_list['Aoc']['US'];
+ $server_list['Aoc']['Tyranny']      = $server_list['Aoc']['US'];
+ $server_list['Aoc']['Cimmeria']     = $server_list['Aoc']['US'];
+ $server_list['Aoc']['Agony']        = $server_list['Aoc']['US'];
 
 ?>
