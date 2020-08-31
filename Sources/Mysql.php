@@ -244,7 +244,7 @@ class MySQL
         $this->connect();
         $sql = $this->add_prefix($sql);
         $result = mysqli_query($this->CONN, "DROP TABLE " . $sql);
-        if (!$return) {
+        if (!$result) {
             $this->error($sql);
             return false;
         } else {

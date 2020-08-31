@@ -812,7 +812,7 @@ class AOChat
 
                 $event = new sfEvent($this, 'Core.on_buddy_remove', array(
                                                                          'source' => 'system',
-                                                                         'message' => $pakcte->args[0]
+                                                                         'message' => $packet->args[0]
                                                                     ));
                 $this->bot->dispatcher->notify($event);
 
