@@ -126,8 +126,8 @@ class Items_Core extends BasePassiveModule
         $url .= '?single=1';
         $url .= '&id=' . $words;
         $result = $this->bot->core("tools")->get_site($url, 1);
-        //A comment explaining the logic of this check would be appreciated! Why are we looking for mysql_real_escape_string here?
-        if (strstr($result, 'mysql_real_escape_string') !== false) {
+        //A comment explaining the logic of this check would be appreciated! Why are we looking for mysqli_real_escape_string here?
+        if (strstr($result, 'mysqli_real_escape_string') !== false) {
             return ("Error in query to database");
         }
         return $result;

@@ -432,7 +432,7 @@ class Raid extends BaseActiveModule
                 return "Raid started. :: " . $this->control();
                 if (isset($this->bot->commands["tell"]["raidhistory"])) {
                     $this->bot->db->query(
-                        "INSERT INTO #___raid_details (name, description, start) VALUES ('$name', '" . mysql_real_escape_string(
+                        "INSERT INTO #___raid_details (name, description, start) VALUES ('$name', '" . mysqli_real_escape_string($this->bot->db->CONN,
                             $desc
                         ) . "', " . time() . ")"
                     );

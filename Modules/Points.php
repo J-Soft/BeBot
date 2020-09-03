@@ -625,7 +625,7 @@ class Points extends BaseActiveModule
         $who = ucfirst(strtolower($who));
         $this->bot->db->query(
             "INSERT INTO #___raid_points_log (name, points, by_who, time, why) VALUES ('$who', $num, '$name', " . time(
-            ) . ", '" . mysql_real_escape_string($why) . "')"
+            ) . ", '" . mysqli_real_escape_string($this->bot->db->CONN,$why) . "')"
         );
     }
 

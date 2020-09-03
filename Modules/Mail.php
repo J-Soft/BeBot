@@ -314,7 +314,7 @@ class Mail extends BaseActiveModule
         } elseif (empty($message)) {
             return ("There is no point in sending empty messages. Usage: <pre>mail send &lt;recipient&gt; &lt;message&gt;");
         } else {
-            $mail_message = mysql_real_escape_string($message);
+            $mail_message = mysqli_real_escape_string($this->bot->db->CONN,$message);
             $mail_message = str_replace('<', '&lt;', $mail_message);
             $mail_message = base64_encode($mail_message);
             $query

@@ -457,7 +457,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
     {
         $grpname = strtolower($grpname);
         // Valid values for $compare won't need escaping, but it's free user input, so better be save:
-        $compare = mysql_real_escape_string($compare);
+        $compare = mysqli_real_escape_string($this->bot->db->CONN,$compare);
         $gid = $this->bot->core("security")->get_gid($grpname);
         if ($gid == -1) {
             return "No group with the name##highlight## " . $grpname . "##end## existing!";
