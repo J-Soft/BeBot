@@ -1,5 +1,5 @@
 .gitignore
-
+*.zip
 *.org
 Conf/*.conf
 Conf/*.ini
