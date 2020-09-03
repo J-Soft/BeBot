@@ -345,14 +345,14 @@ IMPORTANT: All changes made to the guild and bot after the backup WILL BE OVERWR
 PHASE 6: UPDATE DATABASE
 ------------------------
 
-You can let the bot update its cache by itself, whith few control parameters under :
+You can let the bot update its cache by itself, with few control parameters under :
 !settings (into whois section) ...
 
-... but you also could "help" him by scheduling execution of a script settable in this folder :
+... but you also could "help" it by scheduling execution of a script available in folder :
 Extras/WhoisUpdate/
 Just copy the WhoisUpdate.conf.dist & name it WhoisUpdate.conf then edit all its infos correctly :
 Database user, pass, db, server (e.g. localhost), table ("whois" by default) + AO dimension (5 or 6).
 
-You also have few more parameters to play with lower in this file, to set according to your taste.
+You also have few more parameters to play with lower in this file, to set accordingly to your taste.
 
 Then you can schedule the load of whether UpdateWhoisCache.bat (windows) or WhoisUpdate.php (linux).
