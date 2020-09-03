@@ -5,25 +5,25 @@ BeBot does update outdated entries itself, the script takes the whole load out o
 
 
 SETUP:
-To setup the script you need to enter information into the whois-update.conf file. Which information is needed is written in the comments in that file.
-After entering all information just start the php file with something like "php whois-update.php". The script should start working now. When it is finished it outputs some statistical data about the updating and the cache.
+To setup the script you need to enter information into the WhoisUpdate.conf file. Which information is needed is written in the comments in that file.
+After entering all information just start the php file with something like "php WhoisUpdate.php". The script should start working now. When it is finished it outputs some statistical data about the updating and the cache.
 
 
 PHP SETUP:
 If you receive the error:
-Fatal error: Call to undefined function: mysql_connect()
+Fatal error: Call to undefined function: mysqli_connect()
 You may need to add the following line to your PHP.ini file.
 
 Windows:
-extension=php_mysql.dll
+extension=php_mysqli.dll
 
 Linux:
-extension=mysql.so
+extension=mysqli.so
 
 
 OPTIONAL:
-If you want to run some php file after all the updating is done you can add an whois-update.addons file. If this file exists it will be included at the end of whois-update.php
+If you want to run some php file after all the updating is done you can add an WhoisUpdate.addons file. If this file exists it will be included at the end of WhoisUpdate.php
 
 
 EXAMPLE BATCH FILE:
-If you want to just simply run an update periodically, there is an example batch file (Update Whois Cache.bat).  This batch file assumes that php.exe is installed to the bots root directory.  You may need to change the paths to the PHP excecutable and the whois-update.php file.
+If you want to just simply run an update periodically, there is an example batch file (UpdateWhoisCache.bat).  This batch file assumes that php.exe is installed to the bots root directory.  You may need to change the paths to the PHP excecutable and the WhoisUpdate.php file.
