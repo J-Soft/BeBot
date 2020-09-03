@@ -288,6 +288,7 @@ class Is extends BaseActiveModule
             $this->bot
                 ->core("settings")->get("Is", "Checkalts")
         );
+		$msg = "";
         if ($seen) {
             if ($this->bot->core("settings")->get("Is", "Checkalts")) {
                 $msg = ", last seen at ##highlight##" . gmdate(

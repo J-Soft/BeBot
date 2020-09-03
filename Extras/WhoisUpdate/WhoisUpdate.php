@@ -38,7 +38,7 @@
 // Important values:
 $thistime = time(); // the current time, needed to remove old entries and set update time. DO NOT CHANGE THIS!
 $baseurl = "http://people.anarchy-online.com"; // The base URL for all roster queries
-$addons = "whois-update.addons";
+$addons = "WhoisUpdate.addons";
 // Default values:
 $hours = 72;
 $delaytime = 10;
@@ -125,7 +125,7 @@ while ($orgid = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
         $failedrosterlookup++;
     } else {
         $starttime = time();
-        $orgname = $this->bot->db->real_escape_string(xmlparse($org_cont, "name"));
+        $orgname = mysqli_real_escape_string($link,xmlparse($org_cont, "name"));
         $orgfaction = xmlparse($org_cont, "side");
         $org = explode("<member>", $org_cont);
         if ($show_org_names) {
@@ -135,8 +135,8 @@ while ($orgid = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
         for ($i = 1; $i < count($org); $i++) {
             $content = $org[$i];
             $who["nickname"] = xmlparse($content, "nickname");
-            $who["firstname"] = $this->bot->db->real_escape_string(xmlparse($content, "firstname"));
-            $who["lastname"] = $this->bot->db->real_escape_string(xmlparse($content, "lastname"));
+            $who["firstname"] = mysqli_real_escape_string($link,xmlparse($content, "firstname"));
+            $who["lastname"] = mysqli_real_escape_string($link,xmlparse($content, "lastname"));
             $who["level"] = xmlparse($content, "level");
             $who["gender"] = xmlparse($content, "gender");
             $who["breed"] = xmlparse($content, "breed");
@@ -263,8 +263,8 @@ if ($do_unorged_users) {
         if ($content_arr) {
             $content = $content_arr;
             $who["nick"] = xmlparse($content, "nick");
-            $who["firstname"] = $this->bot->db->real_escape_string(xmlparse($content, "firstname"));
-            $who["lastname"] = $this->bot->db->real_escape_string(xmlparse($content, "lastname"));
+            $who["firstname"] = mysqli_real_escape_string($link,xmlparse($content, "firstname"));
+            $who["lastname"] = mysqli_real_escape_string($link,xmlparse($content, "lastname"));
             $who["level"] = xmlparse($content, "level");
             $who["gender"] = xmlparse($content, "gender");
             $who["breed"] = xmlparse($content, "breed");
@@ -275,7 +275,7 @@ if ($do_unorged_users) {
             if ($who["rank_id"] == '') {
                 $who["rank_id"] = 0;
             }
-            $who["org"] = $this->bot->db->real_escape_string(xmlparse($content, "organization_name"));
+            $who["org"] = mysqli_real_escape_string($link,xmlparse($content, "organization_name"));
             $who["org_id"] = xmlparse($content, "organization_id");
             if ($who["org_id"] == '') {
                 $who["org_id"] = 0;
