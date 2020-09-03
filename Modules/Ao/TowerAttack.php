@@ -370,10 +370,10 @@ class TowerAttack extends BaseActiveModule
                     if (!$this->bot->core("settings")->get("TowerAttack", "ReadOnly")) {
                         $this->bot->db->query(
                             "INSERT INTO #___tower_result (time, win_guild, win_side, lose_guild, " . "lose_side, zone) VALUES ('" . time(
-                            ) . "', '" . mysql_real_escape_string(
+                            ) . "', '" . mysqli_real_escape_string($this->bot->db->CONN,
                                 $info[3]
                             )
-                            . "', '" . $info[2] . "', '" . mysql_real_escape_string(
+                            . "', '" . $info[2] . "', '" . mysqli_real_escape_string($this->bot->db->CONN,
                                 $info[5]
                             ) . "', '" . $info[4] . "', '" . $info[6] . "')"
                         );
@@ -472,10 +472,10 @@ class TowerAttack extends BaseActiveModule
             ) {
                 $this->bot->db->query(
                     "INSERT INTO #___tower_attack (time, off_guild, off_side, off_player, " . "off_level, off_profession, def_guild, def_side, zone, x_coord, y_coord) VALUES ('"
-                    . $infos["time"] . "', '" . mysql_real_escape_string(
+                    . $infos["time"] . "', '" . mysqli_real_escape_string($this->bot->db->CONN,
                         $infos["off_guild"]
                     ) . "', '" . $infos["off_side"] . "', '" . $infos["off_player"] . "', '"
-                    . $infos["off_level"] . "', '" . $infos["off_profession"] . "', '" . mysql_real_escape_string(
+                    . $infos["off_level"] . "', '" . $infos["off_profession"] . "', '" . mysqli_real_escape_string($this->bot->db->CONN,
                         $infos["def_guild"]
                     ) . "', '" . $infos["def_side"] . "', '"
                     . $infos["zone"] . "', '" . $infos["x_coord"] . "', '" . $infos["y_coord"] . "')"

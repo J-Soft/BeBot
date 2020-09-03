@@ -145,9 +145,9 @@ class Rally extends BaseActiveModule
             }
         } else {
             $zonenum = $this->bot->db->select(
-                "SELECT zoneid FROM #___land_control_zones WHERE area = '" . mysql_real_escape_string(
+                "SELECT zoneid FROM #___land_control_zones WHERE area = '" . mysqli_real_escape_string($this->bot->db->CONN,
                     $zone
-                ) . "' OR short = '" . mysql_real_escape_string($zone) . "'"
+                ) . "' OR short = '" . mysqli_real_escape_string($this->bot->db->CONN,$zone) . "'"
             );
             if (!empty($zonenum)) {
                 $zonenum = $zonenum[0][0];
@@ -235,16 +235,16 @@ class Rally extends BaseActiveModule
                     Return ("Name needed to save rally as");
                 }
                 $check = $this->bot->db->select(
-                    "SELECT name FROM #___rally WHERE name = '" . mysql_real_escape_string($msg) . "'"
+                    "SELECT name FROM #___rally WHERE name = '" . mysqli_real_escape_string($this->bot->db->CONN,$msg) . "'"
                 );
                 if (!empty($check)) {
                     Return ("Name already exists");
                 }
                 $rally = implode(";", $this->rallyinfo);
                 $this->bot->db->query(
-                    "INSERT INTO #___rally (name, rally) VALUES ('" . mysql_real_escape_string(
+                    "INSERT INTO #___rally (name, rally) VALUES ('" . mysqli_real_escape_string($this->bot->db->CONN,
                         $msg
-                    ) . "', '" . mysql_real_escape_string($rally) . "')"
+                    ) . "', '" . mysqli_real_escape_string($this->bot->db->CONN,$rally) . "')"
                 );
                 Return "Rally has been saved as ##highlight##$msg##end##.";
             } else {
@@ -263,7 +263,7 @@ class Rally extends BaseActiveModule
                 Return ("Name needed to save rally as");
             }
             $check = $this->bot->db->select(
-                "SELECT rally FROM #___rally WHERE name = '" . mysql_real_escape_string($msg) . "'"
+                "SELECT rally FROM #___rally WHERE name = '" . mysqli_real_escape_string($this->bot->db->CONN,$msg) . "'"
             );
             if (empty($check)) {
                 Return ("Rally not found");
@@ -283,12 +283,12 @@ class Rally extends BaseActiveModule
                 Return ("Name needed to delete saved rally");
             }
             $check = $this->bot->db->select(
-                "SELECT name FROM #___rally WHERE name = '" . mysql_real_escape_string($msg) . "'"
+                "SELECT name FROM #___rally WHERE name = '" . mysqli_real_escape_string($this->bot->db->CONN,$msg) . "'"
             );
             if (empty($check)) {
                 Return ("Rally not found");
             }
-            $this->bot->db->query("DELETE FROM #___rally WHERE name = '" . mysql_real_escape_string($msg) . "'");
+            $this->bot->db->query("DELETE FROM #___rally WHERE name = '" . mysqli_real_escape_string($this->bot->db->CONN,$msg) . "'");
             Return "Rally ##highlight##$msg##end## has been deleted.";
         } else {
             return "You must be a ##highlight##LEADER##end## or higher to delete saved rally points.";

@@ -87,8 +87,8 @@ class VhItems extends BaseActiveModule
                     $url .= '&color_normal=' . $this->color_normal;
                 }
                 $result = $this->bot->core("tools")->get_site($url, 1);
-                //Again I do not see why we're looking for mysql_real_escape_string
-                if (strstr($result, 'mysql_real_escape_string') !== false) {
+                //Again I do not see why we're looking for mysqli_real_escape_string
+                if (strstr($result, 'mysqli_real_escape_string') !== false) {
                     return ("received garbled reply from vhabot!");
                 }
                 return $result;

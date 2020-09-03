@@ -169,16 +169,16 @@ class ColorConfig extends BaseActiveModule
     function set_color($module, $scheme, $newcolor)
     {
         $res = $this->bot->db->select(
-            "SELECT * FROM #___colors WHERE name = '" . mysql_real_escape_string($newcolor) . "'"
+            "SELECT * FROM #___colors WHERE name = '" . mysqli_real_escape_string($this->bot->db->CONN,$newcolor) . "'"
         );
         if (empty($res) && !$this->bot->core("colors")->check_theme($newcolor)
         ) {
             return "##error##You have to select an existing color name!##end##";
         }
         $res = $this->bot->db->select(
-            "SELECT * FROM #___color_schemes WHERE module = '" . mysql_real_escape_string(
+            "SELECT * FROM #___color_schemes WHERE module = '" . mysqli_real_escape_string($this->bot->db->CONN,
                 $module
-            ) . "' AND name = '" . mysql_real_escape_string($scheme) . "'"
+            ) . "' AND name = '" . mysqli_real_escape_string($this->bot->db->CONN,$scheme) . "'"
         );
         if (empty($res)) {
             return "##error##You have to select an existing color scheme!##end##";
