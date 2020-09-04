@@ -11,5 +11,4 @@ php.*
 *.iws
 
 log/*
-Logs/*
 Themes/Default.colors.xml
