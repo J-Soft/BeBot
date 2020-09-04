@@ -1,3 +1,0 @@
-Log files will be saved in the format:
-
-YYYY-MM-DD.txt

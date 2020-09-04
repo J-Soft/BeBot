@@ -6,7 +6,7 @@ The Sources directory contains the base files for the bot.
 These are accessed by name during bot startup.
 Any file in here is required, missing or faulty files lead to fatal errors.
 
-conf
+Conf
 ====
 The conf directory contains the configuration files for the bot(s).
 There are three types of configuration files:
@@ -20,22 +20,22 @@ case there must be a Botname.Bot.conf (with first letters uppercase as seen), wh
 contain all information usually found in Bot.conf (just copy the file over, and edit it then).
 Botname.MySQL.conf is optional in cases where you want to use different servers, users or databases.
 
-commodities
+Commodities
 ===========
 The commodities directory contains classes that do not instantiate themselves but are used by other
 classes in the bot.
 
-core
+Core
 ====
 The core directory contains modules offering service not directly to users, but to other modules.
 Modules in here should never contain any user commands, but just offer interfaces to their functions.
 
-custom
+Custom
 ======
 The custom directory contains a core/ and modules/ directory. Here you can place your own custom
 modules. BeBot releases will never touch any files in here.
 
-extra
+Extras
 =====
 This directory contains useful extras that help running the bot, but aren't really needed.
 The extras should contain some readme file.
@@ -45,7 +45,7 @@ log
 This is the default directory used for logging. It contains one subdirectory per bot used, in the
 format botname@RKx, with botname and x replaced.
 
-main
+Main
 ====
 This directory contains the most important core modules of the bot, the ones absolutely needed by
 the Bot class to even run without errors.
@@ -54,15 +54,15 @@ php file name, as could be used for any core module. XY together is a two-digit 
 numbers are used to define the order in which these modules are loaded. Any php file not starting
 with XY- as described above are ignored.
 
-modules
+Modules
 =======
 This directory contains all modules, which offer the in-game command interface.
 
-themes
+Themes
 ======
 This directory contains the color theme(s) of the bot(s). Those are simple XML files.
 BeBot defines a default scheme.
 
-txt
+Text
 ===
 This directory can be used to store text files that are used by modules to be displayed ingame.
