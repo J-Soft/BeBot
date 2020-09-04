@@ -1,8 +1,5 @@
-Please note, this is a text version of the documentation available at
-http://bebot.shadow-realm.org/wiki/installation - Due to the nature of a
-wiki, information may be updated at a rapid pace, so whenever possible
-please refer to the wiki for up to date instructions and general
-documentation.
+Updated README from https://github.com/J-Soft/BeBot
+More documentation at http://bebot.shadow-realm.org/wiki/
 
 
 INSTALLING BEBOT
@@ -80,9 +77,9 @@ On windows, according to the PHP version you'd want Bebot to run into, you may
 need to copy a php.exe file right into bot's root folder (where StartBot.bat is).
 Unless windows PATH and/or php.ini are well set so the exe can locate required
 libraries alone, you may have to copy correct .dll files for this specific PHP.
-For PHP 5.2 : libeay32, libmysql, php5ts and ssleay32 for this PHP version.
-For 5.4 : same files but for this version + php_mysqli & php_sockets.
-For 7.2 : libcrypto & libssl (64) + libssh2, nghttp2, php_curl & php7ts.
+For PHP 5.2/5.3 : libeay32, libmysql, php5ts and ssleay32 for this PHP version.
+For 5.4/5.6 : same files but for this version + php_mysqli & php_sockets.
+For 7.x : libcrypto & libssl (64) + libssh2, nghttp2, php_curl & php7ts.
 Bot will tell you what misses to run during startup, so check all lines !
 
 Set $main_php to the location of the "Main.php" file. Once again you can 
@@ -137,10 +134,9 @@ To make a guild bot set "$guildbot" to true. Change "$guild_name" to the
 exact name of your guild. 
 
 AO only: Set "$guild_id" to the id of your guild. The easiest way to find 
-out the guild ID is going to http://www.anarchy-
-online.com/content/community/people/ and finding your guild. Then scroll
-to the bottom of the page and click the "XML version of this membership
-roster" link.
+out the guild ID go http://www.anarchy-online.com/content/community/people/
+and find your guild. Then scroll to the bottom of the page and click the
+"XML version of this membership roster" link.
 It will start with:
 <organization>
  <id>
@@ -167,76 +163,27 @@ Set the MySQL username, password, server IP adress or server host name and
 database name for the bot (see below). 
 
 
-STARTING THE BOT
-================
-
-* Open a console (In windows press "Start" => "Run" => enter "cmd" and
-  press enter).
-* Now run the start.php
-* Windows: Navigate to the directory of your bot assuming you have the
-  php.exe in the same directory and write "php start.php".
-* Linux: Assuming your can run php5 from anywhere navigate to your bot 
-  directory and write e.g. "php5 start.php" (assuming your php binary is 
-  named "php5" in this example).
-
-The console should now state that the bot is loading the modules, 
-authenticating and connecting. Once this is done (AoC only: wait 5 minutes 
-now) you can log onto an character in-game which you have configured as 
-"superadmin". You should now be able to talk to the bot. 
-
-PLAYING WHILE RUNNING THE BOT (AO ONLY)
----------------------------------------
-
-You can run the bot and play AoC from the same account (with different 
-characters). 
-
-PLAYING WHILE RUNNING THE BOT (AOC ONLY)
-----------------------------------------
-You can run the bot and play AoC from the same account (with different 
-characters). However the bot must connect first and you have to wait at 
-least 5 minutes after logging the bot in, before you can connect with your 
-client. If the bot (re)connects while you are logged in, you get 
-disconnected. 
-
-
-IN-GAME SETUP
-=============
-
-There is a settings module to handle configuration of most aspects and many 
-modules for BeBot. Most notable is the Security module. To start configuring 
-it send a tell to your bot with "!settings security". For a list of modules 
-whose settings are configurable by the new interface send a tell to your bot 
-with "!settings". 
-
-
-ADDING AND REMOVING MODULES
-===========================
-
-If you do not wish for certain modules to be used by a bot just put an 
-underscore ("_") at the front of the name in the "modules" directory. There 
-are several files already in the distribution that have been commented out 
-in this way: Most notable is _ExampleModule.php which is a template to make 
-your own modules. 
-
-INSTALLING 3RD PARTY MODULES
-----------------------------
-
-We recommend you put any 3rd party modules into the directory named custom 
-instead of putting it directly into the modules or core directories. This is 
-because if a 3rd party module has got the same name as a standard module or 
-a module with that name is added later it will be over-written if you 
-upgrade the bot. Modules in the "custom" directory are never touched by 
-installing upgrades to BeBot. 
-
-
 INSTALLING MYSQL ON WINDOWS
 ===========================
 
-First, you'll need MySQL. Download the Windows Essentials package from 
-MySQL.com. This is a MSI based installer. If it doesn't work for you, go to 
+First, you'll need MySQL.
+
+For linux it could be :
+ Debian-like :
+  apt-get install mariadb-server
+ or
+  apt-get install mysql-server
+ CentOs-like :
+  yum install mariadb-server
+ or
+  yum install mysql-server
+It depends on your OS packager (yum/apt) & what DB server you want (sql/maria).
+  
+For windows : Download the Windows Essentials package from MySQL.com.
+This is a MSI based installer. If it doesn't work for you, go to 
 Microsoft Update to install the latest Windows Installer. 
 
-The installer is simple. 
+In all cases, the DB installer is simple and very similar to what's below.
 
 PHASE 1: MYSQL INSTALLER
 ------------------------
@@ -356,3 +303,65 @@ Database user, pass, db, server (e.g. localhost), table ("whois" by default) + A
 You also have few more parameters to play with lower in this file, to set accordingly to your taste.
 
 Then you can schedule the load of whether UpdateWhoisCache.bat (windows) or WhoisUpdate.php (linux).
+
+
+STARTING THE BOT
+================
+
+* Open a console (In windows press "Start" => "Run" => enter "cmd" and
+  press enter).
+* Now run StartBot (.php under linux or .bat under windows) :
+ - Windows: Navigate to the directory of your bot assuming you have the
+   php.exe in the same directory and write "StartBot.bat".
+ - Linux: Assuming your can run php from anywhere navigate to your bot 
+   directory and write e.g. "php StartBot.php" (assuming your php binary is 
+   named "php" in this example).
+
+The console should now state that the bot is loading the modules, 
+authenticating and connecting. Once this is done (AoC only: wait 5 minutes 
+now) you can log onto an character in-game which you have configured as 
+"superadmin". You should now be able to talk to the bot. 
+
+PLAYING WHILE RUNNING THE BOT (AO ONLY)
+---------------------------------------
+
+You can run the bot and play AO from the same account (with different 
+characters). 
+
+PLAYING WHILE RUNNING THE BOT (AOC ONLY)
+----------------------------------------
+You can run the bot and play AoC from the same account (with different 
+characters). However the bot must connect first and you have to wait at 
+least 5 minutes after logging the bot in, before you can connect with your 
+client. If the bot (re)connects while you are logged in, you get 
+disconnected. 
+
+
+IN-GAME SETUP
+=============
+
+There is a settings module to handle configuration of most aspects and many 
+modules for BeBot. Most notable is the Security module. To start configuring 
+it send a tell to your bot with "!settings security". For a list of modules 
+whose settings are configurable by the new interface send a tell to your bot 
+with "!settings". 
+
+
+ADDING AND REMOVING MODULES
+===========================
+
+If you do not wish for certain modules to be used by a bot just put an 
+underscore ("_") at the front of the name in the "Modules" directory. There 
+are several files already in the distribution that have been commented out 
+in this way: Most notable is _ExampleModule.php which is a template to make 
+your own modules. 
+
+INSTALLING 3RD PARTY MODULES
+----------------------------
+
+We recommend you put any 3rd party modules into the directory named Custom 
+instead of putting it directly into the modules or core directories. This is 
+because if a 3rd party module has got the same name as a standard module or 
+a module with that name is added later it will be over-written if you 
+upgrade the bot. Modules in the "Custom" directory are never touched by 
+installing following upgrades to BeBot. 
