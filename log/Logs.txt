@@ -1,0 +1,1 @@
+Logs will stack in here under each bot folder name Botname@RKx (x=5 or 6)

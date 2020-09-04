@@ -10,6 +10,4 @@ php.*
 .idea/tasks.xml
 *.iws
 
-log/*
-Logs/*
 Themes/Default.colors.xml
