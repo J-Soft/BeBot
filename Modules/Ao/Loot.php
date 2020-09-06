@@ -42,24 +42,23 @@ The Class itself...
 */
 class Rolls extends BaseActiveModule
 {
+	var $leftovers = array();
+	var $loot = array();
 
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->count = 0;
-        $this->register_command("pgmsg", "loot", "ANONYMOUS");
-        $this->register_command("pgmsg", "add", "ANONYMOUS");
-        $this->register_command("pgmsg", "rem", "ANONYMOUS");
-        $this->register_command("pgmsg", "list", "ANONYMOUS");
-        $this->register_command("pgmsg", "result", "ADMIN");
-        $this->register_command("pgmsg", "clear", "ADMIN");
-        $this->register_command("pgmsg", "reroll", "ADMIN");
-        $this->register_command("tell", "add", "ANONYMOUS");
-        $this->register_command("tell", "rem", "ANONYMOUS");
-        $this->register_command("tell", "loot", "ANONYMOUS");
-        $this->register_command("tell", "list", "ANONYMOUS");
-        $this->register_command("tell", "clear", "ADMIN");
-        $this->register_command("tell", "reroll", "ADMIN");
+		
+		$this -> register_command("all", "add", "GUEST");
+		$this -> register_command("all", "rem", "GUEST");
+		$this -> register_command("all", "prem", "LEADER");
+		$this -> register_command("all", "loot", "LEADER");
+		$this -> register_command("all", "list", "LEADER");
+		$this -> register_command("all", "clear", "LEADER");
+		$this -> register_command("all", "reroll", "LEADER");
+		$this -> register_command("all", "result", "LEADER");		
+		
         $this->register_event("pgleave");
         $this->bot->core("settings")
             ->create(
@@ -74,7 +73,8 @@ class Rolls extends BaseActiveModule
         $this->help['description'] = 'Module to flat roll on items.';
         $this->help['command']['loot <item>'] = "Adds an item to the roll list.";
         $this->help['command']['add <slot>'] = "Adds your name to the slot number.  Add 0 removes you from all slots.";
-        $this->help['command']['rem <slot>'] = "Removes your name from the slot number.";
+        $this->help['command']['rem <slot>'] = "Removes your name from the slot number given.";
+		$this->help['command']['prem <slot> <name>']="Removes player from roll of the slot number given.";
         $this->help['command']['list'] = "Lists all items and who is rolling for them.";
         $this->help['command']['clear'] = "Clears all rolls.";
         $this->help['command']['result'] = "Rolls for all the items and announces winners.";
@@ -113,14 +113,22 @@ class Rolls extends BaseActiveModule
                                 $this->roll($name);
                             } else {
                                 if (preg_match("/^clear/i", $msg)) {
-                                    unset($this->loot);
-                                    unset($this->leftovers);
+                                    unset($this->loot); $this->loot = array();
+                                    unset($this->leftovers); $this->leftovers = array();
                                     $this->count = 0;
                                     $this->bot->send_pgroup(
                                         "##loot_highlight##" . $name . "##end## cancelled the loot rolls in progress"
                                     );
                                 } else {
-                                    $this->bot->send_help($name);
+									if(preg_match("/^prem ([0-9]+) (.+)/i", $msg, $info)) {
+										if (isset($this->loot[$info[1]][ucfirst($info[2])]))
+										{
+											unset($this->loot[$info[1]][ucfirst($info[2])]);
+											$this->bot->send_pgroup("##loot_highlight##" . ucfirst($info[2]) . "##end## removed from rolls in slot##loot_highlight## #" . $info[1]);
+										}
+									} else {
+										$this->bot->send_help($name);
+									}
                                 }
                             }
                         }
@@ -214,7 +222,7 @@ class Rolls extends BaseActiveModule
             "##loot_highlight##" . $num . "x " . $msg . "##end## being rolled in slot##loot_highlight## #" . $numslot
         );
         if ($this->count == 1) {
-            unset($this->leftovers);
+            unset($this->leftovers); $this->leftovers = array();
         }
     }
 
@@ -223,27 +231,32 @@ class Rolls extends BaseActiveModule
     {
         $num = 1;
         $lcount = 0;
+		$msg = "";
         foreach ($this->loot as $slot) {
-            $item = $slot[item];
-            unset($slot[item]);
-            $numitems = $slot[num];
-            unset($slot[num]);
+            $item = $slot['item'];
+            unset($slot['item']);
+            $numitems = $slot['num'];
+            unset($slot['num']);
+
             for ($k = 0; $k < $numitems; $k++) {
                 $users = array();
                 $list = $slot;
                 $users = array_keys($list);
                 $count = count($list) - 1;
-                for ($i = 1; $i <= 10000; $i++) {
-                    $list[$users[$this->bot->core("tools")
-                        ->my_rand(0, $count)]]
-                        += 1;
-                }
+
+                if($count>0) {
+				for ($i = 1; $i <= 10000; $i++) {
+                    $list[$users[$this->bot->core("tools")->my_rand(0, $count)]] += 1;
+                }}
                 natsort($list);
+				$winner = "";
+
                 foreach ($list as $name => $points) {
                     $winner = $name;
                 }
+
                 if (!$winner) {
-                    $winner = Nobody;
+                    $winner = "Nobody";
                     $lcount = count($this->leftovers) + 1;
                     $this->leftovers[$lcount] = $item;
                 } else {
@@ -267,6 +280,7 @@ class Rolls extends BaseActiveModule
 
     function reroll($name)
     {
+		$msg = "";
         $lcount = count($this->leftovers);
         if ($lcount == 0) {
             $this->bot->send_pgroup("##loot_highlight##No leftovers from last roll.##end##");
@@ -276,8 +290,8 @@ class Rolls extends BaseActiveModule
                 $notyet = true;
                 for ($i = 1; $i <= $this->count; $i++) {
                     if ($item == $this->loot[$i][item]) {
-                        $this->loot[$i][num]++;
-                        $num = $this->loot[$i][num];
+                        $this->loot[$i]['num']++;
+                        $num = $this->loot[$i]['num'];
                         $notyet = false;
                         $numslot = $i;
                     }
@@ -286,30 +300,30 @@ class Rolls extends BaseActiveModule
                     $this->count++;
                     $num = 1;
                     $numslot = $this->count;
-                    $this->loot[$numslot][item] = $item;
-                    $this->loot[$numslot][num] = 1;
+                    $this->loot[$numslot]['item'] = $item;
+                    $this->loot[$numslot]['num'] = 1;
                 }
                 $msg .= "##loot_highlight##" . $num . "x " . $item . "##end## being rolled in slot##loot_highlight## #" . $numslot . "##end##.\n";
             }
             $blob = "Item Roll List :: " . $this->bot->core("tools")
                     ->make_blob("click to view", $msg);
             $this->bot->send_pgroup($blob);
-            unset($this->leftovers);
+            unset($this->leftovers); $this->leftovers = array();
         }
     }
 
 
     function rlist()
     {
-        $num = 0;
-        unset($msg);
+        $msg = "";
+		$num = 0;
         foreach ($this->loot as $slot) {
             $num++;
             $msg .= "Slot ##loot_highlight###" . $num . "##end##: (" . $this->bot
                     ->core("tools")
                     ->chatcmd("add " . $num, "Add") . "/" . $this->bot
                     ->core("tools")->chatcmd("rem " . $num, "Remove") . ")\n";
-            $msg .= "Item: ##loot_highlight##" . $slot[item] . "##end## (##loot_highlight##" . $slot[num] . "x##end##)\n";
+            $msg .= "Item: ##loot_highlight##" . $slot['item'] . "##end## (##loot_highlight##" . $slot['num'] . "x##end##)\n";
             if (count($slot) == 1) {
                 $msg .= "";
             } else {
