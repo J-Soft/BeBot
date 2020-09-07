@@ -289,7 +289,7 @@ class Rolls extends BaseActiveModule
             foreach ($this->leftovers as $item) {
                 $notyet = true;
                 for ($i = 1; $i <= $this->count; $i++) {
-                    if ($item == $this->loot[$i][item]) {
+                    if ($item == $this->loot[$i]['item']) {
                         $this->loot[$i]['num']++;
                         $num = $this->loot[$i]['num'];
                         $notyet = false;
