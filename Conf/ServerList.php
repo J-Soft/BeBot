@@ -9,8 +9,8 @@ $server_list['Ao']['6'] = $server_list['Ao']['Rubi-Ka-2019'];
 
 // AOC
 $server_list['Aoc']['EU'] = array(
-    'server' => 'dm10-nj4.ageofconan.com',
-    'port' => 7000
+    'server' => 'dm09-nj4.ageofconan.com',
+    'port' => 7010
 );
 $server_list['Aoc']['US'] = array(
     'server' => 'aoc-us-um.live.ageofconan.com',
