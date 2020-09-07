@@ -280,11 +280,11 @@ class AOChat
         // Connect to the login server and log in with the username and password
         //
         $loginServer = new LoginServerConnection($this, $username, $password, $serverAddress, $serverPort, LOGIN_TYPE_PROTOBUF);
-        if (!$loginServer->Connect()) { echo " errls "; sleep(1);
+        if (!$loginServer->Connect()) {
             trigger_error("Could not connect to the Loginserver (" . $serverAddress . ":" . $serverPort . ")");
             return false;
         }
-        if (!$loginServer->HandlePackets()) { echo " errpack "; sleep(1);
+        if (!$loginServer->HandlePackets()) {
             $loginServer->Disconnect("Error while handling packets for loginserver");
             trigger_error("Error while handling packets for Loginserver (" . $serverAddress . ":" . $serverPort . ")");
             return false;
