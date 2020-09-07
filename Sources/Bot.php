@@ -132,6 +132,7 @@ class Bot
     var $proxy_server_address;
     var $starttime;
     var $commands;
+	var $sixtyfourbit;
     public $owner;
     public $super_admin;
     private $module_links = array();
