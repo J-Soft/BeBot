@@ -186,7 +186,7 @@ class LoginServerConnection extends ServerConnection
 
                     // Split the server address up from address:port
                     if (strlen($tmAddress) != 0) {
-                        list($this->m_CharacterServerAddress, $this->m_CharacterServerPort) = split(":", $tmAddress);
+                        list($this->m_CharacterServerAddress, $this->m_CharacterServerPort) = explode(":", $tmAddress);
                         echo "[" . $this->m_LogName . "] Received character server address [ " . $this->m_CharacterServerAddress . ":" . $this->m_CharacterServerPort . " ]\n";
                         return true;
                     }

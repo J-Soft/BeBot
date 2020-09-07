@@ -217,10 +217,10 @@ class AOChat
     {
         if (strtolower(AOCHAT_GAME) == 'ao') {
             if ($server == "default") {
-                $server = "chat2.d1.funcom.com";
+                $server = "chat.d1.funcom.com";
             }
             if ($port == "default") {
-                $port = 7012;
+                $port = 7105;
             }
         }
         if ($this->state !== "connect") {
@@ -280,11 +280,11 @@ class AOChat
         // Connect to the login server and log in with the username and password
         //
         $loginServer = new LoginServerConnection($this, $username, $password, $serverAddress, $serverPort, LOGIN_TYPE_PROTOBUF);
-        if (!$loginServer->Connect()) {
+        if (!$loginServer->Connect()) { echo " errls "; sleep(1);
             trigger_error("Could not connect to the Loginserver (" . $serverAddress . ":" . $serverPort . ")");
             return false;
         }
-        if (!$loginServer->HandlePackets()) {
+        if (!$loginServer->HandlePackets()) { echo " errpack "; sleep(1);
             $loginServer->Disconnect("Error while handling packets for loginserver");
             trigger_error("Error while handling packets for Loginserver (" . $serverAddress . ":" . $serverPort . ")");
             return false;
@@ -313,7 +313,6 @@ class AOChat
             return false;
         }
         $characterServer->Disconnect("Done");
-
 
         // Make sure we give this to the main program
         $this->accountid = $loginServer->GetAccountID();
@@ -344,11 +343,11 @@ class AOChat
             $this->login_num++;
 
             $loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(
-                                                                                    1,
-                                                                                    $this->char["id"],
-                                                                                    $this->serverseed,
-                                                                                    $this->char["language"]
-                                                                               ));
+				1,
+				$this->char["id"],
+				$this->serverseed,
+				$this->char["language"]
+		    ));
             $this->send_packet($loginCharacterPacket);
             $this->state = "connected";
             return true;

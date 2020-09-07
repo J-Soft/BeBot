@@ -49,7 +49,7 @@ class Rolls extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->count = 0;
-		
+		$this->register_module("loots");
 		$this -> register_command("all", "add", "GUEST");
 		$this -> register_command("all", "rem", "GUEST");
 		$this -> register_command("all", "prem", "LEADER");
@@ -58,7 +58,6 @@ class Rolls extends BaseActiveModule
 		$this -> register_command("all", "clear", "LEADER");
 		$this -> register_command("all", "reroll", "LEADER");
 		$this -> register_command("all", "result", "LEADER");		
-		
         $this->register_event("pgleave");
         $this->bot->core("settings")
             ->create(
