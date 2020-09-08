@@ -126,6 +126,7 @@ class BuddyList extends BasePassiveModule
 
     function buddy_aoc($args)
     {
+		$user = $this->bot->core("player")->name($args['id']);
         // Get the users current state
         $old_who = $this->bot->core("Whois")
             ->lookup($user, true); // $noupdate MUST be true to avoid adding buddy recursively
@@ -143,7 +144,7 @@ class BuddyList extends BasePassiveModule
         $who["location"] = $args['location']; // For offline users 'location' contains the last online time in milliseconds since 1970!
         $class_name = $this->bot->core("Whois")->class_name[$args['class']];
         $who["class"] = $class_name;
-        $lookup = $this->db->select("SELECT * FROM #___craftingclass WHERE name = '" . $user . "'", MYSQLI_ASSOC);
+        $lookup = $this->bot->db->select("SELECT * FROM #___craftingclass WHERE name = '" . $user . "'", MYSQLI_ASSOC);
         if (!empty($lookup)) {
             $who["craft1"] = $lookup[0]['class1'];
             $who["craft2"] = $lookup[0]['class2'];

@@ -121,7 +121,7 @@ class PlayerList extends BasePassiveModule
         if (empty($uname)) {
             // This is normal and can happen, if the user just types "!whois" etc.
             $this->error->set("Tried to get user id for an empty user name.");
-            $this->bit->log("DEBUG", "PlayerList", "Tried to get user id for an empty user name.");
+            $this->bot->log("DEBUG", "PlayerList", "Tried to get user id for an empty user name.");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
             return $this->error;
         }
