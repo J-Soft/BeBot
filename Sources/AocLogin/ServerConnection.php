@@ -27,7 +27,7 @@ class ServerConnection
     private $m_Socket;
 
 
-    public function ServerConnection(
+    public function SConnection(
         $logname,
         $serverAddress,
         $serverPort,
@@ -208,8 +208,8 @@ class ServerConnection
 
     protected function EncryptAndSend($data, $rpcID)
     {
-        $stream = new BinaryStream();
 
+		$stream = new BinaryStream();
         $tst = substr($data->GetWriteData(), 0, $data->GetWriteLength());
         $crc = crc32($tst);
 

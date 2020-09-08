@@ -333,25 +333,35 @@ class Bot
         if (isset($server_list['Ao'][$dimension])) {
             $server = $server_list['Ao'][$dimension]['server'];
             $port = $server_list['Ao'][$dimension]['port'];
+			$checkao = true;
         } elseif (isset($server_list['Aoc'][$dimension])) {
             $server = $server_list['Aoc'][$dimension]['server'];
             $port = $server_list['Aoc'][$dimension]['port'];
+			$checkao = false;
         } else {
             die("Unknown dimension " . $this->dimension);
         }
 
-        if (!$this->aoc->connect($this->server, $this->port)) {
-            $this->cron_activated = false;
-            $this->disconnect();
-            $this->log("CONN", "ERROR", "Can't connect to server. Retrying in " . $this->reconnecttime . " seconds.");
-            sleep($this->reconnecttime);
-            die("The bot is restarting.\n");
-        }
-        // AoC authentication is a bit different
-        if (strtolower($this->game) == 'aoc') {
-            // Open connection
-            $this->log("LOGIN", "STATUS", "Connecting to $this->game server $server:$port");
-            if (!$this->aoc->connect($server, $port, $this->sixtyfourbit)) {
+        $this->log("LOGIN", "STATUS", "Connecting to $this->game server $server:$port");
+		
+		if($checkao) { // Ao authentication is simplest
+			if (!$this->aoc->connect($this->server, $this->port)) {
+				$this->cron_activated = false;
+				$this->disconnect();
+				$this->log("CONN", "ERROR", "Can't connect to server. Retrying in " . $this->reconnecttime . " seconds.");
+				sleep($this->reconnecttime);
+				die("The bot is restarting.\n");
+			}
+			// Authenticate
+            $this->log("LOGIN", "STATUS", "Authenticating $this->username");
+            $this->aoc->authenticate($this->username, $this->password);
+            // Login the bot character
+            $this->log("LOGIN", "STATUS", "Logging in $this->botname");
+            $this->aoc->login(ucfirst(strtolower($this->botname)));
+		}
+        
+        if (!$checkao) { // Aoc authentication is a bit different
+			if ($this->aoc->authenticateConan($server, $port, $this->username, $this->password, $this->botname, $this->sixtyfourbit) == false) {
                 $this->cron_activated = false;
                 $this->disconnect();
                 $this->log(
@@ -362,14 +372,8 @@ class Bot
                 sleep($this->reconnecttime);
                 die("The bot is restarting.\n");
             }
-        } else {
-            // Authenticate
-            $this->log("LOGIN", "STATUS", "Authenticating $this->username");
-            $this->aoc->authenticate($this->username, $this->password);
-            // Login the bot character
-            $this->log("LOGIN", "STATUS", "Logging in $this->botname");
-            $this->aoc->login(ucfirst(strtolower($this->botname)));
         }
+
         /*
         We're logged in. Make sure we no longer keep username and password in memory.
         */

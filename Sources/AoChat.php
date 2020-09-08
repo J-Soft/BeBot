@@ -217,10 +217,10 @@ class AOChat
     {
         if (strtolower(AOCHAT_GAME) == 'ao') {
             if ($server == "default") {
-                $server = "chat2.d1.funcom.com";
+                $server = "chat.d1.funcom.com";
             }
             if ($port == "default") {
-                $port = 7012;
+                $port = 7105;
             }
         }
         if ($this->state !== "connect") {
@@ -314,7 +314,6 @@ class AOChat
         }
         $characterServer->Disconnect("Done");
 
-
         // Make sure we give this to the main program
         $this->accountid = $loginServer->GetAccountID();
         $this->serverseed = $characterServer->GetChatServerCookie();
@@ -344,11 +343,11 @@ class AOChat
             $this->login_num++;
 
             $loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(
-                                                                                    1,
-                                                                                    $this->char["id"],
-                                                                                    $this->serverseed,
-                                                                                    $this->char["language"]
-                                                                               ));
+				1,
+				$this->char["id"],
+				$this->serverseed,
+				$this->char["language"]
+		    ));
             $this->send_packet($loginCharacterPacket);
             $this->state = "connected";
             return true;
@@ -1314,7 +1313,7 @@ class AOChat
         $base = $this->bighexdec($base);
         $exp = $this->bighexdec($exp);
         $mod = $this->bighexdec($mod);
-        if (function_exists("bcpowmod")) /* PHP5 finally has this */ {
+        if (function_exists("bcpowmod"))  { // PHP5 finally has this
             $r = bcpowmod($base, $exp, $mod);
             return $this->bigdechex($r);
         }
@@ -1433,7 +1432,7 @@ class AOChat
     function SafeDecHexReverseEndian($value)
     {
         $result = "";
-        if (!$this->sixtyfourbit) {
+        if (!$this->sixtyfourbit&&(float)phpversion()<7.0) { // as PHP 7+ fails challenge over this
             $hex = dechex($this->ReduceTo32Bit($value));
             $len = strlen($hex);
             while ($len < 8) {

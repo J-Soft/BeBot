@@ -39,7 +39,7 @@ class CharacterServerConnection extends ServerConnection
     private $m_GuildServerCookie;
 
 
-    public function CharacterServerConnection(
+    public function __construct(
         $parent,
         $accountID,
         $characterName,
@@ -51,7 +51,7 @@ class CharacterServerConnection extends ServerConnection
         $clientEndpoint = new Endpoints(0x7D155738, "PlayerInterface", $accountID, 0);
         $serverEndpoint = new Endpoints(0x82F20484, "PlayerAgent", 0, 0);
 
-        parent::ServerConnection(
+        parent::SConnection(
             "Conan Char Server ",
             $serverAddress,
             $serverPort,
