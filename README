@@ -365,3 +365,20 @@ because if a 3rd party module has got the same name as a standard module or
 a module with that name is added later it will be over-written if you 
 upgrade the bot. Modules in the "Custom" directory are never touched by 
 installing following upgrades to BeBot. 
+
+EXTERNAL LOOT HELPER SUPPORT
+----------------------------
+
+Bebot is now able to benefit from 3rd party loot helper as AOIA offers at
+https://sourceforge.net/projects/aoiaplus/
+
+AOIA running first, it will automate AO scripts during your gameplay.
+When you killed a mob/boss, to roll its remains open loot ingame & do :
+	/loot botname mloot
+
+You then can "view" an AOIA window with a prepared "Roll" link down below.
+Simply click this link, being !leader on bot (named "botname" in example).
+All loots present in remains window should be automatically added to roll.
+
+This way you can add several remains in 1 roll, otherwise !clear in between.
+You also can delete unwanted loots ingame remains BEFORE doing upper /loot

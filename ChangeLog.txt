@@ -1,6 +1,7 @@
 -------------
 Version 0.7.0
 -------------
+- New !mloot command supporting external 3rd party (e.g. M. Fjeldstad AOIA) for quick loot add/roll, as suggested by Relo (RK5)
 - AO/AoC servers update, Mysqli & PHP 7+ compatibility, many legacy plugins/cores fixed
 - Made Bot.php, AOChat.php and MySQL.php conform to the singleton design pattern
 - Moved ConfigMagik out of main and into Source and converted it to use the singleton design pattern.
