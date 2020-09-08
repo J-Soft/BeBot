@@ -210,7 +210,7 @@ class Rolls extends BaseActiveModule
 	function mloot($blob, $name)
 	{ 
 			$multiloots = html_entity_decode($blob);
-			echo $multiloots;
+			//echo $multiloots;
 			if(preg_match_all("/<a href='itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)'>([^<]+)<\/a>/i", $multiloots, $matches)) {
 				//print_r($matches);
 				foreach($matches[0] as $match) {
