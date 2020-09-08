@@ -8,7 +8,7 @@ class Endpoints
     private $m_Token;
 
 
-    public function Endpoints($type, $name, $instance, $token)
+    public function __construct($type, $name, $instance, $token)
     {
         $this->m_Name = $name;
         $this->m_Type = $type;

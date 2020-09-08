@@ -1313,7 +1313,7 @@ class AOChat
         $base = $this->bighexdec($base);
         $exp = $this->bighexdec($exp);
         $mod = $this->bighexdec($mod);
-        if (function_exists("bcpowmod")) /* PHP5 finally has this */ {
+        if (function_exists("bcpowmod"))  { // PHP5 finally has this
             $r = bcpowmod($base, $exp, $mod);
             return $this->bigdechex($r);
         }
@@ -1432,7 +1432,7 @@ class AOChat
     function SafeDecHexReverseEndian($value)
     {
         $result = "";
-        if (!$this->sixtyfourbit) {
+        if (!$this->sixtyfourbit&&(float)phpversion()<7.0) { // as PHP 7+ fails challenge over this
             $hex = dechex($this->ReduceTo32Bit($value));
             $len = strlen($hex);
             while ($len < 8) {

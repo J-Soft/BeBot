@@ -34,7 +34,7 @@
 $botstatistics_core = new BotStatistics_Core($bot);
 class BotStatistics_Core extends BasePassiveModule
 {
-
+	var $online=false;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
@@ -132,6 +132,7 @@ class BotStatistics_Core extends BasePassiveModule
                 "UPDATE " . $this->DB . "#___bots SET online = " . time(
                 ) . " WHERE bot = '" . $this->bot->botname . "' AND dim = '" . $this->bot->dimension . "'"
             );
+			$this->online=true;
         }
     }
 

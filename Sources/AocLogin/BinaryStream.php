@@ -51,7 +51,7 @@ class BinaryStream
         if ($this->m_DataLen > $this->m_WritePtr) {
             return $this->m_DataLen;
         } else {
-            $this->m_WritePtr;
+            return $this->m_WritePtr;
         }
     }
 
@@ -62,8 +62,9 @@ class BinaryStream
     /// @return String - The buffer we have written data into
     /// @author Chaoz
     public function GetWriteData()
-    {
-        return implode($this->m_Data);
+    {	
+		if(is_array($this->m_Data)) return implode($this->m_Data);
+		else return $this->m_Data;
     }
 
 
@@ -171,7 +172,7 @@ class BinaryStream
     {
         $len = $this->ReadUInt16();
         if ($this->m_ReadPtr + $len > $this->m_DataLen) {
-            echo("[BinaryStream][ReadString] " . $str . " [pos:" . ($this->m_ReadPtr) . "] invalid length :" . $len . " since it will read outside of buffer.\n");
+            //echo("[BinaryStream][ReadString] " . $str . " [pos:" . ($this->m_ReadPtr) . "] invalid length :" . $len . " since it will read outside of buffer.\n");
             return null;
         }
 
@@ -190,7 +191,7 @@ class BinaryStream
     public function ReadRaw($len)
     {
         if ($this->m_ReadPtr + $len > $this->m_DataLen) {
-            echo("[BinaryStream][ReadRaw] " . $str . " [pos:" . ($this->m_ReadPtr) . "] invalid length :" . $len . " since it will read outside of buffer.\n");
+            //echo("[BinaryStream][ReadRaw] " . $str . " [pos:" . ($this->m_ReadPtr) . "] invalid length :" . $len . " since it will read outside of buffer.\n");
             return null;
         }
 
@@ -248,12 +249,13 @@ class BinaryStream
     /// @author Chaoz
     public function WriteRaw($str, $len)
     {
-        //echo("[BinaryStream][WriteRaw] " . $str . " [pos:" . ($this->m_WritePtr) . " to " . ($this->m_WritePtr + $len) . "] len:" . $len . "]\n");
+		//echo("[BinaryStream][WriteRaw] " . $str . " [pos:" . ($this->m_WritePtr) . " to " . ($this->m_WritePtr + $len) . "] len:" . $len . "]\n");
         for ($i = 0; $i < $len; $i++) {
-            $this->m_Data[$this->m_WritePtr++] = $str[$i];
+            if(isset($str[$i])) {
+				$this->m_Data[$this->m_WritePtr++] = $str[$i]; }
         }
     }
-
+	
 
     /// WriteString
     /// Writes a string to the write buffer

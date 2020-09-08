@@ -24,7 +24,7 @@ class LoginServerConnection extends ServerConnection
     private $m_CharacterServerPort;
 
 
-    public function LoginServerConnection(
+    public function __construct(
         $parent,
         $username,
         $password,
@@ -35,7 +35,7 @@ class LoginServerConnection extends ServerConnection
         $clientEndpoint = new Endpoints(0x0C384054, "UniverseInterface", 1, 0);
         $serverEndpoint = new Endpoints(0x604DDBA0, "UniverseAgent", 0, 0);
 
-        parent::ServerConnection(
+        parent::SConnection(
             "Conan Login Server",
             $serverAddress,
             $serverPort,
@@ -123,7 +123,7 @@ class LoginServerConnection extends ServerConnection
                 $stream->WriteUInt32(1);
             }
         }
-
+		
         parent::EncryptAndSend($stream, RPC_UNIVERSE_INIT);
     }
 
@@ -135,10 +135,11 @@ class LoginServerConnection extends ServerConnection
     /// @author Chaoz
     public function AnswerChallenge($seed)
     {
-        $response = $this->m_Parent->generate_login_key($seed, $this->m_Username, $this->m_Password);
-
+		$response = $this->m_Parent->generate_login_key($seed, $this->m_Username, $this->m_Password);
+		//echo " ... debug chall resp: ".$response." ... ";
         $stream = parent::CreateBinaryStream(RPC_UNIVERSE_ANSWERCHALLENGE);
         $stream->WriteString($response);
+
         parent::EncryptAndSend($stream, RPC_UNIVERSE_ANSWERCHALLENGE);
     }
 
@@ -158,7 +159,7 @@ class LoginServerConnection extends ServerConnection
             switch ($rpcID) {
                 case RPC_UNIVERSE_CHALLENGE:
                 {
-                    $seed = $stream->ReadString();
+					$seed = $stream->ReadString();
                     $this->AnswerChallenge($seed);
                 }
                     break;
