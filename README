@@ -20,7 +20,8 @@ To install and run BeBot you need the following:
 * database server of either Mysql (from 4.1.1 upto 5.7) or MariaDB (10.0 upto 10.4)
 * either "Official" files at https://github.com/J-Soft/BeBot/archive/master.zip (stable)
   or "Beta" files from https://github.com/bitnykk/BeBot/archive/master.zip (sandbox)
-
+  NB : if you know how to use git, you also can clone/pull from any of these urls.
+  
 Optional (helps run it effectively): 
 
 * An "always-on" internet connection
