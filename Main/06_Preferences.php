@@ -220,6 +220,7 @@ class Preferences_core extends BasePassiveModule
 
     function get($name, $module = false, $setting = false)
     {
+		$prefs = array();
         //Check if $name is already a uid.
         if (is_numeric($name)) {
             $uid = $name;
@@ -231,7 +232,7 @@ class Preferences_core extends BasePassiveModule
         }
         if ($module == false && $setting == false) {
             //We're fetching a list of all preferences for a user
-            $prefs = array_merge($this->cache['def'], (array)$this->cache[$uid]);
+            if(isset($this->cache[$uid])) { $prefs = array_merge($this->cache['def'], (array)$this->cache[$uid]); }
             return ($prefs);
         }
         if ($module != false && $setting == false) {
@@ -335,6 +336,7 @@ class Preferences_core extends BasePassiveModule
 
     function show_modules($name)
     {
+		$window = "";
         $list = $this->bot->core("prefs")->get($name);
         $list = array_keys($list);
         foreach ($list as $module) {

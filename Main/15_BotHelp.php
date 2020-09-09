@@ -215,7 +215,7 @@ class BotHelp_Core extends BaseActiveModule
                     }
                 }
             }
-            $window .= '<br>##blob_title##NOTES:##end##<br>##blob_text##' . $help['notes'] . '##end##';
+            if(isset($help['notes'])) { $window .= '<br>##blob_title##NOTES:##end##<br>##blob_text##' . $help['notes'] . '##end##'; }
             if (!empty($module_commands)) {
                 ksort($module_commands);
                 $window .= "<br><br>##blob_title##OTHER COMMANDS OF THIS MODULE:##end##<br>";

@@ -83,6 +83,7 @@ class Roster_Handler extends BaseActiveModule
         */
         $vars = explode(' ', strtolower($msg));
         $command = $vars[0];
+		if(!isset($vars[1])) { $vars[1]=""; }
         switch ($command) {
             case 'member':
                 switch ($vars[1]) {

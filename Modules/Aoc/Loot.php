@@ -316,7 +316,7 @@ class Rolls extends BaseActiveModule
 
     function rlist()
     {
-        $num = 0;
+        $num = 0; $msg = "";
         unset($msg);
         foreach ($this->loot as $slot) {
             $num++;

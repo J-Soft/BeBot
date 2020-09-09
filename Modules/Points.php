@@ -163,6 +163,7 @@ class Points extends BaseActiveModule
     function command_handler($name, $msg, $origin)
     {
         $msg = explode(" ", $msg, 5);
+		if(!isset($msg[1])) { $msg[1]=""; }
         Switch (strtolower($msg[1])) {
             case 'give':
                 $this->give_points($name, $msg[2], $info[3]);

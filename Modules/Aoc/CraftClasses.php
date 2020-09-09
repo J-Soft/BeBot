@@ -109,7 +109,7 @@ class craftclasses extends BaseActiveModule
         if (preg_match("/^setcraft (.+)$/i", $msg, $info)) {
             $options_str = $info[1];
             $options = array();
-            $options = split(" ", $options_str);
+            $options = explode(" ", $options_str);
             $craftclass = array(
                 "Alchemist",
                 "Architect",

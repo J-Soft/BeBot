@@ -123,7 +123,7 @@ class Time_Core extends BaseActiveModule
         if ($totalsec < 0) {
             $minus = "-";
             $totalsec = $totalsec - ($totalsec * 2);
-        }
+        } else { $minus = ""; }
         $hours = floor($totalsec / (60 * 60));
         $rest = $totalsec % (60 * 60);
         $minutes = floor($rest / 60);

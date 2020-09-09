@@ -340,7 +340,10 @@ class OnlineDisplay extends BaseActiveModule
         if (strtolower($this->bot->game) == 'ao') {
             $ex1 = "defender_rank_id DESC, ";
             $ex2 = ", defender_rank_id";
-        }
+        } else {
+            $ex1 = "";
+            $ex2 = "";		
+		}
         $botstring = $this->bot->core("online")->otherbots();
         if (strtolower(
                 $this->bot->core("settings")
@@ -594,7 +597,9 @@ class OnlineDisplay extends BaseActiveModule
         );
         if (strtolower($this->bot->game) == 'ao') {
             $ex1 = ", defender_rank_id";
-        }
+        } else {
+            $ex1 = "";			
+		}
         $online = $this->bot->db->select(
             "SELECT DISTINCT(t1.nickname), t2.level, " . $this->cp . $ex1 . ", org_name FROM " . $this->bot
                 ->core("online")

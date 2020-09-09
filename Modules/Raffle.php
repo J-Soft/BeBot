@@ -42,7 +42,7 @@ class Raffle extends BaseActiveModule
 {
     var $item;
     var $item_blank;
-    var $users;
+    var $users = array();
     var $output;
     var $admin;
     var $result;
@@ -164,7 +164,7 @@ class Raffle extends BaseActiveModule
                         $results
                     ) . "\n" . "##raffle_highlight##----------------------------------------------------------##end##"
             );
-            $this->users = "";
+            $this->users = array();
             $this->item = "";
             $this->admin = "";
             $this->item_blank = "";
@@ -195,7 +195,7 @@ class Raffle extends BaseActiveModule
                     ->core("security")->check_access($name, "admin"))
         ) {
             $this->output("##raffle_highlight##$name##end## has canceled the raffle.");
-            $this->users = "";
+            $this->users = array();
             $this->item = "";
             $this->admin = "";
             $this->item_blank = "";
@@ -343,7 +343,7 @@ class Raffle extends BaseActiveModule
             }
             $this->item = $item;
             $this->item_blank = preg_replace("/<\/a>/U", "", preg_replace("/<a href(.+)>/sU", "", $item));
-            $this->users = "";
+            $this->users = array();
             $this->admin = $name;
             $timer = $this->bot->core("settings")
                 ->get("Raffle", "timer");
@@ -459,7 +459,7 @@ class Raffle extends BaseActiveModule
                 $this->raffle_result($this->admin);
             } else {
                 $this->output("Raffle for " . $this->item . " ended with no users.");
-                $this->users = "";
+                $this->users = array();
                 $this->item = "";
                 $this->admin = "";
                 $this->item_blank = "";

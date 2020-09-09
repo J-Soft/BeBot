@@ -71,6 +71,7 @@ class ModuleControlGUI extends BaseActiveModule
     */
     function show_stuff()
     {
+		$blob = "";
         $sections = $this->bot->core("ini")->listSections();
         natcasesort($sections);
         foreach ($sections as $section) {

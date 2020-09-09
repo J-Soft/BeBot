@@ -328,6 +328,7 @@ class AccessControlGUI extends BaseActiveModule
 
     function Make_access_string($command, $current_level, $channel)
     {
+		$return = "";
         if ($channel == "all") {
             foreach ($this->channels as $chan => $color) {
                 if (isset($this->bot->commands[$chan][$command]) && isset($current_level[$chan])) {

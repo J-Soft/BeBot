@@ -178,6 +178,7 @@ class BotStatistics_Core extends BasePassiveModule
                 $weekon = 0;
                 $monthon = 0;
                 $allon = 0;
+				$dayon = 0;
                 $restartd = -1;
                 $restartw = -1;
                 $restartm = -1;
@@ -298,12 +299,13 @@ class BotStatistics_Core extends BasePassiveModule
 
     function timedif($low, $high, $showmins = true)
     {
+		$ms = ""; $hs = ""; $ds = "";
         $dif = $high - $low;
         if ($dif < 60 * 60) {
             $mins = floor($dif / 60);
             if ($mins > 1) {
                 $ms = "s";
-            }
+            } 
             Return ($mins . " Minute" . $ms);
         } elseif ($dif < 60 * 60 * 24) {
             $mins = floor($dif / 60);

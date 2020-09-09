@@ -74,6 +74,7 @@ class Rally extends BaseActiveModule
         if (strtolower($msg[0]) != "rally") {
             Return ("Error Unknown Command ##highlight##$msg[0]##end## in Rally Module");
         }
+		if(!isset($msg[1])) { $msg[1]=""; }
         $msg = trim($msg[1]);
         $msg = explode(" ", $msg, 2);
         Switch (strtolower($msg[0])) {

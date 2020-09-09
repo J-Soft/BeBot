@@ -228,7 +228,7 @@ class tools extends BasePassiveModule
         }
         // Did the calling function want http headers stripped?
         if ($strip_headers) {
-            $split = split("\r\n\r\n", $return);
+            $split = explode("\r\n\r\n", $return);
             $return = $split[1];
         }
         return $return;
@@ -282,7 +282,7 @@ class tools extends BasePassiveModule
         // Did the calling function want http headers stripped?
         //if ($strip_headers)// already stripped?
         //{
-        //	$split = split("\r\n\r\n",$return);
+        //	$split = explode("\r\n\r\n",$return);
         //	$return = $split[1];
         //}
         Return $return;

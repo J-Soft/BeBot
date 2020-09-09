@@ -999,7 +999,7 @@ class AOChat
 
         for ($i = 0; ($i < 200) && (!$this->bot->Core('player')->exists($u)); $i++) {
             $pr = $this->wait_for_packet(1);
-            if ($pr->type == AOCP_CLIENT_LOOKUP) {
+            if (isset($pr->type) && $pr->type == AOCP_CLIENT_LOOKUP) {
                 break;
             }
         }

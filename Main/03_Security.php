@@ -284,7 +284,7 @@ class Security_Core extends BaseActiveModule
         $vars = explode(' ', strtolower($msg));
 
         $command = $vars[0];
-
+		if(!isset($vars[1])) { $vars[1]=""; }
         switch ($command) {
             case 'security':
                 switch ($vars[1]) {
@@ -739,7 +739,7 @@ class Security_Core extends BaseActiveModule
         if ($this->bot->core("flexible_security") != null) {
             $this->bot->core("flexible_security")->clear_cache();
         }
-        return "Deleted group ID " . $this->cache['groups'][$target]['gid'] . " Name: " . $target . ".";
+        return "Deleted group "; //ID " . $this->cache['groups'][$target]['gid'] . " Name: " . $target . ".";
     } // End function del_group()
 
     /*
@@ -836,7 +836,7 @@ class Security_Core extends BaseActiveModule
     { // Start function add_user()
         $admin = ucfirst(strtolower($admin));
         $target = ucfirst(strtolower($target));
-        $level = strtoupper($level);
+        //$level = strtoupper($level);
         $uid = $this->bot->core('player')->id($target);
         // Check to see if user is banned.
         if ($this->is_banned($target)) {
@@ -1042,6 +1042,7 @@ class Security_Core extends BaseActiveModule
         $sql .= "WHERE name != 'superadmin' AND name != 'admin' AND name != 'leader' ";
         $sql .= "ORDER BY access_level DESC, name ASC";
         $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
+		$superadmin = ""; $admin = ""; $leader = ""; $member = ""; $guest = ""; $anonymous = "";
         if (!empty($result)) {
             foreach ($result as $group) {
                 if ($group['access_level'] == SUPERADMIN && $group['name'] <> "superadmin") {
@@ -1271,6 +1272,7 @@ class Security_Core extends BaseActiveModule
     */
     function change_links($levelid, $groupid, $msgtype)
     { // Start function change_links
+		$return = "";
         if (!is_numeric($levelid)) {
             return null;
         }
@@ -2144,6 +2146,7 @@ class Security_Core extends BaseActiveModule
     */
     function whoami($name)
     { // Start function whoami
+		$groupmsg = "";
         $groups = $this->bot->core("security")->get_groups($name);
         $access = $this->bot->core("security")->get_access_level($name);
         $access = $this->get_access_name($access);

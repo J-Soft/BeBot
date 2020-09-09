@@ -331,9 +331,12 @@ class Trickle extends BaseActiveModule
                  'stat6',
                  'val6'
             )
-        );
-        if (empty($com['stat1'])) {
-            $this->error->set('You need to specify which stats to trickle from.');
+        ); //print_r($com);
+        if (
+			empty($com['stat1'])||empty($com['stat2'])||empty($com['stat3'])||empty($com['stat4'])||empty($com['stat5'])||empty($com['stat6'])||
+			!is_numeric($com['val1'])||!is_numeric($com['val2'])||!is_numeric($com['val3'])||!is_numeric($com['val4'])||!is_numeric($com['val5'])||!is_numeric($com['val6'])
+		) {
+            $this->error->set('You need to specify which stats & values (6x) to trickle from.');
             return ($this->error);
         }
         $stats = array(
@@ -371,7 +374,10 @@ class Trickle extends BaseActiveModule
         foreach ($this->skill as $group_name => $group) {
             foreach ($group as $item_name => $item) {
                 foreach ($item as $stat => $factor) {
-                    $increase[$group_name][$item_name] += ($upgrade[$stat] / 4) * $factor;
+					if(isset($upgrade[$stat])&&$upgrade[$stat]>0) {
+						if(isset($increase[$group_name][$item_name])) $increase[$group_name][$item_name] += ($upgrade[$stat] / 4) * $factor;
+						else $increase[$group_name][$item_name] = ($upgrade[$stat] / 4) * $factor;
+					}
                 }
             }
         }
@@ -383,22 +389,22 @@ class Trickle extends BaseActiveModule
     {
         $msg = "##ao_infoheadline##::: Ability Trickle-down :::##end##\n\n";
         $msg2 = "";
-        if ($stats['int'] > 0) {
+        if (isset($stats['int']) && $stats['int'] > 0) {
             $msg2 .= "##ao_infotext## - Intelligence: ##end##{$stats['int']}\n";
         }
-        if ($stats['sta'] > 0) {
+        if (isset($stats['sta']) && $stats['sta'] > 0) {
             $msg2 .= "##ao_infotext## - Stamina: ##end##{$stats['sta']}\n";
         }
-        if ($stats['agi'] > 0) {
+        if (isset($stats['agi']) && $stats['agi'] > 0) {
             $msg2 .= "##ao_infotext## - Agility: ##end##{$stats['agi']}\n";
         }
-        if ($stats['sen'] > 0) {
+        if (isset($stats['sen']) && $stats['sen'] > 0) {
             $msg2 .= "##ao_infotext## - Sense: ##end##{$stats['sen']}\n";
         }
-        if ($stats['psy'] > 0) {
+        if (isset($stats['psy']) && $stats['psy'] > 0) {
             $msg2 .= "##ao_infotext## - Psychic: ##end##{$stats['psy']}\n";
         }
-        if ($stats['str'] > 0) {
+        if (isset($stats['str']) && $stats['str'] > 0) {
             $msg2 .= "##ao_infotext## - Strength: ##end##{$stats['str']}\n";
         }
         $msg .= $msg2 . "\n";

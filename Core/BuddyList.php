@@ -148,7 +148,10 @@ class BuddyList extends BasePassiveModule
         if (!empty($lookup)) {
             $who["craft1"] = $lookup[0]['class1'];
             $who["craft2"] = $lookup[0]['class2'];
-        }
+        } else {
+            $who["craft1"] = "";
+            $who["craft2"] = "";	
+		}
         $this->bot->core("Whois")->update($who);
         if ($old_who instanceof BotError) {
             $old_who = array();
@@ -230,7 +233,8 @@ class BuddyList extends BasePassiveModule
             $current_statuses[] = 6;
         }
         // Make sure we only cache members and guests to prevent any issues with !is and anything else that might do buddy actions on non members.
-        if ($member) {
+        //if ($member) {
+		if (isset($this->bot->security->cache['members'][$user])) {
             if (in_array(1, $current_statuses)) {
                 // User just came online
                 // Enter the user into the online buddy list

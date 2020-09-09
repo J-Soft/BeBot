@@ -53,6 +53,7 @@ class CommandAliasInterface extends BaseActiveModule
     function command_handler($name, $msg, $origin)
     {
         $var = explode(" ", $msg, 3);
+		if(!isset($var[1])) { $var[1]=""; }
         switch ($var[1]) {
             case 'add':
                 Return ($this->bot->core("command_alias")->add($var[2]));

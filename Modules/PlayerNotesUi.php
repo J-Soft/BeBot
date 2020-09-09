@@ -162,6 +162,7 @@ class PlayerNotes_UI extends BaseActiveModule
     */
     function show_all_notes($source, $origin)
     {
+		$count = array(); $return="";
         $source = ucfirst(strtolower($source));
         $result = $this->bot->core("player_notes")
             ->get_notes($source, "all", "all", "DESC");
@@ -171,7 +172,8 @@ class PlayerNotes_UI extends BaseActiveModule
         } else {
             $inside = "  :: All Players with Notes ::\n\n";
             foreach ($result as $note) {
-                $count[$note["player"]][$note['class']]++;
+                if(isset($count[$note["player"]][$note['class']])) { $count[$note["player"]][$note['class']]++; }
+				else { $count[$note["player"]][$note['class']]=1; }
             }
             foreach ($count as $player => $data) {
                 foreach (
@@ -181,7 +183,7 @@ class PlayerNotes_UI extends BaseActiveModule
                         2
                     ) as $n
                 ) {
-                    if ($data[$n] < 1) {
+                    if (isset($data[$n]) && $data[$n] < 1) {
                         $data[$n] = 0;
                     }
                 }

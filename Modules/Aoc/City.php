@@ -1602,6 +1602,7 @@ class City extends BaseActiveModule
     function command_handler($name, $msg, $origin)
     {
         $vars = explode(' ', strtolower($msg));
+		if(!isset($var[1])) { $var[1]=""; }
         switch ($vars[0]) {
             case 'city':
                 switch ($vars[1]) {
@@ -2468,9 +2469,9 @@ class City extends BaseActiveModule
     function moneyformat($c)
     {
         if ($c >= 100) {
-            $m .= floor($c / 100) . "G ";
+            $m = floor($c / 100) . "G ";
         }
-        $m .= round(substr($c, -2)) . "S";
+        $m = round(substr($c, -2)) . "S";
         return $m;
     }
 }
