@@ -377,8 +377,9 @@ AOIA running first, it will automate AO scripts during your gameplay.
 When you killed a mob/boss, to roll its remains open loot ingame & do :
 	/loot botname mloot
 
-You then can "view" an AOIA window with a prepared "Roll" link down below.
-Simply click this link, being !leader on bot (named "botname" in example).
+You then can "view" an AOIA window with prepared "Roll" link(s) down below.
+If there are more than 8 items in remains, you'll get several paged links.
+Simply click link(s), being !leader on bot (named "botname" in example).
 All loots present in remains window should be automatically added to roll.
 
 This way you can add several remains in 1 roll, otherwise !clear in between.
