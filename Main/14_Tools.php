@@ -321,12 +321,13 @@ class tools extends BasePassiveModule
                     false,
                     true
                 ) . "     ";
+			if (strtolower($this->bot->game) == 'ao') {
             $inside .= $this->chatcmd(
                 'close InfoView',
                 ' ##blob_text##Close Terminal##end## ',
                 '/',
                 true
-            );
+            );}
 			$inside .= "\n____________________________________\n";
         }
         // Using " inside a blob will end the blob.
