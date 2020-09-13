@@ -150,7 +150,7 @@ class Whois_Core extends BasePassiveModule
         $who = array();
         $who["id"] = $user;
         $who["nickname"] = $name;
-        if (!is_array($this->bot->buddy_status) || !array_key_exists($name, $this->bot->buddy_status)) {
+        if (!isset($this->bot->buddy_status) || !is_array($this->bot->buddy_status) || !array_key_exists($name, $this->bot->buddy_status)) {
             $who["online"] = 0;
         } else {
             if (4 == ($this->bot->buddy_status[$name] & 4)) {

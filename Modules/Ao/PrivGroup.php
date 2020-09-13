@@ -166,6 +166,7 @@ class PrivGroup extends BaseActiveModule
     */
     function invite($from, $type, $who)
     {
+		$pmsg = "";
         $who = explode(" ", $who, 2);
         if (!empty($who[1])) {
             $pmsg = " (" . $who[1] . ")";
