@@ -1080,7 +1080,7 @@ class Bot
             $this->send_help($args[0]);
         } else {
             if (!$found) {
-                if ($this->guild_bot) {
+                if (isset($this->guild_bot)&&$this->guild_bot) {
                     $this->send_tell($args[0], "I only listen to members of " . $this->guildname . ".");
                 } else {
                     $this->send_tell($args[0], "I only listen to members of this bot.");
