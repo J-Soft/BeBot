@@ -151,12 +151,13 @@ class Rolls extends BaseActiveModule
     */
     function pgleave($name)
     {
-        if (isset($this->loot[$info[1]][$name])) {
-            unset($this->loot[$info[1]][$name]);
+		foreach($this->loot as $info) {
+        if (isset($this->loot[$info][$name])) {
+            unset($this->loot[$info][$name]);
             $this->bot->send_pgroup(
-                "##loot_highlight##" . $name . "##end## removed from rolls in slot##loot_highlight## #" . $info[1]
+                "##loot_highlight##" . $name . "##end## removed from rolls in slot##loot_highlight## #" . $info
             );
-        }
+        }}
     }
 
 
