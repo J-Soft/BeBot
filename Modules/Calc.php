@@ -71,6 +71,7 @@ class Calc extends BaseActiveModule
     */
     function do_calcs($name, $calc)
     {
+		$result = 0;
         $test = str_replace(".", "", $calc);
         $test = str_replace(",", "", $test);
         $test = str_replace("+", "", $test);

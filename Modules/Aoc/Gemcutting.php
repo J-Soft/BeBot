@@ -442,7 +442,7 @@ class Gemcut extends BaseActiveModule
             $rare = array();
             $common = array();
             foreach ($this->gem_types[$type][1] as $info => $effect) {
-                list ($prefix, $cut_1h, $cut_2h, $cut_arm, $rarity, $min, $max) = split(":", $info);
+                list ($prefix, $cut_1h, $cut_2h, $cut_arm, $rarity, $min, $max) = explode(":", $info);
                 if ($min <= $tier && $tier <= $max) {
                     switch ($rarity) {
                         case 0:
@@ -527,7 +527,7 @@ class Gemcut extends BaseActiveModule
             $gem = $line[0];
             $info = $line[1];
             $effect = $line[2];
-            list ($prefix, $cut_1h, $cut_2h, $cut_arm, $rarity, $min, $max) = split(":", $info);
+            list ($prefix, $cut_1h, $cut_2h, $cut_arm, $rarity, $min, $max) = explode(":", $info);
             if ($is_rare) {
                 if ($rarity == 2 || $rarity == 1) {
                     $text .= "##gemcut_info##$prefix##end## ##gemcut_highlight##:##end## ";

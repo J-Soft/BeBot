@@ -63,6 +63,9 @@ class Server extends BaseActiveModule
     {
         $server = $this->bot->core("tools")
             ->get_site("http://probes.funcom.com/ao.xml");
+		if($server=="") {
+			return "Could not contact server";
+		} else {
         $server = explode("name=\"" . $this->select_dimension() . "\"", $server);
         $server = explode("</dimension>", $server[1]);
         preg_match("/display-name=\"(.+)\"/U", $server[0], $info);
@@ -105,12 +108,12 @@ class Server extends BaseActiveModule
             }
         }
         if (count($playfields) < 10) {
-            return "Could not access server information";
+            return "Could not access playfields informations";
         } else {
             return "Status of servers on " . $dim_name . ": " . $this->bot
                 ->core("tools")->make_blob("click to view", $inside);
         }
-    }
+	}}
 
 
     /*

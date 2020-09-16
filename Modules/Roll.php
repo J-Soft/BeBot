@@ -132,7 +132,7 @@ class Roll extends BaseActiveModule
             $name = "##highlight##{$roll['name']}##end##";
             if (!empty($roll['item'])) {
                 $item = "Target: ##highlight##'{$roll['item']}'##end##\n";
-            }
+            } else { $item = "..."; }
             $time = time() - $roll['time'];
             $window = "##blob_title##::: Roll verification: $num :::##end##\n\n";
             $window .= "Roller: ##highlight##{$name}##end##\n";

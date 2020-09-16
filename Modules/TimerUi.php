@@ -79,6 +79,7 @@ class TimerGUI extends BaseActiveModule
     function command_handler($name, $msg, $channel)
     {
         $command = explode(" ", $msg, 2);
+		if(!isset($command[1])) { $command[1]=""; }
         Switch (strtolower($command[0])) {
             case 'timer':
                 $classused = $this->bot->core("timer")

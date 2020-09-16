@@ -64,6 +64,7 @@ class Identify extends BaseActiveModule
     {
         $items = preg_split('/<\/a>/', $msg, -1, PREG_SPLIT_NO_EMPTY);
         //$items = explode("><",$msg);
+		$count=0; $return="";
         foreach ($items as $item) {
             if (preg_match("/<a href=\"itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)\">/i", $item, $info)) {
                 $return .= $this->identify_item($info[1], $info[2], $info[3]);
@@ -85,6 +86,7 @@ class Identify extends BaseActiveModule
 
     function identify_item($low, $high, $ql)
     {
+		$highid = 0;
         switch ($high) {
             // List all the AI Biomaterial items
             case 247103:

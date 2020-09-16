@@ -46,6 +46,7 @@ class BotStatisticsUI extends BaseActiveModule
     {
         $var = explode(" ", $msg, 2);
         $command = $var[0];
+		if(!isset($var[1])) { $var[1]=""; }
         switch ($var[0]) {
             case 'bots':
                 $reply = $this->check_bots($name, $origin, $var[1]);

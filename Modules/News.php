@@ -212,19 +212,28 @@ class News extends BaseActiveModule
     */
     function get_news($name)
     {
-        // Create Headline
+        $newsdate = "";
         $result_headline = $this->bot->db->select(
             "SELECT id, time, name, news FROM #___news WHERE type = '2' ORDER BY time DESC LIMIT 0, 3"
         );
+        if (!empty($result)) {
+            $newsdate = gmdate(
+                $this->bot->core("settings")
+                    ->get("Time", "FormatString"),
+                $result[0][1]
+            );
+        }			
         if (!empty($result_headline)) {
-            $inside = "<center>##ao_infoheadline##:::: Headline ::::##end##</center>\n";
+	        $inside = "<center>##ao_infoheadline##:::: Headline ::::##end##</center>\n";
             foreach ($result_headline as $val) {
-                $inside .= "##ao_infoheader##On " . gmdate(
-                        $this->bot
-                            ->core("settings")
-                            ->get("Time", "FormatString"),
-                        $val[1]
-                    ) . " GMT ##ao_cctext##" . $val[2] . "##end## Reported:\n";
+				$valdate = gmdate(
+					$this->bot->core("settings")
+						->get("Time", "FormatString"),
+					$val[1]
+				);	
+				$inside .= "##ao_infoheader##On " . 
+					$valdate
+                    . " GMT ##ao_cctext##" . $val[2] . "##end## Reported:\n";
                 $inside .= "##ao_infotext##" . stripslashes($val[3]);
                 if (($this->bot->core("security")
                         ->check_access(
@@ -245,19 +254,16 @@ class News extends BaseActiveModule
             "SELECT id, time, name, news FROM #___news WHERE type = '1' ORDER BY time DESC LIMIT 0, 10"
         );
         if (!empty($result)) {
-            $newsdate = gmdate(
-                $this->bot->core("settings")
-                    ->get("Time", "FormatString"),
-                $result[0][1]
-            );
             $inside .= "<center>##ao_infoheadline##:::: News ::::##end##</center>\n";
             foreach ($result as $val) {
-                $inside .= "##ao_infoheader##On " . gmdate(
-                        $this->bot
-                            ->core("settings")
-                            ->get("Time", "FormatString"),
-                        $val[1]
-                    ) . " GMT ##ao_cctext##" . $val[2] . "##end## Reported:\n";
+				$valdate = gmdate(
+					$this->bot->core("settings")
+						->get("Time", "FormatString"),
+					$val[1]
+				);				
+                $inside .= "##ao_infoheader##On " .
+					$valdate
+                    . " GMT ##ao_cctext##" . $val[2] . "##end## Reported:\n";
                 $inside .= "##ao_infotext##" . stripslashes($val[3]);
                 if (($this->bot->core("security")
                         ->check_access(
@@ -303,6 +309,7 @@ class News extends BaseActiveModule
     */
     function get_raids($name)
     {
+		$newsdate = "";
         $inside = "<center>##ao_infoheadline##:::: Planned Raids ::::##end##</center>\n";
         $result = $this->bot->db->select("SELECT id, time  FROM #___news WHERE type = '3' ORDER BY id DESC LIMIT 0, 1");
         if (!empty($result)) {
@@ -316,13 +323,15 @@ class News extends BaseActiveModule
             "SELECT id, time, name, news FROM #___news WHERE type = '3' ORDER BY time DESC LIMIT 0, 10"
         );
         if (!empty($result_raids)) {
-            foreach ($result_raids as $val) {
-                $inside .= "##ao_infoheader##" . gmdate(
-                        $this->bot
-                            ->core("settings")
-                            ->get("Time", "FormatString"),
-                        $val[1]
-                    ) . " GMT ##ao_cctext##" . $val[2] . "##end## wrote:\n";
+            foreach ($result_raids as $val) {		
+				$valdate = gmdate(
+					$this->bot->core("settings")
+						->get("Time", "FormatString"),
+					$val[1]
+				);				
+                $inside .= "##ao_infoheader##" .
+					$valdate
+                    . " GMT ##ao_cctext##" . $val[2] . "##end## wrote:\n";
                 $inside .= " ##ao_infotext##" . stripslashes($val[3]);
                 if ($this->bot->core("security")->check_access(
                         $name,

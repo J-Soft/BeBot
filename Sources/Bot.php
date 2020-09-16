@@ -1005,9 +1005,9 @@ class Bot
             if ($group == $this->guildname || (strtolower($this->game) == 'aoc' && $group == "~Guild")) {
                 $group = "org";
             }
-            $registered = $this->commands[$channel][$group];
+            if (isset($this->commands[$channel][$group])) $registered = $this->commands[$channel][$group];
         } else {
-            $registered = $this->commands[$channel];
+            if (isset($this->commands[$channel])) $registered = $this->commands[$channel];
         }
         if (!empty($registered)) {
             $keys = array_keys($registered);
@@ -1071,7 +1071,7 @@ class Bot
         $this->log("TELL", "INC", $user . ": " . $args[1]);
         $found = $this->handle_command_input($user, $args[1], "tell");
         $found = $this->hand_to_chat($found, $user, $args[1], "tells");
-        if ($this->command_error_text) {
+        if (isset($this->command_error_text)&&$this->command_error_text!="") {
             $this->send_tell($args[0], $this->command_error_text);
         } elseif (!$found
             && $this->core("security")
@@ -1080,7 +1080,7 @@ class Bot
             $this->send_help($args[0]);
         } else {
             if (!$found) {
-                if ($this->guild_bot) {
+                if (isset($this->guild_bot)&&$this->guild_bot) {
                     $this->send_tell($args[0], "I only listen to members of " . $this->guildname . ".");
                 } else {
                     $this->send_tell($args[0], "I only listen to members of this bot.");
@@ -1740,8 +1740,8 @@ class Bot
     {
         $trace = debug_backtrace();
         $r = '';
-
-        foreach ($trace as $i => $call) {
+		// decomment below for detailed debugging
+        /*foreach ($trace as $i => $call) {
             if (is_object($call['object'])) {
                 $call['object'] = 'CONVERTED OBJECT OF CLASS ' . get_class($call['object']);
             }
@@ -1758,7 +1758,7 @@ class Bot
             $r .= (!empty($call['object']) ? $call['object'] . $call['type'] : '');
             $r .= $call['function'] . '(' . implode(', ', $call['args']) . ')';
             $r .= "\n";
-        }
+        }*/
 
         return $r;
     }

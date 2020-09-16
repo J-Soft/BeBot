@@ -95,7 +95,7 @@ class Alias extends BaseActiveModule
         $security = false;
         $vars = explode(' ', $msg);
         $vars[0] = strtolower($vars[0]);
-        $vars[1] = strtolower($vars[1]);
+        if(isset($vars[1])) { $vars[1] = strtolower($vars[1]); } else { $vars[1] = ""; }
         switch ($vars[0]) {
             case 'alias':
                 switch ($vars[1]) {

@@ -2,7 +2,7 @@
 /*
 * Loot Module - allows you to flat roll items
 * Module originally coded by Craized <http://www.craized.net>
-* Module heavily updated and rewritten by Ebag333
+* Module heavily updated and rewritten by Ebag333 & Bitnykk
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -16,7 +16,9 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* 
+* !mloot addition suggested by Relo (RK5)
+* 
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -54,6 +56,7 @@ class Rolls extends BaseActiveModule
 		$this -> register_command("all", "rem", "GUEST");
 		$this -> register_command("all", "prem", "LEADER");
 		$this -> register_command("all", "loot", "LEADER");
+		$this -> register_command("all", "mloot", "LEADER");
 		$this -> register_command("all", "list", "LEADER");
 		$this -> register_command("all", "clear", "LEADER");
 		$this -> register_command("all", "reroll", "LEADER");
@@ -71,6 +74,7 @@ class Rolls extends BaseActiveModule
             ->define_scheme("loot", "highlight", "yellow");
         $this->help['description'] = 'Module to flat roll on items.';
         $this->help['command']['loot <item>'] = "Adds an item to the roll list.";
+        $this->help['command']['mloot <item><item><item>...'] = "Adds many items to the roll list.";		
         $this->help['command']['add <slot>'] = "Adds your name to the slot number.  Add 0 removes you from all slots.";
         $this->help['command']['rem <slot>'] = "Removes your name from the slot number given.";
 		$this->help['command']['prem <slot> <name>']="Removes player from roll of the slot number given.";
@@ -126,7 +130,12 @@ class Rolls extends BaseActiveModule
 											$this->bot->send_pgroup("##loot_highlight##" . ucfirst($info[2]) . "##end## removed from rolls in slot##loot_highlight## #" . $info[1]);
 										}
 									} else {
-										$this->bot->send_help($name);
+										if(preg_match("/^mloot (.*)/i", $msg, $info))
+										{
+											$this -> mloot($info[1], $name);	
+										} else {
+											$this->bot->send_help($name);
+										}
 									}
                                 }
                             }
@@ -142,12 +151,13 @@ class Rolls extends BaseActiveModule
     */
     function pgleave($name)
     {
-        if (isset($this->loot[$info[1]][$name])) {
-            unset($this->loot[$info[1]][$name]);
+		foreach($this->loot as $info) {
+        if (isset($this->loot[$info][$name])) {
+            unset($this->loot[$info][$name]);
             $this->bot->send_pgroup(
-                "##loot_highlight##" . $name . "##end## removed from rolls in slot##loot_highlight## #" . $info[1]
+                "##loot_highlight##" . $name . "##end## removed from rolls in slot##loot_highlight## #" . $info
             );
-        }
+        }}
     }
 
 
@@ -198,6 +208,24 @@ class Rolls extends BaseActiveModule
         $this->bot->send_pgroup($this->addmsg);
     }
 
+	function mloot($blob, $name)
+	{ 
+			$multiloots = html_entity_decode($blob);
+			//echo $multiloots;
+			if(preg_match_all("/<a href='itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)'>([^<]+)<\/a>/i", $multiloots, $matches)) {
+				//print_r($matches);
+				foreach($matches[0] as $match) {
+				$this->loot($match,$name);
+				usleep(600);
+				}
+				$this -> bot -> send_pgroup("Multiple loot(s) added by ".$name);
+				$this->rlist();
+			} else {
+				$this -> bot -> send_pgroup("No multi loot blob detected.");
+			}
+			
+
+	}	
 
     function loot($msg, $name)
     {

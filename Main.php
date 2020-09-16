@@ -31,15 +31,15 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-define('BOT_VERSION', "0.7.0");
-define('BOT_VERSION_INFO', ".git(snapshot)");
+define('BOT_VERSION', "0.7.1");
+define('BOT_VERSION_INFO', ".git(official)");
 define('BOT_VERSION_NAME', "BeBot");
 
 // Is this a development snapshot from BZR?
-define('BOT_VERSION_SNAPSHOT', true);
+define('BOT_VERSION_SNAPSHOT', false);
 
 // Is this a stable release or a development release?
-define('BOT_VERSION_STABLE', false);
+define('BOT_VERSION_STABLE', true);
 
 $bot_version = BOT_VERSION;
 $php_version = phpversion();

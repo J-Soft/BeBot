@@ -3,7 +3,7 @@ More documentation at http://bebot.shadow-realm.org/wiki/
 
 
 INSTALLING BEBOT
-====================
+================
 
 This bot works for both, Anarchy Online (AO) and Age of Conan (AoC). Some 
 settings and modules only make sense for AO and some make only sense for 
@@ -20,7 +20,8 @@ To install and run BeBot you need the following:
 * database server of either Mysql (from 4.1.1 upto 5.7) or MariaDB (10.0 upto 10.4)
 * either "Official" files at https://github.com/J-Soft/BeBot/archive/master.zip (stable)
   or "Beta" files from https://github.com/bitnykk/BeBot/archive/master.zip (sandbox)
-
+  NB : if you know how to use git, you also can clone/pull from any of these urls.
+  
 Optional (helps run it effectively): 
 
 * An "always-on" internet connection
@@ -77,7 +78,7 @@ On windows, according to the PHP version you'd want Bebot to run into, you may
 need to copy a php.exe file right into bot's root folder (where StartBot.bat is).
 Unless windows PATH and/or php.ini are well set so the exe can locate required
 libraries alone, you may have to copy correct .dll files for this specific PHP.
-For PHP 5.2/5.3 : libeay32, libmysql, php5ts and ssleay32 for this PHP version.
+For PHP 5.3 : libeay32, libmysql, php5ts and ssleay32 for this PHP version.
 For 5.4/5.6 : same files but for this version + php_mysqli & php_sockets.
 For 7.x : libcrypto & libssl (64) + libssh2, nghttp2, php_curl & php7ts.
 Bot will tell you what misses to run during startup, so check all lines !
@@ -318,18 +319,18 @@ STARTING THE BOT
    named "php" in this example).
 
 The console should now state that the bot is loading the modules, 
-authenticating and connecting. Once this is done (AoC only: wait 5 minutes 
-now) you can log onto an character in-game which you have configured as 
-"superadmin". You should now be able to talk to the bot. 
+authenticating and connecting. Once this is done you can log onto a character
+in-game (see below) marked as "superadmin" to be able to control the bot. 
 
 PLAYING WHILE RUNNING THE BOT (AO ONLY)
 ---------------------------------------
 
 You can run the bot and play AO from the same account (with different 
-characters). 
+characters) without waiting.
 
 PLAYING WHILE RUNNING THE BOT (AOC ONLY)
 ----------------------------------------
+
 You can run the bot and play AoC from the same account (with different 
 characters). However the bot must connect first and you have to wait at 
 least 5 minutes after logging the bot in, before you can connect with your 
@@ -365,3 +366,21 @@ because if a 3rd party module has got the same name as a standard module or
 a module with that name is added later it will be over-written if you 
 upgrade the bot. Modules in the "Custom" directory are never touched by 
 installing following upgrades to BeBot. 
+
+AO EXTERNAL LOOT HELPER SUPPORT
+-------------------------------
+
+Bebot is now able to benefit from 3rd party loot helper as AOIA offers at
+https://sourceforge.net/projects/aoiaplus/
+
+AOIA running first, it will automate AO scripts during your gameplay.
+When you killed a mob/boss, to roll its remains open loot ingame & do :
+	/loot botname mloot
+
+You then can "view" an AOIA window with prepared "Roll" link(s) down below.
+If there are more than 8 items in remains, you'll get several paged links.
+Simply click link(s), being !leader on bot (named "botname" in example).
+All loots present in remains window should be automatically added to roll.
+
+This way you can add several remains in 1 roll, otherwise !clear in between.
+You also can delete unwanted loots ingame remains BEFORE doing upper /loot

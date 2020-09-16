@@ -1,7 +1,13 @@
 -------------
+Version 0.7.1
+-------------
+- AO/AoC: 2020 servers update, Mysqli full support for very latest SQL/Maria + PHP from v. 5.3 upto 7.2 successfull tested runnability
+- AO: updated !raidloot interface v. 1.1 offering most usual upto endgame remains, including latest high level "Temple of 3 Winds" raid
+      new !mloot command supporting external 3rd party (e.g. M. Fjeldstad AOIA) for quick loot add/roll, suggested by player Relo (RK5)
+- AoC: major corrections for connection system in PHP 7+ and also various secondary warnings solved with help of tester Ruskebusk (Crom)
+-------------
 Version 0.7.0
 -------------
-- AO/AoC servers update, Mysqli & PHP 7+ compatibility, many legacy plugins/cores fixed
 - Made Bot.php, AOChat.php and MySQL.php conform to the singleton design pattern
 - Moved ConfigMagik out of main and into Source and converted it to use the singleton design pattern.
 - Moved the configuration reading from Main.php and into Bot.php

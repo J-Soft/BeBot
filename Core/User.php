@@ -190,7 +190,7 @@ class User_Core extends BasePassiveModule
         if ($silent == 0) {
             $this->bot->send_tell(
                 $name,
-                "##highlight##" . $source . "##end## has added you to the bot." . $autoinvitestring
+                "##highlight##" . $source . "##end## has added you to the bot." //. $autoinvitestring
             );
         }
         // Make sure the security cache is up-to-date:

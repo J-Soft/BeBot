@@ -41,9 +41,16 @@ class Raid extends BaseActiveModule
     var $user;
 	var $user2;
     var $announce;
+	var $announcel = 0;
     var $start;
     var $locked;
     var $paused = false;
+	var $description;
+	var $tank;
+	var $move = 0;
+	var $showtank = false;
+	var $showcallers = false;
+	var $type;
 
 
     function __construct(&$bot)
@@ -161,12 +168,16 @@ class Raid extends BaseActiveModule
     function command_handler($name, $msg, $type)
     {
         $var = explode(" ", $msg, 2);
+		if(!isset($var[1])) { $var[1]=""; }
         switch (strtolower($var[0])) {
             case 'c':
                 $this->raid_command($name, $var[1]);
                 Break;
             case 'raid':
                 $var = explode(" ", $msg, 4);
+				if(!isset($var[1])) { $var[1]=""; }
+				if(!isset($var[2])) { $var[2]=""; }
+				if(!isset($var[3])) { $var[3]=""; }
                 switch (strtolower($var[1])) {
                     case 'start':
                         Return $this->start_raid($name, $var[2], $var[3]);
@@ -521,10 +532,12 @@ class Raid extends BaseActiveModule
             );
             if (!empty($users)) {
                 $inside = " :: $points Given to all Raiders ::\n\n";
+				$count=0;
                 foreach ($users as $user) {
                     $count++;
                     $user = $user[0];
-                    $this->points[$user] += $points;
+                    if(isset($this->points[$user])) $this->points[$user] += $points;
+					else $this->points[$user] = $points;
                     $userp = isset($this->points[$user]) ? $this->points[$user] : 0;
                     $inside .= "##highlight##" . $user . "##end##: ##highlight##" . $userp . "##end## points\n";
                     if (isset($this->bot->commands["tell"]["raidhistory"])) {
@@ -585,10 +598,12 @@ class Raid extends BaseActiveModule
             );
             if (!empty($users)) {
                 $inside = " :: $points Taken from all Raiders ::\n\n";
+				$count = 0;
                 foreach ($users as $user) {
                     $count++;
                     $user = $user[0];
-                    $this->points[$user] -= $points;
+                    if(isset($this->points[$user])) $this->points[$user] -= $points;
+					else $this->points[$user] = $points;
                     $userp = isset($this->points[$user]) ? $this->points[$user] : 0;
                     $inside .= "##highlight##" . $user . "##end##: ##highlight##" . $userp . "##end## points\n";
                     if (isset($this->bot->commands["tell"]["raidhistory"])) {
@@ -740,6 +755,7 @@ class Raid extends BaseActiveModule
     */
     function leave_raid($name)
     {
+		$altinraid = false;
         if (!isset($this->user[$name])) {
             return "You are not in the raid.";
         } else {
@@ -1061,12 +1077,12 @@ class Raid extends BaseActiveModule
                 $move = $this->move - time();
                 $move = ", Move in ##highlight##" . $this->bot->core("time")
                         ->format_seconds($move) . " ##end##";
-            }
+            } else { $move = ""; }
 
             if ($this->tank && $this->showtank) {
                 $nl = true;
                 $tank = "\nTank is ##highlight##" . $this->tank . "##end##";
-            }
+            } else { $tank = ""; }
             if ($this->showcallers && isset($this->bot->commands['tell']['caller']) && !empty($this->bot->commands['tell']['caller']->callers)) {
                 if ($nl) {
                     $callers = ", ";
@@ -1074,7 +1090,7 @@ class Raid extends BaseActiveModule
                     $callers = "\n";
                 }
                 $callers .= $this->bot->commands['tell']['caller']->show_callers();
-            }
+            } else { $callers = ""; }
             $this->bot->send_output(
                 "",
                 "Raid is running: ##highlight##" . $this->description . "##end##" . $tank . $callers . $move . " :: " . $this->clickjoin(

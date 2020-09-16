@@ -56,6 +56,7 @@ class admins extends BaseActiveModule
 
     function admins_blob($msg)
     {
+		$all = false;
         if (preg_match("/^admins all$/i", $msg, $info)) {
             $all = true;
         }

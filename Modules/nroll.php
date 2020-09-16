@@ -72,9 +72,9 @@ class Nroll extends BaseActiveModule
             $options_str = $info[1];
             $options = array();
             if (strpos($options_str, ",") === false) {
-                $options = split(" ", $options_str);
+                $options = explode(" ", $options_str);
             } else {
-                $options = split(",", $options_str);
+                $options = explode(",", $options_str);
             }
             $result = $options[array_rand($options)];
             $this->verifyresult[] = $result;

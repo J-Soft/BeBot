@@ -62,6 +62,7 @@ class Notify extends BaseActiveModule
                  'arg'
             )
         );
+		if(!isset($com['arg'])) { $com['arg']=""; }
         Switch ($com['sub']) {
             case 'on':
                 return $this->add_notify($name, $com['arg']);

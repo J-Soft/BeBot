@@ -84,6 +84,7 @@ class Log extends BaseActiveModule
     */
     function show_log($category = false)
     {
+		$inside = "";
         if ($category === false) {
             $results = $this->bot->db->select("SELECT DISTINCT first FROM #___log_message ORDER BY first");
             $inside .= $this->bot->core("tools")

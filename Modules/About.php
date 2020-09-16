@@ -80,7 +80,7 @@ class About extends BaseActiveModule
     function about_blob()
     {
         $version = BOT_VERSION_NAME . " v." . BOT_VERSION;
-        $inside .= "##blob_text##Bot Client:##end##\n";
+        $inside = "##blob_text##Bot Client:##end##\n";
         $inside .= "$version\n\n";
         $inside .= "##blob_text##Developers:##end##\n";
         $inside .= "Alreadythere (RK2)\n";

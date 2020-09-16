@@ -98,8 +98,9 @@ class OnlineCounting extends BaseActiveModule
 
     function get_org_members($orgname)
     {
-        return $this->bot->db->select(
-            "SELECT DISTINCT(t1.nickname), t2.level, t2.defender_rank_id" . " FROM " . $this->bot
+        if(strtolower($this->bot->game) == 'ao') { $aodefrankid = ", t2.defender_rank_id";	} else { $aodefrankid= ""; }
+		return $this->bot->db->select(
+            "SELECT DISTINCT(t1.nickname), t2.level" . $aodefrankid . " FROM " . $this->bot
                 ->core("online")
                 ->full_tablename() . " WHERE t2.org_name = '" . $orgname . "' ORDER BY t1.nickname ASC"
         );
@@ -113,8 +114,9 @@ class OnlineCounting extends BaseActiveModule
         } else {
             $profsearch = "= '" . $prof . "'";
         }
+		if(strtolower($this->bot->game) == 'ao') { $aodefrankid = ", t2.defender_rank_id";	} else { $aodefrankid= ""; }
         return $this->bot->db->select(
-            "SELECT DISTINCT(t1.nickname), t2.level, t2.defender_rank_id" . " FROM " . $this->bot
+            "SELECT DISTINCT(t1.nickname), t2.level" . $aodefrankid . " FROM " . $this->bot
                 ->core("online")
                 ->full_tablename() . " WHERE t2." . $this->cp . " " . $profsearch . " ORDER BY t1.nickname ASC"
         );

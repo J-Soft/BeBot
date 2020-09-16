@@ -454,7 +454,7 @@ class ConfigMagik
             $list = array();
             $all = array_keys($this->VARS[$section]);
             foreach ($all as $possible_key) {
-                if (!is_array($this->VARS[$possible_key])) {
+                if (!isset($this->VARS[$possible_key])||!is_array($this->VARS[$possible_key])) {
                     array_push($list, $possible_key);
                 }
             }

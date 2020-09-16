@@ -44,7 +44,7 @@ class PBParser
         $string = file_get_contents($protofile);
         // now take the filename
         //$filename = str_replace("\\", "/", $filename);
-        $filename = split("/", $protofile);
+        $filename = explode("/", $protofile);
         $filename = $filename[count($filename) - 1];
         // strip the comments out of the protofile
         $this->_strip_comments($string);
@@ -53,7 +53,7 @@ class PBParser
         unset($this->m_types[count($this->m_types) - 1]);
         //$this->m_types = $this->m_types[0]['value'];
         // now create file with classes
-        $name = split('\.', $filename);
+        $name = explode('\.', $filename);
         array_pop($name);
         $name = join($name, '.');
         $this->_create_class_file('pb_proto_' . $name . '.php');
@@ -399,7 +399,7 @@ class PBParser
         $namespace = '';
         $namespace = $type;
 
-        $apath = split("\.", $path);
+        $apath = explode("\.", $path);
         if ($apath > 1) {
             array_pop($apath);
             $namespace = trim(trim(join($apath, '.'), '.') . '.' . $type, '.');
@@ -444,7 +444,7 @@ class PBParser
             throw new Execption('Semantic error in Enum!');
         }
         foreach ($matches[1] as $match) {
-            $split = split("=", $match);
+            $split = explode("=", $match);
             $myarray[] = array(
                 trim($split[0]),
                 trim($split[1])
