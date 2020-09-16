@@ -260,7 +260,7 @@ class Vote extends BaseActiveModule
                     return ("Error running query: $query");
                 } else {
                     //Get the ID of the vote.
-                    $vote_id = mysql_insert_id($this->bot->db->CONN);
+                    $vote_id = mysqli_insert_id($this->bot->db->CONN);
                     var_dump($args);
                     //Add options (if any)
                     foreach ($args as $option) {

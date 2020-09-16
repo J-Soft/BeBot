@@ -347,7 +347,7 @@ class Mail extends BaseActiveModule
         $mailbox = $this->bot->core("alts")->main($name);
         $query = "DELETE FROM #___mail_message WHERE id=$id AND mailbox='$mailbox'";
         $this->bot->db->query($query);
-        if (mysql_affected_rows($this->bot->db->CONN) == 1) {
+        if (mysqli_affected_rows($this->bot->db->CONN) == 1) {
             return ("Mail $id has been deleted.");
         } else {
             $this->error->set("Mail message '$id' was either not found or did not belong to $name.");
