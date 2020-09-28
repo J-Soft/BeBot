@@ -302,7 +302,8 @@ class Roster_Core extends BasePassiveModule
          * $this->startup = FALSE;
          * }
          */
-        $this->lastrun = $this->bot->core("settings")
+		$members = array();
+		$this->lastrun = $this->bot->core("settings")
             ->get("members", "LastRosterUpdate");
         if (($this->lastrun + 21600) >= time() && $force == false) {
             $this->bot->log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
