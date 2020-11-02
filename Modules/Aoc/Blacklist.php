@@ -230,20 +230,20 @@ class Blacklist extends BaseActiveModule
                     "blacklist",
                     "noteid",
                     "add",
-                    "ALTER IGNORE TABLE #___blacklist ADD noteid INT NOT NULL"
+                    "ALTER TABLE #___blacklist ADD noteid INT NOT NULL"
                 );
                 $this->bot->db->update_table(
                     "blacklist",
                     "expire",
                     "add",
-                    "ALTER IGNORE TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0"
+                    "ALTER TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0"
                 );
                 $this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 1.");
                 $this->bot->core("settings")
                     ->save("Blacklist", "table_version", 1);
             case 1:
                 // db->update_table does not work for indexes, so let's do it manually
-                $this->bot->db->query("ALTER IGNORE TABLE #___blacklist ADD INDEX expire (expire)");
+                $this->bot->db->query("ALTER TABLE #___blacklist ADD INDEX expire (expire)");
                 $this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 2.");
                 $this->bot->core("settings")
                     ->save("Blacklist", "table_version", 2);

@@ -113,7 +113,7 @@ class Points extends BaseActiveModule
                     "raid_points",
                     "points",
                     "modify",
-                    "ALTER IGNORE TABLE #___raid_points modify `points` decimal(11,2) default '0.00'"
+                    "ALTER TABLE #___raid_points modify `points` decimal(11,2) default '0.00'"
                 );
                 if ($updatepoints) {
                     $this->bot->db->query("UPDATE #___raid_points SET points = points / 10");
@@ -123,7 +123,7 @@ class Points extends BaseActiveModule
                     "raid_points",
                     "nickname",
                     "add",
-                    "ALTER IGNORE TABLE #___raid_points ADD nickname VARCHAR(20) DEFAULT '' after id"
+                    "ALTER TABLE #___raid_points ADD nickname VARCHAR(20) DEFAULT '' after id"
                 );
                 $users = $this->bot->db->select("SELECT id from #___raid_points");
                 if (!empty($users)) {
@@ -149,7 +149,7 @@ class Points extends BaseActiveModule
                     "raid_points",
                     "raidingas",
                     "add",
-                    "ALTER IGNORE TABLE #___raid_points ADD raidingas VARCHAR(20) DEFAULT '' after raiding"
+                    "ALTER TABLE #___raid_points ADD raidingas VARCHAR(20) DEFAULT '' after raiding"
                 );
             default:
         }

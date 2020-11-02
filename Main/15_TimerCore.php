@@ -248,7 +248,7 @@ class Timer_Core extends BasePassiveModule
                     "timer_class_entries",
                     "notify_prefix",
                     "add",
-                    "ALTER IGNORE TABLE #___timer_class_entries ADD notify_prefix VARCHAR(255) NOT "
+                    "ALTER TABLE #___timer_class_entries ADD notify_prefix VARCHAR(255) NOT "
                     . "NULL DEFAULT '' AFTER notify_delay, CHANGE notify_text notify_suffix VARCHAR(255) NOT NULL DEFAULT ''"
                 );
                 if (empty($res)) {
@@ -263,7 +263,7 @@ class Timer_Core extends BasePassiveModule
                     "timer",
                     "channel",
                     "modify",
-                    "ALTER IGNORE TABLE #___timer MODIFY channel ENUM('tell', 'gc', 'pgmsg', 'both', 'global', 'internal') NOT NULL default 'both'"
+                    "ALTER TABLE #___timer MODIFY channel ENUM('tell', 'gc', 'pgmsg', 'both', 'global', 'internal') NOT NULL default 'both'"
                 );
         }
         $this->bot->db->set_version("timer", 2);

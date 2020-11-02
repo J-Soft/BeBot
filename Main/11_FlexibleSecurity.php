@@ -100,13 +100,13 @@ class FlexibleSecurity_Core extends BasePassiveModule
                     "security_flexible",
                     "id",
                     "add",
-                    "ALTER IGNORE TABLE #___security_flexible ADD `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST"
+                    "ALTER TABLE #___security_flexible ADD `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST"
                 );
                 $this->bot->db->update_table(
                     "security_flexible",
                     "condition",
                     "modify",
-                    "ALTER IGNORE TABLE #___security_flexible CHANGE `condition` `op` ENUM( '=', '<', '<=', '>', '>=', '!=', '&&', '||' )"
+                    "ALTER TABLE #___security_flexible CHANGE `condition` `op` ENUM( '=', '<', '<=', '>', '>=', '!=', '&&', '||' )"
                 );
         }
         $this->bot->db->set_version("security_flexible", 2);

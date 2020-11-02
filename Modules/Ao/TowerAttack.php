@@ -209,7 +209,7 @@ class TowerAttack extends BaseActiveModule
                     "tower_result",
                     "zone",
                     "add",
-                    "ALTER IGNORE TABLE #___tower_result ADD zone VARCHAR(50)"
+                    "ALTER TABLE #___tower_result ADD zone VARCHAR(50)"
                 );
                 $this->bot->db->update_table(
                     "tower_result",
@@ -222,7 +222,7 @@ class TowerAttack extends BaseActiveModule
                          "zone"
                     ),
                     "alter",
-                    "ALTER IGNORE TABLE #___tower_result " . "ADD UNIQUE (time, win_guild, win_side, lose_guild, lose_side, zone), "
+                    "ALTER TABLE #___tower_result " . "ADD UNIQUE (time, win_guild, win_side, lose_guild, lose_side, zone), "
                     . "ADD INDEX (win_guild), ADD INDEX (win_side), ADD INDEX (zone)"
                 );
         }

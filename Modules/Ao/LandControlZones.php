@@ -83,13 +83,13 @@ class LandControlZones extends BaseActiveModule
                     "land_control_zones",
                     "short",
                     "add",
-                    "ALTER IGNORE TABLE #___land_control_zones ADD short VARCHAR(5) DEFAULT NULL"
+                    "ALTER TABLE #___land_control_zones ADD short VARCHAR(5) DEFAULT NULL"
                 );
                 $this->bot->db->update_table(
                     "land_control_zones",
                     "zoneid",
                     "add",
-                    "ALTER IGNORE TABLE #___land_control_zones ADD zoneid INT(11) DEFAULT NULL"
+                    "ALTER TABLE #___land_control_zones ADD zoneid INT(11) DEFAULT NULL"
                 );
                 $this->bot->db->query("truncate table #___land_control_zones");
                 $filename = "./Extras/TableData/LcZones.sql";

@@ -620,7 +620,7 @@ class Settings_Core extends BasePassiveModule
         $schemaversion = $this->bot->db->get_version("settings");
         Switch ($schemaversion) {
             case 1:
-                $sql = "ALTER IGNORE TABLE #___settings ADD COLUMN disporder INT UNSIGNED NOT NULL DEFAULT 1";
+                $sql = "ALTER TABLE #___settings ADD COLUMN disporder INT UNSIGNED NOT NULL DEFAULT 1";
                 $this->bot->log("SETTINGS", "UPDATE", "Settings Table updated to schema version 2");
                 $this->bot->db->update_table("settings", "disporder", "add", $sql);
         }
@@ -644,7 +644,7 @@ class Settings_Core extends BasePassiveModule
 
            if ($result[0][0] == 1)
            {
-               $sql = "ALTER IGNORE TABLE #___settings ADD COLUMN disporder INT UNSIGNED NOT NULL DEFAULT 1";
+               $sql = "ALTER TABLE #___settings ADD COLUMN disporder INT UNSIGNED NOT NULL DEFAULT 1";
                $this -> bot -> log("SETTINGS", "UPDATE", "Settings Table updated to schema version 1.5");
                $this -> bot -> db -> query($sql);
                $this -> save("Settings", "Schemaversion", 1.5);
