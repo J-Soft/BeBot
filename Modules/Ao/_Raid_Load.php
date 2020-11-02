@@ -45,7 +45,7 @@ class raid_load extends BasePassiveModule
                 // name = the name of the loot
                 // img  = the aodb image number for the icon
                 // ref  = the aodb info details number
-                $version = 7;
+                $version = 8;
                 $this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS " . $this -> bot -> db -> define_tablename("RaidLoot", "true") . "
                         (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                          table_version INT,
@@ -3119,6 +3119,212 @@ class raid_load extends BasePassiveModule
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
                         }	
+				// HL Subway		
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Boots of Gridspace Distortion', '13267', '305995', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Condemned Bulwark', '22395', '306003', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Counterfeit fr00b T-shirt', '85945', '305963', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Eumenidess Omni-Pol Forest Body Armor', '13254', '305983', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Fetid Vagabond Cloak', '22898', '305962', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Fortified Construction Sleeves', '13221', '305964', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Jester\'s Gift', '287079', '305029', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Mark of the Bloodless', '96116', '306026', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Notum-Infused Wool Balaclava Mask', '160562', '305979', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Reinforced Bau Cyber Armor Boots', '22878', '305973', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Reinforced Bau Cyber Armor Gloves', '22939', '305971', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Reinforced Bau Cyber Armor Helmet', '31738', '305972', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Reinforced Bau Cyber Armor Pants', '22928', '305970', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Reinforced Bau Cyber Armor Sleeves', '22889', '305969', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Reinforced Bau Cyber Body Armor', '22981', '305967', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Reinforced Bau Cyber Female Body Armor', '22942', '305968', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Superior Ring of the Nucleus Basalis', '301035', '305028', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Supreme Office Worker Suit', '156355', '305982', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Survivalist Leather Armor Legwear', '245961', '305987', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Symbiotic Nanite Gloves', '21871', '305990', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubarmors', 'Common Loot', 'Vergils Black Trenchcoat', '18849', '305997', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubmiscs', 'Common Loot', 'Amalgamated Research Attunement Device', '161873', '305986', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubmiscs', 'Common Loot', 'Aspect of Paralyzing Fear', '20406', '305984', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubmiscs', 'Common Loot', 'Belt of Great Justice', '119145', '306001', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubmiscs', 'Common Loot', 'Combat Assist Wen-Wen', '268035', '305975', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubmiscs', 'Common Loot', 'Eye of The Psion', '149936', '305989', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubmiscs', 'Common Loot', 'Patchwork Defensive Drone', '159123', '306002', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubmiscs', 'Common Loot', 'Purification Stim', '11715', '305978', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubmiscs', 'Common Loot', 'Technical Guidance Personal Terminal', '218777', '305981', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubmiscs', 'Common Loot', 'Unstable Damage Augmentation Device', '218769', '305974', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubweapons', 'Common Loot', 'BBI Faithful 1000', '113994', '305980', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubweapons', 'Common Loot', 'Distraction Rifle', '21146', '305966', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubweapons', 'Common Loot', 'Vicious Support Beam of Malice', '33143', '305965', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubweapons', 'Common Loot', 'Illegally Augmented Ofab Mongoose', '264818', '305985', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubweapons', 'Common Loot', 'Illegally Modified Dreadloch Modified Shark', '264839', '306004', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubweapons', 'Common Loot', 'Illegally Modified Dreadloch Obliterator', '19800', '306005', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubweapons', 'Common Loot', 'Illegally Modified Dreadloch Panther', '264815', '305991', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubweapons', 'Common Loot', 'Illegally Modified Dreadloch Remodulator', '264837', '305999', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubweapons', 'Common Loot', 'Illegally Modified Dreadloch Thrasher', '210185', '305998', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubweapons', 'Common Loot', 'Illegally-Modified Dreadloch Tigress', '264843', '305988', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hlsubway', 'hlsubweapons', 'Common Loot', 'Lost Blade of Elder Tsunayoshi', '13326', '305993', '0')";
+						if(!$this -> bot -> db -> query($query))
+						{
+								echo "\nError running query: ".$query."\n"; sleep(5);
+						}						
 				//HL Temple of 3 Winds
 						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'hltotw', 'hltotwarmors', 'Common Loot', 'Acolyte Purified Robe' ,'159573' ,'305466', '0')";
 						if(!$this -> bot -> db -> query($query))

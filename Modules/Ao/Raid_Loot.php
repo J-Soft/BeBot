@@ -82,6 +82,7 @@ class raidloot extends BaseActiveModule
                 $this -> register_command("all", "POH", "LEADER");
                 $this -> register_command("all", "TARASQUE", "LEADER");
 				$this -> register_command("all", "HLTOTW", "LEADER");
+				$this -> register_command("all", "HLSUBWAY", "LEADER");
 
                 $this -> bot -> core("settings") -> create('raidloot', 'New', 'LEADER', 'Who should be able to start new loot roll', 'GUEST;MEMBER;LEADER;ADMIN;SUPERADMIN;OWNER');
                 $this -> bot -> core("settings") -> create ("Loot", "Roll", "SINGLE", "Should you be allowed to be added to the roll of more than one slot?", "SINGLE;MULTI");
@@ -170,6 +171,9 @@ class raidloot extends BaseActiveModule
 				$this -> help['command']['HLTOTW hltotwweaps']="Shows Possible Weapons from Temple of 3 Winds (High Level).";
 				$this -> help['command']['HLTOTW hltotwbooks']="Shows Possible Books from Temple of 3 Winds (High Level).";
 				$this -> help['command']['HLTOTW hltotwmiscs']="Shows Possible Miscs from Temple of 3 Winds (High Level).";						
+				$this -> help['command']['HLSUBWAY hlsubarmors']="Shows Possible Armors from Subway (High Level).";		
+				$this -> help['command']['HLSUBWAY hlsubmiscs']="Shows Possible Miscs from Subway (High Level).";		
+				$this -> help['command']['HLSUBWAY hlsubweapons']="Shows Possible Weapons from Subway (High Level).";		
 				
                 $this -> help['notes'] = "This module is a work in progress ...<br>";
         }
@@ -679,7 +683,28 @@ class raidloot extends BaseActiveModule
                                                 return $this -> bot -> send_help($source, 'HLTOTW');
                                                 break;
                                 }
-                                break;								
+                                break;		
+               //$this -> register_command("all", "HLSUBWAY", "LEADER");
+                        case 'HLSUBWAY':
+                                switch($subcom)
+                                {
+                                        case '':
+                                                return $this -> rloot_interface($source, 'HLSUBWAY');
+                                                break;
+                                        case 'hlsubarmors':
+                                                return $this -> show_aloot($source, 'hlsubarmors', $command);
+                                                break;
+                                        case 'hlsubmiscs':
+                                                return $this -> show_aloot($source, 'hlsubmiscs', $command);
+                                                break;
+                                        case 'hlsubweapons':
+                                                return $this -> show_aloot($source, 'hlsubweapons', $command);
+                                                break;
+                                        default:
+                                                return $this -> bot -> send_help($source, 'HLSUBWAY');
+                                                break;
+                                }
+                                break;									
                         case 'ADD_RLOOT':
                                 return $this -> add_loot($source, $subcom, $command);
                                 break;
@@ -831,7 +856,7 @@ class raidloot extends BaseActiveModule
                                 $this->bot->core("loots")->loot[$numslot]['num'] = 1;
                         }
 
-                        return "##loot_highlight##" . $num . "x " . $msg . "##end## being rolled in slot##loot_highlight## #" . $numslot;
+						$this -> bot -> send_pgroup("<highlight>" . $num . "x " . $msg . "<end> being rolled in Slot <highlight>#".$numslot);
 
                         if ($this->count == 1)
                         {
@@ -840,7 +865,7 @@ class raidloot extends BaseActiveModule
                 }
                 else
                 {
-                        return "##loot_highlight##" . $num . "x " . $msg . "##end## Not Found!##loot_highlight## #";
+						$this -> bot -> send_pgroup("<highlight>" . $num . "x " . $msg . "<end> Not Found!<highlight> #");
                 }
         }		
 		
@@ -1194,10 +1219,18 @@ class raidloot extends BaseActiveModule
                         $list .= $this -> bot -> core("tools") -> chatcmd("HLTOTW hltotwweaps", "HL Totw Weapons")."\n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("HLTOTW hltotwbooks", "HL Totw Books")."\n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("HLTOTW hltotwmiscs", "HL Totw Miscs")."\n";
-                }				
+                }	
+                else if($area === 'HLSUBWAY')
+                {
+                        $list = "<header>##highlight##::::: High Level Subway Loot :::::##end##<end>\n\n\n";
+                        $list .= "##highlight##\t\tPF Loot##end##\n";
+                        $list .= $this -> bot -> core("tools") -> chatcmd("HLSUBWAY hlsubarmors", "HL Subway Armors")."\n";
+                        $list .= $this -> bot -> core("tools") -> chatcmd("HLSUBWAY hlsubmiscs", "HL Subway Miscs")."\n";
+                        $list .= $this -> bot -> core("tools") -> chatcmd("HLSUBWAY hlsubweapons", "HL Subway Weapons")."\n";
+                }					
                 else
                 {
-                        $list = "<center><header>##highlight##::::: Raid Manager 1.1 :::::##end##<end></center>\n\n\n";
+                        $list = "<center><header>##highlight##::::: Raid Manager 1.11 :::::##end##<end></center>\n\n\n";
                         $list .= "##highlight##    Raid Admin Commands##end##\n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("list ", "Display the Loot List")." \n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("result ", "Roll the Loot")." \n";
@@ -1233,6 +1266,8 @@ class raidloot extends BaseActiveModule
                         $list .= $this -> bot -> core("tools") -> chatcmd("PRISONERS", "Prisoners")."\n\n";
                         $list .= "##highlight##::::: POH Loot :::::##end##\n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("POH", "Pyramid of Home")."\n\n";
+                        $list .= "##highlight##::::: (HL) Subway Loot :::::##end##\n";
+                        $list .= $this -> bot -> core("tools") -> chatcmd("HLSUBWAY", "(HL) Subway")."\n\n";
                         $list .= "##highlight##::::: TARASQUE Loot :::::##end##\n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("TARASQUE", "Tarasque Castle")."\n\n";
                         $list .= "##highlight##::::: (HL) TOTW Loot :::::##end##\n";

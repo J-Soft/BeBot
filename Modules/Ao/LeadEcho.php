@@ -49,7 +49,7 @@ class LeadEcho extends BaseActiveModule
             ->create("Leader", "Echo", false, "Is the chat echo for the leader activated or nor?");
         $this->bot->core("settings")
             ->create("Leader", "LeaderAccess", true, "Does being leader give you at least LEADER access in the bot?");
-        $this->register_command("pgmsg", "leader", "LEADER");
+        $this->register_command("pgmsg", "leader", "GUEST");
         $this->register_command("pgmsg", "repeat", "LEADER");
         $this->register_event("privgroup");
         $this->register_event("pgleave");
