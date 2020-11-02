@@ -55,7 +55,7 @@ if (preg_match("/^windows/i", $os)) {
     This is a sane default for the php binary on Unix systems.
     If your php binary is located someplace else, edit the php_bin path accordingly.
     */
-    $php_bin = trim(shell_exec('which php5'));
+    $php_bin = trim(shell_exec('which php'));
     $php_args = " -c ./ ";
     $main_php = "Main.php";
 }
