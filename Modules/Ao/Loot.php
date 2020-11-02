@@ -70,6 +70,14 @@ class Rolls extends BaseActiveModule
                 "Should you be allowed to be added to the roll of more than one slot?",
                 "SINGLE;MULTI"
             );
+        $this->bot->core("settings")
+            ->create(
+                "Loot",
+                "Addlock",
+                "On",
+                "Are non-joined characters locked from using !add command?",
+                "On;Off"
+            );			
         $this->bot->core("colors")
             ->define_scheme("loot", "highlight", "yellow");
         $this->help['description'] = 'Module to flat roll on items.';
@@ -151,11 +159,12 @@ class Rolls extends BaseActiveModule
     */
     function pgleave($name)
     {
-		foreach($this->loot as $info) {
-        if (isset($this->loot[$info][$name])) {
-            unset($this->loot[$info][$name]);
+		$count = count($this->loot);
+		for($i=1;$i<=$count;$i++) {
+        if (isset($this->loot[$i][$name])) {
+            unset($this->loot[$i][$name]);
             $this->bot->send_pgroup(
-                "##loot_highlight##" . $name . "##end## removed from rolls in slot##loot_highlight## #" . $info
+                "##loot_highlight##" . $name . "##end## removed from rolls in slot##loot_highlight## #" . $i
             );
         }}
     }
@@ -164,6 +173,11 @@ class Rolls extends BaseActiveModule
     /***********************************************************************************************************/
     function add($name, $slot)
     {
+        if ($this->bot->core("settings")->get('Loot','Addlock')=="On" && !$this->bot->core("online")->in_chat($name)) {
+			return $this->bot->send_tell($name, "You must be in the PrivGroup of ##highlight##<botname>##end## to join a Roll.");
+		}
+		$who = $this->bot->core("whois")->lookup($name, true);
+		if(isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }
         if ($slot == 0) {
             $slots = array_keys($this->loot);
             foreach ($slots as $key => $sslot) {
@@ -174,7 +188,7 @@ class Rolls extends BaseActiveModule
                     }
                 }
             }
-            $this->addmsg = "##loot_highlight##" . $name . "##end## removed from all slots.";
+            $this->addmsg = "##loot_highlight##" . $name . "##end## (".$level.") removed from all slots.";
         } else {
             $present = false;
             if ($this->loot[$slot]) {
@@ -192,14 +206,14 @@ class Rolls extends BaseActiveModule
                         }
                     }
                     if ($present == true) {
-                        $this->addmsg = "##loot_highlight##" . $name . "##end## changed to slot##loot_highlight## #" . $slot . "##end##";
+                        $this->addmsg = "##loot_highlight##" . $name . "##end## (".$level.") changed to slot##loot_highlight## #" . $slot . "##end##";
                     } else {
-                        $this->addmsg = "##loot_highlight##" . $name . "##end## assigned to slot##loot_highlight## #" . $slot . "##end##";
+                        $this->addmsg = "##loot_highlight##" . $name . "##end## (".$level.") assigned to slot##loot_highlight## #" . $slot . "##end##";
                     }
                     $this->loot[$slot][$name] = 1;
                 } else {
                     $this->loot[$slot][$name] = 1;
-                    $this->addmsg = "##loot_highlight##" . $name . "##end## assiged to slot##loot_highlight## #" . $slot . "##end##";
+                    $this->addmsg = "##loot_highlight##" . $name . "##end## (".$level.") assigned to slot##loot_highlight## #" . $slot . "##end##";
                 }
             } else {
                 $this->addmsg = "There is currently no roll in slot $slot";
@@ -284,13 +298,16 @@ class Rolls extends BaseActiveModule
 
                 if (!$winner) {
                     $winner = "Nobody";
+					$level = 0;
                     $lcount = count($this->leftovers) + 1;
                     $this->leftovers[$lcount] = $item;
                 } else {
+					$who = $this->bot->core("whois")->lookup($winner, true);
+					if(isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }	
                     unset($slot[$winner]);
-                }
+                }			
                 $msg .= "##loot_highlight##Item: ##end##" . $item . "  (Slot##loot_highlight## #" . $num . "##end##)\n";
-                $msg .= "##loot_highlight##Winner: ##end##" . $winner . "\n\n";
+                $msg .= "##loot_highlight##Winner: ##end##" . $winner . " (".$level.")\n\n";
                 unset($users);
                 unset($winner);
                 unset($list);
@@ -307,7 +324,6 @@ class Rolls extends BaseActiveModule
 
     function reroll($name)
     {
-		$msg = "";
         $lcount = count($this->leftovers);
         if ($lcount == 0) {
             $this->bot->send_pgroup("##loot_highlight##No leftovers from last roll.##end##");
@@ -330,11 +346,8 @@ class Rolls extends BaseActiveModule
                     $this->loot[$numslot]['item'] = $item;
                     $this->loot[$numslot]['num'] = 1;
                 }
-                $msg .= "##loot_highlight##" . $num . "x " . $item . "##end## being rolled in slot##loot_highlight## #" . $numslot . "##end##.\n";
             }
-            $blob = "Item Roll List :: " . $this->bot->core("tools")
-                    ->make_blob("click to view", $msg);
-            $this->bot->send_pgroup($blob);
+            $this->rlist();
             unset($this->leftovers); $this->leftovers = array();
         }
     }
@@ -357,12 +370,16 @@ class Rolls extends BaseActiveModule
                 $list = array_keys($slot);
                 foreach ($list as $key => $player) {
                     if (($player != "item") && ($player != "num") && ($slot[$player] == 2)) {
-                        $msg .= " [##loot_highlight##$player##end##]";
+						$who = $this->bot->core("whois")->lookup($player, true);
+						if(isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }	
+                        $msg .= " [##loot_highlight##$player##end##(".$level.")]";
                     }
                 }
                 foreach ($list as $key => $player) {
                     if (($player != "item") && ($player != "num") && ($slot[$player] == 1)) {
-                        $msg .= " [##loot_highlight##$player##end##]";
+						$who = $this->bot->core("whois")->lookup($player, true);
+						if(isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }	
+						$msg .= " [##loot_highlight##$player##end##(".$level.")]";
                     }
                 }
             }
