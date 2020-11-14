@@ -4,7 +4,7 @@
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
-* Copyright (C) 2005-2020 J-Soft and the BeBot development team.
+* Copyright (C) 2005-2007 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
 *
 * Developed by:
 * - Alreadythere (RK2)
@@ -13,9 +13,11 @@
 * - Glarawyn (RK1)
 * - Khalem (RK1)
 * - Naturalistic (RK1)
+* - Noer
 * - Temar (RK1)
-*
-* See Credits file for all acknowledgements.
+* - Vrykolas
+* *
+* See Credits file for all aknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -30,118 +32,256 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
+*
+* File last changed at $LastChangedDate: 2008-10-29 23:33:21 +0100 (Mi, 29 Okt 2008) $
+* Revision: $Id: StartBot.php 1794 2008-10-29 22:33:21Z temar $
+* Getrix 2009-10-29 - Added fix for German chars.
+* Getrix 2009-10-26 - Added fix to botname so its starts with upercase then lower. (Fixed bug 26/10)
+* Getrix 2009-07-03 - Added search against same DB as submit(Settings,Server) (Using v4).
+* Getrix 2009-04-19 - Added Passkey and server as bot settings connecting to different itemDB.
+* MeatHooks 2019-04-30 - Modify for using MeatHooks Minions Item Database and remove server setting in db.
 */
+
 $items_core = new Items_Core($bot);
+
 class Items_Core extends BasePassiveModule
 {
-    var $server = 'http://aocdb.lunevo.net/';
-    var $itemPattern = '(<a style="text-decoration:none" href="itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)"><font color=#([0-9a-f]*)>\[([\\-a-zA-Z0-9_\'&\s\-]*)\]<\/font><\/a>)';
-
+	var $itemPattern = '<a style="text-decoration:none" href="itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)"><font color=#([0-9a-f]*)>\[([\\-a-zäöüßA-ZÄÖÜ0-9_\'&\s\-\:\(\)\+]*)\]<\/font><\/a>';
 
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module("items");
+
+        $this -> register_module("items");
     }
 
-
-    /*
-    Takes an item string and returns an array of item arrays - each with lowid, highid, ql, lowcrc, highcc, colour and name.
-    If $item is unparsable it returns a BotError
-    */
     function parse_items($itemText)
     {
         $items = array();
-        $count = preg_match_all('/' . $this->itemPattern . '/i', $itemText, $matches, PREG_SET_ORDER);
-        foreach ($matches as $match) {
-            $item['lowid'] = $match[2];
-            $item['highid'] = $match[3];
-            $item['ql'] = $match[4];
-            $item['lowcrc'] = $match[5];
-            $item['highcrc'] = $match[6];
-            $item['colour'] = $match[7];
-            $item['name'] = $match[8];
+
+        $count = preg_match_all('/'.$this->itemPattern.'/i', $itemText, $matches, PREG_SET_ORDER);
+
+        foreach($matches as $match)
+        {
+            $item['lowid']   = $match[1];
+            $item['highid']  = $match[2];
+            $item['lowlvl']  = $match[3];
+            $item['highlvl'] = $match[4];
+            $item['lowcrc']  = $match[5];
+            $item['midcrc']  = $match[6];
+            $item['highcrc'] = $match[7];
+            $item['color']   = $match[8];
+            $item['name']    = $match[9];
             $items[] = $item;
         }
         return $items;
     }
 
-
-    /*
-    Creates a text blob.  Alternate uses ' instead of ".
-    */
-    function make_item($item, $alternate = false)
+	function parse_recipe_item($itemText)
     {
-        if (empty($item)) {
-            return '';
+        $items = array();
+
+        $count = preg_match_all('/'.$this->itemPattern.'/i', $itemText, $matches, PREG_SET_ORDER);
+		if ($count != 2)
+		{
+			return $items;
+		}
+
+		$pos = strpos($itemText, "<a");
+		$qty_makes = trim(substr($itemText, 0, $pos - 1));
+		if (!is_numeric($qty_makes))
+		{
+			return $items;
+		}
+
+		$pos = strpos($itemText, "</a>");
+		$pos2 = strpos($itemText, "<a", $pos);
+
+		$qty_needed = trim(substr($itemText, $pos + 5, $pos2 - $pos - 6));
+		if (!is_numeric($qty_needed))
+		{
+			return $items;
+		}
+
+        foreach($matches as $match)
+        {
+            $item['lowid']   = $match[1];
+            $item['highid']  = $match[2];
+            $item['lowlvl']  = $match[3];
+            $item['highlvl'] = $match[4];
+            $item['lowcrc']  = $match[5];
+            $item['midcrc']  = $match[6];
+            $item['highcrc'] = $match[7];
+            $item['color']   = $match[8];
+            $item['name']    = $match[9];
+            $items[] = $item;
         }
-        if ($alternate) {
-            return '<a style="text-decoration:none" href="itemref://' . $item['lowid'] . '/' . $item['highid'] . '/' . $item['ql'] . '/' . $item['lowcrc'] . '/' . $item['highcrc']
-            . '"><font color=#' . $item['colour'] . '>[' . $item['name'] . ']</font></a>';
-        } else {
-            return "<a style='text-decoration:none' href='itemref://" . $item['lowid'] . "/" . $item['highid'] . "/" . $item['ql'] . "/" . $item['lowcrc'] . "/" . $item['highcrc']
-            . "'><font color=#" . $item['colour'] . ">[" . $item['name'] . "]</font></a>";
-        }
+
+		$items[] = $qty_makes;
+		$items[] = $qty_needed;
+
+        return $items;
     }
 
+    function make_item($item, $alternate = false)
+    {
+        if(empty($item))
+            return '';
 
-    //Returns true if $item is an itemref, false otherwise.
+        if($alternate)
+            return '<a style="text-decoration:none" href="itemref://'.$item['lowid'].'/'.$item['highid'].'/'.$item['lowlvl']."/".$item['highlvl'].'/'.$item['lowcrc'].'/'.$item['midcrc']."/".$item['highcrc'].'"><font color=#'.$item['color'].'>['.$item['name'].']</font></a>';
+        else
+            return "<a style='text-decoration:none' href='itemref://".$item['lowid']."/".$item['highid']."/".$item['lowlvl']."/".$item['highlvl']."/".$item['lowcrc']."/".$item['midcrc']."/".$item['highcrc']."'><font color=#".$item['color'].">[".$item['name']."]</font></a>";
+    }
+
     function is_item($item)
     {
-        if (1 > preg_match('/' . $this->itemPattern . '/i', $item)) {
+        if(1 > preg_match('/'.$this->itemPattern.'/i', $item))
             return false;
-        }
+
         return true;
     }
 
-
-    function submit_item($item, $name)
+    function submit_item($item, $name, $passkey)
     {
-        if (empty($item)) {
+        if(empty($item))
             return -1;
-        }
-        $checksum = md5(
-            'aocitems' + $item['lowid'] + $item['highid'] + $item['ql'] + $item['lowcrc'] + $item['highcrc'] + $item['colour'] + $item['itemname'] + $this->bot->dimension
-            + $this->bot->guild + $name
-        );
-        $url = $this->server . "botsubmit/v3/";
-        $url .= '?lowid=' . urlencode($item['lowid']);
-        $url .= '&highid=' . urlencode($item['highid']);
-        $url .= '&ql=' . urlencode($item['ql']);
-        $url .= '&lowcrc=' . urlencode($item['lowcrc']);
-        $url .= '&highcrc=' . urlencode($item['highcrc']);
-        $url .= '&color=' . urlencode($item['colour']);
-        $url .= '&name=' . urlencode($item['name']);
-        $url .= '&server=' . urlencode($this->bot->dimension);
-        $url .= '&guildname=' . urlencode($this->bot->guild);
-        $url .= '&username=' . urlencode($name);
-        $url .= '&checksum=' . urlencode($checksum);
-        return $this->bot->core("tools")->get_site($url, 1);
+                
+        $item_botname    = $this -> bot -> botname;
+        $item_botname    = ucfirst(strtolower($item_botname));
+        $item_guild      = $this -> bot -> guildname;
+        $item_dimension  = $this -> bot -> dimension;
+        
+        $salt = $item['lowid']."_".$item['highid']."_".$item['lowlvl']."_".$item['highlvl']."_".$item['lowcrc']."_".$item['midcrc']."_".$item['highcrc']."_".$item['color']."_".$item['name']."_".$item_botname."_".$name."_".$passkey;
+
+        $checksum = md5('aocitems' . $salt );
+
+        $url  = "https://conan.meathooksminions.com/aoc_items/itemdb_botsubmit.php";
+        $url .= '?lowid='.urlencode($item['lowid']);
+        $url .= '&highid='.urlencode($item['highid']);
+        $url .= '&lowlvl='.urlencode($item['lowlvl']);
+        $url .= '&highlvl='.urlencode($item['highlvl']);
+        $url .= '&lowcrc='.urlencode($item['lowcrc']);
+        $url .= '&midcrc='.urlencode($item['midcrc']);
+        $url .= '&highcrc='.urlencode($item['highcrc']);
+        $url .= '&color='.urlencode($item['color']);
+        $url .= '&name='.urlencode($item['name']);
+        $url .= '&server='.urlencode($item_dimension);
+        $url .= '&guildname='.urlencode($item_guild);
+        $url .= '&botname='.urlencode($item_botname);
+        $url .= '&username='.urlencode($name);
+        $url .= '&checksum='.urlencode($checksum);
+		
+		if ($this -> bot -> core("settings") -> get("Items", "LogURL"))
+		{
+			$this->bot->log("Items", "URL", "$url");
+		}
+
+        return $this -> bot -> core("tools") -> get_site($url, 1);
     }
 
+	function submit_recipe_item($recipeitem, $recipeqty, $item, $itemqty, $name, $passkey)
+	{
+        if(empty($item) || empty($recipeitem))
+		{
+            return -1;
+		}
+                
+         $result = $this -> bot -> core('items') -> submit_item($recipeitem, $name, $passkey);
 
-    function search_item_db_details($words)
-    {
-        $url = $this->server . "botsearch/";
-        $url .= '?single=1';
-        $url .= '&id=' . $words;
-        $result = $this->bot->core("tools")->get_site($url, 1);
-        //A comment explaining the logic of this check would be appreciated! Why are we looking for mysqli_real_escape_string here?
-        if (strstr($result, 'mysqli_real_escape_string') !== false) {
-            return ("Error in query to database");
-        }
-        return $result;
-    }
+         $result = $this -> bot -> core('items') -> submit_item($item, $name, $passkey);
+		
+		$item_botname    = $this -> bot -> botname;
+        $item_botname    = ucfirst(strtolower($item_botname));
+        $item_guild      = $this -> bot -> guildname;
+        $item_dimension  = $this -> bot -> dimension;
 
+		$salt = $recipeitem['lowid']."_".$recipeitem['highid']."_".$recipeqty."_".$item['lowid']."_".$item['highid']."_".$itemqty."_".$item_botname."_".$name."_".$passkey;
+		$salt = str_replace("&", "", $salt);
+
+        $checksum = md5('aocrecipe' . $salt);
+
+        $url  = "https://conan.meathooksminions.com/aoc_items/itemdb_botrecipesubmit.php";
+        $url .= '?recipelowid='.urlencode($recipeitem['lowid']);
+        $url .= '&recipehighid='.urlencode($recipeitem['highid']);
+        $url .= '&recipeqty='.urlencode($recipeqty);
+        $url .= '&itemlowid='.urlencode($item['lowid']);
+        $url .= '&itemhighid='.urlencode($item['highid']);
+        $url .= '&itemqty='.urlencode($itemqty);
+        $url .= '&server='.urlencode($item_dimension);
+        $url .= '&guildname='.urlencode($item_guild);
+        $url .= '&botname='.urlencode($item_botname);
+        $url .= '&username='.urlencode($name);
+        $url .= '&checksum='.urlencode($checksum);
+		
+		if ($this -> bot -> core("settings") -> get("Items", "LogURL"))
+		{
+			$this->bot->log("Items", "URL", "$url");
+		}
+
+        return $this -> bot -> core("tools") -> get_site($url, 1);
+	}
 
     function search_item_db($words)
     {
-        $url = $this->server . "botsearch/";
-        $url .= '?search=' . urlencode($words);
-        $url .= '&botname=' . $this->bot->botname;
-        $url .= '&pre=' . urlencode($this->bot->commpre);
-        return $this->bot->core("tools")->get_site($url, 1);
+        $passkey    = $this -> bot -> core("settings") -> get("Items", "Passkey");
+        $botname    = $this -> bot -> botname;
+        $botname    = ucfirst(strtolower($botname));
+        $salt       = $passkey."_".$botname;
+        $checksum   = md5('aocitems' . $salt );
+        
+        $url  = "https://conan.meathooksminions.com/aoc_items/itemdb_botsearch.php";
+        $url .= '?search='.urlencode($words);
+        $url .= '&botname='.urlencode($this->bot->botname);
+        $url .= '&pre='.urlencode($this -> bot -> commpre);
+        $url .= '&checksum='.urlencode($checksum);
+
+		if ($this -> bot -> core("settings") -> get("Items", "LogURL"))
+		{
+			$this->bot->log("Items", "URL", "$url");
+		}
+
+        $result = $this -> bot -> core("tools") -> get_site($url, 1);
+
+        if (!empty($result))
+		{
+            return $result;
+		}
+        else
+		{
+            return "Error in query to the database";
+		}
+    }
+
+    function search_item_recipe_db($words)
+    {
+        $passkey    = $this -> bot -> core("settings") -> get("Items", "Passkey");
+        $botname    = $this -> bot -> botname;
+        $botname    = ucfirst(strtolower($botname));
+        $salt       = $passkey."_".$botname;
+        $checksum   = md5('aocrecipe' . $salt );
+        
+        $url  = "https://conan.meathooksminions.com/aoc_items/itemdb_botrecipesearch.php";
+        $url .= '?search='.urlencode($words);
+        $url .= '&botname='.urlencode($this->bot->botname);
+        $url .= '&pre='.urlencode($this -> bot -> commpre);
+        $url .= '&checksum='.urlencode($checksum);
+
+		if ($this -> bot -> core("settings") -> get("Items", "LogURL"))
+		{
+			$this->bot->log("Items", "URL", "$url");
+		}
+
+        $result = $this -> bot -> core("tools") -> get_site($url, 1);
+		
+        if (!empty($result))
+		{
+            return $result;
+		}
+        else
+		{
+            return "Error in query to the database";
+		}
     }
 }
-
 ?>
