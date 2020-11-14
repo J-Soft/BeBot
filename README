@@ -16,8 +16,8 @@ PREREQUISITES (WHAT DO YOU NEED?)
 To install and run BeBot you need the following: 
 
 * Anarchy Online (free or paid) or Age of Conan
-* PHP version from v. 5.3 (minimal requirement) upto 7.2 (max tested so far)
-* database server of either Mysql (from 4.1.1 upto 5.7) or MariaDB (10.0 upto 10.4)
+* PHP version from v. 5.3 (minimal requirement) upto 7.4 (max tested so far)
+* database server of either Mysql (from 4.1 upto 8.0) or MariaDB (10.0 upto 10.4)
 * either "Official" files at https://github.com/J-Soft/BeBot/archive/master.zip (stable)
   or "Beta" files from https://github.com/bitnykk/BeBot/archive/master.zip (sandbox)
   NB : if you know how to use git, you also can clone/pull from any of these urls.
@@ -80,7 +80,7 @@ Unless windows PATH and/or php.ini are well set so the exe can locate required
 libraries alone, you may have to copy correct .dll files for this specific PHP.
 For PHP 5.3 : libeay32, libmysql, php5ts and ssleay32 for this PHP version.
 For 5.4/5.6 : same files but for this version + php_mysqli & php_sockets.
-For 7.x : libcrypto & libssl (64) + libssh2, nghttp2, php_curl & php7ts.
+For 7.x : libcrypt, libssl, libssh2, sockets, nghttp2, curl & php7(ts).
 Bot will tell you what misses to run during startup, so check all lines !
 
 Set $main_php to the location of the "Main.php" file. Once again you can 
@@ -194,6 +194,8 @@ PHASE 1: MYSQL INSTALLER
 3.	Click Install. 
 4.	Select Skip Sign-Up, Click Next.
 5.	Check Configure MySQL Server Now, Click Finish.
+6.  On recent MYSQL, use Legacy Authentification aka "5.x Compatibility"
+	(Unless you can adapt the bot yourself using "new Authentification")
 
 Now you should be in the MySQL Server Instance Configuration Wizard.
 
@@ -204,11 +206,11 @@ PHASE 2: MYSQL SERVER INSTANCE CONFIGURATION WIZARD
 2.	Select Detailed Configuration, Click Next.
 3.	Select Developer Machine, Click Next.
 4.	Select Multifunctional Database, Click Next.
-5.	Select C: and Installation Path, Click Next.
+5.	Select Drive & Installation Path, Click Next.
 6.	Select Decision Support, Click Next. 
 7.	Check Enable TCP/IP Networking and Enable Strict Mode, Click Next.
 8.	Select Standard Character Set, Click Next.
-9.	Check Install As Windows Servers, Check Launch the MySQL Server 
+9.	If windows, check Install As Windows Servers, Check Launch the MySQL Server 
     automatically, Check Include Bin Directory in Windows PATH, Click Next.
 10.	Enter and comfirm your root password. Write down your root password
     and do not loose it!!! Do not check Enable root access from remote machines.
@@ -384,3 +386,15 @@ All loots present in remains window should be automatically added to roll.
 
 This way you can add several remains in 1 roll, otherwise !clear in between.
 You also can delete unwanted loots ingame remains BEFORE doing upper /loot
+
+AOC ITEM SERVER ACCESS
+----------------------
+
+Bebot needs to be granted a server access for Age Of Conan's !items support.
+You could use any custom server by editing the module files by yourself.
+
+But, by default, the module will use MeatHook's database server.
+To contact its server admin & be provided with a key for your bot, go :
+	https://forums.funcom.com/u/MeatHooks
+Once key is obtained, do the following command :
+	!set items Passkey xyz-123-etc
