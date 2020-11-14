@@ -89,13 +89,13 @@ class craftclasses extends BaseActiveModule
                     "craftingclass",
                     "class1",
                     "modify",
-                    "ALTER IGNORE TABLE #___craftingclass modify `class1` enum('Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
+                    "ALTER TABLE #___craftingclass modify `class1` enum('Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
                 );
                 $this->bot->db->update_table(
                     "craftingclass",
                     "class2",
                     "modify",
-                    "ALTER IGNORE TABLE #___craftingclass modify `class2` enum('Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
+                    "ALTER TABLE #___craftingclass modify `class2` enum('Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
                 );
             default:
         }

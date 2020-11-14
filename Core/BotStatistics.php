@@ -83,7 +83,7 @@ class BotStatistics_Core extends BasePassiveModule
                     "bots",
                     "restarts",
                     "add",
-                    "ALTER IGNORE TABLE " . $this->DB . "bots ADD restarts INT DEFAULT '0'"
+                    "ALTER TABLE " . $this->DB . "bots ADD restarts INT DEFAULT '0'"
                 );
             case 2:
                 $this->bot->db->update_table(

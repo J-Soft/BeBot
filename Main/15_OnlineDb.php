@@ -154,7 +154,7 @@ class OnlineDB_Core extends BasePassiveModule
                     "online",
                     "profession",
                     "drop",
-                    "ALTER IGNORE TABLE #___online DROP `profession`, DROP `level`, DROP `ailevel`"
+                    "ALTER TABLE #___online DROP `profession`, DROP `level`, DROP `ailevel`"
                 );
             case 2:
                 $this->bot->db->update_table(
@@ -164,21 +164,21 @@ class OnlineDB_Core extends BasePassiveModule
                          "status_irc_changetime"
                     ),
                     "drop",
-                    "ALTER IGNORE TABLE #___online DROP status_irc, DROP status_irc_changetime"
+                    "ALTER TABLE #___online DROP status_irc, DROP status_irc_changetime"
                 );
             case 3:
                 $this->bot->db->update_table(
                     "online",
                     "reinvite",
                     "add",
-                    "ALTER IGNORE TABLE #___online ADD reinvite INT(1) DEFAULT '0'"
+                    "ALTER TABLE #___online ADD reinvite INT(1) DEFAULT '0'"
                 );
             case 4:
                 $this->bot->db->update_table(
                     "online",
                     "level",
                     "add",
-                    "ALTER IGNORE TABLE #___online ADD level INT(1) DEFAULT '0'"
+                    "ALTER TABLE #___online ADD level INT(1) DEFAULT '0'"
                 );
             default:
         }
