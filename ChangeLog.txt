@@ -1,11 +1,11 @@
 --------------
 Version 0.7.13
 --------------
-- AoC : improvement of the !items command with content and server specific to this game
+- AO/AoC : more tech patch for MySQL 8.x compatibility + addition of an updated !items functionnality for AOC
 --------------
 Version 0.7.12
 --------------
-- AO/AoC : technical patch alowing to use recent MySQL 8.x (with 5.x compatible auth) along with PHP 7.3 or 7.4
+- AO/AoC : technical patch allowing to use recent MySQL 8.x (with 5.x compatible auth) along with PHP 7.3 or 7.4
 --------------
 Version 0.7.11
 --------------

@@ -191,7 +191,7 @@ class ColorConfig extends BaseActiveModule
     function show_themes()
     {
         $blob = "##blob_title##Themes available##end##\n";
-        $folder = dir("./themes/");
+        $folder = dir("./Themes/");
         while ($themefile = $folder->read()) {
             if (!is_dir($themefile) && preg_match("/(.*)\.colors\.xml$/i", $themefile, $info)) {
                 if (strcasecmp(
@@ -228,7 +228,7 @@ class ColorConfig extends BaseActiveModule
     function show_scheme_files()
     {
         $blob = "##blob_title##Scheme files available##end##\n";
-        $folder = dir("./themes/");
+        $folder = dir("./Themes/");
         while ($schemefile = $folder->read()) {
             if (!is_dir($schemefile) && preg_match("/(.*)\.scheme\.xml$/i", $schemefile, $info)) {
                 $blob .= "\n" . $this->bot->core("tools")
