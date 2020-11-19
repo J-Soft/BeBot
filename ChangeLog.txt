@@ -1,7 +1,7 @@
 --------------
 Version 0.7.13
 --------------
-- AO/AoC : more tech patch for MySQL 8.x compatibility + addition of an updated !items functionnality for AOC
+- AO/AoC : more tech patch for MySQL 8.x compatibility + addition of updated !items functionnalities for AOC
 --------------
 Version 0.7.12
 --------------
