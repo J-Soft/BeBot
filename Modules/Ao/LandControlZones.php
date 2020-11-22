@@ -40,7 +40,7 @@ class LandControlZones extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("land_control_zones", "true") . " (
-			`id` int(11) default NULL,
+			`id` int(11) default 0,
 			`lrange` int(10) default NULL,
 			`hrange` int(10) default NULL,
 			`area` varchar(50) default NULL,
@@ -73,6 +73,10 @@ class LandControlZones extends BaseActiveModule
             );
             $this->bot->core("settings")->del("LandControl", "SchemaVersion");
         }
+		$zones = $this->bot->db->select(
+			"SELECT COUNT(*) FROM " . $this->bot->db->define_tablename("land_control_zones", "true")
+		);
+		if ($zones[0][0]==0) { $this->bot->db->set_version("land_control_zones", 5); }
         switch ($this->bot->db->get_version("land_control_zones")) {
             case 1:
             case 2:
