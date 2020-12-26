@@ -202,8 +202,8 @@ class Items extends BaseActiveModule
 
 		if (count($items, COUNT_NORMAL) == 4)
 		{
-            $result = $this -> bot -> core('items') -> submit_item($item[0], $name, $passkey);
-            $result = $this -> bot -> core('items') -> submit_item($item[1], $name, $passkey);
+            $result = $this -> bot -> core('items') -> submit_item($items[0], $name, $passkey);
+            $result = $this -> bot -> core('items') -> submit_item($items[1], $name, $passkey);
 			
 	        $result = $this -> bot -> core('items') -> submit_recipe_item($items[0], $items[2], $items[1], $items[3], $name, $passkey);
 			

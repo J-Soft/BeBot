@@ -961,9 +961,11 @@ class AOChat
             case AOCP_LOGIN_CHARLIST:
                 // AO server pings
             case AOCP_PING:
+                // AO AI 30 & SL 220 ignored
+            case AOCP_MSG_SYSTEM:		
                 break;
             default:
-                $bot->log("MAIN", "TYPE", "Unhandeled packet of type $type. Args: " . serialize($packet->args));
+                $bot->log("MAIN", "TYPE", "Unhandled packet of type $type. Args: " . serialize($packet->args));
                 if (is_resource($this->debug)) {
                     fwrite($this->debug, "<<<<<\n");
                     fwrite($this->debug, print_r($packet->args, true));
