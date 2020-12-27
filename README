@@ -398,3 +398,30 @@ To contact its server admin & be provided with a key for your bot, go :
 	https://forums.funcom.com/u/MeatHooks
 Once key is obtained, do the following command :
 	!set items Passkey xyz-123-etc
+	
+BYPASS THE 1K FRIENDLIST LIMIT
+------------------------------
+
+Any character should be limited to 1000 buddies in friendlist.
+This limitation is a problem :
+- for a guildbot of an org with more than 1000 members
+- for a raidbot with over 1000 subscribers
+
+To bypass that annoying limit :
+- create all needed slaves in one or several froob account(s)
+- download AOCP at https://github.com/Budabot/AOChatProxy
+
+Configure AOCP within its config.properties (copied from template) with :
+- proxy local port (9993 by default, advised unless you know why you change)
+- server distant adress & port (according to what game/dimension you need)
+- all the slaves you want starting at number one (with user, pass, name)
+Once ready, run the service (run.bat on windows, run.sh on linux/mac).
+Then the service should be waiting for main bot connection ...
+
+Now edit you Conf/Bot.conf and set $dimension to the correct value :
+For AOC it's a name : $dimension = "AocProxy";
+For AO its a number, e.g. for Live Proxy : $dimension = "95";
+
+Now, run main bot and it should connect along with all slaves.
+Therefore the resulting friendlist limit is now 1k x (main + X slaves).
+E.g. with 4 slaves : 1k x (1+4) = 5k

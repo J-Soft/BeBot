@@ -1,4 +1,8 @@
 --------------
+Version 0.7.15
+--------------
+- AO/AoC : addition of AoChatProxy compatibility to extend the bot friendlist over 1000 limit
+--------------
 Version 0.7.14
 --------------
 - AoC : correction related to the newly added !items functionnalities
