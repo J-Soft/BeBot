@@ -325,8 +325,20 @@ class Bot
 				break;
 			case "6";
 				$dimension = "Rubi-Ka-2019";
-				break;				
-            Default:
+				break;	
+			case "90";
+				$dimension = "AoTestProxy";
+				$this->dimension = 0;
+				break;					
+			case "95";
+				$dimension = "AoLiveProxy";
+				$this->dimension = 5;
+				break;					
+			case "96";
+				$dimension = "AoRk19Proxy";
+				$this->dimension = 6;
+				break;					
+			Default:
                 $dimension = ucfirst(strtolower($this->dimension));
         }
         Require("Conf/ServerList.php");
