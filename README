@@ -410,6 +410,7 @@ This limitation is a problem :
 To bypass that annoying limit :
 - create all needed slaves in one or several froob account(s)
 - download AOCP at https://github.com/Budabot/AOChatProxy
+- if none yet, you may also need to install Java JDK for your OS
 
 Configure AOCP within its config.properties (copied from template) with :
 - proxy local port (9993 by default, advised unless you know why you change)
