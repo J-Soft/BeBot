@@ -328,18 +328,18 @@ class Roster_Core extends BasePassiveModule
         if (strtolower($this->bot->game) == 'ao') {
             $dimension = $this->bot->dimension;
             switch (strtolower($dimension)) {
-                case "testlive":
-                    $dimension = "0";
-                    break;
-                case "atlantean";
-                    $dimension = "1";
-                    break;
-                case "rimor":
-                    $dimension = "2";
-                    break;
-                case "die neue welt":
-                    $dimension = "3";
-                    break;
+				case "testlive":
+				case "aotestproxy":
+					$dimension = "0";
+					break;
+				case "rubi-ka";
+				case "aoliveproxy":
+					$dimension = "5";
+					break;
+				case "rubi-ka-2019":
+				case "aork19proxy":
+					$dimension = "6";
+					break;
             }
             $members = $this->parse_org($dimension, $this->bot->guildid);
         }

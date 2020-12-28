@@ -424,5 +424,6 @@ For AOC it's a name : $dimension = "AocProxy";
 For AO its a number, e.g. for Live Proxy : $dimension = "95";
 
 Now, run main bot and it should connect along with all slaves.
+(This may take long especially the first time with huge list ...)
 Therefore the resulting friendlist limit is now 1k x (main + X slaves).
 E.g. with 4 slaves : 1k x (1+4) = 5k
