@@ -41,7 +41,7 @@ class Notify extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "notify", "ADMIN");
+        $this->register_command("all", "notify", "LEADER");
         $this->help['description'] = "Handling of notify list.";
         $this->help['command']['notify'] = "Shows the current notify list.";
         $this->help['command']['notify on <player>'] = "Adds <player> to the notify list.";
@@ -68,6 +68,8 @@ class Notify extends BaseActiveModule
                 return $this->add_notify($name, $com['arg']);
             case 'off':
                 return $this->del_notify($com['arg']);
+			case 'over':
+				return $this -> over_notify($com['arg']);				
             case 'cache':
                 Switch (strtolower($com['arg'])) {
                     case 'clear':
@@ -136,8 +138,29 @@ class Notify extends BaseActiveModule
 
     function add_notify($source, $user)
     {
-        return $this->bot->core("notify")->add($source, $user);
+		$notlist = $this->bot->db->select(
+			"SELECT COUNT(*) FROM #___users WHERE notify = 1"
+        );
+		$count = $notlist[0][0]; echo " COUNT : ".$count." ! ";
+        if ($count > 10 && strtolower($this->bot->game)=="aoc") { // 10 for test -> 999 for prod
+			$this -> bot -> send_tell($this->bot->slave, "notify over ".$source."@".$user, 1, false, TRUE);
+        } else {
+			return $this->bot->core("notify")->add($source, $user);
+		}
     }
+	
+	function over_notify($argz)
+	{
+        $infoz = explode("@", $argz);
+        $source = $infoz[0];
+        $user = $infoz[1];
+		$ret = $this -> bot -> core("notify") -> add($source, $user);
+		if ($ret['error'])
+		{
+			$ret['content'] = $ret['content']." : ".$ret['errordesc'];
+		}
+        $this -> bot -> send_output($source, $ret['content'], "tell");
+	}	
 
 
     function del_notify($user)
