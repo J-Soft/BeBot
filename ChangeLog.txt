@@ -1,7 +1,8 @@
 --------------
 Version 0.7.15
 --------------
-- AO/AoC : addition of AoChatProxy compatibility to extend the bot friendlist over the 1000 limit
+- AO : addition of AoChatProxy compatibility to extend the bot friendlist over the 1000 limit
+- AoC : new slave system linked to module AutoUserAdd to extend bot friendlist over 1K limit
 --------------
 Version 0.7.14
 --------------
