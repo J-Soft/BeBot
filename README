@@ -432,6 +432,7 @@ Finally, run main bot and it should connect along with all slaves.
 (This may take long especially the first time with huge list ...)
 
 If you setup this proxy correctly, you should obtain the wanted result.
+In Ao, whole friendlist will be redistributed to main+slave(s) on startup.
 
 AoC
 ---
@@ -464,7 +465,11 @@ On Mybot3 : !adduser Mybot2 leader
 Etc ... until you made the penultimate slave as leader on last slave.
 Note : only the main bot should have no bot as leader!
 
-If you setup this chain correctly, you should obtain the wanted result.
+Also verify this module is set to accept guild members as they chat :
+!settings Autouseradd
+
+If you setup this all correctly, you should obtain the wanted result.
+In AoC, anything over friendlist limit is notified to next slave in chain.
 
 Result
 ------
@@ -475,3 +480,6 @@ E.g. with 4 slaves : 1k x (1+4) = 5k
 In case of issue, check how you setup your bot(s) in these 2 modules :
 !settings Members
 !settings Online
+You may also need to refresh your Whois/User/Online tables by doing :
+!rosterupdate
+!restart
