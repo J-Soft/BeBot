@@ -420,7 +420,7 @@ Once ready, run the service (run.bat on windows, run.sh on linux/mac).
 Then the service should be waiting for main bot connection ...
 
 Now edit you Conf/Bot.conf and set $dimension to the correct value :
-For AOC it's a name : $dimension = "AocProxy";
+For AOC it's a name : $dimension = "Aocproxy";
 For AO its a number, e.g. for Live Proxy : $dimension = "95";
 
 Now, run main bot and it should connect along with all slaves.

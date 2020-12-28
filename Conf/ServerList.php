@@ -26,7 +26,7 @@ $server_list['Aoc']['Aoctestlive'] = array(
     'server' => 'testlive.ageofconan.com',
     'port' => 7010
 );
-$server_list['Aoc']['AocProxy'] = array(
+$server_list['Aoc']['Aocproxy'] = array(
     'server' => 'localhost',
     'port' => 9993
 );
