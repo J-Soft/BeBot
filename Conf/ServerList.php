@@ -26,10 +26,6 @@ $server_list['Aoc']['Aoctestlive'] = array(
     'server' => 'testlive.ageofconan.com',
     'port' => 7010
 );
-$server_list['Aoc']['Aocproxy'] = array(
-    'server' => 'localhost',
-    'port' => 9993
-);
 
 // all EU servers use the same login server
  $server_list['Aoc']['Bloodbrand']  = $server_list['Aoc']['EU'];
