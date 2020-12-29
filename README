@@ -164,8 +164,8 @@ Set the MySQL username, password, server IP adress or server host name and
 database name for the bot (see below). 
 
 
-INSTALLING MYSQL ON WINDOWS
-===========================
+INSTALLING MYSQL
+================
 
 First, you'll need MySQL.
 
