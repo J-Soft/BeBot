@@ -399,17 +399,17 @@ To contact its server admin & be provided with a key for your bot, go :
 Once key is obtained, do the following command :
 	!set items Passkey xyz-123-etc
 	
+	
 BYPASS THE 1K FRIENDLIST LIMIT
-------------------------------
+==============================
 
 Any character should be limited to 1000 buddies in friendlist.
 This limitation is a problem :
 - for a guildbot of an org with more than 1000 members
 - for a raidbot with over 1000 subscribers
 
-
-AO
---
+Anarchy Online
+--------------
 
 To bypass that annoying limit for AO :
 
@@ -434,21 +434,21 @@ Finally, run main bot and it should connect along with all slaves.
 If you setup this proxy correctly, you should obtain the wanted result.
 In Ao, whole friendlist will be redistributed to main+slave(s) on startup.
 
-AoC
----
+Age of Conan
+------------
 
 To bypass that annoying limit for AoC :
 
 First create all needed slaves in one or several account(s).
 E.g. if your main bot is Mybot, slaves could be serially named :
-Mybot1, Mybot2, Mybot3, etc.
+Myslave1, Myslave2, Myslave3, etc.
 
 Edit conf file of your main bot & add this line all below before "?>" :
-  $slave = "Mybot1";
-If you have more slaves, edit conf file of 1st slave to add same way :
-  $slave = "Mybot2";
+  $slave = "Myslave1";
+If you have more slaves, edit conf file of first slave to add same way :
+  $slave = "Myslave2";
 Then do the same for next slave, open its conf file to add also :
-  $slave = "Mybot3";
+  $slave = "Myslave3";
 Etc ... until you added the last slave to the penultimate slave conf.
 Note : only the last slave should have no slave in its config file!
 
@@ -456,12 +456,12 @@ Now you should bring all bots (main + slaves) online together.
 (Remember in AOC you have to pause between logins on same account)
 
 Start by listing all slaves (comma-separated) into main bot, e.g. :
-!set Online OtherBots Mybot1,Mybot2,Mybot3
+!set Online OtherBots Myslave1,Myslave2,Myslave3
 
 Once done, each slave should also have its leader set :
-On Mybot1 : !adduser Mybot leader
-On Mybot2 : !adduser Mybot1 leader
-On Mybot3 : !adduser Mybot2 leader
+On Myslave1 : !adduser Mybot leader
+On Myslave2 : !adduser Myslave1 leader
+On Myslave3 : !adduser Myslave2 leader
 Etc ... until you made the penultimate slave as leader on last slave.
 Note : only the main bot should have no bot as leader!
 
@@ -483,3 +483,4 @@ In case of issue, check how you setup your bot(s) in these 2 modules :
 You may also need to refresh your Whois/User/Online tables by doing :
 !rosterupdate
 !restart
+Note : you may also use the WhoisUpdate tool within Extras folder.

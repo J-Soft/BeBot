@@ -170,10 +170,12 @@ class User_Core extends BasePassiveModule
 				"SELECT COUNT(*) FROM #___users WHERE notify = 1"
 			);
 			$count = $notlist[0][0];
-			if ($count > 10) { // 10 for test -> 999 for prod
+			if ($count >= 10) { // 10 for test -> 999 for prod
 				$notifystate = 0;
 				if($this->bot->slave!=null) {
 					$this->bot->send_tell($this->bot->slave, "notify over ".$this->bot->botname."@".$name, 1, false, TRUE);
+				} else {
+				    $this->bot->log("CORE USER ADD","NULL SLAVE","No more slot available to add ".$name." on notify/friendlist but no slave(s) available. Check documentation to add some.");
 				}
 			}
 		}

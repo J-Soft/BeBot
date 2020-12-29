@@ -147,17 +147,21 @@ class Notify extends BaseActiveModule
 			$infoz = explode("@", $argz);
 			$source = $infoz[0];
 			$user = $infoz[1];
-			$notlist = $this->bot->db->select(
-				"SELECT COUNT(*) FROM #___users WHERE notify = 1"
-			);
-			$count = $notlist[0][0];
-			if ($count > 10) { // 10 for test -> 999 for prod
-				if($this->bot->slave!=null) {
-					$this->bot->send_tell($this->bot->slave, "notify over ".$source."@".$user, 1, false, TRUE);
+			if ($source!="" && $user!="") {
+				$notlist = $this->bot->db->select(
+					"SELECT COUNT(*) FROM #___users WHERE notify = 1"
+				);
+				$count = $notlist[0][0];
+				if ($count >= 10) { // 10 for test -> 999 for prod
+					if($this->bot->slave!=null) {
+						$this->bot->send_tell($this->bot->slave, "notify over ".$source."@".$user, 1, false, TRUE);
+					} else {
+						$this->bot->log("MODULE NOTIFY ADD","NULL SLAVE","No more slot available to add ".$user." on notify/friendlist but no slave(s) available. Check documentation to add some.");
+					}
+				} else {
+					$ret = $this->bot->core("notify")->add($source, $user);
+					// $this -> bot -> send_output($user, $ret, "tell"); // output for test/debug only
 				}
-			} else {
-				$ret = $this->bot->core("notify")->add($source, $user);
-				$this -> bot -> send_output($user, $ret, "tell");				
 			}
 		}
 	}
