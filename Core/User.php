@@ -151,7 +151,7 @@ class User_Core extends BasePassiveModule
 
         $members["id"] = $id;
         $members["nickname"] = $name;
-
+		
         // Mark members for notify in org bots, otherwise no notify as default
         if ($this->bot->core("settings")
                 ->get("Members", "Mark_notify")
@@ -162,6 +162,24 @@ class User_Core extends BasePassiveModule
         } else {
             $notifystate = 0;
         }
+
+		// Verify that our AOC main bot friendlist won't reach limit of 1K buddies
+		// Otherwise we add user unnotified & pass notify job over next slave in chain (& etc)
+		if (strtolower($this->bot->game)=="aoc") {
+			$notlist = $this->bot->db->select(
+				"SELECT COUNT(*) FROM #___users WHERE notify = 1"
+			);
+			$count = $notlist[0][0];
+			if ($count >= 950) { // 10 for test -> 950 for prod
+				$notifystate = 0;
+				if($this->bot->slave!=null) {
+					$this->bot->send_tell($this->bot->slave, "notify over ".$this->bot->botname."@".$name, 1, false, TRUE);
+				} else {
+				    $this->bot->log("CORE USER ADD","NULL SLAVE","No more slot available to add ".$name." on notify/friendlist but no slave(s) available. Check documentation to add some.");
+				}
+			}
+		}
+
         // Add the user to the users table
         if ($change_level) {
             $this->bot->db->query(
@@ -178,7 +196,6 @@ class User_Core extends BasePassiveModule
             );
         }
         // If character is on notify add to buddy list
-        // We probably will want to add some sort of buddylist number tracking to ensure we dont go over 1k buddies at some point.
         if ($notifystate == 1
             && !$this->bot->core("chat")
                 ->buddy_exists($members["id"])

@@ -164,8 +164,8 @@ Set the MySQL username, password, server IP adress or server host name and
 database name for the bot (see below). 
 
 
-INSTALLING MYSQL ON WINDOWS
-===========================
+INSTALLING MYSQL
+================
 
 First, you'll need MySQL.
 
@@ -398,3 +398,89 @@ To contact its server admin & be provided with a key for your bot, go :
 	https://forums.funcom.com/u/MeatHooks
 Once key is obtained, do the following command :
 	!set items Passkey xyz-123-etc
+	
+	
+BYPASS THE 1K FRIENDLIST LIMIT
+==============================
+
+Any character should be limited to 1000 buddies in friendlist.
+This limitation is a problem :
+- for a guildbot of an org with more than 1000 members
+- for a raidbot with over 1000 subscribers
+
+Anarchy Online
+--------------
+
+To bypass that annoying limit for AO :
+
+First create all needed slaves in one or several account(s).
+
+Then download AOCP at https://github.com/Budabot/AOChatProxy
+If none yet, you may also need to install Java JDK for your OS
+
+Configure AOCP within its config.properties (copied from template) with :
+- proxy local port (9993 by default, advised unless you know why you change)
+- server distant adress & port (according to what game/dimension you need)
+- all the slaves you want starting at number one (with user, pass, name)
+Once ready, run the service (run.bat on windows, run.sh on linux/mac).
+Then the service should be waiting for main bot connection ...
+
+Now edit you Conf/Bot.conf and set $dimension to the correct value :
+For AO its a number, e.g. for Live Proxy : $dimension = "95";
+
+Finally, run main bot and it should connect along with all slaves.
+(This may take long especially the first time with huge list ...)
+
+If you setup this proxy correctly, you should obtain the wanted result.
+In Ao, whole friendlist will be redistributed to main+slave(s) on startup.
+
+Age of Conan
+------------
+
+To bypass that annoying limit for AoC :
+
+First create all needed slaves in one or several account(s).
+E.g. if your main bot is Mybot, slaves could be serially named :
+Myslave1, Myslave2, Myslave3, etc.
+
+Edit conf file of your main bot & add this line all below before "?>" :
+  $slave = "Myslave1";
+If you have more slaves, edit conf file of first slave to add same way :
+  $slave = "Myslave2";
+Then do the same for next slave, open its conf file to add also :
+  $slave = "Myslave3";
+Etc ... until you added the last slave to the penultimate slave conf.
+Note : only the last slave should have no slave in its config file!
+
+Now you should bring all bots (main + slaves) online together.
+(Remember in AOC you have to pause between logins on same account)
+
+Start by listing all slaves (comma-separated) into main bot, e.g. :
+!set Online OtherBots Myslave1,Myslave2,Myslave3
+
+Once done, each slave should also have its leader set :
+On Myslave1 : !adduser Mybot leader
+On Myslave2 : !adduser Myslave1 leader
+On Myslave3 : !adduser Myslave2 leader
+Etc ... until you made the penultimate slave as leader on last slave.
+Note : only the main bot should have no bot as leader!
+
+Also verify this module is set to accept guild members as they chat :
+!settings Autouseradd
+
+If you setup this all correctly, you should obtain the wanted result.
+In AoC, anything over 950 (for safety) is notified to next slave in chain.
+
+Result
+------
+
+Therefore resulting friendlist limit is now about 1k x (main + X slaves).
+E.g. with 4 slaves : 1k x (1+4) = 5k
+
+In case of issue, check how you setup your bot(s) in these 2 modules :
+!settings Members
+!settings Online
+You may also need to refresh your Whois/User/Online tables by doing :
+!rosterupdate
+!restart
+Note : you may also use the WhoisUpdate tool within Extras folder.

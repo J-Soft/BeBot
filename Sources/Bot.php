@@ -133,6 +133,7 @@ class Bot
     var $starttime;
     var $commands;
 	var $sixtyfourbit;
+	public $slave;
     public $owner;
     public $super_admin;
     private $module_links = array();
@@ -233,6 +234,11 @@ class Bot
         self::$instance[$bothandle]->core_directories = $core_directories;
         self::$instance[$bothandle]->module_directories = $module_directories;
         //We need to keep these too.
+        if (isset($slave)) {
+            self::$instance[$bothandle]->slave = $slave;
+        } else {
+            self::$instance[$bothandle]->slave = null;
+        }		
         if (isset($owner)) {
             self::$instance[$bothandle]->owner = $owner;
         } else {
@@ -325,8 +331,20 @@ class Bot
 				break;
 			case "6";
 				$dimension = "Rubi-Ka-2019";
-				break;				
-            Default:
+				break;	
+			case "90";
+				$dimension = "AoTestProxy";
+				$this->dimension = 0;
+				break;					
+			case "95";
+				$dimension = "AoLiveProxy";
+				$this->dimension = 5;
+				break;					
+			case "96";
+				$dimension = "AoRk19Proxy";
+				$this->dimension = 6;
+				break;					
+			Default:
                 $dimension = ucfirst(strtolower($this->dimension));
         }
         Require("Conf/ServerList.php");

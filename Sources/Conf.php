@@ -157,7 +157,7 @@ class Conf
 	$ao_username = "' . $ao_username . '";				// Account username
 	$ao_password = "' . $ao_password . '";				// Account password
 	$bot_name = "' . $bot_name . '";				// Name of the bot-character
-	$dimension = "' . $dimension . '";				// The name of the server you play on, or (1, 2 or 3 for AO)
+	$dimension = "' . $dimension . '";				// The name of the server you play on, or (0, 5 or 6 for AO + 90, 95 or 96 for Proxy)
 	$guild = "' . $guild . '";				// Name of the guild running the bot (AOC only)
 
 	/*

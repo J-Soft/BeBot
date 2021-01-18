@@ -328,18 +328,18 @@ class Roster_Core extends BasePassiveModule
         if (strtolower($this->bot->game) == 'ao') {
             $dimension = $this->bot->dimension;
             switch (strtolower($dimension)) {
-                case "testlive":
-                    $dimension = "0";
-                    break;
-                case "atlantean";
-                    $dimension = "1";
-                    break;
-                case "rimor":
-                    $dimension = "2";
-                    break;
-                case "die neue welt":
-                    $dimension = "3";
-                    break;
+				case "testlive":
+				case "aotestproxy":
+					$dimension = "0";
+					break;
+				case "rubi-ka";
+				case "aoliveproxy":
+					$dimension = "5";
+					break;
+				case "rubi-ka-2019":
+				case "aork19proxy":
+					$dimension = "6";
+					break;
             }
             $members = $this->parse_org($dimension, $this->bot->guildid);
         }
@@ -351,7 +351,7 @@ class Roster_Core extends BasePassiveModule
             $this->added = 0;
             $this->removed = 0;
             $this->rerolled = 0;
-            $this->skipped = 0;
+
             $db_members_sql = $this->bot->db->select("SELECT char_id, nickname, user_level, updated_at FROM #___users");
             if (!empty($db_members_sql)) {
                 foreach ($db_members_sql as $db_member) {
@@ -364,66 +364,47 @@ class Roster_Core extends BasePassiveModule
                 Go through all members and make sure we are up to date.
                 */
                 foreach ($members as $member) {
-                    if (!isset($db_members[$member["nickname"]])) {
-                        /*
-                        If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
-                        its a new member we havent picked up for some reason.
-                        */
-                        if ($this->add("Roster-XML", $member["id"], $member["nickname"], "from XML") == true) {
-                            $this->added++;
-                        } else {
-                            $this->skipped++;
-                            continue;
-                        }
-                    } else {
-                        $db_member = $db_members[$member["nickname"]];
-                        if ($db_member[2] == 1 || ($db_member[2] == 0 && (($db_member[3] + 172800) <= time()))) {
-                            if ($this->add("Roster-XML", $member["id"], $member["nickname"], "from XML") == true) {
-                                $this->added++;
-                            } else {
-                                $this->skipped++;
-                                continue;
-                            }
-                        } /*
-                        We have an entry for the nickname, but the character id's have changed, rerolled character.
-                        */
-                        else {
-                            if ($db_member[0] != $member["id"]) {
-                                if ($member["id"] == "0" || $member["id"] == "-1" || $member["id"] == "" || $member["id"] == null || empty($member["id"]) || strlen(
-                                        $id
-                                    ) < 5
-                                ) {
-                                    $this->bot->log(
-                                        "ROSTER",
-                                        "ID",
-                                        "Get ID Failed for {$member['nickname']} (ID: " . $member["id"] . ")"
-                                    );
-                                } else {
-                                    $this->erase(
-                                        "Roster-XML",
-                                        $db_member[0],
-                                        $member["nickname"],
-                                        "char_id mismatch (ID: " . $db_member[0] . ")"
-                                    );
-                                    $this->removed++;
-                                    if ($this->bot->guildid == $member["org_id"]) {
-                                        if ($this->add(
-                                                "Roster-XML-Reroll",
-                                                $member["id"],
-                                                $member["nickname"],
-                                                "after reroll (ID: " . $member["id"] . ")"
-                                            ) == true
-                                        ) {
-                                            $this->rerolled++;
-                                        } else {
-                                            $this->skipped++;
-                                            continue;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+					$db_member = $db_members[$member["nickname"]];
+		
+					/*
+					If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
+					its a new member we havent picked up for some reason.
+					*/
+					if (empty($db_member))
+					{
+						$this -> add("Roster-XML", $member["id"], $member["nickname"], "from XML");
+						$this -> added++;
+					}
+
+					else if ($db_member[2] == 1 || ($db_member[2] == 0 && (($db_member[3] + 172800) <= time())))
+					{
+						$this -> add("Roster-XML", $member["id"], $member["nickname"], "from XML");
+						$this -> added++;
+					}
+
+					/*
+					We have an entry for the nickname, but the character id's have changed, rerolled character.
+					*/
+					else if ($db_member[0] != $member["id"])
+					{
+						if($member["id"] == "0" || $member["id"] == "-1" || $member["id"] == "" || $member["id"] == NULL || empty($member["id"]) || strlen($id) < 5)
+						{
+							$this -> bot -> log("ROSTER", "ID", "Get ID Failed for $name (ID: ".$member["id"].")");
+						}
+						else
+						{
+							$this -> erase("Roster-XML", $db_member[0], $member["nickname"], "char_id mismatch (ID: " . $db_member[0] . ")");
+							$this -> removed++;
+
+							if ($this -> bot -> guildid == $member["org_id"])
+							{
+								$this -> add("Roster-XML-Reroll", $member["id"], $member["nickname"], "after reroll (ID: " . $member["id"] . ")");
+								$this -> added++;
+
+								$this -> rerolled++;
+							}
+						}
+					}
                     /*
                     Make sure we have an entry in the whois cache for the character.
                     */
@@ -651,9 +632,6 @@ class Roster_Core extends BasePassiveModule
             if ($this->rerolled > 0) {
                 $msg .= "::: " . $this->rerolled . " members was found to have rerolled ";
             }
-            if ($this->skipped > 0) {
-                $msg .= "::: " . $this->skipped . " members was skipped due to errors ";
-            }
             $this->bot->core("settings")
                 ->save("members", "LastRosterUpdate", time());
             $this->bot->log("ROSTER", "UPDATE", "Roster update complete. $msg", true);
@@ -804,9 +782,9 @@ class Roster_Core extends BasePassiveModule
         $this->bot->log("ROSTER", "ADD", "Adding $name $reason");
         $result = $this->bot->core("user")->add($source, $name, $id, 2, 1);
         if (!($result instanceof BotError)) {
-            $this->bot->core("chat")->buddy_add($id);
             $this->added++;
         }
+		$this->bot->core("chat")->buddy_add($id);
     }
 
 
