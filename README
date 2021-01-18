@@ -469,12 +469,12 @@ Also verify this module is set to accept guild members as they chat :
 !settings Autouseradd
 
 If you setup this all correctly, you should obtain the wanted result.
-In AoC, anything over friendlist limit is notified to next slave in chain.
+In AoC, anything over 950 (for safety) is notified to next slave in chain.
 
 Result
 ------
 
-Therefore the resulting friendlist limit is now 1k x (main + X slaves).
+Therefore resulting friendlist limit is now about 1k x (main + X slaves).
 E.g. with 4 slaves : 1k x (1+4) = 5k
 
 In case of issue, check how you setup your bot(s) in these 2 modules :

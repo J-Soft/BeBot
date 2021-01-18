@@ -152,7 +152,7 @@ class Notify extends BaseActiveModule
 					"SELECT COUNT(*) FROM #___users WHERE notify = 1"
 				);
 				$count = $notlist[0][0];
-				if ($count >= 10) { // 10 for test -> 999 for prod
+				if ($count >= 950) { // 10 for test -> 950 for prod
 					if($this->bot->slave!=null) {
 						$this->bot->send_tell($this->bot->slave, "notify over ".$source."@".$user, 1, false, TRUE);
 					} else {
