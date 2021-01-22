@@ -222,7 +222,7 @@ class Alts_Core extends BasePassiveModule
         if ($main == $who) {
             $title = "Alts";
         } else {
-            $title = $main . "�s alts";
+            $title = $main . "'s alts";
         }
         if ($returntype == 1) {
             return $result;

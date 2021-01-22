@@ -130,7 +130,7 @@ class Raid extends BaseActiveModule
                 "AnnounceDelay",
                 120,
                 "Specify the delay between raid announces.",
-                '60;120;180;340;400;600;900'
+                '30;60;120;180;340;400;600;900'
             );
 
         $this->help['description'] = 'Module to manage and announce raids.';
