@@ -484,3 +484,65 @@ You may also need to refresh your Whois/User/Online tables by doing :
 !rosterupdate
 !restart
 Note : you may also use the WhoisUpdate tool within Extras folder.
+
+
+EXTERNAL RELAY MODULES
+======================
+
+Nowadays there are 2 main options for this in the gaming universe :
+- IRC which has historically been the most used media for linked chat
+- Discord that is now a very commonly used multiplatform chat appli
+We'll see below how to connect you raid/guild bot to these.
+
+IRC
+---
+
+You first decide which IRC server you want to use. Many are public & free.
+Create you #channel if it doesn't exist, you must be owner or at least moderator.
+You may use a dedicated bot to hold channel, kick intruders, set a pass/key, etc.
+Commands are described @ https://gist.github.com/xero/2d6e4b061b4ecbeb9f99
+
+Once your channel is ready, it's time to link your Bebot by doing :
+!settings irc
+You'll obtain a panel in which you can set everything up :
+- main connection elements Server, Port (often 6667), #Channel & various options
+- security elements like Key (if a pass was set) & channels options
+- visual elements like prefixes, references, size limits, etc ...
+
+After settings this all correctly, you can start IRC relay with :
+!irc connect
+The bot should also reconnect by itself after reboot.
+
+For more details & commands :
+!help irc
+
+Discord
+-------
+
+Create you server/channel(s) if they don't exist, you must be owner or at least admin.
+You make set several channel(s), role(s), visual(s) & start inviting people at will.
+Click on the channel you want to relay from/to & copy its Id (last digit in URL).
+If you can't find it, go into your settings "Appearance" tab & activate Dev mode.
+Then right click the wanted channel to copy its Id all below the contextual menu.
+
+Now go https://discord.com/developers/applications to create an access for your Bebot :
+ Click "New Application" & give it a name which can be different from ingame botname.
+ Go into "Bot" tab, activate this option by clicking "Add Bot" & confirming.
+ Copy the Bot Token from this tab, it will be used later below.
+ Then go into "OAuth2" tab, check "bot" option in the "Scopes" window.
+ Below in "Bot Permissions", check at least "View Channels" & "Send Messages" (aka 3072)
+ Back upper in "Scopes", click "Copy" to obtain the validation link.
+ Past the link in your browser to visit it, select wanted server, confirm, captcha & win!
+ 
+Final step is to configure your Bebot by doing :
+!settings discord
+You'll obtain a panel in which you can set everything up :
+- main connection elements BotToken & ChannelId
+- other elements like channels options
+
+After settings this all correctly, you can start Discord relay with :
+!discord connect
+The bot should also keep on relaying by itself after reboot.
+
+For more details & commands :
+!help discord
