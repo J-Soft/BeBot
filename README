@@ -516,23 +516,35 @@ The bot should also reconnect by itself after reboot.
 For more details & commands :
 !help irc
 
+If your bot can't connect to IRC, verify all !settings ...
+Possibly you mistyped something like server, channel, port or pass/key.
+
 Discord
 -------
 
 Create your server/channel(s) if they don't exist, you must be owner or at least admin.
 You may set several channel(s), role(s), visual(s) & start inviting people at will.
+
+Right clic on server > Settings > Widget and activate it on the top right corner.
 Click on the channel you want to relay from/to & copy its Id (last digit in its URL).
 If you can't find Id, go into your settings "Appearance" tab & activate Dev mode "On".
 Then right click the wanted channel to copy its Id all below its contextual menu.
+(The Server Id is the first digit in URL, or right click server & copy like done upper)
 
 Now go https://discord.com/developers/applications to create an access for your Bebot :
  Click "New Application" & give it a name which can be different from ingame botname.
  Go into "Bot" tab, activate this option by clicking "Add Bot" & confirming.
  Copy the Bot Token from this tab, it will be used later below.
  Then go into "OAuth2" tab, check "bot" option in the "Scopes" window.
- Below in "Bot Permissions", check at least "View Channels" & "Send Messages" (aka 3072)
+ In "Permissions", check "Manage Server" + "View Channels" + "Send Messages" (aka 3104)
  Back upper in "Scopes", click "Copy" to obtain the bot validation link.
  Paste link in a web browser to visit it, select wanted server, confirm, captcha & win!
+ 
+Penultimate unlocker now, very specific to Discord :
+Any bot would be limitated until it has connected just once via Discord socket.
+To emulate this 1-timer ping, you can use any compatible solution for few minutes ...
+E.g. "Bot Designer For Discord" is a genius android appstored by Nilpointer Soft (J. Tomana).
+Launch, create bot, enter name/token, accept policies, start, add time, login, logoff, close.
  
 Final step is to configure your Bebot by doing :
 !settings discord
@@ -546,3 +558,6 @@ The bot should also keep on relaying by itself after reboot.
 
 For more details & commands :
 !help discord
+
+If you bot doesn't relay correctly, verify all !settings ...
+Also verify all Discord side : roles/permissions, Ids, widget, etc.

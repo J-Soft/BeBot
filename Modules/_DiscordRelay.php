@@ -110,15 +110,18 @@ class DiscordRelay extends BaseActiveModule
         parent::__construct($bot, get_class($this));
 		$this->register_module("discord");
 		$this->register_command("all", "discord", "SUPERADMIN");
+		$this->register_command("all", "discordonline", "GUEST");
 		$this->register_event("connect");
 		$this->register_event("privgroup");
         $this->register_event("gmsg", "org");
         $this->help['description'] = "Handles the Discord relay of the bot.";
         $this->help['command']['discord connect'] = "Tries relaying from/to the Discord channel.";
         $this->help['command']['discord disconnect'] = "Stops relaying from/to the Discord channel.";
-        $this->help['notes'] = "The Discord relay is configured via settings, for all options check /tell <botname> <pre>settings discord.";
+        $this->help['notes'] = "The Discord relay is configured via settings, for all options check /tell <botname> <pre>settings discord. Discord side commands available are : is, online/sm, whois, uid, level/lvl/pvp";
         $this->bot->core("settings")
-            ->create("discord", "DiscordRelay", false, "Should the bot be relaying from/to Discord server ?", "On;Off");		
+            ->create("discord", "DiscordRelay", false, "Should the bot be relaying from/to Discord server ?", "On;Off", true);	
+        $this->bot->core("settings")
+            ->create("discord", "ServerId", "", "Discord server ID for the widget online checks ?");			
         $this->bot->core("settings")
             ->create("discord", "ChannelId", "", "Discord channel ID that will be relayed from/to ?");
         $this->bot->core("settings")
@@ -141,11 +144,14 @@ class DiscordRelay extends BaseActiveModule
                         break;	
                     case 'disconnect':
                         return $this->discord_disconnect($name);
-                        break;							
+                        break;						
                     case 'test':
                         return $this->discord_test();
                         break;										
 				}
+			case 'discordonline':
+				return $this->discord_online($name);
+				break;					
 		}
 	}
 
@@ -184,6 +190,58 @@ class DiscordRelay extends BaseActiveModule
 			$this->bot->log("DISCORD", "STATUS", "Restored Discord relay after bot startup");
 		}
 	}	
+
+    /*
+    Discord online check
+    */	
+    function discord_online($name = "")
+    {
+		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
+			$guild = $this->bot->core("settings")->get("discord", "ServerId");
+			$token = $this->bot->core("settings")->get("discord", "BotToken");			
+			if ($guild>0 && $token!="") {
+				$route = "/guilds/{$guild}/widget.json";
+				$result = discord_get($route, $token);
+				if(isset($result['message'])&& isset($result['code'])) {
+					$this->bot->log("DISCORD", "ERROR", "Bad configuration : do !settings discord to fix");
+				} else {
+					$sent = $result['presence_count']." online in discord ... ";
+					foreach ($result['members'] as $member) {			
+						switch ($member['status']) {
+							case 'online':
+								$color = "##green##";
+								break;	
+							case 'idle':
+								$color = "##orange##";
+								break;						
+							case 'dnd':
+								$color = "##red##";
+								break;			
+							default:
+								$color = "##white##";
+								break;
+						}												
+						$sent .= $color.$member['username']."##end## ";
+					}
+				}
+			}	
+			if (($name != "") && ($name != "c")) {
+				$this->bot->send_tell($name,$sent);
+			} else {
+				if ($name == "") {
+					$this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
+				}
+			}	
+		} else {
+			if (($name != "") && ($name != "c")) {
+				$this->bot->send_tell($name,"Discord relay isn't activated");
+			} else {
+				if ($name == "") {
+					$this->bot->send_output("", "Discord relay isn't activated",$this->bot->core("settings")->get("discord", "WhatChat"));
+				}
+			}			
+		}
+	}
 	
     /*
     Manual relay activation
@@ -197,7 +255,7 @@ class DiscordRelay extends BaseActiveModule
 				$this->bot->send_tell($name,"Relaying from/to Discord channel");
 			} else {
 				if ($name == "") {
-					$this->bot->send_gc("Relaying from/to Discord channel");
+					$this->bot->send_output("", "Relaying from/to Discord channel",$this->bot->core("settings")->get("discord", "WhatChat"));
 				}
 			}
 		} else {
@@ -205,7 +263,7 @@ class DiscordRelay extends BaseActiveModule
 				$this->bot->send_tell($name,"Discord relay is already activated");
 			} else {
 				if ($name == "") {
-					$this->bot->send_gc("Discord relay is already activated");
+					$this->bot->send_output("", "Discord relay is already activated",$this->bot->core("settings")->get("discord", "WhatChat"));
 				}
 			}			
 		}
@@ -223,7 +281,7 @@ class DiscordRelay extends BaseActiveModule
 				$this->bot->send_tell($name,"Discord relay has been stopped");
 			} else {
 				if ($name == "") {
-					$this->bot->send_gc("Discord relay has been stopped");
+					$this->bot->send_output("", "Discord relay has been stopped",$this->bot->core("settings")->get("discord", "WhatChat"));
 				}
 			}
 		} else {
@@ -231,7 +289,7 @@ class DiscordRelay extends BaseActiveModule
 				$this->bot->send_tell($name,"Discord relay was already stopped");
 			} else {
 				if ($name == "") {
-					$this->bot->send_gc("Discord relay was already stopped");
+					$this->bot->send_output("", "Discord relay was already stopped",$this->bot->core("settings")->get("discord", "WhatChat"));
 				}
 			}			
 		}
@@ -279,11 +337,14 @@ class DiscordRelay extends BaseActiveModule
 			if (strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="gc" || strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="both" ) {		
 				$channel = $this->bot->core("settings")->get("discord", "ChannelId");
 				$token = $this->bot->core("settings")->get("discord", "BotToken");
-				if ($channel>0 && $token!="") {
+				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
 					$sent = "[Orgchat] ".ucfirst($name).": ".$this->cleanString($msg);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
+					if(isset($result['message'])&& isset($result['code'])) {
+						$this->bot->log("DISCORD", "ERROR", "Erroneous configuration : do !settings discord to fix");
+					}					
 				}
 			}
 		}
@@ -298,11 +359,14 @@ class DiscordRelay extends BaseActiveModule
 			if (strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="pgroup" || strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="both" ) {
 				$channel = $this->bot->core("settings")->get("discord", "ChannelId");
 				$token = $this->bot->core("settings")->get("discord", "BotToken");
-				if ($channel>0 && $token!="") {
+				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
 					$sent = "[Privchat] ".ucfirst($name).": ".$this->cleanString($msg);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
+					if(isset($result['message'])&& isset($result['code'])) {
+						$this->bot->log("DISCORD", "ERROR", "Misconfiguration : do !settings discord to fix");
+					}
 				}
 				
 			}
@@ -329,14 +393,208 @@ class DiscordRelay extends BaseActiveModule
 					foreach ($invert as $msg) {
 							if ($msg['id']>$this->lastmsg) { $this->lastmsg = $msg['id']; }
 							if ($msg['timestamp']>$this->lastcheck && !isset($msg['author']['bot'])) {
-								$sent = "[Discord] ".ucfirst($msg['author']['username']).": ".strip_tags(utf8_decode($msg['content']));
-								$this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
+								if(substr($msg['content'],0,1)!=$this->bot->commpre) {
+									$sent = "[Discord] ".ucfirst($msg['author']['username']).": ".strip_tags(utf8_decode($msg['content']));
+									$this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
+								} else {
+									$com = explode(" ", $msg['content'], 2);
+									Switch ($com[0]) {
+										case $this->bot->commpre . 'is':
+											$sent = $this->discord_is($msg['content']);
+											Break;
+										case $this->bot->commpre . 'online':
+										case $this->bot->commpre . 'sm':
+											$sent = $this->discord_sm($msg['content']);
+											Break;
+										case $this->bot->commpre . 'whois':
+											$sent = $this->discord_whois($msg['content']);
+											Break;
+										case $this->bot->commpre . 'uid':
+											$sent = $this->discord_uid($msg['content']);
+											Break;
+										case $this->bot->commpre . 'level':
+										case $this->bot->commpre . 'lvl':
+										case $this->bot->commpre . 'pvp':
+											$sent = $this->discord_lvl($msg['content']);
+											Break;										
+										Default:
+											$sent = "";
+											Break;
+									}
+									if($sent!="") {
+										$route = "/channels/{$channel}/messages";
+										$sent = "[Gamebot] ".$this->bot->botname.": ".$this->cleanString($sent);
+										$data = array("content" => $sent);
+										$result = discord_post($route, $token, $data);
+										if(isset($result['message'])&& isset($result['code'])) {
+											$this->bot->log("DISCORD", "ERROR", "False configuration : do !settings discord to fix");
+										}									
+									}
+								}
 							}
 					}
 				}
 				$this->lastcheck = date('Y-m-d').'T'.date("H:i:s").'.000000+00:00';
 			}
 		}
+    }
+	
+    /*
+    * Gets called when someone does !is
+    */
+    function discord_is($msg)
+    {
+		$sent = "";
+		if (preg_match("/^" . $this->bot->commpre . "is ([a-zA-Z0-9]{4,25})$/i", $msg, $info)) {
+			$info[1] = ucfirst(strtolower($info[1]));
+            if (!$this->bot->core('player')->id($info[1])) {
+                $sent = "Player " . $info[1] . " does not exist.";
+            } else {
+                if ($info[1] == ucfirst(strtolower($this->bot->botname))) {
+                    $sent = "I'm online!";
+                } else {
+                    if ($this->bot->core("chat")->buddy_exists($info[1])) {
+                        if ($this->bot->core("chat")->buddy_online($info[1])) {
+                            $sent = $info[1] . " is online.";
+                        } else {
+                            $sent= $info[1] . " is offline.";
+                        }
+                    } else {
+						$sent = "Player " . $info[1] . " is unknown.";
+					}
+                }
+            }
+		}
+		return $sent;
+	}
+	
+    /*
+    * Gets called when someone does !uid
+    */
+    function discord_uid($msg)
+    {
+		$sent = "";
+		if (preg_match("/^" . $this->bot->commpre . "uid ([a-zA-Z0-9]{4,25})$/i", $msg, $info)) {
+            $info[1] = ucfirst(strtolower($info[1]));
+            $sent = $info[1] . ": " . $this->bot->core('player')->id($info[1]);
+		}
+		return $sent;		
+	}
+	
+    /*
+    * Gets called when someone does !whois
+    */
+    function discord_whois($msg)
+    {
+		$sent = "";
+		if (preg_match("/^" . $this->bot->commpre . "whois (.+)$/i", $msg, $info)) {
+            $info[1] = ucfirst(strtolower($info[1]));
+			if (!$this->bot->core('player')->id($info[1])) {
+				$sent = "Player " . $info[1] . " does not exist.";
+			} else {
+				$sent = $this->whois_player($info[1]);
+			}		
+		}
+		return $sent;		
+	}	
+
+    /*
+    * Gets called by discord_whois()
+    */	
+    function whois_player($name)
+    {
+        $who = $this->bot->core("whois")->lookup($name);
+        if (!$who) {
+            $result = "Couldn't find infos about " . $info[1] . " ...";
+        } elseif (!($who instanceof BotError)) {
+            $at = "(AT " . $who["at_id"] . " - " . $who["at"] . ") ";
+            $result = "\"" . $who["nickname"] . "\"";
+            if (!empty($who["firstname"]) && ($who["firstname"] != "Unknown")) {
+                $result = $who["firstname"] . " " . $result;
+            }
+            if (!empty($who["lastname"]) && ($who["lastname"] != "Unknown")) {
+                $result .= " " . $who["lastname"];
+            }
+            if (strtolower($this->bot->game) == 'ao') {
+                $result .= " is a level " . $who["level"] . " " . $at . "" . $who["gender"] . " " . $who["breed"] . " ";
+                $result .= $who["profession"] . ", " . $who["faction"];
+            } else {
+                $result .= " is a level " . $who["level"] . " ";
+                $result .= $who["class"];
+            }
+            if (!empty($who["rank"])) {
+                $result .= ", " . $who["rank"] . " of " . $who["org"] . "";
+            }
+            if ($this->bot->core("settings")->get("Whois", "Details") == true) {
+                if ($this->bot->core("settings")
+                        ->get("Whois", "ShowMain") == true
+                ) {
+                    $main = $this->bot->core("alts")->main($name);
+                    if ($main != $name) {
+                        $result .= " :: Alt of " . $main;
+                    }
+                }
+            }
+        } else {
+            $result = $who;
+        }
+        return $result;
+    }	
+	
+    /*
+    Level command for discord
+    */
+    function discord_lvl($msg)
+    {
+		$sent = "";
+        if (preg_match("/^" . $this->bot->commpre . "([a-zA-Z]{3,5}) ([0-9]{1,3})$/i", $msg, $info)) {
+			$sent = $this->bot->commands["tell"]["level"]->get_level($info[2]);
+		}
+		return $sent;		
+    }	
+	
+    /*
+    * Gets called when someone does !online
+    */
+    function discord_sm()
+    {
+		$sent = "";
+        $channels = "";
+        if (strtolower(
+                $this->bot->core("settings")
+                    ->get("discord", "WhatChat")
+            ) == "both"
+        ) {
+            $channels = "(status_pg = 1 OR status_gc = 1)";
+        } elseif (strtolower(
+                $this->bot->core("settings")
+                    ->get("discord", "WhatChat")
+            ) == "gc"
+        ) {
+            $channels = "status_gc = 1";
+        } elseif (strtolower(
+                $this->bot->core("settings")
+                    ->get("discord", "WhatChat")
+            ) == "pgroup"
+        ) {
+            $channels = "status_pg = 1";
+        }
+        $online = $this->bot->db->select(
+            "SELECT DISTINCT(nickname) FROM #___online WHERE " . $this->bot
+                ->core("online")
+                ->otherbots() . " AND " . $channels . " ORDER BY nickname ASC"
+        );
+        if (empty($online)) {
+            $sent = "Nobody online on notify!";
+        } else {
+            $sent = count($online) . " online in game ... ";
+            $list = array();
+            foreach ($online as $name) {
+                $list[] = $name[0];
+            }
+            $sent .= implode(" ", $list);
+        }
+		return $sent;		
     }	
 	
 }

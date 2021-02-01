@@ -70,7 +70,7 @@ class IRC extends BaseActiveModule
         $this->help['command']['irconline'] = "Shows users in the IRC Channel.";
         $this->help['command']['irc connect'] = "Tries to connect to the IRC channel.";
         $this->help['command']['irc disconnect'] = "Disconnects from the IRC server.";
-        $this->help['notes'] = "The IRC relay is configured via settings, for all options check /tell <botname> <pre>settings IRC.";
+        $this->help['notes'] = "The IRC relay is configured via settings, for all options check /tell <botname> <pre>settings IRC. Irc side commands available are : is, online/sm, whois, uid, level/lvl/pvp";
         // Create default settings:
         if ($this->bot->guildbot) {
             $guildprefix = "[" . $this->bot->guildname . "]";
@@ -748,6 +748,12 @@ class IRC extends BaseActiveModule
         );
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_CHANNEL,
+            $this->bot->commpre . 'sm',
+            $this->bot->commands["tell"]["irc"],
+            'irc_online'
+        );		
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_CHANNEL,
             $this->bot->commpre . 'whois',
             $this->bot->commands["tell"]["irc"],
             'irc_whois'
@@ -808,6 +814,12 @@ class IRC extends BaseActiveModule
             $this->bot->commands["tell"]["irc"],
             'irc_online'
         );
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_QUERY,
+            $this->bot->commpre . 'sm',
+            $this->bot->commands["tell"]["irc"],
+            'irc_online'
+        );		
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_QUERY,
             $this->bot->commpre . 'whois',
@@ -1352,6 +1364,7 @@ class IRC extends BaseActiveModule
         Switch ($msg[0]) {
             case $this->bot->commpre . 'is':
             case $this->bot->commpre . 'online':
+			case $this->bot->commpre . 'sm':
             case $this->bot->commpre . 'whois':
             case $this->bot->commpre . 'uid':
             case $this->bot->commpre . 'level':
@@ -1363,6 +1376,7 @@ class IRC extends BaseActiveModule
                 $this->irc_is($irc, $data);
                 Break;
             case 'online':
+			case 'sm':
                 $data->message = $this->bot->commpre . $data->message;
                 $this->irc_online($irc, $data);
                 Break;
