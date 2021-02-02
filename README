@@ -16,7 +16,7 @@ PREREQUISITES (WHAT DO YOU NEED?)
 To install and run BeBot you need the following: 
 
 * Anarchy Online (free or paid) or Age of Conan
-* PHP version from v. 5.3 (minimal requirement) upto 7.4 (max tested so far)
+* PHP version from 5.4 (minimal requirement) upto 7.4 (max tested so far)
 * database server of either Mysql (from 4.1 upto 8.0) or MariaDB (10.0 upto 10.4)
 * either "Official" files at https://github.com/J-Soft/BeBot/archive/master.zip (stable)
   or "Beta" files from https://github.com/bitnykk/BeBot/archive/master.zip (sandbox)
@@ -78,10 +78,12 @@ On windows, according to the PHP version you'd want Bebot to run into, you may
 need to copy a php.exe file right into bot's root folder (where StartBot.bat is).
 Unless windows PATH and/or php.ini are well set so the exe can locate required
 libraries alone, you may have to copy correct .dll files for this specific PHP.
-For PHP 5.3 : libeay32, libmysql, php5ts and ssleay32 for this PHP version.
-For 5.4/5.6 : same files but for this version + php_mysqli & php_sockets.
+For 5.4/5.6 : libeay32, libmysql, php5ts and ssleay32, php_mysqli & php_sockets.
 For 7.x : libcrypt, libssl, libssh2, sockets, nghttp2, curl & php7(ts).
+
 Bot will tell you what misses to run during startup, so check all lines !
+You may need to install some modules (e.g. curl) and activate them in php.ini
+So be sure of what php.ini file is loaded by the PHP client Bebot uses.
 
 Set $main_php to the location of the "Main.php" file. Once again you can 
 just enter "Main.php" if you're starting the bot from the directory its in. 
