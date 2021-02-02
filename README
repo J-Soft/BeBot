@@ -539,13 +539,8 @@ Now go https://discord.com/developers/applications to create an access for your 
  In "Permissions", check "Manage Server" + "View Channels" + "Send Messages" (aka 3104)
  Back upper in "Scopes", click "Copy" to obtain the bot validation link.
  Paste link in a web browser to visit it, select wanted server, confirm, captcha & win!
- 
-Penultimate unlocker now, very specific to Discord :
-Any bot would be limitated until it has connected just once via Discord socket.
-To emulate this 1-timer ping, you can use any compatible solution for few minutes ...
-E.g. "Bot Designer For Discord" is a genius android appstored by Nilpointer Soft (J. Tomana).
-Launch, create bot, enter name/token, accept policies, start, add time, login, logoff, close.
- 
+ Now your bot should show as offline in your Discord (except at quick connection ping).
+
 Final step is to configure your Bebot by doing :
 !settings discord
 You'll obtain a panel in which you can set everything up :
@@ -554,10 +549,10 @@ You'll obtain a panel in which you can set everything up :
 
 After settings this all correctly, you can start Discord relay with :
 !discord connect
-The bot should also keep on relaying by itself after reboot.
+The bot should fastly ping & then keep on relaying by itself even after reboot.
 
 For more details & commands :
 !help discord
 
-If you bot doesn't relay correctly, verify all !settings ...
+If you bot doesn't ping/relay correctly, verify all !settings ...
 Also verify all Discord side : roles/permissions, Ids, widget, etc.
