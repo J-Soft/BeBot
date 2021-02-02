@@ -1,0 +1,12 @@
+[submodule "Sources/Discord/SimpleDiscord"]
+	path = Sources/Discord/SimpleDiscord
+	url = https://github.com/bitnykk/SimpleDiscord
+[submodule "Sources/Discord/discord-php-kiss"]
+	path = Sources/Discord/discord-php-kiss
+	url = https://github.com/bitnykk/discord-php-kiss
+[submodule "Sources/Discord/websocket-php"]
+	path = Sources/Discord/websocket-php
+	url = https://github.com/Textalk/websocket-php
+[submodule "Sources/Discord/log"]
+	path = Sources/Discord/log
+	url = https://github.com/php-fig/log
