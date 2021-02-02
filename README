@@ -541,6 +541,14 @@ Now go https://discord.com/developers/applications to create an access for your 
  Paste link in a web browser to visit it, select wanted server, confirm, captcha & win!
  Now your bot should show as offline in your Discord (except at quick connection ping).
 
+Execute this section only if you run Bebot on a PHP version lower than 7.0 :
+Any Discord bot would be limitated until it has connected Discord wsocket once.
+There is a lib to automate that but it only works with PHP 7.0+ ...
+So to emulate this 1-timer ping, you can use any compatible solution for few minutes.
+E.g. "Bot Designer For Discord" is a genius android appstored by Nilpointer Soft (J. Tomana).
+Launch, create bot, enter name/token, accept policies, start, add time, login, logoff, close.
+This way your bot access will be unlocked & fully capable, even under PHP 5.x !
+ 
 Final step is to configure your Bebot by doing :
 !settings discord
 You'll obtain a panel in which you can set everything up :

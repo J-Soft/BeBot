@@ -35,31 +35,33 @@
 Add a "_" at the beginning of the file (_DiscordRelay.php) if you do not want it to be loaded.
 */
 
-// WS API
-$results = array();
-function autoLoader($dir, &$results, $exclude='') {
-	$files = scandir($dir);
-	foreach ($files as $key => $value) {
-		$path = realpath($dir . DIRECTORY_SEPARATOR . $value);
-		if (!is_dir($path) && substr($path, -4)=='.php' && $path!=$exclude) {
-			$slash = str_replace("\\","/",$path);
-			$explode = explode($dir,$slash);
-			$results[] = $dir.$explode[1];
+if ((float)phpversion() > 6.9) {
+	// WS API working with PHP 7.0+
+	$results = array();
+	function autoLoader($dir, &$results, $exclude='') {
+		$files = scandir($dir);
+		foreach ($files as $key => $value) {
+			$path = realpath($dir . DIRECTORY_SEPARATOR . $value);
+			if (!is_dir($path) && substr($path, -4)=='.php' && $path!=$exclude) {
+				$slash = str_replace("\\","/",$path);
+				$explode = explode($dir,$slash);
+				$results[] = $dir.$explode[1];
+			}
 		}
 	}
-}
-$results[] = 'Sources/Discord/log/Psr/Log/LoggerInterface.php';
-autoLoader('Sources/Discord/log/Psr/Log/',$results,'LoggerInterface.php');
-$results[] = 'Sources/Discord/websocket-php/lib/Message/Message.php';
-autoLoader('Sources/Discord/websocket-php/lib/Message/',$results,'Message.php');
-$results[] = 'Sources/Discord/websocket-php/lib/Exception.php';
-autoLoader('Sources/Discord/websocket-php/lib/',$results,'Exception.php');
-autoLoader('Sources/Discord/SimpleDiscord/src/RestClient/Resources/',$results);
-$results[] = 'Sources/Discord/SimpleDiscord/src/RestClient/RestClient.php';
-autoLoader('Sources/Discord/SimpleDiscord/src/DiscordSocket/',$results);
-$results[] = 'Sources/Discord/SimpleDiscord/src/SimpleDiscord.php';
-foreach ($results as $key) {
-	include_once($key);
+	$results[] = 'Sources/Discord/log/Psr/Log/LoggerInterface.php';
+	autoLoader('Sources/Discord/log/Psr/Log/',$results,'LoggerInterface.php');
+	$results[] = 'Sources/Discord/websocket-php/lib/Message/Message.php';
+	autoLoader('Sources/Discord/websocket-php/lib/Message/',$results,'Message.php');
+	$results[] = 'Sources/Discord/websocket-php/lib/Exception.php';
+	autoLoader('Sources/Discord/websocket-php/lib/',$results,'Exception.php');
+	autoLoader('Sources/Discord/SimpleDiscord/src/RestClient/Resources/',$results);
+	$results[] = 'Sources/Discord/SimpleDiscord/src/RestClient/RestClient.php';
+	autoLoader('Sources/Discord/SimpleDiscord/src/DiscordSocket/',$results);
+	$results[] = 'Sources/Discord/SimpleDiscord/src/SimpleDiscord.php';
+	foreach ($results as $key) {
+		include_once($key);
+	}
 }
 
 // REST API
@@ -197,16 +199,18 @@ class DiscordRelay extends BaseActiveModule
 	}
 	
 	/*
-    WS ping called at discord_connect()
+    WS ping called at discord_connect() for PHP 7.0+
     */
     function discord_ping()
     {	
-		$token = $this->bot->core("settings")->get("discord", "BotToken");
-		$ws = new \SimpleDiscord\SimpleDiscord([
-			"token" => $token,
-			"debug" => 0 // 3 for test, 0 for prod
-		]);
-		$ws->ping();
+		if ((float)phpversion() > 6.9) {
+			$token = $this->bot->core("settings")->get("discord", "BotToken");
+			$ws = new \SimpleDiscord\SimpleDiscord([
+				"token" => $token,
+				"debug" => 0 // 3 for test, 0 for prod
+			]);
+			$ws->ping();
+		}
 	}	
 	
     /*
