@@ -35,34 +35,8 @@
 Add a "_" at the beginning of the file (_DiscordRelay.php) if you do not want it to be loaded.
 */
 
-// RC1 DiscordPhpKiss lightest forked standalone @ https://github.com/bitnykk/discord-php-kiss
-define("DISCORD_API", "https://discordapp.com/api/v6");
-require_once('Sources/DiscordPhpKiss/discord_curl.php');
-
-// RC2 Nebucord : heavier standalone with threading issue
-/*function autoLoader($dir, &$results = array()) {
-    $files = scandir($dir);
-    foreach ($files as $key => $value) {
-        $path = realpath($dir . DIRECTORY_SEPARATOR . $value);
-        if (!is_dir($path) && substr($path, -4)=='.php') {
-			$slash = str_replace("\\","/",$path);
-			$explode = explode('Sources/Nebucord/src/',$slash);
-			$results[] = 'Sources/Nebucord/src/'.$explode[1];
-        } else if ($value != "." && $value != "..") {
-            autoLoader($path, $results);
-        }
-    }
-	return $results;
-}
-$autoList = autoLoader('Sources/Nebucord/src/');
-$autoInv = array_reverse($autoList);
-foreach ($autoInv as $key) {
-	//echo " * ".$key." * ";
-	include_once($key);
-}*/
-
-// RC3 SimpleDiscord : require Websocket + Psr Log ; buggy & incomplete
-/*$results = array();
+// WS API
+$results = array();
 function autoLoader($dir, &$results, $exclude='') {
 	$files = scandir($dir);
 	foreach ($files as $key => $value) {
@@ -74,21 +48,23 @@ function autoLoader($dir, &$results, $exclude='') {
 		}
 	}
 }
-$results[] = 'Sources/Log/Psr/Log/LoggerInterface.php';
-autoLoader('Sources/Log/Psr/Log/',$results,'LoggerInterface.php');
-$results[] = 'Sources/Websocket/lib/Message/Message.php';
-autoLoader('Sources/Websocket/lib/Message/',$results,'Message.php');
-$results[] = 'Sources/Websocket/lib/Exception.php';
-autoLoader('Sources/Websocket/lib/',$results,'Exception.php');
-autoLoader('Sources/SimpleDiscord/src/RestClient/Resources/',$results);
-$results[] = 'Sources/SimpleDiscord/src/RestClient/RestClient.php';
-autoLoader('Sources/SimpleDiscord/src/DiscordSocket/',$results);
-$results[] = 'Sources/SimpleDiscord/src/SimpleDiscord.php';
-//$inverts = array_reverse($results);
+$results[] = 'Sources/Discord/log/Psr/Log/LoggerInterface.php';
+autoLoader('Sources/Discord/log/Psr/Log/',$results,'LoggerInterface.php');
+$results[] = 'Sources/Discord/websocket-php/lib/Message/Message.php';
+autoLoader('Sources/Discord/websocket-php/lib/Message/',$results,'Message.php');
+$results[] = 'Sources/Discord/websocket-php/lib/Exception.php';
+autoLoader('Sources/Discord/websocket-php/lib/',$results,'Exception.php');
+autoLoader('Sources/Discord/SimpleDiscord/src/RestClient/Resources/',$results);
+$results[] = 'Sources/Discord/SimpleDiscord/src/RestClient/RestClient.php';
+autoLoader('Sources/Discord/SimpleDiscord/src/DiscordSocket/',$results);
+$results[] = 'Sources/Discord/SimpleDiscord/src/SimpleDiscord.php';
 foreach ($results as $key) {
-	//echo " * ".$key." * ";
 	include_once($key);
-}*/
+}
+
+// REST API
+define("DISCORD_API", "https://discordapp.com/api/v6");
+require_once('Sources/Discord/discord-php-kiss/discord_curl.php');
 
 $discordrelay = new DiscordRelay($bot);
 /*
@@ -100,6 +76,7 @@ class DiscordRelay extends BaseActiveModule
 	var $lastmsg = 0;
 	var $lastcheck = 0;
 	var $crondelay = "2sec";
+	var $is;
 
     /*
     Constructor:
@@ -114,6 +91,7 @@ class DiscordRelay extends BaseActiveModule
 		$this->register_event("connect");
 		$this->register_event("privgroup");
         $this->register_event("gmsg", "org");
+		$this->register_event("buddy");
         $this->help['description'] = "Handles the Discord relay of the bot.";
         $this->help['command']['discord connect'] = "Tries relaying from/to the Discord channel.";
         $this->help['command']['discord disconnect'] = "Stops relaying from/to the Discord channel.";
@@ -156,38 +134,13 @@ class DiscordRelay extends BaseActiveModule
 	}
 
 	/*
-    Just a test function, might delete for release
-    */
-    function discord_test()
-    {	
-		/*$nebucord = new \Nebucord\Nebucord(['token' => $this->token, 'ctrlusr' => ['controluser-snowflake1', 'controluser-snowflake2']]);
-		$nebucord->bootstrap()->run();*/
-		/*$nebucordREST = new \Nebucord\NebucordREST(['token' => $this->token]);
-		$message_model = $nebucordREST->channel->createMessage($this->channel, "test sending message");*/
-		
-		/*$simpledisc = new \SimpleDiscord\SimpleDiscord([
-			"token" => $this->token,
-			"debug" => 3
-		]);
-		$simpledisc->run();*/	
-		
-		// DiscordPhpKiss POST content
-		/*$channel = $this->channel;
-		$token = $this->token;
-		$route = "/channels/{$channel}/messages";
-		$msg = strip_tags("bot sending test ".time());
-		$data = array("content" => $msg);
-		$result = discord_post($route, $token, $data);*/
-	}
-
-	/*
     Called at bot startup
     */
     function connect()
     {	
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
-			$this->register_event("cron", $this->crondelay);
-			$this->bot->log("DISCORD", "STATUS", "Restored Discord relay after bot startup");
+			$this->bot->core('settings')->save('discord', 'DiscordRelay', FALSE);
+			$this->discord_connect();
 		}
 	}	
 
@@ -203,7 +156,7 @@ class DiscordRelay extends BaseActiveModule
 				$route = "/guilds/{$guild}/widget.json";
 				$result = discord_get($route, $token);
 				if(isset($result['message'])&& isset($result['code'])) {
-					$this->bot->log("DISCORD", "ERROR", "Bad configuration : do !settings discord to fix");
+					$this->bot->log("DISCORD", "ERROR", "Bad configuration : check discord widget + !settings discord");
 				} else {
 					$sent = $result['presence_count']." online in discord ... ";
 					foreach ($result['members'] as $member) {			
@@ -243,12 +196,26 @@ class DiscordRelay extends BaseActiveModule
 		}
 	}
 	
+	/*
+    WS ping called at discord_connect()
+    */
+    function discord_ping()
+    {	
+		$token = $this->bot->core("settings")->get("discord", "BotToken");
+		$ws = new \SimpleDiscord\SimpleDiscord([
+			"token" => $token,
+			"debug" => 0 // 3 for test, 0 for prod
+		]);
+		$ws->ping();
+	}	
+	
     /*
-    Manual relay activation
+    Manual/Auto relay activation
     */	
     function discord_connect($name = "")
     {	
 		if (!$this->bot->core("settings")->get("discord", "DiscordRelay")) {
+			$this->discord_ping();
 			$this->bot->core('settings')->save('discord', 'DiscordRelay', TRUE);
 			$this->register_event("cron", $this->crondelay);
 			if (($name != "") && ($name != "c")) {
@@ -428,7 +395,7 @@ class DiscordRelay extends BaseActiveModule
 										$result = discord_post($route, $token, $data);
 										if(isset($result['message'])&& isset($result['code'])) {
 											$this->bot->log("DISCORD", "ERROR", "False configuration : do !settings discord to fix");
-										}									
+										}								
 									}
 								}
 							}
@@ -460,13 +427,48 @@ class DiscordRelay extends BaseActiveModule
                             $sent= $info[1] . " is offline.";
                         }
                     } else {
-						$sent = "Player " . $info[1] . " is unknown.";
+						$this->is[$info[1]] = "discord_is";
+                        $this->bot->core("chat")->buddy_add($info[1]);
 					}
                 }
             }
 		}
 		return $sent;
 	}
+	
+    /*
+    This gets called if a buddy logs on/off
+    */
+    function buddy($name, $msg)
+    {
+        if ($msg == 1 || $msg == 0) {
+            // Only handle this if connected to Discord server
+            if (!$this->bot->core("settings")->get("discord", "DiscordRelay")) {
+                return;
+            }
+
+            if ((!$this->bot->core("notify")
+                    ->check($name))
+                && isset($this->is[$name])
+            ) {
+                if ($msg == 1) {
+                    $sent = $name . " is online.";
+                } else {
+                    $sent = $name . " is offline.";
+                }			
+                unset($this->is[$name]);				
+				$channel = $this->bot->core("settings")->get("discord", "ChannelId");
+				$token = $this->bot->core("settings")->get("discord", "BotToken");				
+				$route = "/channels/{$channel}/messages";
+				$sent = "[Gamebot] ".$this->bot->botname.": ".$this->cleanString($sent);
+				$data = array("content" => $sent);
+				$result = discord_post($route, $token, $data);
+				if(isset($result['message'])&& isset($result['code'])) {
+					$this->bot->log("DISCORD", "ERROR", "Odd configuration : do !settings discord to fix");
+				}							
+            }
+        }
+    }	
 	
     /*
     * Gets called when someone does !uid
