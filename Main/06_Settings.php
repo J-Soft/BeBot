@@ -171,7 +171,7 @@ class Settings_Core extends BasePassiveModule
         if (isset($this->settings_cache[$module][$setting])) {
             return $this->settings_cache[$module][$setting];
         } else {
-            $this->error->set("The setting named " . $setting . " for setting group " . $module . " does not exisit.");
+            $this->error->set("The setting named " . $setting . " for setting group " . $module . " does not exist.");
             return $this->error;
         }
     } // End function get()
@@ -185,7 +185,7 @@ class Settings_Core extends BasePassiveModule
         if (!empty($this->settings_cache[$module])) {
             return $this->settings_cache[$module];
         } else {
-            $this->error->set("No settings exisit for group " . $module . ".");
+            $this->error->set("No settings exist for group " . $module . ".");
             return $this->error;
         }
     } // End function get_all()
@@ -199,7 +199,7 @@ class Settings_Core extends BasePassiveModule
         $result = $this->bot->db->select($sql);
         if (empty($result)) {
             $this->settings_cache = array();
-            $this->error->set("No settings loaded from database. It's possible that no settings exisit.");
+            $this->error->set("No settings loaded from database. It's possible that no settings exist.");
             return $this->error;
         } else {
             foreach ($result as $data) {
@@ -489,7 +489,7 @@ class Settings_Core extends BasePassiveModule
         if (is_null($setting)) // Delete a setting group.
         {
             if (!isset($this->settings_cache[strtolower($module)])) {
-                $this->error->set("Setting " . $setting . " for module " . $module . " does not exisit.");
+                $this->error->set("Setting " . $setting . " for module " . $module . " does not exist.");
                 return $this->error;
             } else {
                 $sql = "DELETE FROM #___settings WHERE module = '" . $this->bot->db->real_escape_string($module) . "'";
@@ -499,7 +499,7 @@ class Settings_Core extends BasePassiveModule
             }
         } else {
             if (!isset($this->settings_cache[strtolower($module)][strtolower($setting)])) {
-                $this->error->set("Setting " . $setting . " for module " . $module . " does not exisit.");
+                $this->error->set("Setting " . $setting . " for module " . $module . " does not exist.");
                 return $this->error;
             } else {
                 unset($this->settings_cache[strtolower($module)][strtolower($setting)]);
@@ -636,7 +636,7 @@ class Settings_Core extends BasePassiveModule
                $result = $this -> bot -> db -> select($sql);
            }
 
-           if (empty($result)) // If still empty, table may not exisit.
+           if (empty($result)) // If still empty, table may not exist.
            {
                $this -> bot -> log("SETTINGS", "ERROR", "Could not determine version of the settings table. Quitting.");
                die("The bot has been shutdown");

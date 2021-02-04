@@ -61,7 +61,7 @@ if (preg_match("/^windows/i", $os)) {
 }
 $confc = true;
 require_once "./Sources/Conf.php";
-if ($argv[1] != $conf->argv) {
+if (isset($argv[1]) && $argv[1] != $conf->argv) {
     echo "Use \"StartBot.php " . $conf->argv . "\" to start bot next time\n";
     $argv[1] = $conf->argv;
     $conf->ask("Press Enter to load Bot");

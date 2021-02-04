@@ -623,7 +623,7 @@ class OnlineDisplay extends BaseActiveModule
             foreach ($online as $player) {
                 if (strtolower($this->bot->game) == 'ao') {
                     $ex2 = " (" . $player[4] . ")";
-                }
+                } else { $ex2 = ""; }
                 $msg .= $this->bot->core("colors")
                     ->colorize("online_title", $player[0] . "\n");
                 $msg .= "    " . $player[1] . "/" . $player[2] . " " . $player[3] . $ex2 . "\n";

@@ -88,18 +88,18 @@ Used to convert an unsigned interger in string form to an overflowed (negative) 
 If the passed string is not an integer large enough to overflow, the string is merely passed back in integer form with no modifications.
 - Returns an integer.
 */
-define('CHAT_AO_TELL', bindec("00 00 00 001"));
-define('CHAT_AO_PGROUP', bindec("00 00 00 010"));
-define('CHAT_AO_GC', bindec("00 00 00 100"));
-define('CHAT_AO', bindec("00 00 00 111"));
-define('CHAT_IRC_PRIV', bindec("00 00 01 000"));
-define('CHAT_IRC_CHAN', bindec("00 00 10 000"));
-define('CHAT_IRC', bindec("00 00 11 000"));
-define('CHAT_MSN_PRIV', bindec("00 01 00 000"));
-define('CHAT_MSN_PUB', bindec("00 10 00 000"));
-define('CHAT_MSN', bindec("00 11 00 000"));
-define('CHAT_PRIVATE', bindec("00 01 01 001"));
-define('CHAT_ALL', bindec("11 1111111"));
+define('CHAT_AO_TELL', bindec("000000001")); // 00 00 00 001
+define('CHAT_AO_PGROUP', bindec("000000010")); // 00 00 00 010
+define('CHAT_AO_GC', bindec("000000100")); // 00 00 00 100
+define('CHAT_AO', bindec("000000111")); // 00 00 00 111
+define('CHAT_IRC_PRIV', bindec("000001000")); // 00 00 01 000
+define('CHAT_IRC_CHAN', bindec("000010000")); // 00 00 10 000
+define('CHAT_IRC', bindec("000011000")); // 00 00 11 000
+define('CHAT_MSN_PRIV', bindec("000100000")); // 00 01 00 000
+define('CHAT_MSN_PUB', bindec("001000000")); // 00 10 00 000
+define('CHAT_MSN', bindec("001100000")); // 00 11 00 000
+define('CHAT_PRIVATE', bindec("000101001")); // 00 01 01 001
+define('CHAT_ALL', bindec("111111111")); // 11 1111111
 define("SAME", 1);
 define("TELL", 2);
 define("GC", 4);

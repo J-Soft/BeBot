@@ -41,8 +41,8 @@ class Conf
     function __construct($argv, $confc)
     {
         $this->confc = $confc;
-        $this->argv = $argv[1];
-        $this->check($argv);
+        if(isset($argv[1])) { $this->argv = $argv[1]; } else { $this->argv = ""; }
+		$this->check($argv);
         $this->mysql_check();
         $this->load();
     }

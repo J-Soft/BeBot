@@ -663,7 +663,8 @@ class Points extends BaseActiveModule
                 //		Return("Error: 2nd time
                 //}
                 $field = "time";
-                $value = "> " . time() - ($timeorname * 60 * 60);
+				$tdif = time() - ($timeorname * 60 * 60);
+                $value = "> " . $tdif;
                 $for = "last $timeorname hours";
             } else {
                 $field = "name";

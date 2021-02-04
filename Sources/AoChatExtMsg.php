@@ -196,7 +196,7 @@ $GLOBALS["ref_cat"] = array(
 class AOExtMsg
 {
 
-    function AOExtMsg($str = null)
+	function __construct($str = null)
     {
         $this->type = 'AOEM_UNKNOWN';
         if (!empty($str)) {

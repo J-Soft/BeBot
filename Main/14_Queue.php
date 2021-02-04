@@ -87,7 +87,7 @@ class Queue_Core extends BasePassiveModule
             if (!empty($this->queue[$name])) {
                 $this->set_queue($name);
                 foreach ($this->queue[$name] as $key => $value) {
-                    if ($this->queue_left[$name] >= 1) {
+                    if (isset($this->queue_left[$name]) && $this->queue_left[$name] >= 1) {
                         $mod->queue($name, $value);
 
                         unset($this->queue[$name][$key]);
@@ -115,8 +115,9 @@ class Queue_Core extends BasePassiveModule
     */
     function set_queue($name)
     {
-        $time = time();
-        $add = ($time - $this->last_call[$name]) / $this->delay[$name];
+        $time = time(); 
+		if(isset($this->last_call[$name]) && $this->last_call[$name]!= null) { $tlcn = $this->last_call[$name]; } else { $tlcn = 0; }
+        if(isset($this->delay[$name]) && $this->delay[$name] > 0) { $add = ($time - $tlcn) / $this->delay[$name]; } else { $add = 0; }
         if ($add > 0) {
             if (!isset($this->queue_left[$name])) {
                 $this->queue_left[$name] = $add;
@@ -138,7 +139,7 @@ class Queue_Core extends BasePassiveModule
     {
         $name = strtolower($name);
         $this->set_queue($name);
-        if (($this->queue_left[$name] >= 1) && empty($this->queue[$name]) && empty($this->queue_low[$name])) {
+        if ((isset($this->queue_left[$name]) && $this->queue_left[$name] >= 1) && empty($this->queue[$name]) && empty($this->queue_low[$name])) {
             $this->queue_left[$name] -= 1;
             return true;
         }
@@ -157,7 +158,7 @@ class Queue_Core extends BasePassiveModule
             // results most likely from double clicking a link or spamming the bot
             // (like if 100 people are klicking on a guild info link multiple times).
             // There is no point in sending the same answer back twice in a row.
-            if ($this->filter[$name]) {
+            if ($this->filter && isset($this->queue[$name])) {
                 foreach ($this->queue[$name] as $item) {
                     if ($this->bot->core("tools")->compare($info, $item)) {
                         return;
@@ -167,7 +168,7 @@ class Queue_Core extends BasePassiveModule
             $this->queue[$name][] = $info;
         } else {
             // Filter duplicate messages.
-            if ($this->filter[$name]) {
+            if ($this->filter && isset($this->queue_low[$name])) {
                 foreach ($this->queue_low[$name] as $item) {
                     if ($this->bot->core("tools")->compare($info, $item)) {
                         return;
