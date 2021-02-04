@@ -414,8 +414,8 @@ class OnlineDisplay extends BaseActiveModule
                                 ->get("Online", "Mode")
                         ) == "fancy"
                     ) {
-                        $online_list .= "\n<img src=tdb://id:GFX_GUI_FRIENDLIST_SPLITTER>\n";
-                        $online_list .= "<img src=rdb://" . $profgfx[$player[4]] . ">";
+                        $online_list .= "\n\n";
+                        if(strtolower($this->bot->game) == 'ao') $online_list .= "<img src=rdb://" . $profgfx[$player[4]] . ">";
                     } else {
                         $online_list .= "\n";
                     }
@@ -426,7 +426,7 @@ class OnlineDisplay extends BaseActiveModule
                                 ->get("Online", "Mode")
                         ) == "fancy"
                     ) {
-                        $online_list .= "<img src=tdb://id:GFX_GUI_FRIENDLIST_SPLITTER>\n";
+                        $online_list .= "\n";
                     }
                 }
                 $admin = "";

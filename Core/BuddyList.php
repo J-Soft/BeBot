@@ -234,7 +234,7 @@ class BuddyList extends BasePassiveModule
         }
         // Make sure we only cache members and guests to prevent any issues with !is and anything else that might do buddy actions on non members.
         //if ($member) {
-		if (isset($this->bot->security->cache['members'][$user])) {
+		if (isset($this->bot->core("security")->cache['members'][$user])) {
             if (in_array(1, $current_statuses)) {
                 // User just came online
                 // Enter the user into the online buddy list

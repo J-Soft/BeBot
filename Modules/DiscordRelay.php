@@ -554,7 +554,7 @@ class DiscordRelay extends BaseActiveModule
     {
 		$sent = "";
         if (preg_match("/^" . $this->bot->commpre . "([a-zA-Z]{3,5}) ([0-9]{1,3})$/i", $msg, $info)) {
-			$sent = $this->bot->commands["tell"]["level"]->get_level($info[2]);
+			if (strtolower($this->bot->game) == 'ao') $sent = $this->bot->commands["tell"]["level"]->get_level($info[2]);
 		}
 		return $sent;		
     }	
