@@ -70,7 +70,7 @@ class IRC extends BaseActiveModule
         $this->help['command']['irconline'] = "Shows users in the IRC Channel.";
         $this->help['command']['irc connect'] = "Tries to connect to the IRC channel.";
         $this->help['command']['irc disconnect'] = "Disconnects from the IRC server.";
-        $this->help['notes'] = "The IRC relay is configured via settings, for all options check /tell <botname> <pre>settings IRC. Irc side commands available are : is, online/sm, whois, uid, level/lvl/pvp";
+        $this->help['notes'] = "The IRC relay is configured via settings, for all options check /tell <botname> <pre>settings IRC. Irc side commands available are : is, online/sm, whois, level/lvl/pvp";
         // Create default settings:
         if ($this->bot->guildbot) {
             $guildprefix = "[" . $this->bot->guildname . "]";
@@ -155,9 +155,6 @@ class IRC extends BaseActiveModule
                 true,
                 "Should we announce logons and logoffs as controlled by the Logon module to IRC?"
             );
-
-        $this->bot->core("settings")->del("Irc", "AnnounceTo");
-        $this->bot->core("settings")->del("Irc", "AnnounceWhat");
 
         $this->bot->core("colors")->define_scheme("Irc", "Text", "normal");
         $this->bot->core("colors")->define_scheme("Irc", "User", "normal");
@@ -489,14 +486,12 @@ class IRC extends BaseActiveModule
         if (!$this->bot->core("settings")->get("irc", "connected")) {
             return;
         }
-        if ((strtolower(
-                    $this->bot->core("settings")
-                        ->get("Irc", "AnnounceWhat")
-                ) == "joins")
-            || (strtolower(
-                    $this->bot
-                        ->core("settings")->get("Irc", "AnnounceWhat")
-                ) == "both")
+        if ($this->bot->core("settings")
+                ->get("Irc", "Announce")
+            && (
+				(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "both")
+			||	(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "pgroup")
+			)
         ) {
             $this->send_irc(
                 $this->bot->core("settings")
@@ -514,14 +509,12 @@ class IRC extends BaseActiveModule
         if (!$this->bot->core("settings")->get("irc", "connected")) {
             return;
         }
-        if ((strtolower(
-                    $this->bot->core("settings")
-                        ->get("Irc", "AnnounceWhat")
-                ) == "joins")
-            || (strtolower(
-                    $this->bot
-                        ->core("settings")->get("Irc", "AnnounceWhat")
-                ) == "both")
+        if ($this->bot->core("settings")
+                ->get("Irc", "Announce")
+            && (
+				(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "both")
+			||	(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "pgroup")
+			)
         ) {
             $this->send_irc(
                 $this->bot->core("settings")
@@ -826,12 +819,6 @@ class IRC extends BaseActiveModule
             $this->bot->commands["tell"]["irc"],
             'irc_whois'
         );
-        $this->irc->registerActionhandler(
-            SMARTIRC_TYPE_QUERY,
-            $this->bot->commpre . 'uid (.*)',
-            $this->bot->commands["tell"]["irc"],
-            'irc_uid'
-        );
         $this->irc->registerActionhandler(SMARTIRC_TYPE_NAME, '.*', $this->bot->commands["tell"]["irc"], 'irc_query');
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_CHANNEL,
@@ -977,10 +964,8 @@ class IRC extends BaseActiveModule
     {
         if (($data->nick != $this->bot->core("settings")
                     ->get("Irc", "Nick"))
-            && (strtolower(
-                    $this->bot->core("settings")
-                        ->get("Irc", "AnnounceTo")
-                ) != "none")
+            && $this->bot->core("settings")
+                    ->get("Irc", "Announce")
         ) {
             $msg = "##irc_group##" . $this->bot->core("settings")
                     ->get(
@@ -991,7 +976,7 @@ class IRC extends BaseActiveModule
                 "",
                 $msg,
                 $this->bot->core("settings")
-                    ->get("Irc", "AnnounceTo")
+                    ->get("Irc", "Chat")
             );
         }
         if (($data->nick != $this->bot->core("settings")->get("Irc", "Nick"))) {
@@ -1022,10 +1007,8 @@ class IRC extends BaseActiveModule
     {
         if (($data->nick != $this->bot->core("settings")
                     ->get("Irc", "Nick"))
-            && (strtolower(
-                    $this->bot->core("settings")
-                        ->get("Irc", "AnnounceTo")
-                ) != "none")
+            && $this->bot->core("settings")
+                    ->get("Irc", "Announce")
         ) {
             $msg = "##irc_group##" . $this->bot->core("settings")
                     ->get(
@@ -1036,7 +1019,7 @@ class IRC extends BaseActiveModule
                 "",
                 $msg,
                 $this->bot->core("settings")
-                    ->get("Irc", "AnnounceTo")
+                    ->get("Irc", "Chat")
             );
         }
         if (($data->nick != $this->bot->core("settings")->get("Irc", "Nick"))) {
@@ -1093,29 +1076,6 @@ class IRC extends BaseActiveModule
                     }
                 }
             }
-        }
-        if (!empty($msg)) {
-            $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
-        }
-    }
-
-
-    /*
-    * Gets called when someone does !uid
-    */
-    function irc_uid(&$irc, &$data)
-    {
-        if ($data->type == SMARTIRC_TYPE_QUERY) {
-            $target = $data->nick;
-        } else {
-            $target = $this->bot->core("settings")->get("Irc", "Channel");
-        }
-        if (!preg_match("/^" . $this->bot->commpre . "uid ([a-zA-Z0-9]{4,25})$/i", $data->message, $info)) {
-            $msg = "Please enter a valid name.";
-        } else {
-            $info[1] = ucfirst(strtolower($info[1]));
-            $msg = $info[1] . ": " . $this->bot->core('player')
-                    ->id($info[1]);
         }
         if (!empty($msg)) {
             $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
@@ -1261,16 +1221,14 @@ class IRC extends BaseActiveModule
                     "Irc",
                     "Guildprefix"
                 ) . "##end## ##irc_user##" . $data->nick . "##end####irc_text## is known as##end## ##irc_user##" . $data->message . "##end##";
-        if (strtolower(
-                $this->bot->core("settings")
-                    ->get("Irc", "AnnounceTo")
-            ) != "none"
+        if ($this->bot->core("settings")
+                ->get("Irc", "Announce")
         ) {
             $this->bot->send_output(
                 "",
                 $txt,
                 $this->bot->core("settings")
-                    ->get("Irc", "AnnounceTo")
+                    ->get("Irc", "Chat")
             );
         }
         if ($this->bot->core("settings")
@@ -1366,7 +1324,6 @@ class IRC extends BaseActiveModule
             case $this->bot->commpre . 'online':
 			case $this->bot->commpre . 'sm':
             case $this->bot->commpre . 'whois':
-            case $this->bot->commpre . 'uid':
             case $this->bot->commpre . 'level':
             case $this->bot->commpre . 'lvl':
             case $this->bot->commpre . 'pvp':
@@ -1383,10 +1340,6 @@ class IRC extends BaseActiveModule
             case 'whois':
                 $data->message = $this->bot->commpre . $data->message;
                 $this->irc_whois($irc, $data);
-                Break;
-            case 'uid':
-                $data->message = $this->bot->commpre . $data->message;
-                $this->irc_uid($irc, $data);
                 Break;
             case 'level':
             case 'lvl':

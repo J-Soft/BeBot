@@ -97,7 +97,7 @@ class DiscordRelay extends BaseActiveModule
         $this->help['description'] = "Handles the Discord relay of the bot.";
         $this->help['command']['discord connect'] = "Tries relaying from/to the Discord channel.";
         $this->help['command']['discord disconnect'] = "Stops relaying from/to the Discord channel.";
-        $this->help['notes'] = "The Discord relay is configured via settings, for all options check /tell <botname> <pre>settings discord. Discord side commands available are : is, online/sm, whois, uid, level/lvl/pvp";
+        $this->help['notes'] = "The Discord relay is configured via settings, for all options check /tell <botname> <pre>settings discord. Discord side commands available are : is, online/sm, whois, level/lvl/pvp";
         $this->bot->core("settings")
             ->create("discord", "DiscordRelay", false, "Should the bot be relaying from/to Discord server ?", "On;Off", true);	
         $this->bot->core("settings")
@@ -380,9 +380,6 @@ class DiscordRelay extends BaseActiveModule
 										case $this->bot->commpre . 'whois':
 											$sent = $this->discord_whois($msg['content']);
 											Break;
-										case $this->bot->commpre . 'uid':
-											$sent = $this->discord_uid($msg['content']);
-											Break;
 										case $this->bot->commpre . 'level':
 										case $this->bot->commpre . 'lvl':
 										case $this->bot->commpre . 'pvp':
@@ -473,19 +470,6 @@ class DiscordRelay extends BaseActiveModule
             }
         }
     }	
-	
-    /*
-    * Gets called when someone does !uid
-    */
-    function discord_uid($msg)
-    {
-		$sent = "";
-		if (preg_match("/^" . $this->bot->commpre . "uid ([a-zA-Z0-9]{4,25})$/i", $msg, $info)) {
-            $info[1] = ucfirst(strtolower($info[1]));
-            $sent = $info[1] . ": " . $this->bot->core('player')->id($info[1]);
-		}
-		return $sent;		
-	}
 	
     /*
     * Gets called when someone does !whois
