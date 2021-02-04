@@ -497,7 +497,9 @@ class DiscordRelay extends BaseActiveModule
         if (!$who) {
             $result = "Couldn't find infos about " . $info[1] . " ...";
         } elseif (!($who instanceof BotError)) {
-            $at = "(AT " . $who["at_id"] . " - " . $who["at"] . ") ";
+			if (strtolower($this->bot->game) == 'ao') {
+				$at = "(AT " . $who["at_id"] . " - " . $who["at"] . ") ";
+			}
             $result = "\"" . $who["nickname"] . "\"";
             if (!empty($who["firstname"]) && ($who["firstname"] != "Unknown")) {
                 $result = $who["firstname"] . " " . $result;
