@@ -47,6 +47,7 @@ class OnlineDisplay extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "online", "GUEST");
         $this->register_command("all", "sm", "GUEST");
+		$this->register_module("onlinedisplay");
         // Register for logon notifies
         $this->register_event("logon_notify");
         $this->register_event("pgjoin");
@@ -539,6 +540,31 @@ class OnlineDisplay extends BaseActiveModule
             $online_list
         );
     }
+	
+    /*
+    make the list of online players as array of name > prof,lvl
+    */
+    function online_array()
+    {
+        $sortstring = " ORDER BY " . $this->cp . " ASC, t1.nickname ASC";
+		$channel = "(status_gc=1 OR status_pg=1)";
+        $online = $this->bot->db->select(
+            "SELECT t1.nickname, t2.level, " . $this->cp . ", t1.level FROM "
+            . "#___online AS t1 LEFT JOIN #___whois AS t2 ON t1.nickname = t2.nickname WHERE " . $channel . $sortstring
+        );
+        $online_list = array();
+        if (!empty($online)) {
+            $currentprof = "";
+            foreach ($online as $player) {
+                if ($currentprof != $player[2]) {
+                    $currentprof = $player[2];
+                }
+				$name = $player[0];
+                $online_list[$name] = array($currentprof,$player[1]);
+            }
+        }
+        return $online_list;
+    }	
 
 
     function irc_online_list()
@@ -561,7 +587,6 @@ class OnlineDisplay extends BaseActiveModule
             $online_list
         );
     }
-
 
     /*
     Makes the message.

@@ -38,10 +38,13 @@ The Class itself...
 class Rules extends BaseActiveModule
 {
 
+	var $on = true;	
+
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'rules', 'GUEST');
+		$this->register_module("rules");
+        $this->register_command('all', 'rules', 'GUEST');	
     }
 
 

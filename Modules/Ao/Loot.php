@@ -60,6 +60,7 @@ class Rolls extends BaseActiveModule
 		$this -> register_command("all", "list", "LEADER");
 		$this -> register_command("all", "clear", "LEADER");
 		$this -> register_command("all", "reroll", "LEADER");
+		$this -> register_command("all", "ffa", "LEADER");
 		$this -> register_command("all", "result", "LEADER");		
         $this->register_event("pgleave");
         $this->bot->core("settings")
@@ -77,6 +78,14 @@ class Rolls extends BaseActiveModule
                 "On",
                 "Are non-joined characters locked from using !add command?",
                 "On;Off"
+            );
+        $this->bot->core("settings")
+            ->create(
+                "Loot",
+                "Raidlock",
+                "On",
+                "Are non-raiding characters locked from using !add command?",
+                "On;Off"
             );			
         $this->bot->core("colors")
             ->define_scheme("loot", "highlight", "yellow");
@@ -90,6 +99,7 @@ class Rolls extends BaseActiveModule
         $this->help['command']['clear'] = "Clears all rolls.";
         $this->help['command']['result'] = "Rolls for all the items and announces winners.";
         $this->help['command']['reroll'] = "Adds any unwon items from the last roll to a new roll.";
+		$this->help['command']['ffa'] = "Declare any unwon items as Free For All to be looted.";
     }
 
 
@@ -142,7 +152,12 @@ class Rolls extends BaseActiveModule
 										{
 											$this -> mloot($info[1], $name);	
 										} else {
-											$this->bot->send_help($name);
+											if(preg_match("/^ffa/i", $msg, $info))
+											{
+												$this->ffa($name);	
+											} else {
+												$this->bot->send_help($name);
+											}
 										}
 									}
                                 }
@@ -176,6 +191,9 @@ class Rolls extends BaseActiveModule
         if ($this->bot->core("settings")->get('Loot','Addlock')=="On" && !$this->bot->core("online")->in_chat($name)) {
 			return $this->bot->send_tell($name, "You must be in the PrivGroup of ##highlight##<botname>##end## to join a Roll.");
 		}
+        if ($this->bot->core("settings")->get('Loot','Raidlock')=="On" && $this->bot->core("raid")->raid && !isset($this->bot->core("raid")->user[$name])) {
+			return $this->bot->send_tell($name, "You must first !raid join before being allowed to join any further Roll.");
+		}		
 		$who = $this->bot->core("whois")->lookup($name, true);
 		if(isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }
         if ($slot == 0) {
@@ -351,6 +369,22 @@ class Rolls extends BaseActiveModule
             unset($this->leftovers); $this->leftovers = array();
         }
     }
+	
+	
+    function ffa($name)
+    {
+        $lcount = count($this->leftovers);
+        if ($lcount == 0) {
+            $this->bot->send_pgroup("##loot_highlight##No leftovers to declare FFA anymore.##end##");
+        } else {
+			$blob = "";
+            foreach ($this->leftovers as $item) {
+				$blob .= " ".$item." ";
+            }
+			$this->bot->send_pgroup("##loot_highlight##" . $name . "##end## has declared ".$lcount." following item(s) FFA : ".$this->bot->core("tools")->make_blob("click to see", $blob));
+            unset($this->leftovers); $this->leftovers = array();
+        }
+    }	
 
 
     function rlist()
