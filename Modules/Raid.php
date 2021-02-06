@@ -1007,9 +1007,22 @@ class Raid extends BaseActiveModule
 
         $inside = "##blob_title##:::: Join/Leave Raid ::::##end##\n\n";
         if ($this->description && !empty($this->description)) {
-            $inside .= "Description:\n     " . $this->description;
+            $inside .= "Description:\n     " . $this->description."\n\n";
         }
 
+        if ($join) {
+            $inside .= $this->bot->core("tools")
+                    ->chatcmd("join", "Join <botname>")." || ";
+        }
+        $inside .= $this->bot->core("tools")
+                ->chatcmd("raid join", "Join the raid")." || ";
+        if ($this->bot->core("settings")->get("Raid", "showlft")) {
+            $inside .= $this->bot->core("tools")
+                    ->chatcmd("<botname>", "Go LFT", "lft")." || ";
+        }
+        $inside .= $this->bot->core("tools")
+                ->chatcmd("raid leave", "Leave the raid");		
+		
 		$onarr = $this->bot->core("onlinedisplay")->online_array();
 		$inside .= "\n\n:: ".count($this->user)." Joined User(s) ::\n";
 		if (!empty($this->user)) {
@@ -1019,23 +1032,11 @@ class Raid extends BaseActiveModule
 				} else {
 					$pl = "?/?";
 				}
-				$inside .= "$n ($pl) | ";
+				$inside .= "$n ($pl)\n";
 			}
 		}
-		
-        if ($join) {
-            $inside .= "\n\n - " . $this->bot->core("tools")
-                    ->chatcmd("join", "Join <botname>");
-        }
-        $inside .= "\n\n - " . $this->bot->core("tools")
-                ->chatcmd("raid join", "Join the raid") . "\n";
-        if ($this->bot->core("settings")->get("Raid", "showlft")) {
-            $inside .= " - " . $this->bot->core("tools")
-                    ->chatcmd("<botname>", "Go LFT", "lft") . "\n";
-        }
-        $inside .= "\n - " . $this->bot->core("tools")
-                ->chatcmd("raid leave", "Leave the raid") . "\n";
-        return $this->bot->core("tools")->make_blob("click to join", $inside);
+
+		return $this->bot->core("tools")->make_blob("click to join", $inside);
     }
 
 
