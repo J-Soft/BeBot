@@ -392,12 +392,23 @@ class Rolls extends BaseActiveModule
         $msg = "";
 		$num = 0;
         foreach ($this->loot as $slot) {
+			$ico = "";
+			if(preg_match("/^<a href='itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)'>([^<]+)<\/a>$/i", $slot['item'], $match)) {
+				if($this->bot->exists_module("raidloot")) {
+					$query = "SELECT img FROM #___RaidLoot WHERE ref = '$match[1]' LIMIT 1";
+					$rloot = $this->bot->db->select($query, MYSQLI_ASSOC);
+					if(!empty($rloot) && isset($rloot[0]['img']) && is_numeric($rloot[0]['img']))
+					{
+						$ico = "<img src=rdb://".$rloot[0]['img'].">";
+					}				
+				}
+			}
             $num++;
             $msg .= "Slot ##loot_highlight###" . $num . "##end##: (" . $this->bot
                     ->core("tools")
                     ->chatcmd("add " . $num, "Add") . "/" . $this->bot
-                    ->core("tools")->chatcmd("rem " . $num, "Remove") . ")\n";
-            $msg .= "Item: ##loot_highlight##" . $slot['item'] . "##end## (##loot_highlight##" . $slot['num'] . "x##end##)\n";
+                    ->core("tools")->chatcmd("rem " . $num, "Remove") . ")\n";					
+            $msg .= $ico."Item: ##loot_highlight##" . $slot['item'] . "##end## (##loot_highlight##" . $slot['num'] . "x##end##)\n";
             if (count($slot) == 1) {
                 $msg .= "";
             } else {

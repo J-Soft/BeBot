@@ -53,7 +53,7 @@ class raidloot extends BaseActiveModule
         function __construct(&$bot)
         {
                 parent::__construct($bot, get_class($this));
-
+				$this->register_module("raidloot");
                 $this -> count = 0;
 				$this -> register_command("all", "RLTEST", "LEADER");
                 $this -> register_command("all", "raidloot", "GUEST");

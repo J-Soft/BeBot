@@ -254,7 +254,7 @@ class PrivGroup extends BaseActiveModule
 
     function pgjoin($name)
     {
-        if ($this->exists_module("rules") && $this->bot->core("rules")->on && $this->bot->core("settings")->get("PrivGroup", "ShowRules")) {
+        if ($this->bot->exists_module("rules") && $this->bot->core("rules")->on && $this->bot->core("settings")->get("PrivGroup", "ShowRules")) {
 			$this->bot->send_tell($name, $this->bot->core("rules")->make_rules());
 		}
 		if ($this->bot->core("settings")
