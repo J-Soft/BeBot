@@ -343,10 +343,12 @@ STARTING THE BOT
   press enter).
 * Now run StartBot (.php under linux or .bat under windows) :
  - Windows: Navigate to the directory of your bot assuming you have the
-   php.exe in the same directory and write "StartBot.bat".
- - Linux: Assuming your can run php from anywhere navigate to your bot 
-   directory and write e.g. "php StartBot.php" (assuming your php binary is 
-   named "php" in this example).
+   php.exe in the same directory and write "StartBot.bat". You also can
+   make it a startup shortcut as long as your database service runs too.
+ - Linux: Assuming you can run php from anywhere, navigate to your bot 
+   directory & write e.g. "php StartBot.php" (assuming your php binary is 
+   named "php" for example). You also can cron it at startup with screen,
+   as long as your database service runs too.
 
 The console should now state that the bot is loading the modules, 
 authenticating and connecting. Once this is done you can log onto a character
