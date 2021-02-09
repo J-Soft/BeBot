@@ -134,12 +134,13 @@ class Whois_Core extends BasePassiveModule
             ->create(
                 'Whois',
                 'LookupOrder',
-                'funcom_auno',
+                'funcom_mirror',
                 'Which order should we use to look up players information?',
-                'funcom_auno;auno_funcom;funcom_only;auno_only'
+                'funcom_mirror;mirror_funcom;funcom_only;mirror_only'
             );
         $this->bot->core("settings")
             ->create('Whois', "Debug", false, "Show debug information (such as Character ID, Org ID, etc)");
+		$this->bot->core("settings")->create("Whois", "MirrorUrl", "http://people.anarchy-online.com", "What is HTTP(s) Mirror interface  URL (FC official by default, or your prefered mirror) ?");
         $this->update_table();
     }
 
@@ -438,7 +439,7 @@ class Whois_Core extends BasePassiveModule
             */
             else {
                 $this->error->set(
-                    "Character lookup could not be completed. people.anarchy-online.com and www.auno.org lookups have failed and no cached data is available for $name."
+                    "Character lookup could not be completed. funcom & mirror lookups have failed and no cached data is available for $name."
                 );
                 return $this->error;
             }
@@ -447,8 +448,8 @@ class Whois_Core extends BasePassiveModule
 
 
     /*
-    Get player XML data. If lookup via FunCom fails, try Auno.
-    Return whatever we get. If both FunCom and Auno's XML fail,
+    Get player XML data. If lookup via FunCom fails, try mirror.
+    Return whatever we get. If both FunCom and mirror's XML fail,
     you rewrite $xml->description.
     */
     function get_playerxml($name)
@@ -457,16 +458,16 @@ class Whois_Core extends BasePassiveModule
         $fcurl = "http://people.anarchy-online.com/character/bio/d/" . $this->bot->dimension . "/name/" . strtolower(
                 $name
             ) . "/bio.xml";
-        $aunourl = "http://auno.org/ao/char.php?output=xml&dimension=" . $this->bot->dimension . "&name=" . strtolower(
+        $mirrorurl = $this->bot->core("settings")->get("Whois", "MirrorUrl")."/character/bio/d/" . $this->bot->dimension . "/name/" . strtolower(
                 $name
             );
         if ($this->bot->core("settings")
-                ->get("Whois", "LookupOrder") == "funcom_auno"
+                ->get("Whois", "LookupOrder") == "funcom_mirror"
         ) {
             $site1NAME = "Anarchy-Online";
             $site1URL = $fcurl;
-            $site2NAME = "Auno";
-            $site2URL = $aunourl;
+            $site2NAME = "Mirror";
+            $site2URL = $mirrorurl;
         } elseif ($this->bot->core("settings")
                 ->get("Whois", "LookupOrder") == "funcom_only"
         ) {
@@ -474,14 +475,14 @@ class Whois_Core extends BasePassiveModule
             $site1URL = $fcurl;
             $site2NAME = false;
         } elseif ($this->bot->core("settings")
-                ->get("Whois", "LookupOrder") == "auno_only"
+                ->get("Whois", "LookupOrder") == "mirror_only"
         ) {
-            $site1NAME = "Auno";
-            $site1URL = $aunourl;
+            $site1NAME = "Mirror";
+            $site1URL = $mirrorurl;
             $site2NAME = false;
         } else {
-            $site1NAME = "Auno";
-            $site1URL = $aunourl;
+            $site1NAME = "Mirror";
+            $site1URL = $mirrorurl;
             $site1NAME = "Anarchy-Online";
             $site1URL = $fcurl;
         }
@@ -500,9 +501,9 @@ class Whois_Core extends BasePassiveModule
             }
         }
         if ($xml instanceof BotError) {
-            // If we get here, both Auno and FunCom XML lookups have failed.
+            // If we get here, both Mirror and FunCom XML lookups have failed.
             // Rewrite the error message to reflect this before returning.
-            $xml->set_description("people.anarchy-online.com and www.auno.org lookups have failed for $name.");
+            $xml->set_description("funcom & mirror lookups have failed for $name.");
             if ($this->bot->core("settings")->get("Statistics", "Enabled")) {
                 $this->bot->core("statistics")
                     ->capture_statistic("Whois", "Lookup", "BadName");
@@ -761,14 +762,14 @@ class Whois_Core extends BasePassiveModule
             $funcomURL = "http://people.anarchy-online.com/character/bio/d/" . $this->bot->dimension . "/name/" . strtolower(
                     $whois['nickname']
                 );
-            $aunoURL = "http://auno.org/ao/char.php?dimension=" . $this->bot->dimension . "&name=" . strtolower(
+            $mirrorURL = "http://mirror.org/ao/char.php?dimension=" . $this->bot->dimension . "&name=" . strtolower(
                     $whois['nickname']
                 );
             $window .= "\n##normal##::: Links :::##end##\n";
             $window .= $this->bot->core("tools")
                     ->chatcmd($funcomURL, 'Official character bio', 'start') . "\n";
             $window .= $this->bot->core("tools")
-                    ->chatcmd($aunoURL, 'Auno\'s character info', 'start') . "\n";
+                    ->chatcmd($mirrorURL, 'Mirror\'s character info', 'start') . "\n";
         }
         return ($this->bot->core("tools")->make_blob("Details", $window));
     }

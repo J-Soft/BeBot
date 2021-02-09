@@ -16,7 +16,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -141,7 +141,35 @@ class ClassName extends BaseActiveModule
         $this->help['command']['command1 <keyword>'] = "What does command1 do with keyword";
         $this->help['command']['command2 <keyword> [param]'] = "What does command2 do with <keyword> and the optional [param]";
         $this->help['notes'] = "Notes for the help goes in here.";
+		
+		$this->table();
+		/* to start optionnal DB update just below */
     }
+	
+	
+    /*
+    Table creator and/or updater
+    */	
+    function table()
+    {
+        $this->bot->db->define_tablename("tablename", "true");
+        Switch ($this->bot->db->get_version("tablename")) {
+            case 1:  // table didn't exist yet
+            case 2: // table has old version
+                $filename = "./Extras/Modulename/Tablename.sql";
+                $handle = fopen($filename, "r");
+                $query = fread($handle, filesize($filename));
+                fclose($handle);
+                $query = explode(";", $query);
+                foreach ($query as $q) {
+                    if (!empty($q)) {
+                        $this->bot->db->query($q);
+                    }
+                }
+        }
+        $this->bot->db->set_version("tablename", 3); // table is now uptodate
+		// we set it 4 on next patch & add "case 3:" upper, etc (increment over time)
+    }	
 
 
     /*

@@ -82,6 +82,7 @@ class Roster_Core extends BasePassiveModule
             ->create("Members", "Update", true, "Should the roster be updated automaticly?");
         $this->bot->core("settings")
             ->create("Members", "QuietUpdate", false, "Do roster update quietly without spamming the guild channel?");
+		$this->bot->core("settings")->create("Members", "MembersUrl", "http://people.anarchy-online.com", "What is HTTP(s) Members interface  URL (FC official by default, or your prefered mirror) ?");
         $this->startup = true;
         $this->running = false;
     }
@@ -343,6 +344,12 @@ class Roster_Core extends BasePassiveModule
             }
             $members = $this->parse_org($dimension, $this->bot->guildid);
         }
+		
+		if(!is_array($members)) {
+			$this->bot->log("ROSTER", "ERROR", "XML obtained is broken ... stopping update.");
+			return;
+		}
+		
         /*
         Only run the update if the XML returns more than one member, otherwise we skip the update.
         */
@@ -820,7 +827,7 @@ class Roster_Core extends BasePassiveModule
             $i = 0;
             $j = 0;
             $xml_roster = $this->bot->core("tools")
-                ->get_site("http://people.anarchy-online.com/org/stats/d/$dim/name/$id/basicstats.xml");
+                ->get_site($this->bot->core("settings")->get("Members", "MembersUrl")."/org/stats/d/$dim/name/$id/basicstats.xml");
             $faction = $this->bot->core("tools")
                 ->xmlparse($xml_roster, "side");
             $orgname = $this->bot->core("tools")
@@ -876,7 +883,10 @@ class Roster_Core extends BasePassiveModule
                     "UPDATE",
                     "XML for the $faction guild $orgname contained $i member entries. Ignored $j entries that could not be looked up."
                 );
-            }
+            } else {
+				$this->bot->log("ROSTER", "ERROR", "XML obtained is empty or broken. Stopping here.");	
+				return;
+			}
         }
         if (($this->bot->core("settings")
                     ->get("Members", "Roster") == "WhoisCache"
