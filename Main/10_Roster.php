@@ -358,7 +358,7 @@ class Roster_Core extends BasePassiveModule
             $this->added = 0;
             $this->removed = 0;
             $this->rerolled = 0;
-
+			$db_members = array();
             $db_members_sql = $this->bot->db->select("SELECT char_id, nickname, user_level, updated_at FROM #___users");
             if (!empty($db_members_sql)) {
                 foreach ($db_members_sql as $db_member) {
@@ -366,13 +366,13 @@ class Roster_Core extends BasePassiveModule
                 }
             }
             unset($db_members_sql);
-            if (strtolower($this->bot->game) == 'ao') {
+            if (strtolower($this->bot->game) == 'ao' && count($db_members) > 0) {
                 /*
                 Go through all members and make sure we are up to date.
                 */
                 foreach ($members as $member) {
-					$db_member = $db_members[$member["nickname"]];
-		
+					if(isset($member["nickname"]) && isset($db_members[$member["nickname"]])) $db_member = $db_members[$member["nickname"]];
+					else $db_member = array();
 					/*
 					If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
 					its a new member we havent picked up for some reason.
