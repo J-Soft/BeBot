@@ -292,7 +292,7 @@ class User_Core extends BasePassiveModule
                         );
                         $this->bot->core("chat")->buddy_remove($id);
                     }
-                    if ($rerolled != 1 && $silent == 0) {
+                    if (isset($rerolled) && $rerolled != 1 && isset($silent) && $silent == 0) {
                         $this->bot->send_tell(
                             $name,
                             "##highlight##" . $source . "##end## has removed you from the bot."
