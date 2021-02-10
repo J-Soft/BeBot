@@ -393,15 +393,22 @@ class Rolls extends BaseActiveModule
 		$num = 0;
         foreach ($this->loot as $slot) {
 			$ico = "";
-			if(preg_match("/^<a href='itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)'>([^<]+)<\/a>$/i", $slot['item'], $match)) {
+			if(preg_match('/^<a href="itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)">([^<]+)<\/a>$/i', $slot['item'], $match)) {
+				if($this->bot->db->get_version("aorefs")>1) {
+					$query = "SELECT icon FROM aorefs WHERE id = ".$match[1]." ORDER BY ql DESC LIMIT 1";
+					$ref = $this->bot->db->select($query, MYSQLI_ASSOC);
+					if (!empty($ref)) {
+						$ico = "<img src=rdb://".$ref[0]['icon'].">";
+					}
+				}				
 				if($this->bot->exists_module("raidloot")) {
 					$query = "SELECT img FROM #___RaidLoot WHERE ref = '$match[1]' LIMIT 1";
 					$rloot = $this->bot->db->select($query, MYSQLI_ASSOC);
 					if(!empty($rloot) && isset($rloot[0]['img']) && is_numeric($rloot[0]['img']))
 					{
 						$ico = "<img src=rdb://".$rloot[0]['img'].">";
-					}				
-				}
+					}
+				}				
 			}
             $num++;
             $msg .= "Slot ##loot_highlight###" . $num . "##end##: (" . $this->bot

@@ -314,7 +314,6 @@ class MySQL
     /*
     Used for first defines of tablenames, allows to set if prefix should be used.
     If the tablename already exists, the existing name is returned - NO NAMES ARE REDEFINED!
-
     Otherwise same as get_tablename()
     */
     function define_tablename($table, $use_prefix)

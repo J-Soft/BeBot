@@ -157,6 +157,8 @@ class ClassName extends BaseActiveModule
             case 1:  // table didn't exist yet
             case 2: // table has old version
                 $filename = "./Extras/Modulename/Tablename.sql";
+				/* .sql contains DROP TABLE IF EXISTS + CREATE TABLE
+				otherwise you should add them first in this function */
                 $handle = fopen($filename, "r");
                 $query = fread($handle, filesize($filename));
                 fclose($handle);
@@ -169,6 +171,7 @@ class ClassName extends BaseActiveModule
         }
         $this->bot->db->set_version("tablename", 3); // table is now uptodate
 		// we set it 4 on next patch & add "case 3:" upper, etc (increment over time)
+		// other way to do: have only 1 case of latest version + default for init & old
     }	
 
 
