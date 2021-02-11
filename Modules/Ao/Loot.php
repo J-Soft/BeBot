@@ -393,7 +393,9 @@ class Rolls extends BaseActiveModule
 		$num = 0;
         foreach ($this->loot as $slot) {
 			$ico = "";
-			if(preg_match('/^<a href="itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)">([^<]+)<\/a>$/i', $slot['item'], $match)) {
+			if(preg_match('/^<a href="itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)">([^<]+)<\/a>$/i', $slot['item'], $match)
+			|| preg_match("/^<a href='itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)'>([^<]+)<\/a>$/i", $slot['item'], $match)
+			) {
 				if($this->bot->db->get_version("aorefs")>1) {
 					$query = "SELECT icon FROM aorefs WHERE id = ".$match[1]." ORDER BY ql DESC LIMIT 1";
 					$ref = $this->bot->db->select($query, MYSQLI_ASSOC);
