@@ -530,7 +530,7 @@ class Whois_Core extends BasePassiveModule
         We have an empty nick despite having gotten a valid responce from Funcom XML? Bail!
         This should __never__ happen, but you can never rule out errors on Funcom's end.
         */
-        if ($nickname == '') {
+        if ($nickname == null || $nickname == '') {
             $error = $this->bot->core("tools")->xmlparse($xml, "error");
             if ($error != '') {
                 $this->error->set(
