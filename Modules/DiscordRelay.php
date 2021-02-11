@@ -310,7 +310,7 @@ class DiscordRelay extends BaseActiveModule
 				$token = $this->bot->core("settings")->get("discord", "BotToken");
 				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
-					$sent = "[Orgchat] ".ucfirst($name).": ".$this->cleanString($msg);
+					$sent = "[Guildchat] ".ucfirst($name).": ".$this->cleanString($msg);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
 					if(isset($result['message'])&& isset($result['code'])) {
