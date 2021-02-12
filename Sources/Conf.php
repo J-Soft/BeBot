@@ -117,7 +117,9 @@ class Conf
         $dimension = $this->ask("Dimension/Server Name:");
         if (!is_numeric($dimension)) {
             $guild = $this->ask("Guild:");
-        }
+        } else {
+			$guild = "";
+		}
         $owner = $this->ask("Owner:");
         while (!$guildbot) {
             echo "Is this a Guild Bot? (y/yes or n/no)\n";
