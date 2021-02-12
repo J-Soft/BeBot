@@ -121,6 +121,7 @@ class Conf
 			$guild = "";
 		}
         $owner = $this->ask("Owner:");
+		$guildbot = false;
         while (!$guildbot) {
             echo "Is this a Guild Bot? (y/yes or n/no)\n";
             $gb = $this->ask("Guild bot:");
