@@ -288,7 +288,8 @@ class Conf
             $server = "localhost";
         }
         echo "The bot will use " . $botname . " as prefix on default, Do you want to use Default? (y/yes or n/no)\n";
-        while (!$prefix) {
+        $prefix = false;
+		while (!$prefix) {
             $ubn = $this->ask("Use default prefix:");
             $ubn = strtolower($ubn);
             if ($ubn == "y" || $ubn == "yes") {
@@ -302,7 +303,8 @@ class Conf
             $prefix = '$table_prefix = "' . $prefix . '";';
         }
         echo "The bot will use " . $botname . "_tablenames for tablename table on default, Do you want to use Default? (y/yes or n/no)\n";
-        while (!$mt) {
+        $mt = false;
+		while (!$mt) {
             $mtq = $this->ask("Use default prefix:");
             $mtq = strtolower($mtq);
             if ($mtq == "y" || $mtq == "yes") {
