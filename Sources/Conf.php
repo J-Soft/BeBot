@@ -41,7 +41,7 @@ class Conf
     function __construct($argv, $confc)
     {
         $this->confc = $confc;
-        if(isset($argv[1])) { $this->argv = $argv[1]; } else { $this->argv = ""; }
+        if(is_array($argv) && count($argv)>0 && isset($argv[1])) { $this->argv = $argv[1]; } else { $this->argv = ""; }
 		$this->check($argv);
         $this->mysql_check();
         $this->load();
@@ -136,7 +136,7 @@ class Conf
         $sa[1]
             = '
 	// $super_admin["Superadmin2"] = true;';
-        $san = 0;
+        $san = 0; $sac = false;
         while (!$sac) {
             $saask = $this->ask("SuperAdmin:");
             if ($saask != "") {
