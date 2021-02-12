@@ -267,6 +267,7 @@ class Conf
     {
         echo "\nCreating Mysql Conf File\n";
         echo "Would u like to use botname like botname.Mysql.conf  (y/yes or n/no)\n";
+		$filename = false;
         while (!$filename) {
             $ubn = $this->ask("Use Botname:");
             $ubn = strtolower($ubn);
