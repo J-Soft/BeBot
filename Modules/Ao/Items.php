@@ -1,9 +1,9 @@
 <?php
 /**
- * Items database changed to Xyphos.
+ * Items database changed to Xyphos then Demoder
  *
  * Central Items Database v1.1, By Vhab
- * Latest version can always be found at: http://bebot.shadow-realm.org/index.php/topic,380.0.html
+ * Latest version can always be found at: http://bebot.link/index.php/topic,380.0.html
  * Details about the database itself: http://aodevs.com/index.php/topic,84.0.html
  *
  * BeBot - An Anarchy Online & Age of Conan Chat Automaton

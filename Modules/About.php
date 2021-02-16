@@ -108,9 +108,9 @@ class About extends BaseActiveModule
         $inside .= "##blob_text##Links:##end##\n";
         if (strtolower($this->bot->game) == 'ao') {
 		$inside .= $this->bot->core("tools")
-                ->chatcmd("http://bebot.shadow-realm.org", "BeBot website and support forums", "start") . "\n";
+                ->chatcmd("http://bebot.link", "BeBot website and support forums", "start") . "\n";
 		} else {
-		$inside .= "BeBot website and support forums: http://bebot.shadow-realm.org \n";
+		$inside .= "BeBot website and support forums: http://bebot.link \n";
 		}
         $return = "$version ::: " . $this->bot->core("tools")
                 ->make_blob('More details', $inside);

@@ -138,7 +138,7 @@ class AccessControlGUI extends BaseActiveModule
         } else {
             return $this->bot->core("tools")
                 ->chatcmd(
-                    "http://bebot.shadow-realm.org/wiki/doku.php?id=commands",
+                    "http://wiki.bebot.link/index.php/Commands",
                     "Help",
                     "start"
                 ) . " for <pre>commands";

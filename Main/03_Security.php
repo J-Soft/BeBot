@@ -2,7 +2,7 @@
 /*
 * Security.php - Provide security to all of BeBot.
 *
-* See http://bebot.shadow-realm.org/wiki/doku.php?id=security for full on
+* See http://wiki.bebot.link/index.php/Security for full on
 * usage of BeBots Security System.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
