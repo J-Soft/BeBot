@@ -55,7 +55,7 @@ class ClassName extends BaseActiveModule
         //Initialize the base module
         parent::__construct($bot, get_class($this));
 		/* Register within the bot to make it accessible in other cores/modules */
-		$this->register_module("name");		
+		$this->register_module("name");
         /*
                 Register commands with the bot.
                 Possible values for $channel:
