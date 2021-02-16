@@ -38,8 +38,6 @@
 
 BeBot was created by Jonas Jax (Blondengy (RK1)) in 2004 with spiritual guidance by Thomas Juberg (Khalem (RK1)).
 
-Currently maintained by a small group of dedicated community members with good help from the Anarchy Online community at large.
-
 The following people have written code that have made it into BeBot in one form or another:
 	- Akarah (RK1)
 	- Bigburtha (RK2) aka. Craized
@@ -56,4 +54,6 @@ The following people have written code that have made it into BeBot in one form 
 	- Zacix (RK2)
 	- Zarkingu (RK2)
 	- Bitnykk (RK5)
-Special thanks go out to the best MMORPG community in existence and Auno for writing and maintaining the PHP AOChat library.
+
+Currently maintained by a small group of dedicated AO/AoC community members, among which Ruskebusk + people from Raidforall.
+Special thanks go out to Auno for PHP AOChat library, Demoder for various tools provided, Tyrence for inspiring Buda/Tyr code.
