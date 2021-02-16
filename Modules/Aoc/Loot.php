@@ -133,7 +133,7 @@ class Rolls extends BaseActiveModule
                 $this->reroll($name);
                 break;
             case 'rem':
-                if (is_numeric($com['args']) && (int)$com['args'] == (real)$com['args'] && array_key_exists(
+                if (is_numeric($com['args']) && (int)$com['args'] == (float)$com['args'] && array_key_exists(
                         $name,
                         $this->loot[$com['args']]
                     )

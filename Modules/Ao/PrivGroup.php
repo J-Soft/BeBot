@@ -98,6 +98,17 @@ class PrivGroup extends BaseActiveModule
                 "The text shown if the private chat cannot be joined.",
                 ""
             );
+		 $this->bot->core("settings")
+            ->create("PrivGroup", "ShowRules", false, "Should we display the rules (if they exist) to a joining player?");			
+		 $this->bot->core("settings")
+            ->create("PrivGroup", "ShowMain", true, "Should we display the main of the player joining in if it's an alt?");
+        $this->bot->core("settings")
+            ->create(
+                "PrivGroup",
+                "ShowAlts",
+                false,
+                "Should we display the list of alts if the player joining on is a main in the details chatblob?"
+            );			
         unset($longjoin);
         unset($longleave);
         unset($joindef);
@@ -243,18 +254,37 @@ class PrivGroup extends BaseActiveModule
 
     function pgjoin($name)
     {
-        if ($this->bot->core("settings")
+        if ($this->bot->exists_module("rules") && $this->bot->core("rules")->on && $this->bot->core("settings")->get("PrivGroup", "ShowRules")) {
+			$this->bot->send_tell($name, $this->bot->core("rules")->make_rules());
+		}
+		if ($this->bot->core("settings")
                 ->get("Privgroup", "Echojoin") == "none"
         ) {
             return;
         }
+		// manage main/alt cases
+		$alt = "";
+		$main = $this->bot->core("alts")->main($name);
+		if (strcasecmp($main, $name) != 0) { // it's an alt
+			if ($this->bot->core("settings")->get("PrivGroup", "ShowMain") == true) {
+				$alt .= " (alt of $main)";
+			}
+		} else { // it's a main
+			if ($this->bot->core("settings")->get("PrivGroup", "ShowAlts") == true) {
+				
+				$alts = $this->bot->core("alts")->show_alt($name);
+                    if ($alts['alts']) {
+                        $alt .= " ".$alts['list'];
+                    }				
+			}			
+		}
         // Parse the string first:
         $text = $this->parse_text(
             $name,
             $this->bot->core("settings")
                 ->get("Privgroup", "Joinstring"),
             "has joined"
-        );
+        ).$alt;
         switch (strtolower(
             $this->bot->core("settings")
                 ->get("Privgroup", "Echojoin")

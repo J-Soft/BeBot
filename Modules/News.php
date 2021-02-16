@@ -121,7 +121,8 @@ class News extends BaseActiveModule
 
     function notify($name, $startup = false)
     {
-        if (!$startup) {
+        $spam = "";
+		if (!$startup) {
             switch ($this->bot->core("prefs")->get($name, "News", "Logonspam")) {
                 case 'Last_headline':
                     $spam .= $this->get_last_headline();
@@ -142,6 +143,7 @@ class News extends BaseActiveModule
 
     function pgjoin($name)
     {
+        $spam = "";		
         switch ($this->bot->core("prefs")->get($name, "News", "PGjoinspam")) {
             case 'Last_headline':
                 $spam .= $this->get_last_headline();

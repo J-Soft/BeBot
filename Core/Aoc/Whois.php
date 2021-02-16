@@ -178,7 +178,10 @@ class Whois_Core extends BasePassiveModule
         if (!empty($lookup)) {
             $who["craft1"] = $lookup[0]['class1'];
             $who["craft2"] = $lookup[0]['class2'];
-        }
+        } else {
+            $who["craft1"] = "";
+            $who["craft2"] = "";
+		}
         $this->update($who);
     }
 
@@ -317,6 +320,7 @@ class Whois_Core extends BasePassiveModule
             $who["location"] = $lookup[0]['location'];
             $who["craft1"] = $lookup[0]['craft1'];
             $who["craft2"] = $lookup[0]['craft2'];
+			$who["org"] = $lookup[0]['org_name'];
             // Check if user id needs to be updated, only done if entry in DB has 0 as UID:
             if ($lookup[0]['ID'] == 0 || $lookup[0]['ID'] == -1) {
                 $this->bot->db->query("UPDATE #___whois SET ID = '" . $uid . "' WHERE nickname = '" . $name . "'");

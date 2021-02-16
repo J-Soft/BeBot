@@ -36,7 +36,7 @@ class PB extends BaseActiveModule
 {
     private $slots
         = array(
-            'ocullar' => 'eye',
+            'ocular' => 'eye',
             'brain' => 'head',
             'right arm' => 'rarm',
             'left arm' => 'larm',
@@ -113,7 +113,7 @@ class PB extends BaseActiveModule
         $this->help['command']['symb <type> <slot>'] = "Shows all known drops of symbs of <type> in <slot>.";
         $this->help['command']['symb <profession> <slot>'] = "Shows all known drops of symbs usable by <profession> in <slot>";
         $this->help['notes']
-            = "Supported slots: eye, ocullar, head, brain, ear, rarm, right arm, chest, larm, left arm, rwrist, right wrist, waist, lwrist, left wrist, rhand, right hand, legs, thigh, lhand, left hand, feet.<br>";
+            = "Supported slots: eye, ocular, head, brain, ear, rarm, right arm, chest, larm, left arm, rwrist, right wrist, waist, lwrist, left wrist, rhand, right hand, legs, thigh, lhand, left hand, feet.<br>";
         $this->help['notes'] .= "Supported type: support, control, infantry, artillery, extermination.";
         $this->help['notes']
             .= "Supported professions: adventurer, adv, agent, bureaucrat, crat, doctor, doc, enforcer, enf, engineer, eng, fixer, martial artist, ma, meta-Physicist, mp, nano-technician, nt, soldier, sol, keeper, trader<br>";

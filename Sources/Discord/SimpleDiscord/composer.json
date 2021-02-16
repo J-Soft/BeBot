@@ -1,0 +1,22 @@
+{
+    "name": "smileytechguy/simple-discord",
+    "description": "Boilerplate api for discord.",
+    "keywords": ["discord", "gateway", "websocket"],
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Noah Overcash",
+            "email": "smileytechguy@smileytechguy.com"
+        }
+    ],
+    "type": "library",
+    "require": {
+		"php": ">=7.1",
+        "textalk/websocket": "^1.2"
+    },
+	"autoload": {
+        "psr-4": {
+            "SimpleDiscord\\": "src/"
+        }
+    }
+}

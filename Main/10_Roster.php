@@ -82,6 +82,7 @@ class Roster_Core extends BasePassiveModule
             ->create("Members", "Update", true, "Should the roster be updated automaticly?");
         $this->bot->core("settings")
             ->create("Members", "QuietUpdate", false, "Do roster update quietly without spamming the guild channel?");
+		$this->bot->core("settings")->create("Members", "MembersUrl", "http://people.anarchy-online.com", "What is HTTP(s) Members interface  URL (FC official by default, or your prefered mirror) ?");
         $this->startup = true;
         $this->running = false;
     }
@@ -302,7 +303,7 @@ class Roster_Core extends BasePassiveModule
          * $this->startup = FALSE;
          * }
          */
-		$members = array();
+		$members = array(); $db_member = array();
 		$this->lastrun = $this->bot->core("settings")
             ->get("members", "LastRosterUpdate");
         if (($this->lastrun + 21600) >= time() && $force == false) {
@@ -343,6 +344,12 @@ class Roster_Core extends BasePassiveModule
             }
             $members = $this->parse_org($dimension, $this->bot->guildid);
         }
+		
+		if(!is_array($members)) {
+			$this->bot->log("ROSTER", "ERROR", "XML obtained is broken ... stopping update.");
+			return;
+		}
+		
         /*
         Only run the update if the XML returns more than one member, otherwise we skip the update.
         */
@@ -351,7 +358,7 @@ class Roster_Core extends BasePassiveModule
             $this->added = 0;
             $this->removed = 0;
             $this->rerolled = 0;
-
+			$db_members = array();
             $db_members_sql = $this->bot->db->select("SELECT char_id, nickname, user_level, updated_at FROM #___users");
             if (!empty($db_members_sql)) {
                 foreach ($db_members_sql as $db_member) {
@@ -359,13 +366,13 @@ class Roster_Core extends BasePassiveModule
                 }
             }
             unset($db_members_sql);
-            if (strtolower($this->bot->game) == 'ao') {
+            if (strtolower($this->bot->game) == 'ao' && count($db_members) > 0) {
                 /*
                 Go through all members and make sure we are up to date.
                 */
                 foreach ($members as $member) {
-					$db_member = $db_members[$member["nickname"]];
-		
+					if(isset($member["nickname"]) && isset($db_members[$member["nickname"]])) $db_member = $db_members[$member["nickname"]];
+					else $db_member = array();
 					/*
 					If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
 					its a new member we havent picked up for some reason.
@@ -820,7 +827,7 @@ class Roster_Core extends BasePassiveModule
             $i = 0;
             $j = 0;
             $xml_roster = $this->bot->core("tools")
-                ->get_site("http://people.anarchy-online.com/org/stats/d/$dim/name/$id/basicstats.xml");
+                ->get_site($this->bot->core("settings")->get("Members", "MembersUrl")."/org/stats/d/$dim/name/$id/basicstats.xml");
             $faction = $this->bot->core("tools")
                 ->xmlparse($xml_roster, "side");
             $orgname = $this->bot->core("tools")
@@ -876,7 +883,10 @@ class Roster_Core extends BasePassiveModule
                     "UPDATE",
                     "XML for the $faction guild $orgname contained $i member entries. Ignored $j entries that could not be looked up."
                 );
-            }
+            } else {
+				$this->bot->log("ROSTER", "ERROR", "XML obtained is empty or broken. Stopping here.");	
+				return;
+			}
         }
         if (($this->bot->core("settings")
                     ->get("Members", "Roster") == "WhoisCache"

@@ -160,7 +160,7 @@ class SetConf extends BaseActiveModule
             ->make_blob("Settings for " . $module, $inside);
     } // End fucnction show_module()
 
-    function change_setting($user, $module, $setting, $value)
+    function change_setting($user, $module, $setting, $value="")
     { // Start function change_setting()
         $module = $this->bot->core("settings")->remove_space($module);
         $setting = $this->bot->core("settings")->remove_space($setting);

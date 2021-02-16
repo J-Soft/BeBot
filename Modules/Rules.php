@@ -38,10 +38,13 @@ The Class itself...
 class Rules extends BaseActiveModule
 {
 
+	var $on = true;	
+
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'rules', 'GUEST');
+		$this->register_module("rules");
+        $this->register_command('all', 'rules', 'GUEST');	
     }
 
 
@@ -60,10 +63,10 @@ class Rules extends BaseActiveModule
     function make_rules()
     {
         $content = "<font color=CCInfoHeadline> :::: RULES ::::</font>\n\n";
-        if (file_exists("./txt/" . $this->bot->botname . "_rules.txt")) {
-            $content .= implode("", file("./txt/" . $this->bot->botname . "_rules.txt"));
-        } elseif (file_exists("./txt/rules.txt")) {
-            $content .= implode("", file("./txt/rules.txt"));
+        if (file_exists("./Text/" . $this->bot->botname . "Rules.txt")) {
+            $content .= implode("", file("./Text/" . $this->bot->botname . "Rules.txt"));
+        } elseif (file_exists("./Text/Rules.txt")) {
+            $content .= implode("", file("./Text/Rules.txt"));
         }
         return "<botname>'s Rules :: " . $this->bot->core("tools")
             ->make_blob("click to view", $content);

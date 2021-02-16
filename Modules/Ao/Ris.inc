@@ -42,7 +42,7 @@ class Ri {
 	var $numMembers;
 	var $leader;
 
-	function Ri($riMember,$riName) {
+	function __construct($riMember,$riName) {
 		$this->riMembers = array();
 		$this->riName = $riName;
 		$this->numMembers = 0;
@@ -130,7 +130,7 @@ class RiMember {
 	var $guild;
 	var $leader;
 
-	function RiMember($name,$level,$profession,$guild,$leader=false) {
+	function __construct($name,$level,$profession,$guild,$leader=false) {
 		$this->name = $name;
 		$this->level = $level;
 		$this->profession = $profession;

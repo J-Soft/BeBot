@@ -1,9 +1,9 @@
 <?php
 /**
- * Items database changed to Xyphos.
+ * Items database changed to Xyphos then Demoder
  *
  * Central Items Database v1.1, By Vhab
- * Latest version can always be found at: http://bebot.shadow-realm.org/index.php/topic,380.0.html
+ * Latest version can always be found at: http://bebot.link/index.php/topic,380.0.html
  * Details about the database itself: http://aodevs.com/index.php/topic,84.0.html
  *
  * BeBot - An Anarchy Online & Age of Conan Chat Automaton
@@ -18,7 +18,10 @@
  * - Khalem (RK1)
  * - Naturalistic (RK1)
  * - Temar (RK1)
- *
+ * - Bitnykk (RK5)
+ * - Auno (RK1)
+ * - Tyrence (RK5)
+ * - Demoder (RK2)
  * See Credits file for all acknowledgements.
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -52,10 +55,64 @@ class VhItems extends BaseActiveModule
         $this->register_command('all', 'items', 'GUEST');
         $this->help['description'] = 'Searches the central database for information about an item.';
         $this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";
-        $this->help['notes'] = "This module uses the Xyphos Items Database .";
+        $this->help['notes'] = "This module uses CIDB from Demoder, Adbp/Aoppa from Auno with ItemsExtractor filter from Tyrence.";
+		$this->bot->db->define_tablename("aorefs", "false");
+		$this->table();
     }
 
-
+    function table()
+    {
+		$current = 18085300;
+        Switch ($this->bot->db->get_version("aorefs")) {
+            case 2:
+				$this->bot->log("ITEMS", "AOREFS", "DB is up to date with what this bot version expected: ".$current);
+				break;
+			default:
+				$this->bot->log("ITEMS", "AOREFS", "DB is outdated/missing, trying to import: ".$current);
+				$filename = "./Extras/Items/"."aorefs-".$current."ep1.sql";
+				if(file_exists($filename)) {
+					$handle = fopen($filename, "r");
+					if (preg_match("/^windows/i", getenv("OS"))) {
+						$used = round(memory_get_usage(true)/1048576,2);
+						exec('wmic memorychip get capacity', $totalMemory);
+						$total = round(array_sum($totalMemory)/1048576);
+					} else {
+						$contents = file_get_contents('/proc/meminfo');
+						preg_match_all('/(\w+):\s+(\d+)\s/', $contents, $matches);
+						$info = array_combine($matches[1], $matches[2]);
+						$total = round($info['MemTotal']/1048576);
+					}
+					$free = floor($total-$used);
+					if($free<10) {
+						$this->bot->log("ITEMS", "AOREFS", "Too few RAM available, going (slow) ram-saving mode ...");
+						$step = 9;
+					} elseif($free<30) {
+						$this->bot->log("ITEMS", "AOREFS", "Average RAM available, trying (moderate) ram-balanced mode.");
+						$step = 99;
+					} else {
+						$this->bot->log("ITEMS", "AOREFS", "Much RAM available, rushing (fast) ram-costing mode!");
+						$step = 999;
+					}
+					$stack = ""; $main = ""; $init = false; $count = 0;
+					while(!feof($handle)) {
+						$line = fgets($handle);
+						if (strpos($line, ';') !== false) {
+							$this->bot->db->query($stack.$line);
+							$stack = "";
+						} else {
+							if($main=="") { $main = $line; }
+							if($init) { $stack .= substr($line,1); $init = false; } else { $stack .= $line; }
+							$count++;							
+							if($count>$step) { $this->bot->db->query($stack.";"); $stack = $main; $init = true; $count = 0; }
+						}
+					}
+				}
+				$this->bot->db->set_version("aorefs", 2);
+				$this->bot->log("ITEMS", "AOREFS", "DB has been updated, thanks for your patience, we're now in: ".$current);
+				break;
+        }
+    }
+	
     function command_handler($name, $msg, $origin)
     {
         if (preg_match('/^items/i', $msg, $info)) {
@@ -87,10 +144,6 @@ class VhItems extends BaseActiveModule
                     $url .= '&color_normal=' . $this->color_normal;
                 }
                 $result = $this->bot->core("tools")->get_site($url, 1);
-                //Again I do not see why we're looking for mysqli_real_escape_string
-                if (strstr($result, 'mysqli_real_escape_string') !== false) {
-                    return ("received garbled reply from vhabot!");
-                }
                 return $result;
             } else {
                 return "Usage: items [quality] [item]";

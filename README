@@ -1,5 +1,31 @@
+												   
+                ////////////////////               
+            ///////////////////////////            
+         ////////////////////////////////          
+       ///@@@@@@///////////////////////////        
+     /////@@///@////////////////////////////       
+    ///////@////@@@/////////@@@@@/////////////     
+   ////////@///////@@/////@@/////@@////////////    
+  /////////@///@@@///@//@@///@@@//@@////////////   
+ //////////@///@//@///@/@///@@@@//@@/////////////  
+ //////////@///@//@///@/@/////////@@////////////// 
+ //////////@///@@@@///@/@////@@@@@@/////////////// 
+ //////////@/////////@///@@/////@@//////////////// 
+ ///////////@@@@@@@@@/////@@@@@@@@//////////////// 
+ //////@@@/////////////////////////@@@///////////  
+ ///////@@///////////////@@@////////@@///////////  
+  //////@@@@@@@@//////@@@@@@@@@/////@@@@/////////  
+   /////@@/////@@////@@///////@@////@@//////////   
+    ////@@/////@@/({/@@/(o/o)/@@/})/@@/////////    
+     ///@@/////@@////@@///////@@////@@////////     
+      //@@@@@@@@@/////@@@@@@@@@/////@@@@@@@//      
+       //////////////////@@@////////////////       
+         /////////////////////////////////         
+           /////////////////////////////           
+               /////////////////////               
+                                                   
 Updated README from https://github.com/J-Soft/BeBot
-More documentation at http://bebot.shadow-realm.org/wiki/
+More documentation at http://wiki.bebot.link
 
 
 INSTALLING BEBOT
@@ -16,7 +42,7 @@ PREREQUISITES (WHAT DO YOU NEED?)
 To install and run BeBot you need the following: 
 
 * Anarchy Online (free or paid) or Age of Conan
-* PHP version from v. 5.3 (minimal requirement) upto 7.4 (max tested so far)
+* PHP version from 5.4 (minimal requirement) upto 7.4 (max tested so far)
 * database server of either Mysql (from 4.1 upto 8.0) or MariaDB (10.0 upto 10.4)
 * either "Official" files at https://github.com/J-Soft/BeBot/archive/master.zip (stable)
   or "Beta" files from https://github.com/bitnykk/BeBot/archive/master.zip (sandbox)
@@ -78,10 +104,12 @@ On windows, according to the PHP version you'd want Bebot to run into, you may
 need to copy a php.exe file right into bot's root folder (where StartBot.bat is).
 Unless windows PATH and/or php.ini are well set so the exe can locate required
 libraries alone, you may have to copy correct .dll files for this specific PHP.
-For PHP 5.3 : libeay32, libmysql, php5ts and ssleay32 for this PHP version.
-For 5.4/5.6 : same files but for this version + php_mysqli & php_sockets.
+For 5.4/5.6 : libeay32, libmysql, php5ts and ssleay32, php_mysqli & php_sockets.
 For 7.x : libcrypt, libssl, libssh2, sockets, nghttp2, curl & php7(ts).
+
 Bot will tell you what misses to run during startup, so check all lines !
+You may need to install some modules (e.g. curl) and activate them in php.ini
+So be sure of what php.ini file is loaded by the PHP client Bebot uses.
 
 Set $main_php to the location of the "Main.php" file. Once again you can 
 just enter "Main.php" if you're starting the bot from the directory its in. 
@@ -315,10 +343,12 @@ STARTING THE BOT
   press enter).
 * Now run StartBot (.php under linux or .bat under windows) :
  - Windows: Navigate to the directory of your bot assuming you have the
-   php.exe in the same directory and write "StartBot.bat".
- - Linux: Assuming your can run php from anywhere navigate to your bot 
-   directory and write e.g. "php StartBot.php" (assuming your php binary is 
-   named "php" in this example).
+   php.exe in the same directory and write "StartBot.bat". You also can
+   make it a startup shortcut as long as your database service runs too.
+ - Linux: Assuming you can run php from anywhere, navigate to your bot 
+   directory & write e.g. "php StartBot.php" (assuming your php binary is 
+   named "php" for example). You also can cron it at startup with screen,
+   as long as your database service runs too.
 
 The console should now state that the bot is loading the modules, 
 authenticating and connecting. Once this is done you can log onto a character
@@ -484,3 +514,83 @@ You may also need to refresh your Whois/User/Online tables by doing :
 !rosterupdate
 !restart
 Note : you may also use the WhoisUpdate tool within Extras folder.
+
+
+EXTERNAL RELAY MODULES
+======================
+
+Nowadays there are 2 main options for this in the gaming universe :
+- IRC which has historically been the most used media for linked chat
+- Discord that is now a very commonly used multiplatform chat appli
+We'll see below how to connect your raid/guild bot to these.
+
+IRC
+---
+
+You first decide which IRC server you want to use. Many are public & free.
+Create you #channel if it doesn't exist, you must be owner or at least moderator.
+You may use a dedicated bot to hold channel, kick intruders, set a pass/key, etc.
+Commands are described @ https://gist.github.com/xero/2d6e4b061b4ecbeb9f99
+
+Once your #channel is ready, it's time to link your Bebot by doing :
+!settings irc
+You'll obtain a panel in which you can set everything up :
+- main connection elements Server, Port (often 6667), #Channel & various options
+- security elements like Key (if a pass was set) & channels options
+- visual elements like prefixes, references, size limits, etc ...
+
+After settings this all correctly, you can start IRC relay with :
+!irc connect
+The bot should also reconnect by itself after reboot.
+
+For more details & commands :
+!help irc
+
+If your bot can't connect to IRC, verify all !settings ...
+Possibly you mistyped something like server, channel, port or pass/key.
+
+Discord
+-------
+
+Create your server/channel(s) if they don't exist, you must be owner or at least admin.
+You may set several channel(s), role(s), visual(s) & start inviting people at will.
+
+Right clic on server > Settings > Widget and activate it on the top right corner.
+Click on the channel you want to relay from/to & copy its Id (last digit in its URL).
+If you can't find Id, go into your settings "Appearance" tab & activate Dev mode "On".
+Then right click the wanted channel to copy its Id all below its contextual menu.
+(The Server Id is the first digit in URL, or right click server & copy like done upper)
+
+Now go https://discord.com/developers/applications to create an access for your Bebot :
+ Click "New Application" & give it a name which can be different from ingame botname.
+ Go into "Bot" tab, activate this option by clicking "Add Bot" & confirming.
+ Copy the Bot Token from this tab, it will be used later below.
+ Then go into "OAuth2" tab, check "bot" option in the "Scopes" window.
+ In "Permissions", check at least "View Channels" & "Send Messages" (aka 3072)
+ Back upper in "Scopes", click "Copy" to obtain the bot validation link.
+ Paste link in a web browser to visit it, select wanted server, confirm, captcha & win!
+ Now your bot should show as offline in your Discord (except at quick connection ping).
+
+Execute this section only if you run Bebot on a PHP version lower than 7.0 :
+Any Discord bot would be limitated until it has connected Discord wsocket once.
+There is a lib to automate that but it only works with PHP 7.0+ ...
+So to emulate this 1-timer ping, you can use any compatible solution for few minutes.
+E.g. "Bot Designer For Discord" is a genius android appstored by Nilpointer Soft (J. Tomana).
+Launch, create bot, enter name/token, accept policies, start, add time, login, logoff, close.
+This way your bot access will be unlocked & fully capable, even under PHP 5.x !
+ 
+Final step is to configure your Bebot by doing :
+!settings discord
+You'll obtain a panel in which you can set everything up :
+- main connection elements BotToken & ChannelId
+- other elements like channels options
+
+After settings this all correctly, you can start Discord relay with :
+!discord connect
+The bot should fastly ping & then keep on relaying by itself even after reboot.
+
+For more details & commands :
+!help discord
+
+If you bot doesn't ping/relay correctly, verify all !settings ...
+Also verify all Discord side : roles/permissions, Ids, widget, etc.

@@ -1,4 +1,8 @@
 --------------
+Version 0.7.16
+--------------
+- Discord relay added + IRC improved ; several features added or improved for both games ; AO icons enriched
+--------------
 Version 0.7.15
 --------------
 - AO : addition of AoChatProxy compatibility to extend the bot friendlist over the 1000 limit
@@ -89,6 +93,3 @@ Removed Modules:
 +- Moving from Status array to BotError. This WILL cause breakage until the checks have been converted as well.
 +- Moving uid/uname cache from AOChat to core/PlayerList.php. Calls to core("chat")->get_u* are now deprecated and PlayerList does return BotError on failures.
 +- rosterupdate seems to output alot of errors todo with failed to get whois (confirmed by luyu)
- 
-+Known breakage
-+- IRC module fails to process commands given in IRC.

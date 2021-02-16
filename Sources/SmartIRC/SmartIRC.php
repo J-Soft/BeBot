@@ -340,7 +340,7 @@ class Net_SmartIRC_base
      * @access public
      * @return void
      */
-    function Net_SmartIRC_base()
+    function __construct()
     {
         // precheck
         $this->_checkPHPVersion();
@@ -3030,7 +3030,7 @@ class Net_SmartIRC_Error
     var $error_msg;
 
 
-    function Net_SmartIRC_Error($message)
+    function __construct($message)
     {
         $this->error_msg = $message;
     }

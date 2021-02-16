@@ -42,7 +42,7 @@ class MySQL
     public static $instance;
 
 
-    public function get_instance($bothandle)
+    public static function get_instance($bothandle)
     {
         $bot = Bot::get_instance($bothandle);
         if (!isset(self::$instance[$bothandle])) {
@@ -314,7 +314,6 @@ class MySQL
     /*
     Used for first defines of tablenames, allows to set if prefix should be used.
     If the tablename already exists, the existing name is returned - NO NAMES ARE REDEFINED!
-
     Otherwise same as get_tablename()
     */
     function define_tablename($table, $use_prefix)

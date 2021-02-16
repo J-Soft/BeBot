@@ -41,8 +41,8 @@ class Conf
     function __construct($argv, $confc)
     {
         $this->confc = $confc;
-        $this->argv = $argv[1];
-        $this->check($argv);
+        if(is_array($argv) && count($argv)>0 && isset($argv[1])) { $this->argv = $argv[1]; } else { $this->argv = ""; }
+		$this->check($argv);
         $this->mysql_check();
         $this->load();
     }
@@ -117,8 +117,11 @@ class Conf
         $dimension = $this->ask("Dimension/Server Name:");
         if (!is_numeric($dimension)) {
             $guild = $this->ask("Guild:");
-        }
+        } else {
+			$guild = "";
+		}
         $owner = $this->ask("Owner:");
+		$guildbot = false;
         while (!$guildbot) {
             echo "Is this a Guild Bot? (y/yes or n/no)\n";
             $gb = $this->ask("Guild bot:");
@@ -136,7 +139,7 @@ class Conf
         $sa[1]
             = '
 	// $super_admin["Superadmin2"] = true;';
-        $san = 0;
+        $san = 0; $sac = false;
         while (!$sac) {
             $saask = $this->ask("SuperAdmin:");
             if ($saask != "") {
@@ -265,6 +268,7 @@ class Conf
     {
         echo "\nCreating Mysql Conf File\n";
         echo "Would u like to use botname like botname.Mysql.conf  (y/yes or n/no)\n";
+		$filename = false;
         while (!$filename) {
             $ubn = $this->ask("Use Botname:");
             $ubn = strtolower($ubn);
@@ -284,7 +288,8 @@ class Conf
             $server = "localhost";
         }
         echo "The bot will use " . $botname . " as prefix on default, Do you want to use Default? (y/yes or n/no)\n";
-        while (!$prefix) {
+        $prefix = false;
+		while (!$prefix) {
             $ubn = $this->ask("Use default prefix:");
             $ubn = strtolower($ubn);
             if ($ubn == "y" || $ubn == "yes") {
@@ -298,7 +303,8 @@ class Conf
             $prefix = '$table_prefix = "' . $prefix . '";';
         }
         echo "The bot will use " . $botname . "_tablenames for tablename table on default, Do you want to use Default? (y/yes or n/no)\n";
-        while (!$mt) {
+        $mt = false;
+		while (!$mt) {
             $mtq = $this->ask("Use default prefix:");
             $mtq = strtolower($mtq);
             if ($mtq == "y" || $mtq == "yes") {

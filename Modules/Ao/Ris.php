@@ -438,21 +438,24 @@ class NewRis extends BaseActiveModule
 		$uid = $this->bot->core('player')->id($name);
 		$result = $this -> bot -> core("whois") -> lookup($name);
 		//print_r($result);
-		if (isset($result["error"]))
+		if ( !($result instanceof BotError) && !empty($result) && count($result)>0 && !isset($result["error"]) 
+		   && isset($result["level"]) && is_numeric($result["level"]) && $result["level"]>0 
+		   && isset($result["profession"]) && $result["profession"]!=""
+		   && isset($result["org"]) && $result["org"]!="" )
 		{
 			$member[0] = $name;
-			$member[1] = "Unknown";
-			$member[2] = "Unknown";
-			$member[3] = "Unknown";
+			$member[1] = $result["level"];
+			$member[2] = $result["profession"];
+			$member[3] = $result["org"];
 			$member[4] = true;
 			return $member;
 		}
 		else
 		{
 			$member[0] = $name;
-			$member[1] = $result["level"];
-			$member[2] = $result["profession"];
-			$member[3] = $result["org"];
+			$member[1] = "Unknown";
+			$member[2] = "Unknown";
+			$member[3] = "Unknown";
 			$member[4] = true;
 			return $member;
 		}
