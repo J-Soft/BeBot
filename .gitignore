@@ -16,3 +16,5 @@ Themes/Default.colors.xml
 Text/Rules.txt
 Custom/Core/*
 Custom/Modules/*
+
+Extras/History/*
