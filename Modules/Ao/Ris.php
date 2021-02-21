@@ -298,7 +298,7 @@ class NewRis extends BaseActiveModule
 	{
 		$return = false;
 
-		if($this->bot->core('player')->id($name))
+		if(! ($this->bot->core('player')->id($name) instanceof BotError) )
 		{
 			for($i=1;$i<=count($this->ris);$i++)
 			{

@@ -1058,7 +1058,7 @@ class IRC extends BaseActiveModule
         } else {
             $info[1] = ucfirst(strtolower($info[1]));
             $msg = "";
-            if (!$this->bot->core('player')->id($info[1])) {
+            if ($this->bot->core('player')->id($info[1]) instanceof BotError) {
                 $msg = "Player " . $info[1] . " does not exist.";
             } else {
                 if ($info[1] == ucfirst(strtolower($this->bot->botname))) {

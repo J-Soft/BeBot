@@ -230,7 +230,7 @@ class Points extends BaseActiveModule
             $this->bot->send_tell($name, "You have ##highlight##$points##end## raidpoints.");
         } else {
             if ($this->bot->core("security")->check_access($name, "admin")) {
-                if (!$this->bot->core('player')->id($target)) {
+                if ($this->bot->core('player')->id($target) instanceof BotError) {
                     $this->bot->send_tell($name, "Player ##highlight##$target##end## does not exist.");
                 } else {
                     $result = $this->bot->db->select(
@@ -487,7 +487,7 @@ class Points extends BaseActiveModule
                 $this->bot->send_tell($name, "You only have ##highlight''" . ($result[0][0]) . "##end## raid points.");
                 return;
             } else {
-                if (!$this->bot->core('player')->id($who)) {
+                if ($this->bot->core('player')->id($who) instanceof BotError) {
                     $this->bot->send_tell($name, "Player ##highlight##$who##end## does not exist.");
                     return;
                 } else {
@@ -528,7 +528,7 @@ class Points extends BaseActiveModule
             $this->bot->send_tell($name, "$num is not a valid points value.");
             return false;
         }
-        if (!$this->bot->core('player')->id($who)) {
+        if ($this->bot->core('player')->id($who) instanceof BotError) {
             $this->bot->send_tell($name, "Player ##highlight##$who##end## does not exist.");
             return false;
         } else {
@@ -568,7 +568,7 @@ class Points extends BaseActiveModule
             $this->bot->send_tell($name, "$num is not a valid points value.");
             return false;
         }
-        if (!$this->bot->core('player')->id($who)) {
+        if ($this->bot->core('player')->id($who) instanceof BotError) {
             $this->bot->send_tell($name, "Player ##highlight##$who##end## does not exist.");
             return false;
         } else {

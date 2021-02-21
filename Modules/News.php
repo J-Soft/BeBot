@@ -214,7 +214,7 @@ class News extends BaseActiveModule
     */
     function get_news($name)
     {
-        $newsdate = "";
+        $newsdate = ""; $inside = "";
         $result_headline = $this->bot->db->select(
             "SELECT id, time, name, news FROM #___news WHERE type = '2' ORDER BY time DESC LIMIT 0, 3"
         );

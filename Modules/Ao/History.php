@@ -71,8 +71,7 @@ class History extends BaseActiveModule
     function player_history($name)
     {
         $name = ucfirst(strtolower($name));
-        $id = $this->bot->core('player')->id($name);
-        if (!empty($id)) {
+        if (! ($this->bot->core("player")->id($name) instanceof BotError) ) {
             $output = "##blob_title##::: Character history for " . $name . " :::##end##\n\n";
             $content = $this->bot->core("tools")
                 ->get_site(

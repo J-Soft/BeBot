@@ -655,7 +655,7 @@ class Raid extends BaseActiveModule
                 }
             }
             $uid = $this->bot->core('player')->id($player);
-            if (!$uid) {
+            if ($uid instanceof BotError) {
                 return "Player ##highlight##$player##end## does not exist.";
             } else {
                 if (empty($this->user)) {

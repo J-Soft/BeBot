@@ -130,7 +130,7 @@ class Alts extends BaseActiveModule
 
     function display_alts($name)
     {
-        if (!$this->bot->core("player")->id($name)) {
+        if ($this->bot->core("player")->id($name) instanceof BotError) {
             return "##error##Character ##highlight##$name##end## does not exist.##end##";
         }
 
@@ -180,11 +180,11 @@ class Alts extends BaseActiveModule
             return "##error##You cannot register yourself as your own alt.##end##";
         }
         //Check that $name is a valid character
-        if (!$this->bot->core('player')->id($name)) {
+        if ($this->bot->core('player')->id($name) instanceof BotError) {
             return "##error##Character ##highlight##$name##end## does not exist.##end##";
         }
         //Check that the alt is a valid character
-        if (!$this->bot->core('player')->id($alt)) {
+        if ($this->bot->core('player')->id($alt) instanceof BotError) {
             return "##error##Character ##highlight##$alt##end## does not exist.##end##";
         }
         //Establish the main of the caller
