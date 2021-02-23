@@ -51,7 +51,7 @@ class History extends BaseActiveModule
 		$this -> register_alias("archive", "archives");
         $this->help['command']['history <name>'] = "Show the history of player <name>";
 		$this->help['command']['archive <name>'] = "Show the archive of player <name>";
-        $this->help['notes'] = "(!history checks AP/Tyrence's RK-5/19 while !archive checks Auno RK-1/2/3)";
+        $this->help['notes'] = "(!history checks AP/Tyrence's RK-5/19 while !archive checks Auno RK-1/2)";
 		$this -> bot -> core("settings") -> create("History", "CleanDelay", 30, "After how many Days should a History cache file be considered old and deleted ?", "7;15;30;60;120");
 		$this->path = "./Extras/History";
 		$this->register_event("cron", "24hour");
@@ -84,8 +84,10 @@ class History extends BaseActiveModule
 				$output = "##blob_title##::: History for " . $name . " on RK".$dim." :::##end##\n\n";
 				if(file_exists($this->path."/".$file)) {
 					$content = file_get_contents($this->path."/".$file);
+					$distant = false;
 				} else {
 					$content = $this->bot->core("tools")->get_site("http://pork.budabot.jkbff.com/pork/history.php?server=".$dim."&name=".$name);
+					$distant = true;
 				}
 				if (!($content instanceof BotError)) {
 					if (strpos($content, '{"nickname":"'.$name.'",') !== false) {
@@ -119,9 +121,9 @@ class History extends BaseActiveModule
 							$output .= $result->guild_name . " " . $result->guild_rank_name . "\n";
 						}
 						$this->bot->send_output($asker, "RK".$dim." history found about ".$name.": ".$this->bot->core("tools")->make_blob("click to view", $output), $origin);
-						$this->file_cache($file,$content);
+						if($distant) $this->file_cache($file,$content);
 					} elseif (strpos($content, '[]') !== false) {
-						$this->file_cache($file,$content);
+						if($distant) $this->file_cache($file,$content);
 					} else {
 						return "Content history  error on : ".$content;
 					}
@@ -142,13 +144,15 @@ class History extends BaseActiveModule
         $name = ucfirst(strtolower($name));
         if (! ($this->bot->core("player")->id($name) instanceof BotError) ) {
 			// START AUNO ARCHIVES
-			for($j=1;$j<=3;$j++) {
+			for($j=1;$j<=2;$j++) {
 				$file = $j.".".$name.".xml";
 				$output = "##blob_title##::: Archive(s) for " . $name . " on RK".$j." :::##end##\n\n";
 				if(file_exists($this->path."/".$file)) {
 					$content = file_get_contents($this->path."/".$file);
+					$distant = false;
 				} else {
 					$content = $this->bot->core("tools")->get_site("https://auno.org/ao/char.php?output=xml&dimension=".$j."&name=".$name);
+					$distant = true;
 				}
 				if (!($content instanceof BotError)) {
 					if (strpos($content, '<history>') !== false) {
@@ -190,9 +194,9 @@ class History extends BaseActiveModule
 							}
 						}
 						$this->bot->send_output($asker, "RK".$j." archive found about ".$name.": ".$this->bot->core("tools")->make_blob("click to view", $output), $origin);
-						$this->file_cache($file,$content);
+						if($distant) $this->file_cache($file,$content);
 					} elseif (strpos($content, '<description>') !== false) {
-						$this->file_cache($file,$content);
+						if($distant) $this->file_cache($file,$content);
 					} else {
 						return "Content archive error on : ".$content;
 					}
