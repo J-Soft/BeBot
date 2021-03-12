@@ -265,18 +265,17 @@ It will allow you to use an SQL window to copy-paste and then execute requests b
 PHASE 4: CREATE A DATABASE AND DATABASE USER FOR BEBOT
 ------------------------------------------------------
 
-1.	Type CREATE DATABASE databasename CHARACTER SET latin1; (replace 
-    databasename with the name of the database you wish to create)
+1.	Type CREATE DATABASE databasename CHARACTER SET latin1; (or utf8 for recent PHP/SQL)
+    (replace databasename with the name of the database you wish to create)
 2.	Press Enter/Return. 
 3.	CREATE USER username@localhost; (Change username to the username you 
     want, keep @localhost)
 4.	Press Enter/Return. 
 5.	SET PASSWORD FOR username@localhost = PASSWORD("newpassword"); 
-    (Change username and newpassword to your selected username and 
-    password, again keep @localhost)
+    (Change username and newpassword to your selected username and password, again keep @localhost)
 6.	Press Enter/Return. 
-7.	Type GRANT ALL on databasename.* TO username@localhost; (Again, 
-    change username, keep @localhost)
+7.	Type GRANT ALL on databasename.* TO username@localhost; 
+    (Again, change username, keep @localhost)
 8.	Press Enter/Return. 
 9.	Type quit then Enter/Return to exit the MySQL Monitor. 
 
