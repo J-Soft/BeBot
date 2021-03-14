@@ -6,19 +6,19 @@
 *   Yite@BeBot.Forum
 *   heljeere@BeBot.Forum/Crom
 * </Credits>
-**
-**	changelog:
-**  2021-03-12  b1.0.8  Adapted for the Bebot 0.7.x serie
-**  2020-03-22  b1.0.7  Added option to set the timer to 'finished' for those who have filled the AA tree.
-                        Logon notify will not spam you when you are set to 'finished' or 'done'.
-**	2019-09-14	b1.0.6	Added logon notify if you dont have a timer set for characters above lvl 20. (Credits: Ruskebusk / Crom)
-** 				b1.0.5	Added optional name of AA being trained (Credits: Kyr)
-** 				b1.0.4	Rewrote "showall" to sort the timers by when they run out. Also cleaned it up a bit so it now does all the work in a single query instead of doing one per toon. (Credits: heljeere@BeBot.Forum/Crom)
-**				b1.0.3	Added "timeraa showall <nick>" to include alts of a chars. (Thanks to Yite@BeBot.Forum)
-** 				b1.0.2	Recoded diff calculation and some minor text changes
-** 				b1.0.1	Command access fixed and change in database. Clean of old structur needed (DROP #__timer_aa)
-** 				b1.0.0	First release.
-/*
+*
+*	changelog:
+*  2021-03-12  b1.0.8  Adapted for the Bebot 0.7.x serie
+*  2020-03-22  b1.0.7  Added option to set the timer to 'finished' for those who have filled the AA tree.
+*                      Logon notify will not spam you when you are set to 'finished' or 'done'.
+*	2019-09-14	b1.0.6	Added logon notify if you dont have a timer set for characters above lvl 20. (Credits: Ruskebusk / Crom)
+* 				b1.0.5	Added optional name of AA being trained (Credits: Kyr)
+* 				b1.0.4	Rewrote "showall" to sort the timers by when they run out. Also cleaned it up a bit so it now does all the work in a single query instead of doing one per toon. (Credits: heljeere@BeBot.Forum/Crom)
+*				b1.0.3	Added "timeraa showall <nick>" to include alts of a chars. (Thanks to Yite@BeBot.Forum)
+* 				b1.0.2	Recoded diff calculation and some minor text changes
+* 				b1.0.1	Command access fixed and change in database. Clean of old structur needed (DROP #__timer_aa)
+* 				b1.0.0	First release.
+*
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
 * Copyright (C) 2005-2020 Thomas Juberg Stensås, ShadowRealm Creations and the BeBot development team.
