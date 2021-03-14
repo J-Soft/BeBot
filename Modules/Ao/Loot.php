@@ -16,7 +16,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-* 
+* - Bitnykk (RK5)
 * !mloot addition suggested by Relo (RK5)
 * 
 * See Credits file for all acknowledgements.
@@ -323,6 +323,7 @@ class Rolls extends BaseActiveModule
 					$who = $this->bot->core("whois")->lookup($winner, true);
 					if(isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }	
                     unset($slot[$winner]);
+					$this->bot->log("LOOT", "NOTICE", $winner." (".$level.") won ".$item." from slot ".$num);
                 }			
                 $msg .= "##loot_highlight##Item: ##end##" . $item . "  (Slot##loot_highlight## #" . $num . "##end##)\n";
                 $msg .= "##loot_highlight##Winner: ##end##" . $winner . " (".$level.")\n\n";

@@ -14,7 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -147,11 +147,13 @@ class Raffle extends BaseActiveModule
             $winner = "";
             $res = "";
             $count = count($this->users);
+			$notice = "";
             foreach ($this->users as $key => $points) {
                 if ($count == 1) {
                     $winner = $key;
                 }
                 $res = "##highlight##" . $count . ".##end## $key ##highlight##" . $points . " points##end##\n" . $res;
+				$notice = $key." ";				
                 $count--;
             }
             $results .= $res;
@@ -164,6 +166,7 @@ class Raffle extends BaseActiveModule
                         $results
                     ) . "\n" . "##raffle_highlight##----------------------------------------------------------##end##"
             );
+			$this->bot->log("RAFFLE", "NOTICE", "Win order : ".$notice);
             $this->users = array();
             $this->item = "";
             $this->admin = "";
