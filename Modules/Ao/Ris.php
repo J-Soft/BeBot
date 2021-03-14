@@ -345,8 +345,11 @@ class NewRis extends BaseActiveModule
 						$member = new RiMember($this->pgroup[$name][0],$this->pgroup[$name][1],$this->pgroup[$name][2],$this->pgroup[$name][3]);
 						$ri = $this->GetRi($num);
 						$rimembers = $ri->GetRiMembers();
-						//print_r(get_object_vars($rimembers));
-						if(array_search($member,$rimembers))
+						$isri = false;
+						foreach($rimembers as $id=>$object) {
+							if($object->name==$name) { $isri = true; }
+						}											
+						if($isri)
 						{
 						$this->bot->send_tell($executer,"##highlight##".$name . "##end## is already in ri ##highlight##".$num . "##end##");
 							return;
@@ -521,17 +524,27 @@ class NewRis extends BaseActiveModule
 		$msg .= "##blob_title##::Looking For Ri::##end##\n\n";
 		foreach($this->pgroup as $index=>$array)
 		{
-			$test = $array;
+			$test = $array;							
 			if(isset($array[4]))
-			{
-				$msg .= "\t[##highlight##" . $array[0] . "##end##] (" . $array[1] . " " . $array[2] . ") :: ";
-				$msg .= $this -> bot -> core("tools") -> chatcmd("startri ".$array[0], "Start Ri");
-				foreach($this->ris as $indexri=>$ris)
+			{				
+				$hasri = false;
+				foreach($this->ris as $index=>$ri)
 				{
-					$msg .= "/";
-					$msg .= $this -> bot -> core("tools") -> chatcmd("addri " . bcadd($indexri,1) . " " . $test[0], bcadd($indexri,1));
+					$checkri = $ri->GetRiMembers();
+					foreach($checkri as $id=>$object) {
+						if($object->name==$array[0]) { $hasri = true; }
+					}
 				}
-				$msg .= "\n";
+				if(!$hasri) { 
+					$msg .= "\t[##highlight##" . $array[0] . "##end##] (" . $array[1] . " " . $array[2] . ") :: ";
+					$msg .= $this -> bot -> core("tools") -> chatcmd("startri ".$array[0], "Start Ri");
+					foreach($this->ris as $indexri=>$ris)
+					{
+						$msg .= "/";
+						$msg .= $this -> bot -> core("tools") -> chatcmd("addri " . bcadd($indexri,1) . " " . $test[0], bcadd($indexri,1));
+					}
+					$msg .= "\n";
+				}
 			}
 		}
 		$msg .= "##end##";
