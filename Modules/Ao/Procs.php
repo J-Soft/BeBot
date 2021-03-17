@@ -33,6 +33,7 @@ class procs extends BaseActiveModule
 	{
 		parent::__construct($bot, get_class($this));
 		$this -> register_command("all", "procs", "MEMBER");
+		$this -> register_alias("procs", "leprocs");
 		$this -> help['description'] = "Displays procs per profession.";
 		$this -> help['command']['procs <expression>'] = "procs <profession>";
 		$this -> help['notes'] = "You can use &lt;prof&gt; or &lt;profession&gt;.";

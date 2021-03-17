@@ -450,6 +450,7 @@ class OnlineOrg extends BaseActiveModule
 			$orgname = $this -> org_cache[$this -> id]["orgname"];
 			$faction = $this -> org_cache[$this -> id]["faction"];
 			$orgcount = count($orgcache);
+			$oncount = 0;
 			$sortedorg = array();
 			foreach($orgcache as $key => $player) {
 				$array = array("nickname"=>$player["nickname"],"level"=>$player["level"],"rank_id"=>$player["rank_id"],"rank"=>$player["rank"],"profession"=>$player["profession"],"state"=>$this->online[$player["nickname"]]);
@@ -484,7 +485,7 @@ class OnlineOrg extends BaseActiveModule
 			foreach ($sortedorg as $sorted)
 			{
 				foreach($sorted as $player) {
-					if($player["state"]=="on") { $color = "##green##"; } elseif($player["state"]=="off") { $color = "##red##"; } else { $color = "##orange##"; }
+					if($player["state"]=="on") { $color = "##green##"; $oncount++; } elseif($player["state"]=="off") { $color = "##red##"; } else { $color = "##orange##"; }
 					if($player["profession"]=="Adventurer") { $prof="Advy"; }
 					elseif($player["profession"]=="Agent") { $prof="Agt"; }
 					elseif($player["profession"]=="Bureaucrat") { $prof="Bur"; }
@@ -532,7 +533,7 @@ class OnlineOrg extends BaseActiveModule
 				}
 			}
 			
-			$sent = "Result on ".$faction." '".$orgname."' ".$orgcount." member(s) sorted by ".$sortby.": ".$this->bot->core("tools")->make_blob("Click to view", $blob);
+			$sent = $oncount." online among ".$faction." '".$orgname."' ".$orgcount." member(s) sorted by ".$sortby.": ".$this->bot->core("tools")->make_blob("Click to view", $blob);
 			$this->bot->send_output($name, $sent, $origin);
 			
 		} else {

@@ -50,6 +50,7 @@ class Twink extends BaseActiveModule
 		$this -> register_command("all", "buffitem", "GUEST");
 		$this -> register_command("all", "clustloc", "GUEST");
 		$this -> register_command("all", "impql", "GUEST");
+		$this -> register_alias("impql", "implant");
 		$this -> register_command("all", "impreq", "GUEST");
 		$this -> help['description'] = 'Helps you to twink.';
         	$this -> help['command']['whatbuffs <skill>']="Shows the usual twink items for a skill.";
