@@ -65,8 +65,36 @@ class Rally extends BaseActiveModule
 		             rally VARCHAR(200) NOT NULL,
 		             PRIMARY KEY (name))"
         );
+		$this->table_update();
     }
 
+	function table_update() {
+		$countsel = $this->bot->db->select("SELECT COUNT(*) FROM #___land_control_zones");
+		if (!empty($countsel)) {
+			$count = $countsel[0][0];
+			if($count==263) {
+				$this->bot->db->query("INSERT INTO #___land_control_zones VALUES
+					(264, 0, 0, 'Jobe Research', 'JR', '0', 4001, '0', '0', ''),
+					(265, 0, 0, 'Nascense Frontier', 'NF', '0', 4310, '0', '0', ''),
+					(266, 0, 0, 'Nascense Wilds', 'NW', '0', 4311, '0', '0', ''),
+					(267, 0, 0, 'Nascense Swamp', 'NS', '0', 4312, '0', '0', ''),
+					(268, 0, 0, 'South Elysium', 'SE', '0', 4540, '0', '0', ''),
+					(269, 0, 0, 'West Elysium', 'WE', '0', 4541, '0', '0', ''),
+					(270, 0, 0, 'Elysium', 'E', '0', 4542, '0', '0', ''),
+					(271, 0, 0, 'Eastern Elysium', 'EE', '0', 4543, '0', '0', ''),
+					(272, 0, 0, 'Northern Elysium', 'NE', '0', 4544, '0', '0', ''),
+					(273, 0, 0, 'Upper Scheol', 'US', '0', 4880, '0', '0', ''),
+					(274, 0, 0, 'Lower Scheol', 'LS', '0', 4881, '0', '0', ''),
+					(275, 0, 0, 'Adonis City', 'AC', '0', 4872, '0', '0', ''),
+					(276, 0, 0, 'Adonis Abyss', 'AA', '0', 4873, '0', '0', ''),
+					(277, 0, 0, 'Penumbra Forest', 'PF', '0', 4320, '0', '0', ''),
+					(278, 0, 0, 'Penumbra Valley', 'PV', '0', 4321, '0', '0', ''),
+					(279, 0, 0, 'Burning Marshes', 'BM', '0', 4005, '0', '0', ''),
+					(280, 0, 0, 'Inferno', 'I', '0', 4605, '0', '0', '');									
+				");
+			}
+		}
+	}
 
     function command_handler($name, $msg, $origin)
     {
