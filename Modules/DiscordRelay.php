@@ -373,6 +373,12 @@ class DiscordRelay extends BaseActiveModule
 										case $this->bot->commpre . 'is':
 											$sent = $this->discord_is($msg['content']);
 											Break;
+										case $this->bot->commpre . 'tara':
+											$sent = $this->discord_tara($msg['content']);
+											Break;
+										case $this->bot->commpre . 'viza':
+											$sent = $this->discord_viza($msg['content']);
+											Break;											
 										case $this->bot->commpre . 'online':
 										case $this->bot->commpre . 'sm':
 											$sent = $this->discord_sm($msg['content']);
@@ -487,6 +493,32 @@ class DiscordRelay extends BaseActiveModule
 		}
 		return $sent;		
 	}	
+	
+    /*
+    * Gets called when someone does !tara
+    */
+    function discord_tara($msg)
+    {
+		if ($this->bot->exists_module("taraviza")) {
+			$sent = $this->bot->core("taraviza")->show_tara($msg,"Discord");
+		} else {
+			$sent = "No Tarasque/Cameloot timer found.";
+		}
+		return $sent;		
+	}	
+
+    /*
+    * Gets called when someone does !viza
+    */
+    function discord_viza($msg)
+    {
+		if ($this->bot->exists_module("taraviza")) {
+			$sent = $this->bot->core("taraviza")->show_viza($msg,"Discord");
+		} else {
+			$sent = "No Vizaresh/Gauntlet timer found.";
+		}
+		return $sent;		
+	}		
 
     /*
     * Gets called by discord_whois()

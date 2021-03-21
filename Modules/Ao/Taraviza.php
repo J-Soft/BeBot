@@ -45,6 +45,7 @@ class Taraviza extends BaseActiveModule
 	function __construct(&$bot)
 	{
 		parent::__construct($bot, get_class($this));
+		$this->register_module("taraviza");
 		$this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS tara (time int NOT NULL default '0')");
 		$this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS viza (time int NOT NULL default '0')");
 		$this -> register_command("all", "tara", "GUEST");
@@ -117,7 +118,7 @@ class Taraviza extends BaseActiveModule
         if ($hour < 10) { $hour = "0".$hour; }
         if ($min < 10) { $min = "0".$min; }
         $msg = "Tarasque should pop in about ".$hour."h".$min."m"; //.":".$sec;
-        $this -> bot -> send_output($name, $msg, $channel);
+		return $msg;
         }
 
 	function show_viza($name, $channel)
@@ -137,7 +138,7 @@ class Taraviza extends BaseActiveModule
         if ($hour < 10) { $hour = "0".$hour; }
         if ($min < 10) { $min = "0".$min; }
         $msg = "Gauntlet should start in about ".$hour."h".$min."m"; //.":".$sec;
-        $this -> bot -> send_output($name, $msg, $channel);
+		return $msg;
         }
 
 	function set_now($name, $channel)

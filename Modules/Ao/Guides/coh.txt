@@ -31,7 +31,7 @@ parts of themselves, you'll understand later on in this guide).
 Here is a map to help you out a bit (be aware that some sections overlap): 
 
 URL For CoH map:
-http://ao-universe.com/website/images/guides/clao/153/crypt_of_home_map.jpg
+https://www.ao-universe.com/user/upload/knowledge/153/crypt_of_home_map.jpg
 
 Note: This is the most complicated map I have made so far, I recommend that 
 you be very aware of your location and which level you're in so that you 
