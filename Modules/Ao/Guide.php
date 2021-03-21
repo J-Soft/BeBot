@@ -45,9 +45,15 @@ class Guide extends BaseActiveModule
 		$this->register_module("guide");
         $this->register_command('all', 'guides', 'GUEST');
 		$this->register_command('all', 'guide', 'GUEST');
+		$this->register_command('all', 'doja', 'GUEST');
+		$this -> register_alias('doja', 'dojas');
+		$this->register_command('all', 'light', 'GUEST');
+		$this -> register_alias('light', 'lights');
 		$this -> help['description'] = "Display various minimal guides ingame.";
 		$this -> help['command']['guides'] = "Display a list of clickable ingame guides links.";
 		$this -> help['command']['guide <word>'] = "Display the guide named <word>.";
+		$this -> help['command']['doja'] = "Display a list of existing dojas.";
+		$this -> help['command']['light'] = "Display a list of lighting options.";
 		$this->register_command('all', 'aou', 'GUEST');
 		$this -> help['command']['aou <search|read> [keywords|id]'] = "AO Universe guide <search> for [keyword] or <read> [id]";
 		$this->bot->core("settings")->create("Guide", "RefSite", "Aoitems", "What site should be used for default items references ?", "Aoitems;Auno");
@@ -58,6 +64,10 @@ class Guide extends BaseActiveModule
 	{
 		if (preg_match("/^guides$/i", $msg))
 			return ($this->guide_list($origin, $name));
+		elseif (preg_match("/^doja$/i", $msg))
+			return $this -> guide_open($name, "guide doja", $origin);
+		elseif (preg_match("/^light$/i", $msg))
+			return $this -> guide_open($name, "guide light", $origin);			
 		elseif (preg_match("/^guide ([a-zA-Z0-9_-]+)$/i", $msg))
 			return $this -> guide_open($name, $msg, $origin);
 		elseif (preg_match("/guide/i", $msg))
