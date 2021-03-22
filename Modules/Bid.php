@@ -1,6 +1,6 @@
 <?php
 /*
-* Bid.php - Raid bidding.
+* Bid.php - Raid point bidding.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -14,7 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,7 @@ class Bid extends BaseActiveModule
     var $announce;
     var $announced;
     var $end;
+	var $history;
 
 
     /*
@@ -54,7 +55,9 @@ class Bid extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
+		$this -> register_module("bidding");
         $this->bid = "";
+		$this->history = array();
         $this->register_command('all', 'bid', 'MEMBER');
         $this->help['description'] = "Handles auctions using raid points";
         $this->help['command']['bid start <item>'] = "Starts an auction for <item>. <item> can be text or an item ref.";
@@ -64,9 +67,9 @@ class Bid extends BaseActiveModule
         $this->help['command']['bid [lock|unlock]'] = "Lock or Unlock the Current Auction to Raid users.";
         $this->help['command']['bid [history|list]'] = "Shows last 20 auctions or all since restart if less.";
         $this->bot->core("settings")
-            ->create("bid", "timer", 60, "How Long shold a Auction Last?");
+            ->create("bid", "timer", 60, "How Long in seconds should an Auction last?");
         $this->bot->core("settings")
-            ->create("bid", "raid_locked", false, "Should Auction be Locked to Users in Raid?");
+            ->create("bid", "raid_locked", false, "Should Auction be locked by default to users in raid?");
     }
 
 
@@ -85,7 +88,7 @@ class Bid extends BaseActiveModule
             case 'cancel':
                 Return $this->cancel($name);
             case 'lock':
-                Return $this->cancel($name, true);
+                Return $this->lock($name, true);
             case 'unlock':
                 Return $this->lock($name, false);
             case 'history':
@@ -240,6 +243,7 @@ class Bid extends BaseActiveModule
         }
         $highest = (($this->maxbid == $this->secondbid) ? ($this->maxbid) : ($this->secondbid + 1));
         if ($highest != $currenthigh) {
+			$obb = "";
             $secs = $this->end - time();
             if ($secs < 10) {
                 $secs = 10;
@@ -274,6 +278,7 @@ class Bid extends BaseActiveModule
             }
             if (empty($this->highestbidder)) {
                 $this->bot->send_output("", "Auction is over. No bids where placed. Item is FFA.", "both");
+				$this->bot->log("BID", "NOTICE", "Nobody has won bid on ".$this->bid." which became FFA.");
                 $this->history[] = array(
                     time(),
                     $this->bid,
@@ -287,10 +292,9 @@ class Bid extends BaseActiveModule
                     . "##end##. ##highlight##$highest##end## points are being deducted from this account.",
                     "both"
                 );
+				$this->bot->log("BID", "NOTICE", $this->highestbidder." has won bid on ".$this->bid." with ".$highest." points");
                 $this->bot->core("points")
                     ->rem_points($this->name, $this->highestbidder, $highest, "Auction: " . $this->bid, true);
-                //	$this -> bot -> db -> query("UPDATE #___raid_points SET points = points - " . $highest .
-                //	" WHERE id = " . $this -> points_to($this -> highestbidder));
                 $this->history[] = array(
                     time(),
                     $this->bid,
@@ -314,7 +318,7 @@ class Bid extends BaseActiveModule
         $inside .= "##blob_text##/tell <botname> <pre>bid &lt;points&gt;##end##\n";
         $inside .= "(Replace &lt;points&gt; with the number of points you would like to bid)\n\n";
         $inside .= "First you may place your bids as stated above.\n";
-        $inside .= "The auction ends after 60 seconds or 10 seconds after the last bid was placed. So you always have some time to outbid ";
+        $inside .= "The auction ends after ".$this->bot->core("settings")->get("Bid", "timer")." seconds or 10 seconds after the last bid was placed. So you always have some time to outbid ";
         $inside .= "but please try to bid the highest you're willing to pay right from the start to not make auctions last too long.\n\n";
         $inside .= "Highest bids work kindof like ebay:\n";
         $inside .= "You bid a maximum ammount, but the amount you acutally pay is the second highest bid + 1 point.\n";
@@ -325,7 +329,7 @@ class Bid extends BaseActiveModule
         $inside .= "to correct later on.\n";
         $this->bot->send_tell(
             $name,
-            "Infomation about bidding :: " . $this->bot
+            "Information about bidding :: " . $this->bot
                 ->core("tools")->make_blob("click for info", $inside)
         );
     }
@@ -339,40 +343,26 @@ class Bid extends BaseActiveModule
         $inside = "##blob_title##::::: Auction :::::##end##\n\n";
         $inside .= "##darkorange##" . $this->highestbidder . "##end## Leading bid" . "##highlight## [ " . $this->maxbid . " ]##end##" . " for = [ " . $this->bid . " ]" . "\n\n";
         $ammounts = array(
-            2,
-            10,
-            20,
-            50,
-            70,
+            1,2,5,10,25,50,75,
             "nl",
-            100,
-            150,
-            170,
-            200,
-            300,
+            100,200,300,400,500,600,
             "nl",
-            400,
-            500,
-            600,
-            700,
-            1000
+            700,800,900,1000,1500,2000
         );
         $highest = (($this->maxbid == $this->secondbid) ? ($this->maxbid) : ($this->secondbid + 1));
         foreach ($ammounts as $am) {
             if ($am == "nl") {
                 $inside .= "\n";
-            } elseif ($am < $highest) {
-                $inside .= "[ Bid 2 ] | ";
             } else {
                 $inside .= $this->bot->core("tools")
-                        ->chatcmd("bid 2", "[ Bid 2 ]") . " | ";
+                        ->chatcmd("bid ".$am, "[".$am."]") . " | ";
             }
         }
         $inside = substr($inside, 0, -3);
         $inside .= "\n\n";
         $inside .= $this->bot->core("tools")
                 ->chatcmd("points", ":: <font color=#99CC00>Check your points##end## ::") . "\n\n";
-        $inside .= "To place a bid write:\n";
+        $inside .= "To place a bid click an upper link or do:\n";
         $inside .= "##highlight##/tell <botname> <pre>bid &lt;points&gt;##end##\n";
         $inside .= "(Replace &lt;points&gt; with the number of points you would like to bid)\n";
         Return $this->bot->core("tools")

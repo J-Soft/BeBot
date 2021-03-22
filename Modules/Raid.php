@@ -1075,10 +1075,12 @@ class Raid extends BaseActiveModule
                 );
                 if (!empty($users)) {
                     //$inside = " :: $points Given to all Raiders ::\n\n";
+					$count = 0;
                     foreach ($users as $user) {
                         $count++;
-                        $user = $user[0];
-                        $this->points[$user] += $points;
+                        $user = $user[0];			
+						if(isset($this->points[$user])) $this->points[$user] += $points;
+						else $this->points[$user] = $points;					
                         $userp = isset($this->points[$user]) ? $this->points[$user] : 0;
                         $this->bot->db->query(
                             "INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points + "
