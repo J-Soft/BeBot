@@ -81,6 +81,8 @@ class OnlineOrg extends BaseActiveModule
 	{
 		if (preg_match("/^orglist ([0-9]+)$/i", $msg, $match))
 			return $this -> main($name, $match[1], $origin);
+		elseif (preg_match("/^orglist ([A-Za-z0-9-]+)$/i", $msg, $match))
+			return $this -> character($name, $match[1], $origin);		
 		elseif (preg_match("/olpurge/i", $msg))	
 			return $this -> purge_cache();
 		elseif (preg_match("/olcache/i", $msg))	
@@ -91,6 +93,23 @@ class OnlineOrg extends BaseActiveModule
 			$this -> bot -> send_help($name);
 		else
 			return ("##error##Error : Broken Orgs plugin, received unhandled command: ".$msg."##end##");
+	}	
+	
+	function character($name,$charname,$origin)
+	{
+		if ($this -> debug) echo "verif charname\n";
+        if ($this->bot->core('player')->id($charname) instanceof BotError) {
+            return "##error##Character ##highlight##$charname##end## does not exist.##end##";
+        }
+		else
+		{
+			$whois = $this->bot->core("whois")->lookup($charname);
+			if(isset($whois['org_id']) && is_numeric($whois['org_id']) && $whois['org_id']>0) {
+				$this->main($name,$whois['org_id'],$origin);
+			} else {
+				return "##error##Character ##highlight##$name##end## org not found.##end##";
+			}			
+		}
 	}	
 	
 	function main($name,$id,$origin)
