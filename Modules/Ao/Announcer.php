@@ -1,8 +1,8 @@
 <?php
 /* Announcer.php
 * From work by Doctorhyde@RK5, Alreadythere@RK2
-* To use this module : log your bebot character in client/chat and register to the wanted botnet
-* Then start bot after editing few parameters below in 2 EDITABLE zones, according to your needs
+* To use this module : edit few parameters below in 2 EDITABLE zones, according to your needs
+* Then start bot, setup parameters & do !register to join the target Botnet + start relaying
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -45,7 +45,9 @@ class Announcer extends BaseActiveModule
 		parent::__construct($bot, get_class($this));
 		
 		$this->register_event("tells");
-
+		$this->register_command('all', 'register', 'SUPERADMIN');
+		$this->register_command('all', 'unregister', 'SUPERADMIN');
+		
 		$this -> bot -> core("colors") -> define_scheme("Announcer", "botname", "bluesilver");
 		$this -> bot -> core("colors") -> define_scheme("Announcer", "sender", "bluegray");
 		$this -> bot -> core("colors") -> define_scheme("Announcer", "type", "brightgreen");
@@ -57,8 +59,33 @@ class Announcer extends BaseActiveModule
 		
 	}
 
-	function command_handler($name, $msg, $origin) {}
+	function command_handler($name, $msg, $origin) {
+		if (preg_match("/^register$/i", $msg))
+			return $this->register($name, $origin);
+		elseif (preg_match("/^unregister$/i", $msg))
+			return $this->unregister($name, $origin);
+	}
 
+	function register($name, $origin) {
+		$main = $this->bot->core("settings")->get("Announcer", "BotName");
+        if (!$this->bot->core('player')->id($main) instanceof BotError) {
+			$this->bot->send_tell($main, "register", 1, false);
+            return "Register command sent to ##highlight##$main##end##";
+        } else {
+			return "##error##Character ##highlight##$main##end## does not exist.##end##";
+		}
+	}
+
+	function unregister($name, $origin) {
+		$main = $this->bot->core("settings")->get("Announcer", "BotName");
+        if (!$this->bot->core('player')->id($main) instanceof BotError) {
+			$this->bot->send_tell($main, "unregister", 1, false);
+            return "Unregister command sent to ##highlight##$main##end##";
+        } else {
+			return "##error##Character ##highlight##$main##end## does not exist.##end##";
+		}
+	}	
+	
         function tells($name, $relay_message) {
 		
 		if (!$this->bot->core("settings")->get("Announcer", "OrgOn") && !$this->bot->core("settings")->get("Announcer", "PrivOn")) {
@@ -80,7 +107,7 @@ class Announcer extends BaseActiveModule
 
 		if (in_array($name,$announcers))
         {
-
+			$relay_Sender = "";
 			$font_pattern = '/\<([\/]*)font([^\>]*)\>/';
 			$relay_message = preg_replace($font_pattern,'',$relay_message);
 
