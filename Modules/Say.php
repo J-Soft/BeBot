@@ -49,16 +49,18 @@ class Say extends BaseActiveModule
         // Setup Access Control
         $this->register_command("all", "say", "ADMIN");
         $this->register_command("all", "whosaidthat", "MEMBER");
+		$this->register_command("all", "sendtell", "ADMIN");
         $this->bot->core("settings")
             ->create(
                 "Say",
                 "OutputChannel",
                 "both",
-                "Into which channel should the output of say be sent? Either gc, pgmsg, both or original channel.",
+                "Into which channel should the output of !say be sent? Either gc, pgmsg, both or original channel.",
                 "gc;pgmsg;both;origin"
             );
         $this->help['description'] = 'Makes the bot say things.';
-        $this->help['command']['say something'] = "Makes that bot say 'something'";
+        $this->help['command']['say something'] = "Makes that bot say 'something' in org/private channel.";
+		$this->help['command']['sendtell someone something'] = "Makes that bot send 'something' in /tell to someone.";
         $this->help['command']['whosaidthat'] = "Find out who made the bot say that.";
     }
 
@@ -89,6 +91,8 @@ class Say extends BaseActiveModule
                     );
                 }
                 return false;
+			case "sendtell":
+				return $this->sendtell($name, $args['args']);
             case "whosaidthat":
                 return $this->whosaidthat();
         }
@@ -103,7 +107,29 @@ class Say extends BaseActiveModule
         $this->whosaidthat['what'] = $message;
         return $message;
     }
-
+	
+    function sendtell($name, $message)
+    {
+        if(isset($message) && $message!="") {
+			$args = explode(' ',$message, 2);
+			if($this->bot->core("whois")->lookup($args[0]) instanceof BotError) {
+				return "Player ".$args[0]." does not exist";
+			} elseif(strtolower($name)==strtolower($args[0])) {
+				return "No use to send a tell to yourself";
+			} elseif(isset($args[1]) && $args[1]!="") {
+				$this->whosaidthat['time'] = time();
+				$this->whosaidthat['name'] = $name;
+				$this->whosaidthat['what'] = $message;					
+				$this->bot->send_tell($args[0],$args[1]);
+				return "Message sent to ".$args[0];							
+			} else {
+				return "Can't send empty message";
+			}
+		} else {
+			return "Please provide player & message";
+		}
+        return $message;
+    }	
 
     function whosaidthat()
     {
