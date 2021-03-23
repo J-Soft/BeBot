@@ -66,14 +66,14 @@ class Points extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Points", "Transfer", false, "Can points be transfered?");
         $this->bot->core("settings")
-            ->create("Points", "To_Main", false, "Are points shared over all alts?");
+            ->create("Points", "To_Main", false, "Are points shared over all alts (hidden) ?", null, true);
         $this->help['description'] = 'Manage raid points';
         $this->help['command']['points [name]'] = "Shows the amount of points in [name]s account. If [name] is not given it shows the points in your account";
         $this->help['command']['points give <name> <points>'] = "Gives <points> points to player <name>";
         $this->help['command']['points add <name> <points> <why>'] = "Adds <points> points to player <name>s point account";
         $this->help['command']['points [del/rem] <name> <points> <why>'] = "Removes <points> points from player <name>s point account";
         $this->help['command']['points transfer <(on|off)>'] = "Turns ability to give points on or off.";
-        $this->help['command']['points tomain <(on|off)>'] = "Turns ability to give points from alts to main on (turns alt confirmation on also) or off.";
+        $this->help['command']['points tomain <(on|off)>'] = "Turns ability to concentrate points at main on (which turns alt confirmation on also) or off.";
         $this->help['command']['points all'] = "Shows all players points for admin.";
         $this->help['command']['points top'] = "Shows the 25 biggest point accounts.";
 		$this->help['command']['points log'] = "Shows your character points log.";
@@ -97,7 +97,7 @@ class Points extends BaseActiveModule
     function update_table()
     {
 		$updatepoints = false;
-        if ($this->bot->db->get_version("raid_points") == 4) {
+        if ($this->bot->db->get_version("raid_points") == 5) {
             return;
         }
         switch ($this->bot->db->get_version("raid_points")) {
@@ -152,9 +152,14 @@ class Points extends BaseActiveModule
                     "add",
                     "ALTER TABLE #___raid_points ADD raidingas VARCHAR(20) DEFAULT '' after raiding"
                 );
+			case 4:
+				$this->bot->db->query(
+					"UPDATE #___settings
+		            SET hidden = 1 WHERE setting = 'To_Main' "
+				);
             default:
         }
-        $this->bot->db->set_version("raid_points", 4);
+        $this->bot->db->set_version("raid_points", 5);
     }
 
 
@@ -483,12 +488,26 @@ class Points extends BaseActiveModule
             $result = $this->bot->db->select(
                 "SELECT points FROM #___raid_points WHERE id = " . $this->points_to($name)
             );
+			
+			if($this->bot->core("settings")->get("Points", "To_Main")) {
+				$self = false;
+				$main = $this->points_to_name($who);
+				if($name==$main) $self = true;
+				$alts = $this->bot->core("alts")->get_alts($main);
+				foreach($alts AS $alt) {
+					if($name==$alt) $self = true;
+				}
+				if($self) {
+					$this->bot->send_tell($name, "No use to send points to yourself!");
+					return;
+				}
+			}
             if (!$result) {
                 $this->bot->send_tell($name, "You have no points.");
                 return;
             }
             if ($num > ($result[0][0])) {
-                $this->bot->send_tell($name, "You only have ##highlight''" . ($result[0][0]) . "##end## raid points.");
+                $this->bot->send_tell($name, "You don't have that much points.");
                 return;
             } else {
                 if ($this->bot->core('player')->id($who) instanceof BotError) {
