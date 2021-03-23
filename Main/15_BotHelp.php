@@ -197,7 +197,7 @@ class BotHelp_Core extends BaseActiveModule
         $window = "##blob_title## ::::: HELP ON " . strtoupper($command) . " :::::##end##<br><br>";
         if (isset($com->help)) {
             $help = $com->help;
-            $window .= '##highlight##' . $help['description'] . '##end##<br><br>';
+            if(isset($help['description'])) $window .= '##highlight##' . $help['description'] . '##end##<br><br>';
             $module_commands = array();
             foreach ($help['command'] as $key => $value) {
                 // Only show help for the specific command, not all help for module!
