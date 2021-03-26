@@ -48,7 +48,7 @@ class tokens extends BaseActiveModule
         $this->help['command']['tokens <target/current> <target/current>']
             = "Calculates the amount of tokens, token bags or VP tokens (and price) based on your current level, <target> and <current> tokens";
         $this->help['command']['tokens <level > <target/current> <target/current>']
-            = "Calculates the amount of tokens, token bags or VP tokens (and price) based on your <level>, <target> and <current> tokens";
+            = "Calculates the amount of tokens, token bags or VP tokens (and price) based on given <level>, <target> and <current> tokens";
     }
 
 
@@ -79,7 +79,7 @@ class tokens extends BaseActiveModule
                                 $clan = true;
                             }
                         }
-                        $return = $this->ShowTokens($level, $vars[1], $vars[2], $clan);
+                        return $this->ShowTokens($level, $vars[1], $vars[2], $clan);
                     }
                 } else {
                     if ($count == 4) {
@@ -93,7 +93,7 @@ class tokens extends BaseActiveModule
                                     $clan = true;
                                 }
                             }
-                            $return = $this->ShowTokens($vars[1], $vars[2], $vars[3], $clan);
+                            return $this->ShowTokens($vars[1], $vars[2], $vars[3], $clan);
                         }
                     } else {
                         if ($count == 1) {
@@ -197,8 +197,8 @@ class tokens extends BaseActiveModule
         $inside = "##normal##::: ##highlight##Token calculator results##end## :::\n\n";
         $inside .= "::: ##highlight##Your status##end## :::\n";
         $inside .= "Your level: ##highlight##" . $level . "##end##\n";
-        $inside .= "Current # of tokens: ##highlight##" . number_format($current) . "##end##\n";
-        $inside .= "Goal # of Tokens: ##highlight##" . number_format($goal) . "##end##\n";
+        $inside .= "Current n. of tokens: ##highlight##" . number_format($current) . "##end##\n";
+        $inside .= "Goal n. of Tokens: ##highlight##" . number_format($goal) . "##end##\n";
         $inside .= "Tokens needed: ##highlight##" . number_format($need) . "##end##\n";
         $inside .= "Tokens per token disk: ##highlight##" . number_format($tpl) . "##end##\n\n";
         $inside .= "::: ##highlight## Your Calculated Token Options##end## :::\n";

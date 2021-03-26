@@ -46,14 +46,12 @@ class Twink extends BaseActiveModule
 	{
 		parent::__construct($bot, get_class($this));
 
-		$this -> register_command("all", "whatbuffs", "GUEST");
 		$this -> register_command("all", "buffitem", "GUEST");
 		$this -> register_command("all", "clustloc", "GUEST");
 		$this -> register_command("all", "impql", "GUEST");
 		$this -> register_alias("impql", "implant");
 		$this -> register_command("all", "impreq", "GUEST");
 		$this -> help['description'] = 'Helps you to twink.';
-        	$this -> help['command']['whatbuffs <skill>']="Shows the usual twink items for a skill.";
         	$this -> help['command']['buffitem <item>']="Shows the twink items details.";
         	$this -> help['command']['clustloc <skill>']="Shows the location of a cluster.";
         	$this -> help['command']['impql <QL>']="Shows the implant requirement at given QL (RK & SL considered).";
@@ -387,15 +385,13 @@ $this->cl_list = array(
 
 	function command_handler($sender, $msg, $channel)
 	{
-		if (preg_match("/^whatbuffs (.+)/i", $msg, $arr))
-			return $this -> find_what($sender, $arr, $channel);
-         	elseif (preg_match("/^buffitem (.+)/i", $msg, $arr))
+		if (preg_match("/^buffitem (.+)/i", $msg, $arr))
 			return $this -> show_what($sender, $arr, $channel);
-         	elseif (preg_match("/^clustloc (.+)/i", $msg, $arr))
+        elseif (preg_match("/^clustloc (.+)/i", $msg, $arr))
 			return $this -> find_clust($sender, $arr, $channel);
-         	elseif (preg_match("/^impreq ([0-9]+) ([0-9]+)/i", $msg, $arr))
+        elseif (preg_match("/^impreq ([0-9]+) ([0-9]+)/i", $msg, $arr))
 			return $this -> imp_req($sender, $arr, $channel);
-         	elseif (preg_match("/^impql ([0-9]+)/i", $msg, $arr))
+         elseif (preg_match("/^impql ([0-9]+)/i", $msg, $arr))
 			return $this -> imp_ql($sender, $arr, $channel);
 	}
 
@@ -464,59 +460,6 @@ $this->cl_list = array(
 			$unique = ($count == 1 ? true : false);
 			return $unique;
 		}
-
-	function find_what($sender, $arr, $channel)
-	{
-	$header = "<header>::::: Twink info :::::<end>\n\n";
-	$footer = "by Imoutochan, RK1";
-		$name = trim($arr[1]);
-		// check if key words are unambiguous
-		$skills = array();
-		$results = array();
-		foreach ($this->skill_list as $skill) {
-			if ($this -> matches($skill, $name)) {
-				array_unshift($skills, $skill);
-			}
-		}
-
-		switch (sizeof($skills)) {
-			case 0: $this -> bot -> send_output($sender, "There is no such skill, or at least no twink relevant skill going by that name.", $channel);
-					return;
-			case 1: $info = "";										// exactly one matching skill
-					$found = 0;
-					foreach ($this->buffitems as $key => $item_info) {
-						if ($this -> contains($item_info, $skills[0])) {
-							$found++;
-							$info .= "- <a href='chatcmd:///tell ".$this->bot->botname ." buffitem $key'>$key</a>\n";
-	  					}
-					}
-					if ($found > 0) {								// found items that modify this skill
-						$inside = $header;
-						$inside .= "Your query of $name yielded the following results:\n\n";
-						$inside .= "Items that buff ".$skills[0].":\n\n";
-						$inside .= $info;
-						$inside .= "\n\nClick the item(s) for more info\n\n".$footer;
-						$windowlink = $this -> bot -> core("tools") -> make_blob("Your What buffs results", $inside);
-                                                $this -> bot -> send_output($sender, $windowlink, $channel);
-						return;
-					} else {
-                                                $this -> bot -> send_output($sender, "Nothing found in my database, sorry.", $channel);
-                                                return;
-					}
-			default: $info = ""; 									// found more than 1 matching skill
-					foreach ($skills as $skill) {
-						$info .= "- <a href='chatcmd:///tell ".$this->bot->botname ." whatbuffs ".$skill."'>$skill</a>\n";
-					}
-					$inside = $header;
-					$inside .= "Your query of $name matches more than one skill:\n\n";
-					$inside .= $info."\n";
-					$inside .= "Which of those skills did you mean?\n\n";
-					$inside .= $footer;
-					$windowlink = $this -> bot -> core("tools") -> make_blob("Your What buffs results", $inside);
-                                        $this -> bot -> send_output($sender, $windowlink, $channel);
-					return;
-		}
-        }
 
 	function show_what($sender, $arr, $channel)
 	{

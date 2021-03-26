@@ -126,6 +126,7 @@ class Orgs extends BaseActiveModule
 
 	function get_orgs_letter()
 	{
+		$this->geterror = false;
 		if ($this->debug) echo " letter ";
 		$letter = $this->letters[$this->next];
 		if ($this->debug) echo " (".$letter.") ";
@@ -154,7 +155,6 @@ class Orgs extends BaseActiveModule
 			$this->geterror = true;
 		} elseif (!empty($result)) {
 			if ($this->debug) echo " results ";
-			$this->geterror = false;
 			$updatetime = time();
 			foreach ($result as $ID => $org)
 			{

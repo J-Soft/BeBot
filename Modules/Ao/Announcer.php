@@ -53,6 +53,10 @@ class Announcer extends BaseActiveModule
 		$this -> bot -> core("colors") -> define_scheme("Announcer", "type", "brightgreen");
 		$this -> bot -> core("colors") -> define_scheme("Announcer", "text", "lightyellow");
 		
+		$this -> help['description'] = 'Allows to register/unregister from configured BotNet.';
+		$this -> help['command']['register']="Registers your bot into configured BotNet.";
+		$this -> help['command']['unregister']="Unregisters your bot from configured BotNet.";
+		
 		$this->bot->core("settings")->create("Announcer", "OrgOn", false, "Should the bot be relaying from Botnet to guild channel ?", "On;Off");
 		$this->bot->core("settings")->create("Announcer", "PrivOn", false, "Should the bot be relaying from Botnet to private channel ?", "On;Off");
 		$this->bot->core("settings")->create("Announcer", "BotName", "Darknet", "What's the Botnet main BotName (Darknet by default) ?", "Darknet");

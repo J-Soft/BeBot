@@ -242,7 +242,7 @@ class Dyna extends BaseActiveModule
 		}				
 		foreach($dynas as $dyna) {
 			if($lvl>=$dyna[3] && $lvl<=$dyna[4]) {
-					$waypoint = $this->bot->core("tools")->chatcmd("waypoint ".$dyna[5]." ".$dyna[6]." ".$dyna[0], "Click for waypoint");
+					$waypoint = $this->bot->core("tools")->chatcmd($dyna[5]." ".$dyna[6]." ".$dyna[0], "Click for waypoint", "waypoint");
 					$blob .= $dyna[1]." : ".$dyna[3]."-".$dyna[4]." ".$dyna[2]." ".$waypoint."\n";
 					$all++;
 			}

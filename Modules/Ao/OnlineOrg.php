@@ -127,7 +127,6 @@ class OnlineOrg extends BaseActiveModule
 		$this->bot->send_output($name, "First loading Org list member(s) ...", $origin);
 		$list = $this -> get_list();
 		if($list) {
-			$this->bot->send_output($name, "Now checking Org list known on/off ...", $origin);
 			$check = $this->check_list();
 			if(!$check) {
 				Return "Error, couldn't check for online presence among generated list!";
@@ -459,7 +458,6 @@ class OnlineOrg extends BaseActiveModule
 
 	function online_list($name,$origin)
 	{
-		$this->bot->send_output($name, "Generating Org list on/off results ...", $origin);
 		$sortby = $this->bot->core("settings")->get("OnlineOrg","SortBy");
 		if ($this -> debug) echo "online_list (s.by: ".$sortby.")\n";
 		

@@ -45,8 +45,8 @@ class Ofab extends BaseActiveModule
 		$this -> register_command("all", "ofabarmor", "MEMBER");
 		$this -> register_alias("ofabarmor", "ofabarmors");
 		$this -> help['description'] = "Gives information about Ofab content.";
-		$this -> help['command']['ofabweapon <QL>'] = "Show Ofab weapons of given QL.";
-		$this -> help['command']['ofabarmor <QL> <profession>'] = "Show Ofab armor of given profession.";
+		$this -> help['command']['ofabweapon <QL>'] = "Show Ofab weapons of given QL (must be a multiple of 25).";
+		$this -> help['command']['ofabarmor <QL> <profession>'] = "Show Ofab armor of given QL (must be a multiple of 25) and profession.";
 	}
 	
 	function command_handler($source, $msg, $origin)
@@ -67,7 +67,7 @@ class Ofab extends BaseActiveModule
 				}
 				else
 				{
-					$this -> error -> set("You have to submit an available QL and an existing profession.");
+					$this -> error -> set("You have to submit an available QL (multiple of 25)and an existing profession.");
 					return($this->error->message());
 					break;
 				}
@@ -79,7 +79,7 @@ class Ofab extends BaseActiveModule
 				}
 				else
 				{
-					$this -> error -> set("You have to submit an available weapon QL.");
+					$this -> error -> set("You have to submit an available weapon QL. Must be a multiple of 25.");
 					return($this->error->message());
 					break;
 				}				
@@ -504,7 +504,7 @@ class Ofab extends BaseActiveModule
 		$types[] = array(935, "Fixer");
 		$types[] = array(935, "Shade");		
 		
-		$blob = "No armor of that QL was found for this profession.";
+		$blob = "No armor of that QL was found for this profession. Must be a multiple of 25.";
 		$upg = "";
 		foreach($types AS $type) {
 			if($type[1]==$profname) {
@@ -554,7 +554,7 @@ class Ofab extends BaseActiveModule
 		$costs[] = array(275, 13665);
 		$costs[] = array(300, 18000);
 		
-		$blob = "No weapon of that QL was found.";
+		$blob = "No weapon of that QL was found. Must be a multiple of 25.";
 		$price = "";
 		$upg = "";
 		foreach($costs AS $cost) {
