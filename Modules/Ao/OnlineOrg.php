@@ -550,7 +550,7 @@ class OnlineOrg extends BaseActiveModule
 				}
 			}
 			
-			$sent = $oncount." online among ".$faction." '".$orgname."' ".$orgcount." member(s) sorted by ".$sortby.": ".$this->bot->core("tools")->make_blob("Click to view", $blob);
+			$sent = $oncount." online among ".$faction." '".htmlentities($orgname)."' ".$orgcount." member(s) sorted by ".$sortby.": ".$this->bot->core("tools")->make_blob("Click to view", $blob);
 			$this->bot->send_output($name, $sent, $origin);
 			
 		} else {
