@@ -102,7 +102,8 @@ class Taraviza extends BaseActiveModule
 				$text = "Alert : Tarasque should pop in ".$tt." minutes !";
 				if($ta=='Both'||$ta=='Guildchat') {
 					$this->bot->send_gc($text);
-				} elseif($ta=='Both'||$ta=='Private') {
+				}
+				if($ta=='Both'||$ta=='Private') {
 					$this->bot->send_pgroup($text);
 				}
 			}
@@ -115,7 +116,8 @@ class Taraviza extends BaseActiveModule
 				$text = "Alert : Gauntlet should start in ".$vt." minutes !";
 				if($va=='Both'||$va=='Guildchat') {
 					$this->bot->send_gc($text);
-				} elseif($va=='Both'||$va=='Private') {
+				}
+				if($va=='Both'||$va=='Private') {
 					$this->bot->send_pgroup($text);
 				}
 			}
