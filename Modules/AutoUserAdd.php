@@ -49,9 +49,11 @@ class AutoUserAdd extends BasePassiveModule
 		if(strtolower($this->bot->game)=='ao') $this->register_event("pgjoin");
         $this->register_module("autouseradd");
         $this->bot->core("settings")
-            ->create("Autouseradd", "Enabled", true, "Should users be added to the Bot?");
+            ->create("Autouseradd", "Enabled", true, "Should Ao/Aoc bot users be added to the Bot?");
         $this->bot->core("settings")
-            ->create("Autouseradd", "Notify", true, "Should the User be Notified that he was added to the Bot?");
+            ->create("Autouseradd", "Private", false, "Should Ao private channel be included in user detection?");
+        $this->bot->core("settings")
+            ->create("Autouseradd", "Notify", false, "Should the User be Notified that he was added to the Bot?");
         // Fill checked array with current members, we won't need to readd them:
         $this->checked = array();
         $mems = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level = 2", MYSQLI_ASSOC);
@@ -69,8 +71,10 @@ class AutoUserAdd extends BasePassiveModule
 
 	
 	function pgjoin($name)
-    {	
-		$this->gmsg($name,"private","join");
+    {
+		if($this->bot->core("settings")->get("Autouseradd", "Private")) {
+			$this->gmsg($name,"private","join");
+		}
 	}	
 	
 	
