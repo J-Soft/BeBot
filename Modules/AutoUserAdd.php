@@ -46,6 +46,7 @@ class AutoUserAdd extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->register_event("gmsg", "org");
+		if(strtolower($this->bot->game)=='ao') $this->register_event("pgjoin");
         $this->register_module("autouseradd");
         $this->bot->core("settings")
             ->create("Autouseradd", "Enabled", true, "Should users be added to the Bot?");
@@ -60,14 +61,19 @@ class AutoUserAdd extends BasePassiveModule
             }
         }
     }
-
-
+	
     function register(&$module)
     {
         $this->hooks[] = & $module;
     }
 
-
+	
+	function pgjoin($name)
+    {	
+		$this->gmsg($name,"private","join");
+	}	
+	
+	
     function gmsg($name, $group, $msg)
     {
         if (!$this->bot->core("settings")->get("Autouseradd", "Enabled")) {

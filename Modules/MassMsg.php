@@ -1,7 +1,7 @@
 <?php
 /*
 * MassMsg.php - Sends out mass messages and invites.
-*
+* Improved by Bitnykk with great help from Tyrence
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
 * Copyright (C) 2005-2020 J-Soft and the BeBot development team.
@@ -169,7 +169,8 @@ class MassMsg extends BaseActiveModule
                     $status[$recipient]['sent'] = false;
                     $status[$recipient]['pg'] = true;
                 } else {
-                    $this->bot->send_tell($recipient, $message, 0, false, true, false);
+					if(strtolower($this->bot->game)=='ao'&&$this->bot->port>9000) $this->bot->aoc->send_tell($recipient, $message, "spam");
+                    else $this->bot->send_tell($recipient, $message, 1, false, true, false);					
                     $status[$recipient]['sent'] = true;
                 }
             } else {
@@ -184,7 +185,8 @@ class MassMsg extends BaseActiveModule
                     } else {
                         //Check if they've already gotten the tell so we don't spam unneccessarily.
                         if (!$status[$recipient]['sent']) {
-                            $this->bot->send_tell($recipient, $message, 0, false, true, false);
+							if(strtolower($this->bot->game)=='ao'&&$this->bot->port>9000) $this->bot->aoc->send_tell($recipient, $message, "spam");
+                            else $this->bot->send_tell($recipient, $message, 1, false, true, false);
                             $status[$recipient]['sent'] = true;
                         }
                         if ($this->bot->core("queue")->check_queue("invite")) {
