@@ -12,7 +12,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,6 @@
 * Improved by Temar
 * This module automatically adds new users it sees chat on the guildchat to the user database.
 *
-*
 */
 $AutoUserAdd = new AutoUserAdd($bot);
 class AutoUserAdd extends BasePassiveModule
@@ -45,6 +44,7 @@ class AutoUserAdd extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
+		$this->register_module("autouseradd");
         $this->register_event("gmsg", "org");
 		if(strtolower($this->bot->game)=='ao') $this->register_event("pgjoin");
         $this->register_module("autouseradd");
