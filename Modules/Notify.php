@@ -114,7 +114,7 @@ class Notify extends BaseActiveModule
         $other = "##blob_title## ::: All others on notify for " . $this->bot->botname . " ::: ##end##\n";
         foreach ($notlist as $notuser) {
             $blob = "\n&#8226; " . $notuser[0] . " " . $this->bot->core("tools")
-                    ->chatcmd("notify off " . $notuser[0], "[Remove]");
+                    ->chatcmd("notify off " . $notuser[0], "[x]");
             $blob = $this->bot->core("colors")->colorize("blob_text", $blob);
             if ($notuser[1] >= 2) {
                 $member .= $blob;
