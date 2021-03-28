@@ -47,7 +47,7 @@ class MassMsg extends BaseActiveModule
         $this->help['command']['announce <message>'] = "Sends out announcement <message> as tells to all online members.";
         $this->help['command']['massinv <message>'] = "Sends out announcement <message> as tells to all online members and invites them to the private group.";
         $this->bot->core("settings")
-            ->create('MassMsg', 'MassMsg', 'Both', 'Who should get mass messages and invites?', 'Guild;Private;Both');
+            ->create('MassMsg', 'MassMsg', 'Both', 'Who should get mass messages and invites?', 'Guild;Private;Both;Online');
         $this->bot->core("settings")
             ->create(
                 'MassMsg',
@@ -108,6 +108,7 @@ class MassMsg extends BaseActiveModule
     function mass_msg($sender, $msg, $type)
     {
         //get a list of online users in the configured channel.
+		$status = array();
         $users = $this->bot->core('online')->list_users(
             $this->bot
                 ->core('settings')->get('MassMsg', 'MassMsg')
@@ -115,6 +116,14 @@ class MassMsg extends BaseActiveModule
         if ($users instanceof BotError) {
             return ($users);
         }
+		if($this->bot->core('settings')->get('MassMsg', 'MassMsg')=='Online') {
+			foreach ($users as $num => $recipient) {
+				$check = $this->bot->core("online")->get_online_state($recipient);
+				if($check['status']==0) {
+					unset($users[$num]);
+				}
+			}
+		}
         $msg = "##massmsg_type##$type from##end## ##highlight##$sender##end##: ##massmsg_msg##$msg##end##";
         $msg = $this->bot->core("colors")->parse($msg);
         $inchattell = $this->bot->core('settings')
@@ -208,6 +217,7 @@ class MassMsg extends BaseActiveModule
 
     function make_status_blob($status_array)
     {
+		if(!is_array($status_array)||count($status_array)==0) return "Found no member to send message to.";
         $window = "<center>##blob_title##::: Status report for mass message :::##end##</center>\n";
         foreach ($status_array as $recipient => $status) {
             $window .= "\n##highlight##$recipient##end## - Message: ";
