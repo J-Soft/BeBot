@@ -88,17 +88,17 @@ class BanManager extends BaseActiveModule
     {
         if (preg_match("/^ban$/i", $msg) || preg_match("/^ban list$/i", $msg)) {
             return $this->show_ban_list();
-        } elseif (preg_match("/^ban add ([a-z0-9]+) ([0-9]+[mhd]?)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban add ([a-z0-9-]+) ([0-9]+[mhd]?)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], $info[2], "");
-        } elseif (preg_match("/^ban add ([a-z0-9]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban add ([a-z0-9-]+)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], "0", "");
-        } elseif (preg_match("/^ban add ([a-z0-9]+) ([0-9]+[mhd]?) (.+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban add ([a-z0-9-]+) ([0-9]+[mhd]?) (.+)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], $info[2], $info[3]);
-        } elseif (preg_match("/^ban add ([a-z0-9]+) (.+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban add ([a-z0-9-]+) (.+)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], "0", $info[2]);
-        } elseif (preg_match("/^ban del ([a-z0-9]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban del ([a-z0-9-]+)$/i", $msg, $info)) {
             return $this->del_ban($name, $info[1]);
-        } elseif (preg_match("/^ban rem ([a-z0-9]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban rem ([a-z0-9-]+)$/i", $msg, $info)) {
             return $this->del_ban($name, $info[1]);
         }
         return $this->bot->send_help($name, "ban");
