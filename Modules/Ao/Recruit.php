@@ -212,7 +212,15 @@ class Recruit extends BaseActiveModule
 					break;					
 			}
 			$msg = $this->bot->core("settings")->get("Recruit","GuildName")." is recruiting ... ";
-			$blob = "<a href=\"text://To initiate recruitment process: <a href='chatcmd:///tell ".$this->bot->botname." recruit'>Start application</a><br><br>\">Click this!</a>";
+			$blob = "";
+			if (file_exists("./Text/" . $this->bot->botname . "Recruit.txt")) { // custom
+				$blob .= implode("", file("./Text/" . $this->bot->botname . "Rules.txt"));
+			} elseif (file_exists("./Text/Rules.txt")) {
+				$blob .= implode("", file("./Text/Recruit.txt"));
+			}
+			if($blob=="") { // default
+				$blob = "<a href=\"text://To initiate recruitment process: <a href='chatcmd:///tell ".$this->bot->botname." recruit'>Start application</a><br><br>\">Click this!</a>";
+			}
 			$this -> bot -> aoc -> send_group($channel,utf8_encode($msg.$blob));
 			$this->bot->log("RECRUIT", "NOTICE", "Sent recruit message on ".$channel);
 		}

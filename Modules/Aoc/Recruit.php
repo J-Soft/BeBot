@@ -48,14 +48,12 @@ class Recruit extends BaseActiveModule
 
 		$this -> register_command('tell', 'recruit', 'ANONYMOUS');
 		$this -> help['description'] = 'Allows a person to send a tell to the bot to start the recruitment process. Uses the !news system to warn offline officers.';
-		//$this -> register_event("cron", "19min");
+		
 		$this -> bot -> core("settings") -> create("Recruit", "GuildName", "", "Guild Name to use for all messages (tells, public, etc).");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer1", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer2", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficerNo", 2, "Last Officer slot used");
-		//$this -> bot -> core("settings") -> create("Recruit", "SpamPublic", false, "Should the bot be spamming a public channel every 20 minutes ?", "On;Off");	
-		//$this -> bot -> core("settings") -> create("Recruit", "WhatChan", "Newbie", "Which channel should be spammed every 20 minutes ?", "Newbie;Neutral;Clan;Omni");
 	}
 
 	function command_handler($name, $msg, $origin)
@@ -194,31 +192,6 @@ class Recruit extends BaseActiveModule
 			return $tell_reply_msg_notfound;
 		}
 	}
-	
-    /*function cron()
-    {
-		if ($this->bot->core("settings")->get("Recruit", "SpamPublic")) {
-			$whatchan = $this->bot->core("settings")->get("Recruit", "WhatChan");
-			switch($whatchan) {
-				case 'Neutral':
-					$channel = "Neu. OOC";
-					break;
-				case 'Omni':
-					$channel = "OT OOC";
-					break;			
-				case 'Clan':
-					$channel = "Clan OOC";
-					break;
-				default:
-					$channel = "Neu. Newbie OOC";
-					break;					
-			}
-			$msg = $this->bot->core("settings")->get("Recruit","GuildName")." is recruiting ... ";
-			$inside = "To start recruitment process: <a href='chatcmd:///tell ".$this->bot->botname." recruit'>Start application</a><br><br>";
-			$blob = $this -> bot -> core("tools") -> make_blob(utf8_encode("Click this!"), utf8_encode($inside));			
-			$this -> bot -> aoc -> send_group($channel, utf8_encode($msg).$blob);
-		}
-    }*/
 	
 }
 ?>
