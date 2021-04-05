@@ -45,7 +45,7 @@ class raid_load extends BasePassiveModule
                 // name = the name of the loot
                 // img  = the aodb image number for the icon
                 // ref  = the aodb info details number
-                $version = 8;
+                $version = 9;
                 $this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS " . $this -> bot -> db -> define_tablename("RaidLoot", "true") . "
                         (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                          table_version INT,
@@ -287,6 +287,11 @@ class raid_load extends BasePassiveModule
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
                         }
+                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'pande', 'BeastWeapons', 'The Beast', 'Lord of Wisdom', '293991', '293997', '0')";
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }						
                         $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'pande', 'BeastWeapons', 'The Beast', 'Lady of Abandonment', '245083', '244743', '0')";
                         if(!$this -> bot -> db -> query($query))
                         {
@@ -347,6 +352,11 @@ class raid_load extends BasePassiveModule
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
                         }
+                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'pande', 'BeastWeapons', 'The Beast', 'Lady of Wisdom', '293991', '294000', '0')";
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }						
                         $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'pande', 'TNH', 'The Night Heart', 'Maar&#39;s Blue Belt of Double Prudence (Int/Psy)', '244991', '244989', '0')";
                         if(!$this -> bot -> db -> query($query))
                         {
