@@ -378,9 +378,9 @@ class Rolls extends BaseActiveModule
         if ($lcount == 0) {
             $this->bot->send_pgroup("##loot_highlight##No leftovers to declare FFA anymore.##end##");
         } else {
-			$blob = "";
+			$blob = "FFA:\n";
             foreach ($this->leftovers as $item) {
-				$blob .= " ".$item." ";
+				$blob .= $item."\n";
             }
 			$this->bot->send_pgroup("##loot_highlight##" . $name . "##end## has declared ".$lcount." following item(s) FFA : ".$this->bot->core("tools")->make_blob("click to see", $blob));
             unset($this->leftovers); $this->leftovers = array();
