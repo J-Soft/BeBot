@@ -211,7 +211,7 @@ class MassMsg extends BaseActiveModule
                 }
             }
         }
-        return ("Mass messages complete. " . $this->make_status_blob($status));
+        return (count($users)." mass messages/invites complete. " . $this->make_status_blob($status));
     }
 
 
