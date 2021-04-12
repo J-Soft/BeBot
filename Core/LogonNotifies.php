@@ -74,8 +74,16 @@ class Logon_Notifies_Core extends BasePassiveModule
                 "0;1;2;3;4;5;10;15;30"
             );
         $this->bot->core("settings")
+            ->create(
+                "Logon_Notifies",
+                "Startup_Delay",
+                120,
+                "How many seconds should be waited after startup before bot starts firing its notifcations?",
+                "15;30;60;120;240;480;960"
+            );			
+        $this->bot->core("settings")
             ->create("Logon_Notifies", "Enabled", true, "Are notifies on logon enabled or disabled?");
-        // Set startup high enough that it cannot be reached before connection is done successfully:
+        // Init startup high enough that it cannot be reached before connection is done successfully:
         $this->startup = time() + 3600;
     }
 
@@ -107,7 +115,7 @@ class Logon_Notifies_Core extends BasePassiveModule
                 ->check($name)
         ) {
             $this->notifies[$name] = time() + $this->bot->core("settings")
-                    ->get("Logon_notifies", "Notify_delay");
+                    ->get("Logon_notifies", "Notify_Delay");
             $this->waiting = true;
         }
     }
@@ -115,8 +123,7 @@ class Logon_Notifies_Core extends BasePassiveModule
 
     function connect()
     {
-        $this->startup = time() + 120 + $this->bot->core("settings")
-                ->get("Logon_notifies", "Notify_delay");
+        $this->startup = time() + $this->bot->core("settings")->get("Logon_notifies", "Startup_Delay") + $this->bot->core("settings")->get("Logon_notifies", "Notify_Delay");
     }
 
 
