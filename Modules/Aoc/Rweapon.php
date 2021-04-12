@@ -145,7 +145,7 @@ class rweapon Extends BaseActiveModule
 			  $output .= "<font face='HEADLINE' color=#c0c0c0>".$lastclass."</font><br>";
 		   }
 		   if ($value[4] != "")
-			  $output .= " <a style=text-decoration:none href='chatcmd:///tell ".$this->bot->botname." item ".$value[4]."'><font color=#8d11be>[".$value[3]."]</font></a> (".$value[1]." ".$value[2].")<br>";
+			  $output .= " <a style=text-decoration:none href='chatcmd:///tell ".$this->bot->botname." items ".$value[4]."'><font color=#8d11be>[".$value[3]."]</font></a> (".$value[1]." ".$value[2].")<br>";
 		   else
 			  $output .= " ".$value[3]." (".$value[1]." ".$value[2].")<br>";
 		}
@@ -169,8 +169,8 @@ class rweapon Extends BaseActiveModule
 	 foreach($weaponslist as $key => $value)
 	 {
 		if (preg_match("/^.*".$searchstring.".*$/i", " ".$value[3])) {
-		   $singlematchoutput   = $value[3].' ('.$value[1].' '.$value[2].') - '.$value[0]." <a href=\"text://<a href='chatcmd:///tell ".$this->bot->botname." item ".$value[4]."'>[".$value[3]."]</a> (".$value[1]." ".$value[2].") - ".$value[0]."<br>\">(Click for info)</a>";
-		   $multimatchoutput   .= " <a href='chatcmd:///tell ".$this->bot->botname." item ".$value[4]."'>[".$value[3]."]</a> (".$value[1]." ".$value[2].") - ".$value[0]."<br>";
+		   $singlematchoutput   = $value[3].' ('.$value[1].' '.$value[2].') - '.$value[0]." <a href=\"text://<a href='chatcmd:///tell ".$this->bot->botname." items ".$value[4]."'>[".$value[3]."]</a> (".$value[1]." ".$value[2].") - ".$value[0]."<br>\">(Click for info)</a>";
+		   $multimatchoutput   .= " <a href='chatcmd:///tell ".$this->bot->botname." items ".$value[4]."'>[".$value[3]."]</a> (".$value[1]." ".$value[2].") - ".$value[0]."<br>";
 		   $matches++;
 		}
 	 }

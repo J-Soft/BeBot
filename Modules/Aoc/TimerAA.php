@@ -123,9 +123,7 @@ class TimerAA extends BaseActiveModule
         $timeraa_username = mysqli_real_escape_string($this->bot->db->CONN,$name);
         $timeraa_cooldown = strtolower(mysqli_real_escape_string($this->bot->db->CONN,$arr[0]));
         $timeraa_start    = time();
-        $timeraa_end      = $this->utime_add($timeraa_start, $timeraa_cooldown);
         $timeraa_name     = "";
-
 
         if ($firstspace != 0)
             $timeraa_name = substr($args, $firstspace + 1);
@@ -140,7 +138,7 @@ class TimerAA extends BaseActiveModule
           }
         }
 
-
+        $timeraa_end      = $this->utime_add($timeraa_start, $timeraa_cooldown);
 
         $chk_time = $this -> bot -> db -> select("SELECT * FROM #___timer_aa WHERE timeraa_username='$name'");
         if (empty($chk_time)) {

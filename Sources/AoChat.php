@@ -566,7 +566,7 @@ class AOChat
             if (($packet instanceof AOChatPacket) && ($packet->type == $type)) {
                 $args_match = true;
                 for ($i = 0; $i < count($packet->args); $i++) {
-                    if ($args[$i] !== null && $packet->args[$i] != $args[$i]) {
+                    if (isset($args[$i]) && $args[$i] !== null && $packet->args[$i] != $args[$i]) {
                         $args_match = false;
                     }
                 }
