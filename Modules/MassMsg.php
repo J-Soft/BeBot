@@ -251,6 +251,11 @@ class MassMsg extends BaseActiveModule
         }
         return ($this->bot->core('tools')->make_blob('report', $window));
     }
+
+	function queue($name, $recipient)
+	{
+		$this->bot->core('chat')->pgroup_invite($recipient);
+	}		
 }
 
 ?>
