@@ -76,8 +76,8 @@ class TimerAA extends BaseActiveModule
 
 		$this -> version = "b1.0.8";
         $this -> help['description'] = "This module helps you keep track of Offline AA time training.";
-        $this -> help['command']['timeraa show <nick>'] = "Show how long time left on AA training.";
-        $this -> help['command']['timeraa showall <nick>'] = "Show how long time left on AA training on all chars for user.";
+        $this -> help['command']['timeraa show <nick>'] = "Show how long time left over running AA training for given char only.";
+        $this -> help['command']['timeraa showall <nick>'] = "Show how long time left on running AA trainings for all user chars.";
         $this -> help['command']['timeraa set 18'] = "Set the training time for current AA. Only use hours.";
         $this -> help['command']['timeraa set 18 <name of AA>'] = "Set the training time for current AA. Only use hours, with optional name of AA.";
         $this -> help['notes'] = sprintf("(C) Module By Getrix@Fury<br />Version: ##lightbeige##%s##end##", $this->version);
@@ -224,23 +224,27 @@ class TimerAA extends BaseActiveModule
     }
 
     function get_time_difference( $start, $end ) {
+	$diff_text = "";
     $uts['start']      =    $start ;
     $uts['end']        =    $end ;
         if( $uts['start']!==-1 && $uts['end']!==-1 ) {
             if( $uts['end'] >= $uts['start'] ) {
                 $diff    =    $uts['end'] - $uts['start'];
-                if( $days=intval((floor($diff/86400))) )
+				$days=intval((floor($diff/86400)));
+                if($days)
                     $diff = $diff % 86400;
-                if( $hours=intval((floor($diff/3600))) )
+				$hours=intval((floor($diff/3600)));
+                if($hours)
                     $diff = $diff % 3600;
-                if( $minutes=intval((floor($diff/60))) )
+				$minutes=intval((floor($diff/60)));
+                if($minutes)
                     $diff = $diff % 60;
-                $diff    =    intval( $diff );
+                $seconds=intval($diff);
                 $diffs = array();
                 if ($days    != "0") { $diffs['days']    = $days; }
                 if ($hours   != "0") { $diffs['hours']   = $hours; }
                 if ($minutes != "0") { $diffs['minutes'] = $minutes; }
-                if ($seconds != "0") { $diffs['seconds'] = $diff; }
+                if ($seconds != "0") { $diffs['seconds'] = $seconds; }
                 foreach ($diffs as $key=>$df) {
                     $diff_text .= $df." ".$key." ";
                 }
@@ -289,7 +293,7 @@ class TimerAA extends BaseActiveModule
 		}
 		// $msg2 = "Logon notify debugg endtime: ".$time. " og aaend: ".$aaend[0]." og result: ".$result["level"]; // for debugging
 		// $this->bot->send_tell($user, $msg2); // for debugging
-    return $output;
+		return $output;
     }
 	
 }

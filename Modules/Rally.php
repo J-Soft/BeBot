@@ -65,7 +65,7 @@ class Rally extends BaseActiveModule
 		             rally VARCHAR(200) NOT NULL,
 		             PRIMARY KEY (name))"
         );
-		$this->table_update();
+		if (strtolower($this->bot->game) == 'ao') { $this->table_update(); }
     }
 
 	function table_update() {

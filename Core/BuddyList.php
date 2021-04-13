@@ -220,11 +220,11 @@ class BuddyList extends BasePassiveModule
             }
         }
         // Deal with events we don't have to remember
-        if ($old_who["level"] != $who["level"] && $old_who["level"] != 0) {
+        if (isset($old_who["level"]) && isset($who["level"]) && $old_who["level"] != $who["level"] && $old_who["level"] != 0) {
             // User has changed level
             $current_statuses[] = 7;
         }
-        if ($old_who["location"] != $who["location"] && $old_who["location"] != 0 && $who["online"] != 0 && !in_array(
+        if (isset($old_who["location"]) && isset($who["location"]) && isset($who["online"]) && $old_who["location"] != $who["location"] && $old_who["location"] != 0 && $who["online"] != 0 && !in_array(
                 0,
                 $current_statuses
             )
