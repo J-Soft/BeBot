@@ -897,7 +897,7 @@ class Security_Core extends BaseActiveModule
             $groups = $this->get_groups($target);
             if ($groups <> -1) {
                 foreach ($groups as $gid) {
-                    $this->rem_group_member($target, $this->cache['groups'][$gid]['name']);
+                    $this->rem_group_member($target, $this->cache['groups'][$gid]['name'], $admin);
                 }
             }
             $this->bot->core("notify")->del($target);
