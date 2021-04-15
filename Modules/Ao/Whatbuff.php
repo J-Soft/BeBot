@@ -50,30 +50,44 @@ class Whatbuff extends BaseActiveModule
 			return $this -> what_item($sender, $arr);
          	elseif (preg_match("/^whatbuff (Arms|Back|Chest|Deck|Feet|Fingers|Hands|Head|Hud|Legs|Nano|Neck|Shoulders|Unknown|Util|Weapon|Wrists)/i", $msg, $arr))
 			return $this -> what_skill($sender, $arr);
+         	elseif (preg_match("/^whatbuff (.+)/i", $msg, $arr))
+			return $this -> what_search($sender, $arr[1]);			
          	elseif (preg_match("/^whatbuff/i", $msg))
-			return $this -> what_type($sender);
+			return $this -> what_type($sender, "");
 	}
 	
-		function what_type($sender) {
+		function what_search($sender, $info) {
+			$req = strtolower($info);
+			$cnt = strlen($req);
+			foreach ($this -> skills as $skill){
+				$short = strtolower(substr(str_replace(' ','',$skill[1]),0,$cnt));
+				if( $req!="" && ( strtolower($skill[1])==$req || $short==$req ) ) {
+					return $this -> what_type($sender, $skill[0]." ");
+				}
+			}
+			return "Sorry no buffed skill of that name was found ...";
+		}
+	
+		function what_type($sender, $num) {
 			$bot = $this->bot->botname;
 $msg = "<b>WhatBuff - Choose Type :<b>\n\n";			
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Arms'>Arms</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Back'>Back</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Chest'>Chest</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Deck'>Deck</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Feet'>Feet</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Fingers'>Fingers</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Hands'>Hands</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Head'>Head</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Hud'>Hud</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Legs'>Legs</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Nano'>Nano</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Neck'>Neck</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Shoulders'>Shoulders</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Unknown'>Unknown</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Util'>Util</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Weapon'>Weapon</a>\n";
-$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff Wrists'>Wrists</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Arms'>Arms</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Back'>Back</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Chest'>Chest</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Deck'>Deck</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Feet'>Feet</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Fingers'>Fingers</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Hands'>Hands</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Head'>Head</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Hud'>Hud</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Legs'>Legs</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Nano'>Nano</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Neck'>Neck</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Shoulders'>Shoulders</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Unknown'>Unknown</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Util'>Util</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Weapon'>Weapon</a>\n";
+$msg .= "<a href='chatcmd:///tell ".$bot." !whatbuff ".$num."Wrists'>Wrists</a>\n";
 	   $blob = $this -> bot -> core("tools") -> make_blob("WhatBuff - Choose Type", $msg);
 			$this -> bot -> send_tell($sender, $blob, 1, false, TRUE);
 			return;
