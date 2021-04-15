@@ -123,7 +123,7 @@ class ArtIntel extends BaseActiveModule
 			$url = "http://api.wolframalpha.com/v1/result?appid=".$this->bot->core("settings")->get('ArtIntel', 'ScienceId')."&i=".urlencode($req);
 			$getit = $this->bot->core("tools")->get_site($url);
 			if(strlen($getit)>0&&substr($getit,0,5)!="Error") {
-				$reply = $getit;
+				$reply = utf8_decode($getit);
 			}
 		}
 		if($chan=='private') {
