@@ -214,8 +214,8 @@ class Recruit extends BaseActiveModule
 			$msg = $this->bot->core("settings")->get("Recruit","GuildName")." is recruiting ... ";
 			$blob = "";
 			if (file_exists("./Text/" . $this->bot->botname . "Recruit.txt")) { // custom
-				$blob .= implode("", file("./Text/" . $this->bot->botname . "Rules.txt"));
-			} elseif (file_exists("./Text/Rules.txt")) {
+				$blob .= implode("", file("./Text/" . $this->bot->botname . "Recruit.txt"));
+			} elseif (file_exists("./Text/Recruit.txt")) {
 				$blob .= implode("", file("./Text/Recruit.txt"));
 			}
 			if($blob=="") { // default
