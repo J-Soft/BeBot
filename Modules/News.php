@@ -57,11 +57,15 @@ class News extends BaseActiveModule
 		           id INT NOT NULL auto_increment PRIMARY KEY,
 		           type INT default '1',
 		           time INT NOT NULL default '0',
-		           name VARCHAR(30) default NULL,
+		           name VARCHAR(255) default NULL,
 		           news TEXT
 		           )"
         );
-        //Regiser commands
+		if($this->bot->db->get_version("news")<2) {
+			$this->bot->db->query("ALTER TABLE #___news MODIFY COLUMN Name VARCHAR(255)");
+			$this -> bot -> db -> set_version("news", 2);
+		}
+        //Register commands
         $this->register_command('all', 'news', 'GUEST', array('add' => 'MEMBER'));
         $this->register_command('all', 'headline', 'GUEST', array('add' => 'ADMIN'));
         $this->register_command(
