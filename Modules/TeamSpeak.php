@@ -45,7 +45,7 @@ class Teamspeak Extends BaseActiveModule
 		$this -> help['description'] = "Shows information about teamspeak.";
 		$this -> help['command']['ts'] = "See description";
 		
-		$this -> bot -> core("settings") -> create("Teamspeak", "tsip", "141.157.197.21", "What is TS server IP ?");
+		$this -> bot -> core("settings") -> create("Teamspeak", "tsip", "141.157.197.21", "What is TS server fixed IP or dynamic hostname ?");
 		$this -> bot -> core("settings") -> create("Teamspeak", "tsqp", "10011", "What is TS Query Port ?");
 		$this -> bot -> core("settings") -> create("Teamspeak", "tssp", "9987", "What is TS Server Port ?");
 		$this -> bot -> core("settings") -> create("Teamspeak", "tssn", "AoSpeak", "What is TS Server Name ?");
@@ -96,7 +96,7 @@ class Teamspeak Extends BaseActiveModule
 			$infolines = preg_replace( "/\r|\n/", "",$infolines);
 			preg_match_all("/cid=([0-9]+) pid=(?:[0-9]+) channel_order=(?:[0-9]+) channel_name=([^ ]+) total_clients=([0-9]+) channel_needed_subscribe_power=(?:[0-9]+)/i",$infolines,$channels);
 			$chtot = count($channels[0]);
-			preg_match_all("/clid=(?:[0-9]+) cid=([0-9]+) client_database_id=(?:[0-9]+) client_nickname=([^ ]+) client_type=(?:[0-9]+)/i",$infolines,$users);
+			preg_match_all("/clid=(?:[0-9]+) cid=([0-9]+) client_database_id=(?:[0-9]+) client_nickname=([^ ]+) client_type=0/i",$infolines,$users);
 			$cltot = count($users[0]);
 		} else {
 			return "Can´t connect to the TS server. Pls try again later.";
@@ -110,12 +110,16 @@ class Teamspeak Extends BaseActiveModule
 		$msg .="Total of channels: ##highlight##".$chtot."##end##\n";
 		$msg .="Number of Players Currently Connected: ##highlight##".$cltot."##end##\n\n";
 		foreach($channels[1] AS $num => $cid) {
+			$tmp = ""; $uzr = 0;
 			if($channels[3][$num]>0) {
-				$msg .="##highlight##".str_replace("\s"," ",$channels[2][$num]).":##end##\n";
+				$tmp .="##highlight##".str_replace("\s"," ",$channels[2][$num]).":##end##\n";
 				foreach($users[1] AS $id => $uid) {
-					if($cid==$uid) $msg .=" ".$users[2][$id]." ";
+					if($cid==$uid) {
+						$tmp .=" ".$users[2][$id]." ";
+						$uzr++;
+					}
 				}
-				$msg .="\n\n";
+				if($uzr>0) $msg .=$tmp."\n\n";
 			}
 		}	
 		return $this -> bot -> core("tools") -> make_blob("Teamspeak server status", '##omni##'.$msg.'##end##');
