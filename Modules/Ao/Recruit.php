@@ -78,13 +78,15 @@ class Recruit extends BaseActiveModule
 		$lastofficer2 = $this->bot->core("settings")->get("Recruit","LastOfficer2");
 		$lastofficerno = $this->bot->core("settings")->get("Recruit","LastOfficerNo");
 
-		$return = $this->bot->core("whois")->lookup($name);
+		//$return = $this->bot->core("whois")->lookup($name);
 
-		$tell_officer_msg = "##highlight##RECRUITMENT:##end## Please contact ##highlight##$name (a lvl " . $return['level'] . " " . $return['profession'] . ")##end##, he/she has requested recruitment information.  Thank you.";
+		//$tell_officer_msg = "##highlight##RECRUITMENT:##end## Please contact ##highlight##$name (a lvl " . $return['level'] . " " . $return['profession'] . ")##end##, he/she has requested recruitment information.  Thank you.";
+		$tell_officer_msg = "##highlight##RECRUITMENT:##end## Please contact ##highlight##$name##end##, he/she has requested recruitment information.  Thank you.";
 		$tell_reply_msg_found = "An Officer is ##highlight##Online##end##.  You will be contacted as soon as possible.  ##highlight##Thank you for your interest in $guildname.##end##";
 		$tell_reply_msg_notfound = "There currently are no Guild Officers Online to speak to you about your request for recruitment information.  Your information has been stored and as soon as an Officer does logon, you will be contacted.  ##highlight##Thank you for your interest in $guildname.##end##";
 		$newsfrom = "$guildname - Recruitment";
-		$newstext = "RECRUITMENT: ##highlight##$name (a lvl " . $return['level'] . " " . $return['profession'] . ")##end## requested recruitment information but there were no officers online.  Please contact ##highlight##$name##end## as soon as possible.  If you are the officer that is going to contact this person, please delete this news item so that other officers do not also contact him/her.  Thank you.";
+		//$newstext = "RECRUITMENT: ##highlight##$name (a lvl " . $return['level'] . " " . $return['profession'] . ")##end## requested recruitment information but there were no officers online.  Please contact ##highlight##$name##end## as soon as possible.  If you are the officer that is going to contact this person, please delete this news item so that other officers do not also contact him/her.  Thank you.";
+		$newstext = "RECRUITMENT: ##highlight##$name##end## requested recruitment information but there were no officers online.  Please contact ##highlight##$name##end## as soon as possible.  If you are the officer that is going to contact this person, please delete this news item so that other officers do not also contact him/her.  Thank you.";
 
 		$botstring = $this->bot->core("online")->otherbots();
 		$channel = "gc";
