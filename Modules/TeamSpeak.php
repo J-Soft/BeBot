@@ -94,7 +94,7 @@ class Teamspeak Extends BaseActiveModule
 				$infolines.=fgets($connection1,1024);
 			}
 			$infolines = preg_replace( "/\r|\n/", "",$infolines);
-			preg_match_all("/cid=([0-9]+) pid=(?:[0-9]+) channel_order=(?:[0-9]+) channel_name=([^ ]+) total_clients=([0-9]+) channel_needed_subscribe_power=(?:[0-9]+)/i",$infolines,$channels);
+			preg_match_all("/cid=([0-9]+) pid=([0-9]+) channel_order=(?:[0-9]+) channel_name=([^ ]+) total_clients=([0-9]+) channel_needed_subscribe_power=(?:[0-9]+)/i",$infolines,$channels);
 			$chtot = count($channels[0]);
 			preg_match_all("/clid=(?:[0-9]+) cid=([0-9]+) client_database_id=(?:[0-9]+) client_nickname=([^ ]+) client_type=0/i",$infolines,$users);
 			$cltot = count($users[0]);
@@ -109,10 +109,14 @@ class Teamspeak Extends BaseActiveModule
 		$msg .="Server Port: ##highlight##".$this->bot->core("settings")->get("Teamspeak","tssp")."##end##\n\n";
 		$msg .="Total of channels: ##highlight##".$chtot."##end##\n";
 		$msg .="Number of Players Currently Connected: ##highlight##".$cltot."##end##\n\n";
+		$main = "";
 		foreach($channels[1] AS $num => $cid) {
 			$tmp = ""; $uzr = 0;
-			if($channels[3][$num]>0) {
-				$tmp .="##highlight##".str_replace("\s"," ",$channels[2][$num]).":##end##\n";
+			$name = str_replace("\s"," ",$channels[3][$num]);
+			if($channels[2][$num]==0) $main = $name;
+			if($channels[4][$num]>0) {
+				if($channels[2][$num]>0) $tmp .="##highlight##".$main."/".$name.":##end##\n";
+				else $tmp .="##highlight##".$name.":##end##\n";
 				foreach($users[1] AS $id => $uid) {
 					if($cid==$uid) {
 						$tmp .=" ".$users[2][$id]." ";
