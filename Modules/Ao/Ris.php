@@ -501,14 +501,26 @@ class NewRis extends BaseActiveModule
 			$members = $ri->GetRiMembers();
 			foreach($members as $indexri=>$rimember)
 			{
+				$sid = ":";
+				if (strtolower($this->bot->game) == 'ao') {
+					$who = $this->bot->core("whois")->lookup($rimember->GetName());
+					if (!($who instanceof BotError)) {
+						if ($who["faction"] == 'Clan') $sid = "C";
+						elseif ($who["faction"] == 'Omni') $sid = "O";						
+						elseif ($who["faction"] == 'Neutral') $sid = "N";
+						else $sid = "?";
+					} else {
+						$sid = "!";
+					}
+				}
 				if($rimember->IsLeader())
 				{
-					$msg .= "\t[##blob_title##" . $rimember->GetName() . " :: Leader##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ";
+					$msg .= "\t[##blob_title##" . $rimember->GetName() . " :: Leader##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ".$sid." ";
 					$msg .= $this->GetExtraInfo($rimember->GetName(),$index+1);
 				}
 				else
 				{
-					$msg .= "\t[##highlight##" . $rimember->GetName() . "##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ";
+					$msg .= "\t[##highlight##" . $rimember->GetName() . "##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ".$sid." ";
 					$msg .= $this->GetExtraInfo($rimember->GetName(),$index+1);
 				}
 				foreach($this->ris as $indexri=>$ris)
@@ -526,7 +538,7 @@ class NewRis extends BaseActiveModule
 		{
 			$test = $array;							
 			if(isset($array[4]))
-			{				
+			{
 				$hasri = false;
 				foreach($this->ris as $index=>$ri)
 				{
@@ -535,8 +547,20 @@ class NewRis extends BaseActiveModule
 						if($object->name==$array[0]) { $hasri = true; }
 					}
 				}
-				if(!$hasri) { 
-					$msg .= "\t[##highlight##" . $array[0] . "##end##] (" . $array[1] . " " . $array[2] . ") :: ";
+				if(!$hasri) {
+					$sid = ":";
+					if (strtolower($this->bot->game) == 'ao') {
+						$who = $this->bot->core("whois")->lookup($array[0]);
+						if (!($who instanceof BotError)) {
+							if ($who["faction"] == 'Clan') $sid = "C";
+							elseif ($who["faction"] == 'Omni') $sid = "O";						
+							elseif ($who["faction"] == 'Neutral') $sid = "N";
+							else $sid = "?";
+						} else {
+							$sid = "!";
+						}
+					}				
+					$msg .= "\t[##highlight##" . $array[0] . "##end##] (" . $array[1] . " " . $array[2] . ") ".$sid." ";
 					$msg .= $this -> bot -> core("tools") -> chatcmd("startri ".$array[0], "Start Ri");
 					foreach($this->ris as $indexri=>$ris)
 					{
