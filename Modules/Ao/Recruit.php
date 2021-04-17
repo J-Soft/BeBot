@@ -213,7 +213,7 @@ class Recruit extends BaseActiveModule
 					$channel = "Neu. Newbie OOC";
 					break;					
 			}
-			$msg = $this->bot->core("settings")->get("Recruit","GuildName")." is recruiting ... ";
+			$msg = $this->bot->core("settings")->get("Recruit","GuildName")." announce : ";
 			$blob = "";
 			if (file_exists("./Text/" . $this->bot->botname . "Recruit.txt")) { // custom
 				$blob .= implode("", file("./Text/" . $this->bot->botname . "Recruit.txt"));
