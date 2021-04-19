@@ -1,4 +1,8 @@
 --------------
+Version 0.7.17
+--------------
+...
+--------------
 Version 0.7.16
 --------------
 - Discord relay added + IRC improved ; several features added or improved for both games ; AO icons enriched
