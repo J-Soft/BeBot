@@ -46,7 +46,7 @@ class Recruit extends BaseActiveModule
 
 		$this -> register_command('tell', 'recruit', 'ANONYMOUS');
 		$this -> help['description'] = 'Allows a person to send a tell to the bot to start the recruitment process. Uses the !news system to warn offline officers.';
-		$this -> register_event("cron", "19min");
+		$this -> register_event("cron", "59min");
 		$this -> bot -> core("settings") -> create("Recruit", "GuildName", "", "Guild Name to use for all messages (tells, public, etc).");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer1", $this->bot->owner, "Last Officer to receive a recruitment tell message");
