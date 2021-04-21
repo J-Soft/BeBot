@@ -45,7 +45,7 @@ class raid_load extends BasePassiveModule
                 // name = the name of the loot
                 // img  = the aodb image number for the icon
                 // ref  = the aodb info details number
-                $version = 9;
+                $version = 10;
                 $this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS " . $this -> bot -> db -> define_tablename("RaidLoot", "true") . "
                         (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                          table_version INT,
@@ -923,12 +923,12 @@ class raid_load extends BasePassiveModule
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
                         }
-                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'apf', '28', 'Embalmer Cha&#39;Khaz', 'Notum Amplification Coil', '257195', '275963', '0')";
+                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'apf', '28', 'Embalmer Cha&#39;Khaz', 'Notum Amplification Coil', '257195', '257963', '0')";
                         if(!$this -> bot -> db -> query($query))
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
                         }
-                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'apf', '28', 'Embalmer Cha&#39;Khaz', 'Inertial Adjustment Processing Unit', '11618', '275959', '0')";
+                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'apf', '28', 'Embalmer Cha&#39;Khaz', 'Inertial Adjustment Processing Unit', '11618', '257959', '0')";
                         if(!$this -> bot -> db -> query($query))
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
@@ -1063,12 +1063,12 @@ class raid_load extends BasePassiveModule
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
                         }
-                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'apf', '42', 'West - Proto-Embalmer', 'Notum Amplification Coil', '257195', '275963', '0')";
+                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'apf', '42', 'West - Proto-Embalmer', 'Notum Amplification Coil', '257195', '257963', '0')";
                         if(!$this -> bot -> db -> query($query))
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
                         }
-                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'apf', '42', 'West - Proto-Embalmer', 'Inertial Adjustment Processing Unit', '11618', '275959', '0')";
+                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'apf', '42', 'West - Proto-Embalmer', 'Inertial Adjustment Processing Unit', '11618', '257959', '0')";
                         if(!$this -> bot -> db -> query($query))
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
@@ -1093,7 +1093,7 @@ class raid_load extends BasePassiveModule
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
                         }
-                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'apf', '42', 'Artillery Commander', 'Unlearning Device', '99257', '260422', '0')";
+                        $query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'apf', '42', 'Artillery Commander', 'Unlearning Device', '290826', '260422', '0')";
                         if(!$this -> bot -> db -> query($query))
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
