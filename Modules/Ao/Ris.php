@@ -186,7 +186,6 @@ class NewRis extends BaseActiveModule
 					$members = $ri->GetRiMembers();
 					foreach($members as $index=>$rimember)
 					{
-						echo " ".$rimember->GetName()." ? ".$toon." ";
 						if($rimember->GetName()==$toon) {
 							$free = false;
 						}
@@ -213,7 +212,6 @@ class NewRis extends BaseActiveModule
 			}
 		  }
 		}
-		print_r($sorted);
 	
 		$check = array();
 		foreach($this->ris as $index=>$ri)
