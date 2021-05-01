@@ -178,8 +178,23 @@ class NewRis extends BaseActiveModule
 		if(count($this->ris)==0) $this -> bot -> send_tell($name,"No RI was yet created ... please do this first!");
 
 		$sorted = array();
-		foreach($this->pgroup as $name=>$array) {
-			$sorted[] = $array;
+		foreach($this->pgroup as $toon=>$array) {
+			if($toon) {
+				$free = true;
+				foreach($this->ris as $index=>$ri)
+				{
+					$members = $ri->GetRiMembers();
+					foreach($members as $index=>$rimember)
+					{
+						echo " ".$rimember->GetName()." ? ".$toon." ";
+						if($rimember->GetName()==$toon) {
+							$free = false;
+						}
+					}
+					
+				}
+				if($free) $sorted[] = $array;
+			}
 		}
 		$j=0;
 		$flag = true;
@@ -198,6 +213,7 @@ class NewRis extends BaseActiveModule
 			}
 		  }
 		}
+		print_r($sorted);
 	
 		$check = array();
 		foreach($this->ris as $index=>$ri)
@@ -379,7 +395,7 @@ class NewRis extends BaseActiveModule
 			}
 		}
 		
-		$this -> bot -> send_tell($name,"Auto distribution among existing RI(s) is done.");
+		$this -> bot -> send_tell($name,"Auto distributed ".count($sorted)." character(s) among ".count($this->ris)." RI(s).");
 	}
 	
 	function PrintRis()
