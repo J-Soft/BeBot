@@ -96,7 +96,7 @@ class Rolls extends BaseActiveModule
         $this->help['command']['rem <slot>'] = "Removes your name from the slot number given.";
 		$this->help['command']['prem <slot> <name>']="Removes player from roll of the slot number given.";
         $this->help['command']['list'] = "Lists all items and who is rolling for them.";
-        $this->help['command']['clear'] = "Clears all rolls.";
+        $this->help['command']['clear (slot)'] = "Clears all rolls (or just slot number given).";
         $this->help['command']['result'] = "Rolls for all the items and announces winners.";
         $this->help['command']['reroll'] = "Adds any unwon items from the last roll to a new roll.";
 		$this->help['command']['ffa'] = "Declare any unwon items as Free For All to be looted.";
@@ -133,19 +133,27 @@ class Rolls extends BaseActiveModule
                             if (preg_match("/^result/i", $msg)) {
                                 $this->roll($name);
                             } else {
-                                if (preg_match("/^clear/i", $msg)) {
-                                    unset($this->loot); $this->loot = array();
-                                    unset($this->leftovers); $this->leftovers = array();
-                                    $this->count = 0;
-                                    $this->bot->send_pgroup(
-                                        "##loot_highlight##" . $name . "##end## cancelled the loot rolls in progress"
-                                    );
-                                } else {
+								if(preg_match("/^clear ([0-9]+)/i", $msg, $info))
+								{
+									if(isset($this->loot[$info[1]])) {
+										unset($this->loot[$info[1]]);
+										foreach($this->loot AS $key => $arr) {
+											if($key>$info[1]) {
+												$this->loot[$key-1] = $arr;
+												unset($this->loot[$key]);
+											}
+										}
+										$this->count--;
+										$this->bot->send_pgroup(
+											"##loot_highlight##" . $name . "##end## deleted slot #".$info[1]. " & shifted higher slot(s)"
+										);													
+									}
+								} else {
 									if(preg_match("/^prem ([0-9]+) (.+)/i", $msg, $info)) {
 										if (isset($this->loot[$info[1]][ucfirst($info[2])]))
 										{
 											unset($this->loot[$info[1]][ucfirst($info[2])]);
-											$this->bot->send_pgroup("##loot_highlight##" . ucfirst($info[2]) . "##end## removed from rolls in slot##loot_highlight## #" . $info[1]);
+											$this->bot->send_pgroup("##loot_highlight##" . ucfirst($info[2]) . "##end## removed from rolls in slot##loot_highlight## #" . $info[1]. "##end##");
 										}
 									} else {
 										if(preg_match("/^mloot (.*)/i", $msg, $info))
@@ -155,8 +163,18 @@ class Rolls extends BaseActiveModule
 											if(preg_match("/^ffa/i", $msg, $info))
 											{
 												$this->ffa($name);	
-											} else {
-												$this->bot->send_help($name);
+											} else {	
+												if (preg_match("/^clear/i", $msg))
+												{
+													unset($this->loot); $this->loot = array();
+													unset($this->leftovers); $this->leftovers = array();
+													$this->count = 0;
+													$this->bot->send_pgroup(
+														"##loot_highlight##" . $name . "##end## cancelled the loot rolls in progress"
+													);
+												} else {										
+													$this->bot->send_help($name);
+												}
 											}
 										}
 									}
