@@ -1,7 +1,7 @@
 --------------
 Version 0.7.17
 --------------
-...
+- Many modules improved/added for both AO & AoC (& few more bot fixes in various core/modules)
 --------------
 Version 0.7.16
 --------------
