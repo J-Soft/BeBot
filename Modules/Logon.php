@@ -195,7 +195,7 @@ class Logon extends BaseActiveModule
                                 }
                                 $aliasm = $this->bot->core("alias")
                                     ->get_main($name);
-                                if ($aliasm) {
+                                if ($aliasm && $aliasm!='online') {
                                     $res = "##highlight##" . $aliasm . "##end## Logged On";
                                     $res .= " (" . $name . " ";
                                 } else {

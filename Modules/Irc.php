@@ -70,7 +70,7 @@ class IRC extends BaseActiveModule
         $this->help['command']['irconline'] = "Shows users in the IRC Channel.";
         $this->help['command']['irc connect'] = "Tries to connect to the IRC channel.";
         $this->help['command']['irc disconnect'] = "Disconnects from the IRC server.";
-        $this->help['notes'] = "The IRC relay is configured via settings, for all options check /tell <botname> <pre>settings IRC. Irc side commands available are : is, online/sm, whois, level/lvl/pvp";
+        $this->help['notes'] = "The IRC relay is configured via settings, for all options check /tell <botname> <pre>settings IRC. Irc side commands available are : tara, viza, is, online/sm, whois, level/lvl/pvp";
         // Create default settings:
         if ($this->bot->guildbot) {
             $guildprefix = "[" . $this->bot->guildname . "]";
@@ -120,9 +120,9 @@ class IRC extends BaseActiveModule
             ->create(
                 "Irc",
                 "ItemRef",
-                "AOMainframe",
-                "Should AO Mainframe of AUNO be used for links in item refs?",
-                "AOMainframe;AUNO"
+                "AOItems",
+                "Should AOItems or AUNO be used for links in item refs?",
+                "AOItems;AUNO"
             );
         $this->bot->core("settings")
             ->create(
@@ -243,7 +243,7 @@ class IRC extends BaseActiveModule
         ) {
             $rep = "http://auno.org/ao/db.php?id=\\1&id2=\\2&ql=\\3";
         } else {
-            $rep = "http://aomainframe.net/showitem.asp?LowID=\\1&HiID=\\2&QL=\\3";
+            $rep = "http://aoitems.com/item/\\1/\\2/\\3";
         }
         $msg = preg_replace(
             "/<a href=\"itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\">(.*)<\/a>/iU",
@@ -671,7 +671,7 @@ class IRC extends BaseActiveModule
     */
     function change_itemref($new)
     {
-        $tmp = "AOMainframe";
+        $tmp = "AOItems";
         if (strtolower($new) == "auno") {
             $tmp = "AUNO";
         }
@@ -738,13 +738,25 @@ class IRC extends BaseActiveModule
             $this->bot->commpre . 'online',
             $this->bot->commands["tell"]["irc"],
             'irc_online'
-        );
+        );		
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_CHANNEL,
             $this->bot->commpre . 'sm',
             $this->bot->commands["tell"]["irc"],
             'irc_online'
+        );
+		$this->irc->registerActionhandler(
+            SMARTIRC_TYPE_CHANNEL,
+            $this->bot->commpre . 'tara',
+            $this->bot->commands["tell"]["irc"],
+            'irc_tara'
         );		
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_CHANNEL,
+            $this->bot->commpre . 'viza',
+            $this->bot->commands["tell"]["irc"],
+            'irc_viza'
+        );	
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_CHANNEL,
             $this->bot->commpre . 'whois',
@@ -812,6 +824,18 @@ class IRC extends BaseActiveModule
             $this->bot->commpre . 'sm',
             $this->bot->commands["tell"]["irc"],
             'irc_online'
+        );		
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_QUERY,
+            $this->bot->commpre . 'tara',
+            $this->bot->commands["tell"]["irc"],
+            'irc_tara'
+        );
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_QUERY,
+            $this->bot->commpre . 'viza',
+            $this->bot->commands["tell"]["irc"],
+            'irc_viza'
         );		
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_QUERY,
@@ -906,6 +930,8 @@ class IRC extends BaseActiveModule
             && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'is')))
             && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'whois')))
             && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'level')))
+			&& (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'tara')))
+			&& (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'viza')))
         ) {
             $msg = str_replace("<", "&lt;", $data->message);
             $msg = str_replace(">", "&gt;", $msg);
@@ -1058,7 +1084,7 @@ class IRC extends BaseActiveModule
         } else {
             $info[1] = ucfirst(strtolower($info[1]));
             $msg = "";
-            if (!$this->bot->core('player')->id($info[1])) {
+            if ($this->bot->core('player')->id($info[1]) instanceof BotError) {
                 $msg = "Player " . $info[1] . " does not exist.";
             } else {
                 if ($info[1] == ucfirst(strtolower($this->bot->botname))) {
@@ -1185,7 +1211,36 @@ class IRC extends BaseActiveModule
         return $result;
     }
 
+    function irc_tara(&$irc, &$data)
+    {
+        if ($data->type == SMARTIRC_TYPE_QUERY) {
+            $target = $data->nick;
+        } else {
+            $target = $this->bot->core("settings")->get("Irc", "Channel");
+        }
+        $this->target = $target;
+		$msg = "No Tarasque/Cameloot timer found.";
+		if($this->bot->exists_module("taraviza")) {
+			$msg = $this->bot->core("taraviza")->show_tara($this->bot->core("settings")->get("Irc", "Channel"),"IRC");
+		}
+        $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
+    }	
 
+    function irc_viza(&$irc, &$data)
+    {
+        if ($data->type == SMARTIRC_TYPE_QUERY) {
+            $target = $data->nick;
+        } else {
+            $target = $this->bot->core("settings")->get("Irc", "Channel");
+        }
+        $this->target = $target;
+		$msg = "No Vizaresh/Gauntlet timer found.";
+		if($this->bot->exists_module("taraviza")) {
+			$msg = $this->bot->core("taraviza")->show_viza($this->bot->core("settings")->get("Irc", "Channel"),"IRC");
+		}		
+        $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
+    }		
+	
     function irc_whois(&$irc, &$data)
     {
         if ($data->type == SMARTIRC_TYPE_QUERY) {

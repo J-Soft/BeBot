@@ -750,14 +750,14 @@ class Security_Core extends BaseActiveModule
         $target = ucfirst(strtolower($target));
         $group = strtolower($group);
         $uid = $this->bot->core('player')->id($target);
-        if (!$uid) {
+        if ($uid instanceof BotError) {
             $this->error->set($target . " is not a valid character.");
             return $this->error;
         }
         $gid = $this->get_gid($group);
         if ($gid == -1) {
             $this->error->set(
-                "Unable to find group ID for " . $group . " " . $group . " may not exisit. Check your spelling and try again."
+                "Unable to find group ID for " . $group . " " . $group . " may not exist. Check your spelling and try again."
             );
             return $this->error;
         }
@@ -897,7 +897,7 @@ class Security_Core extends BaseActiveModule
             $groups = $this->get_groups($target);
             if ($groups <> -1) {
                 foreach ($groups as $gid) {
-                    $this->rem_group_member($target, $this->cache['groups'][$gid]['name']);
+                    $this->rem_group_member($target, $this->cache['groups'][$gid]['name'], $admin);
                 }
             }
             $this->bot->core("notify")->del($target);

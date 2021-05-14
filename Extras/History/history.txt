@@ -1,0 +1,2 @@
+This folder stores xml/json history cache files.
+It will be cleaned frequently to refresh infos and spare disk space.

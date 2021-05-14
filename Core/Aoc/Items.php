@@ -16,7 +16,7 @@
 * - Noer
 * - Temar (RK1)
 * - Vrykolas
-* *
+* - Bitnykk (RK5)
 * See Credits file for all aknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -53,6 +53,7 @@ class Items_Core extends BasePassiveModule
         parent::__construct($bot, get_class($this));
 
         $this -> register_module("items");
+		$this->bot->core("settings")->create("Items", "CIDB", "https://conan.meathooksminions.com", "What is HTTP(s) Central Item Database URL (MeatHooks Minions by default, or your prefered mirror) ?");
     }
 
     function parse_items($itemText)
@@ -156,7 +157,7 @@ class Items_Core extends BasePassiveModule
 
         $checksum = md5('aocitems' . $salt );
 
-        $url  = "https://conan.meathooksminions.com/aoc_items/itemdb_botsubmit.php";
+        $url  = $this->bot->core("settings")->get("Items", "CIDB")."/aoc_items/itemdb_botsubmit.php";
         $url .= '?lowid='.urlencode($item['lowid']);
         $url .= '&highid='.urlencode($item['highid']);
         $url .= '&lowlvl='.urlencode($item['lowlvl']);
@@ -201,7 +202,7 @@ class Items_Core extends BasePassiveModule
 
         $checksum = md5('aocrecipe' . $salt);
 
-        $url  = "https://conan.meathooksminions.com/aoc_items/itemdb_botrecipesubmit.php";
+        $url  = $this->bot->core("settings")->get("Items", "CIDB")."/aoc_items/itemdb_botrecipesubmit.php";
         $url .= '?recipelowid='.urlencode($recipeitem['lowid']);
         $url .= '&recipehighid='.urlencode($recipeitem['highid']);
         $url .= '&recipeqty='.urlencode($recipeqty);
@@ -230,7 +231,7 @@ class Items_Core extends BasePassiveModule
         $salt       = $passkey."_".$botname;
         $checksum   = md5('aocitems' . $salt );
         
-        $url  = "https://conan.meathooksminions.com/aoc_items/itemdb_botsearch.php";
+        $url  = $this->bot->core("settings")->get("Items", "CIDB")."/aoc_items/itemdb_botsearch.php";
         $url .= '?search='.urlencode($words);
         $url .= '&botname='.urlencode($this->bot->botname);
         $url .= '&pre='.urlencode($this -> bot -> commpre);
@@ -261,7 +262,7 @@ class Items_Core extends BasePassiveModule
         $salt       = $passkey."_".$botname;
         $checksum   = md5('aocrecipe' . $salt );
         
-        $url  = "https://conan.meathooksminions.com/aoc_items/itemdb_botrecipesearch.php";
+        $url  = $this->bot->core("settings")->get("Items", "CIDB")."/aoc_items/itemdb_botrecipesearch.php";
         $url .= '?search='.urlencode($words);
         $url .= '&botname='.urlencode($this->bot->botname);
         $url .= '&pre='.urlencode($this -> bot -> commpre);

@@ -82,7 +82,7 @@ class User_Core extends BasePassiveModule
             return $this->error;
         }
         // Make sure $name is a valid character
-        if (!$this->bot->core("player")->id($name)) {
+        if ($this->bot->core("player")->id($name) instanceof BotError) {
             $this->error->set($name . " is not a valid character!");
             return $this->error;
         }

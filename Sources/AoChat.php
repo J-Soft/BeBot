@@ -566,7 +566,7 @@ class AOChat
             if (($packet instanceof AOChatPacket) && ($packet->type == $type)) {
                 $args_match = true;
                 for ($i = 0; $i < count($packet->args); $i++) {
-                    if ($args[$i] !== null && $packet->args[$i] != $args[$i]) {
+                    if (isset($args[$i]) && $args[$i] !== null && $packet->args[$i] != $args[$i]) {
                         $args_match = false;
                     }
                 }
@@ -948,11 +948,11 @@ class AOChat
             // Events currently being debugged for possible inclusion
             case AOCP_MSG_VICINITYA:
                 $bot->log("MAIN", "INC", "Vicinity announcement");
-                if (is_resource($this->debug)) {
+                /*if (is_resource($this->debug)) {
                     fwrite($this->debug, "<<<<<\n");
                     fwrite($this->debug, print_r($packet->args, true));
                     fwrite($this->debug, "\n=====\n");
-                }
+                }*/
                 break;
             // Events we ignore
             // some notice, e.g. after buddy add

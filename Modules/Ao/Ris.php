@@ -70,6 +70,7 @@ class NewRis extends BaseActiveModule
         $this -> register_command("all", "riname", "LEADER");
         $this -> register_command("all", "risend", "LEADER");
         $this -> register_command("all", "ritake", "GUEST");
+		$this -> register_command("all", "riauto", "LEADER");
         $this -> register_command("all", "ritest", "OWNER");
 
         $this -> bot -> core("settings") -> create("Ris", "sendrate", 100000, "Microsecond (usleep) pause between each member manipulation (kick/invite)");
@@ -128,6 +129,10 @@ class NewRis extends BaseActiveModule
 		{
 			$this->SendRi($msg[1],strtolower($msg[2]),$name);
 		}
+		else if($msg[0] == "riauto")
+		{
+			$this->AutoRi($name);
+		}
 		else if($msg[0] == "ritest")
 		{
 			echo " (1-DEBUG-1) "; print_r($this->ris); echo " (0-DEBUG-0) ";
@@ -168,6 +173,229 @@ class NewRis extends BaseActiveModule
 		}
 	}
 
+	function AutoRi($name)
+	{
+		if(count($this->ris)==0) $this -> bot -> send_tell($name,"No RI was yet created ... please do this first!");
+
+		$sorted = array();
+		foreach($this->pgroup as $toon=>$array) {
+			if($toon) {
+				$free = true;
+				foreach($this->ris as $index=>$ri)
+				{
+					$members = $ri->GetRiMembers();
+					foreach($members as $index=>$rimember)
+					{
+						if($rimember->GetName()==$toon) {
+							$free = false;
+						}
+					}
+					
+				}
+				if($free) $sorted[] = $array;
+			}
+		}
+		$j=0;
+		$flag = true;
+		$temp=0;
+		while ( $flag )
+		{
+		  $flag = false;
+		  for( $j=0;  $j < count($sorted)-1; $j++)
+		  {
+			if ( isset($sorted[$j][1]) && isset($sorted[$j+1][1]) && $sorted[$j][1] < $sorted[$j+1][1] )
+			{
+			  $temp = $sorted[$j];
+			  $sorted[$j] = $sorted[$j+1];
+			  $sorted[$j+1]=$temp;
+			  $flag = true;
+			}
+		  }
+		}
+	
+		$check = array();
+		foreach($this->ris as $index=>$ri)
+		{
+			$check['tank'][bcadd($index,1)] = 0;
+			$check['heal'][bcadd($index,1)] = 0;
+			$check['refl'][bcadd($index,1)] = 0;
+			$check['snar'][bcadd($index,1)] = 0;
+			$check['aura'][bcadd($index,1)] = 0;
+			$check['buff'][bcadd($index,1)] = 0;
+			$check['back'][bcadd($index,1)] = 0;
+			$check['dmgd'][bcadd($index,1)] = 0;
+		}
+		foreach($this->ris as $index=>$ri)
+		{
+			$members = $ri->GetRiMembers();
+			foreach($members as $indexri=>$rimember)
+			{
+				$prof = $rimember->GetProfession();
+				if($prof=="Enforcer") {
+					$check['tank'][bcadd($index,1)] = $check['tank'][bcadd($index,1)]+1;
+				}
+				if($prof=="Doctor") {
+					$check['heal'][bcadd($index,1)] = $check['heal'][bcadd($index,1)]+1;
+				}
+				if($prof=="Engineer"||$prof=="Soldier") {
+					$check['refl'][bcadd($index,1)] = $check['refl'][bcadd($index,1)]+1;
+				}
+				if($prof=="Bureaucrat"||$prof=="Fixer") {
+					$check['snar'][bcadd($index,1)] = $check['snar'][bcadd($index,1)]+1;
+				}
+				if($prof=="Keeper") {
+					$check['aura'][bcadd($index,1)] = $check['aura'][bcadd($index,1)]+1;
+				}
+				if($prof=="Trader"||$prof=="Meta-Physicist") {
+					$check['buff'][bcadd($index,1)] = $check['buff'][bcadd($index,1)]+1;
+				}
+				if($prof=="Adventurer"||$prof=="Martial Artist"||$prof=="Agent") {
+					$check['back'][bcadd($index,1)] = $check['back'][bcadd($index,1)]+1;
+				}
+				if($prof=="Shade"||$prof=="Nano-Technician") {
+					$check['dmgd'][bcadd($index,1)] = $check['dmgd'][bcadd($index,1)]+1;
+				}
+			}
+		}
+		
+		foreach($sorted as $index=>$array)
+		{
+			if(isset($array[4])&&$array[4])
+			{
+				if($array[2]=="Enforcer") {
+					$count = 0; $sent = false;
+					while(!$sent) {
+						foreach($this->ris as $index=>$ri)
+						{
+							if(!$sent&&$check['tank'][bcadd($index,1)] == $count) {
+								$member = new RiMember($array[0],$array[1],$array[2],$array[3]);
+								$dest = $this->GetRi(bcadd($index,1));
+								$dest->AddMember($member);
+								$check['tank'][bcadd($index,1)] = $check['tank'][bcadd($index,1)]+1;
+								$sent = true;
+							}
+						}
+						$count++;						
+					}
+				}
+				if($array[2]=="Doctor") {
+					$count = 0; $sent = false;
+					while(!$sent) {
+						foreach($this->ris as $index=>$ri)
+						{
+							if(!$sent&&$check['heal'][bcadd($index,1)] == $count) {
+								$member = new RiMember($array[0],$array[1],$array[2],$array[3]);
+								$dest = $this->GetRi(bcadd($index,1));
+								$dest->AddMember($member);
+								$check['heal'][bcadd($index,1)] = $check['heal'][bcadd($index,1)]+1;
+								$sent = true;
+							}
+						}
+						$count++;						
+					}
+				}
+				if($array[2]=="Engineer"||$array[2]=="Soldier") {
+					$count = 0; $sent = false;
+					while(!$sent) {
+						foreach($this->ris as $index=>$ri)
+						{
+							if(!$sent&&$check['refl'][bcadd($index,1)] == $count) {
+								$member = new RiMember($array[0],$array[1],$array[2],$array[3]);
+								$dest = $this->GetRi(bcadd($index,1));
+								$dest->AddMember($member);
+								$check['refl'][bcadd($index,1)] = $check['refl'][bcadd($index,1)]+1;
+								$sent = true;
+							}
+						}
+						$count++;						
+					}
+				}
+				if($array[2]=="Bureaucrat"||$array[2]=="Fixer") {
+					$count = 0; $sent = false;
+					while(!$sent) {
+						foreach($this->ris as $index=>$ri)
+						{
+							if(!$sent&&$check['snar'][bcadd($index,1)] == $count) {
+								$member = new RiMember($array[0],$array[1],$array[2],$array[3]);
+								$dest = $this->GetRi(bcadd($index,1));
+								$dest->AddMember($member);
+								$check['snar'][bcadd($index,1)] = $check['snar'][bcadd($index,1)]+1;
+								$sent = true;
+							}
+						}
+						$count++;						
+					}
+				}
+				if($array[2]=="Keeper") {
+					$count = 0; $sent = false;
+					while(!$sent) {
+						foreach($this->ris as $index=>$ri)
+						{
+							if(!$sent&&$check['aura'][bcadd($index,1)] == $count) {
+								$member = new RiMember($array[0],$array[1],$array[2],$array[3]);
+								$dest = $this->GetRi(bcadd($index,1));
+								$dest->AddMember($member);
+								$check['aura'][bcadd($index,1)] = $check['aura'][bcadd($index,1)]+1;
+								$sent = true;
+							}
+						}
+						$count++;						
+					}
+				}
+				if($array[2]=="Trader"||$array[2]=="Meta-Physicist") {
+					$count = 0; $sent = false;
+					while(!$sent) {
+						foreach($this->ris as $index=>$ri)
+						{
+							if(!$sent&&$check['buff'][bcadd($index,1)] == $count) {
+								$member = new RiMember($array[0],$array[1],$array[2],$array[3]);
+								$dest = $this->GetRi(bcadd($index,1));
+								$dest->AddMember($member);
+								$check['buff'][bcadd($index,1)] = $check['buff'][bcadd($index,1)]+1;
+								$sent = true;
+							}
+						}
+						$count++;						
+					}
+				}
+				if($array[2]=="Adventurer"||$array[2]=="Martial Artist"||$array[2]=="Agent") {
+					$count = 0; $sent = false;
+					while(!$sent) {
+						foreach($this->ris as $index=>$ri)
+						{
+							if(!$sent&&$check['back'][bcadd($index,1)] == $count) {
+								$member = new RiMember($array[0],$array[1],$array[2],$array[3]);
+								$dest = $this->GetRi(bcadd($index,1));
+								$dest->AddMember($member);
+								$check['back'][bcadd($index,1)] = $check['back'][bcadd($index,1)]+1;
+								$sent = true;
+							}
+						}
+						$count++;						
+					}
+				}
+				if($array[2]=="Shade"||$array[2]=="Nano-Technician") {
+					$count = 0; $sent = false;
+					while(!$sent) {
+						foreach($this->ris as $index=>$ri)
+						{
+							if(!$sent&&$check['dmgd'][bcadd($index,1)] == $count) {
+								$member = new RiMember($array[0],$array[1],$array[2],$array[3]);
+								$dest = $this->GetRi(bcadd($index,1));
+								$dest->AddMember($member);
+								$check['dmgd'][bcadd($index,1)] = $check['dmgd'][bcadd($index,1)]+1;
+								$sent = true;
+							}
+						}
+						$count++;						
+					}
+				}				
+			}
+		}
+		
+		$this -> bot -> send_tell($name,"Auto distributed ".count($sorted)." character(s) among ".count($this->ris)." RI(s).");
+	}
+	
 	function PrintRis()
 	{
 		foreach($this->ris as $index=>$ri)
@@ -298,7 +526,7 @@ class NewRis extends BaseActiveModule
 	{
 		$return = false;
 
-		if($this->bot->core('player')->id($name))
+		if(! ($this->bot->core('player')->id($name) instanceof BotError) )
 		{
 			for($i=1;$i<=count($this->ris);$i++)
 			{
@@ -345,8 +573,11 @@ class NewRis extends BaseActiveModule
 						$member = new RiMember($this->pgroup[$name][0],$this->pgroup[$name][1],$this->pgroup[$name][2],$this->pgroup[$name][3]);
 						$ri = $this->GetRi($num);
 						$rimembers = $ri->GetRiMembers();
-						//print_r(get_object_vars($rimembers));
-						if(array_search($member,$rimembers))
+						$isri = false;
+						foreach($rimembers as $id=>$object) {
+							if($object->name==$name) { $isri = true; }
+						}											
+						if($isri)
 						{
 						$this->bot->send_tell($executer,"##highlight##".$name . "##end## is already in ri ##highlight##".$num . "##end##");
 							return;
@@ -477,6 +708,7 @@ class NewRis extends BaseActiveModule
 		$msg  = "##highlight##:::: Multiple RI Admin ::::##end##\n\n";
 		$msg .= "##highlight##Commands:##end##\n";
 		$msg .= $this -> bot -> core("tools") -> chatcmd("riadmin", "Refresh this admin.")."\n";
+		$msg .= $this -> bot -> core("tools") -> chatcmd("riauto", "Auto distrib profs among RIs.")."\n";
 		$msg .= $this -> bot -> core("tools") -> chatcmd("showris", "Show RIs on channel.")."\n";
 		$msg .= $this -> bot -> core("tools") -> chatcmd("clearris", "Reset all RIs !")."\n";
 		$msg .= $this -> bot -> core("tools") -> chatcmd("risend", "Howto export RI ?")."\n\n";
@@ -498,14 +730,26 @@ class NewRis extends BaseActiveModule
 			$members = $ri->GetRiMembers();
 			foreach($members as $indexri=>$rimember)
 			{
+				$sid = ":";
+				if (strtolower($this->bot->game) == 'ao') {
+					$who = $this->bot->core("whois")->lookup($rimember->GetName());
+					if (!($who instanceof BotError)) {
+						if ($who["faction"] == 'Clan') $sid = "C";
+						elseif ($who["faction"] == 'Omni') $sid = "O";						
+						elseif ($who["faction"] == 'Neutral') $sid = "N";
+						else $sid = "?";
+					} else {
+						$sid = "!";
+					}
+				}
 				if($rimember->IsLeader())
 				{
-					$msg .= "\t[##blob_title##" . $rimember->GetName() . " :: Leader##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ";
+					$msg .= "\t[##blob_title##" . $rimember->GetName() . " :: Leader##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ".$sid." ";
 					$msg .= $this->GetExtraInfo($rimember->GetName(),$index+1);
 				}
 				else
 				{
-					$msg .= "\t[##highlight##" . $rimember->GetName() . "##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ";
+					$msg .= "\t[##highlight##" . $rimember->GetName() . "##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ".$sid." ";
 					$msg .= $this->GetExtraInfo($rimember->GetName(),$index+1);
 				}
 				foreach($this->ris as $indexri=>$ris)
@@ -521,17 +765,39 @@ class NewRis extends BaseActiveModule
 		$msg .= "##blob_title##::Looking For Ri::##end##\n\n";
 		foreach($this->pgroup as $index=>$array)
 		{
-			$test = $array;
+			$test = $array;							
 			if(isset($array[4]))
 			{
-				$msg .= "\t[##highlight##" . $array[0] . "##end##] (" . $array[1] . " " . $array[2] . ") :: ";
-				$msg .= $this -> bot -> core("tools") -> chatcmd("startri ".$array[0], "Start Ri");
-				foreach($this->ris as $indexri=>$ris)
+				$hasri = false;
+				foreach($this->ris as $index=>$ri)
 				{
-					$msg .= "/";
-					$msg .= $this -> bot -> core("tools") -> chatcmd("addri " . bcadd($indexri,1) . " " . $test[0], bcadd($indexri,1));
+					$checkri = $ri->GetRiMembers();
+					foreach($checkri as $id=>$object) {
+						if($object->name==$array[0]) { $hasri = true; }
+					}
 				}
-				$msg .= "\n";
+				if(!$hasri) {
+					$sid = ":";
+					if (strtolower($this->bot->game) == 'ao') {
+						$who = $this->bot->core("whois")->lookup($array[0]);
+						if (!($who instanceof BotError)) {
+							if ($who["faction"] == 'Clan') $sid = "C";
+							elseif ($who["faction"] == 'Omni') $sid = "O";						
+							elseif ($who["faction"] == 'Neutral') $sid = "N";
+							else $sid = "?";
+						} else {
+							$sid = "!";
+						}
+					}				
+					$msg .= "\t[##highlight##" . $array[0] . "##end##] (" . $array[1] . " " . $array[2] . ") ".$sid." ";
+					$msg .= $this -> bot -> core("tools") -> chatcmd("startri ".$array[0], "Start Ri");
+					foreach($this->ris as $indexri=>$ris)
+					{
+						$msg .= "/";
+						$msg .= $this -> bot -> core("tools") -> chatcmd("addri " . bcadd($indexri,1) . " " . $test[0], bcadd($indexri,1));
+					}
+					$msg .= "\n";
+				}
 			}
 		}
 		$msg .= "##end##";

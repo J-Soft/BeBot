@@ -239,6 +239,14 @@ class Roster_Handler extends BaseActiveModule
             $cp = "profession";
         }
         $buddies = count($this->bot->aoc->buddies);
+		$oncount = 0;
+		foreach($this->bot->aoc->buddies as $id => $state) {			
+				$name = $this->bot->core("player")->name($id);
+				$check = $this->bot->core("online")->get_online_state($name);
+				if($check['status']==1) {
+					$oncount++;
+				}
+		}
         //Get a list of professions
         $profession_list = "'" . $this->bot->core('professions')
                 ->get_professions("', '") . "'";
@@ -266,7 +274,7 @@ class Roster_Handler extends BaseActiveModule
         }
         $blob = " :: " . $this->bot->core("tools")
                 ->make_blob("click to view", $inside);
-        return $total . " members in <botname>" . $blob;
+        return $total . " members in <botname> (".$oncount." online)" . $blob;
     }
 
 

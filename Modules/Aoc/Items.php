@@ -12,7 +12,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all aknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -60,7 +60,7 @@ class Items extends BaseActiveModule
 		$this -> register_command('all', 'itemrecipes', 'MEMBER');
 
 
-        $this -> help['description'] = 'Submit and searches the MeatHooks Minions Central Item Database for information about an item.';
+        $this -> help['description'] = 'Submit and searches the Central Item Database for information about an item (MeatHooks Minions by default).';
         $this -> help['command']['items <text>'] = "Searches for items with the <text> in the name.";
         $this -> help['command']['items <id>'] = "Searches for a specific item with the <id>.";
         $this -> help['command']['items <[item]>'] = "Submits the item(s) into the item database. Several items may be sent in the same submit.";

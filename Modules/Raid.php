@@ -343,7 +343,7 @@ class Raid extends BaseActiveModule
                 unset($this->user[$name]);
                 $this->user2[$name] = "Left PrivGroup";
                 $this->pgleave[$name] = time();
-                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this->points_to($name));
+                if ($this->bot->exists_module("points")) $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this->points_to($name));
                 $this->bot->send_output("", "##highlight##$name##end## was removed from the raid.", "both");
             }
         }
@@ -362,11 +362,13 @@ class Raid extends BaseActiveModule
                     $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
                 }
                 $this->user[$name] = $this->bot->core('player')->id($name);
-                $this->bot->db->query(
-                    "UPDATE #___raid_points SET raiding = 1, raidingas = '" . $name . "' WHERE id = " . $this->points_to(
-                        $name
-                    )
-                );
+				if ($this->bot->exists_module("points")) {
+					$this->bot->db->query(
+						"UPDATE #___raid_points SET raiding = 1, raidingas = '" . $name . "' WHERE id = " . $this->points_to(
+							$name
+						)
+					);
+				}
                 $this->bot->send_output("", "##highlight##$name##end## has Rejoined the raid.", "both");
             }
         }
@@ -655,7 +657,7 @@ class Raid extends BaseActiveModule
                 }
             }
             $uid = $this->bot->core('player')->id($player);
-            if (!$uid) {
+            if ($uid instanceof BotError) {
                 return "Player ##highlight##$player##end## does not exist.";
             } else {
                 if (empty($this->user)) {
@@ -667,12 +669,14 @@ class Raid extends BaseActiveModule
                         "##error##Warning: ##highlight##$player##end## is not in the PrivGroup of ##highlight##<botname>##end####end##"
                     );
                 }
-                $this->bot->db->query(
-                    "INSERT INTO #___raid_points (id, nickname, points, raiding, raidingas) VALUES (" . $this->points_to(
-                        $player
-                    ) . ", '" . $this->points_to_name($player)
-                    . "', 0, 1, '" . $player . "') ON DUPLICATE KEY UPDATE raiding = 1, raidingas = '" . $player . "'"
-                );
+				if ($this->bot->exists_module("points")) {
+					$this->bot->db->query(
+						"INSERT INTO #___raid_points (id, nickname, points, raiding, raidingas) VALUES (" . $this->points_to(
+							$player
+						) . ", '" . $this->points_to_name($player)
+						. "', 0, 1, '" . $player . "') ON DUPLICATE KEY UPDATE raiding = 1, raidingas = '" . $player . "'"
+					);
+				}
                 $this->bot->db->query(
                     "INSERT INTO #___raid_log (name, points, time) VALUES ('" . $player . "', 0, " . $this->start . ") ON DUPLICATE KEY UPDATE name = '" . $player . "'"
                 ); //update is just so no error
@@ -729,13 +733,15 @@ class Raid extends BaseActiveModule
             return "You must be in the PrivGroup of ##highlight##<botname>##end## to join a Raid.";
         } else {
             if ($this->raid) {
-                $this->bot->db->query(
-                    "INSERT INTO #___raid_points (id, nickname, points, raiding, raidingas) VALUES (" . $this->points_to(
-                        $name
-                    ) . ", '" . $this->points_to_name($name)
-                    . "', 0, 1, '"
-                    . $name . "') ON DUPLICATE KEY UPDATE raiding = 1, raidingas = '" . $name . "'"
-                );
+				if ($this->bot->exists_module("points")) {
+					$this->bot->db->query(
+						"INSERT INTO #___raid_points (id, nickname, points, raiding, raidingas) VALUES (" . $this->points_to(
+							$name
+						) . ", '" . $this->points_to_name($name)
+						. "', 0, 1, '"
+						. $name . "') ON DUPLICATE KEY UPDATE raiding = 1, raidingas = '" . $name . "'"
+					);
+				}
                 $this->bot->db->query(
                     "INSERT INTO #___raid_log (name, points, time) VALUES ('" . $name . "', 0, " . $this->start . ") ON DUPLICATE KEY UPDATE name = '" . $name . "'"
                 ); //update is just so no error
@@ -780,7 +786,7 @@ class Raid extends BaseActiveModule
                 }
             }
             if (!$altinraid) {
-                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this->points_to($name));
+                if ($this->bot->exists_module("points")) $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this->points_to($name));
             }
 
             if (!$this->locked) {
@@ -836,7 +842,7 @@ class Raid extends BaseActiveModule
                         }
                     }
                 }
-                if (!$altinraid) {
+                if (!$altinraid && $this->bot->exists_module("points")) {
                     $this->bot->db->query(
                         "UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this->points_to($who)
                     );
@@ -1075,10 +1081,12 @@ class Raid extends BaseActiveModule
                 );
                 if (!empty($users)) {
                     //$inside = " :: $points Given to all Raiders ::\n\n";
+					$count = 0;
                     foreach ($users as $user) {
                         $count++;
-                        $user = $user[0];
-                        $this->points[$user] += $points;
+                        $user = $user[0];			
+						if(isset($this->points[$user])) $this->points[$user] += $points;
+						else $this->points[$user] = $points;					
                         $userp = isset($this->points[$user]) ? $this->points[$user] : 0;
                         $this->bot->db->query(
                             "INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points + "

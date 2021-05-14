@@ -759,10 +759,10 @@ class Whois_Core extends BasePassiveModule
                     ->chatcmd('history ' . $whois['nickname'], 'Character history') . "\n";
         }
         if ($this->bot->core("settings")->get("Whois", "ShowLinks") == true) {
-            $funcomURL = "http://people.anarchy-online.com/character/bio/d/" . $this->bot->dimension . "/name/" . strtolower(
+            $funcomURL = "https://people.anarchy-online.com/character/bio/d/" . $this->bot->dimension . "/name/" . strtolower(
                     $whois['nickname']
                 );
-            $mirrorURL = "http://mirror.org/ao/char.php?dimension=" . $this->bot->dimension . "&name=" . strtolower(
+            $mirrorURL = "https://auno.org/ao/char.php?name=" . strtolower(
                     $whois['nickname']
                 );
             $window .= "\n##normal##::: Links :::##end##\n";

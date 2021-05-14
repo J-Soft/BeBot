@@ -1454,8 +1454,16 @@ class Bot
             if ((strlen($result[$page]) + strlen($line) + 12) < $this->maxsize) {
                 $result[$page] .= $line . "\n";
             } else {
-                $page++;
-                $result[$page] = $line . "\n";
+				$line = preg_replace('/<\/([^>]+)> /','</$1>#@?#', $line);
+				$words = explode("#@?#", $line);
+				foreach ($words as $word) {
+					if ((strlen($result[$page]) + strlen($word) + 12) < $this->maxsize) {
+						$result[$page] .= $word . " ";
+					} else {				
+						$page++;
+						$result[$page] = $word . " ";
+					}
+				}
             }
         }
         $between = "";
@@ -1463,7 +1471,7 @@ class Bot
             if ($i != 0) {
                 $between = "text://";
             }
-            $msg = $info[1] . "<a href=\"" . $between . $result[$i] . "\">" . $info[3] . " <font color=#ffffff>(page " . ($i + 1) . " of " . ($page + 1) . ")</font>";
+			$msg = $info[1] . "<a href=\"" . $between . $result[$i] . "\">" . $info[3] . " <font color=#ffffff>(page " . ($i + 1) . " of " . ($page + 1) . ")</font>";
             if ($type == "tell") {
                 $this->send_tell($to, $msg, $pri, true, false);
             } else {

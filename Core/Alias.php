@@ -131,7 +131,7 @@ class Alias extends BaseActiveModule
 
     function add_alias($name, $alias)
     {
-        if (!$this->bot->core('player')->id($name)) {
+        if ($this->bot->core('player')->id($name) instanceof BotError) {
             return "##error##Character ##highlight##" . $name . "##end## does not exist.##end##";
         }
         if (strlen($alias) < 3) {

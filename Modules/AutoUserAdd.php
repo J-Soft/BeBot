@@ -12,7 +12,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,6 @@
 * Improved by Temar
 * This module automatically adds new users it sees chat on the guildchat to the user database.
 *
-*
 */
 $AutoUserAdd = new AutoUserAdd($bot);
 class AutoUserAdd extends BasePassiveModule
@@ -45,12 +44,16 @@ class AutoUserAdd extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
+		$this->register_module("autouseradd");
         $this->register_event("gmsg", "org");
+		if(strtolower($this->bot->game)=='ao') $this->register_event("pgjoin");
         $this->register_module("autouseradd");
         $this->bot->core("settings")
-            ->create("Autouseradd", "Enabled", true, "Should users be added to the Bot?");
+            ->create("Autouseradd", "Enabled", true, "Should Ao/Aoc bot users be added to the Bot?");
         $this->bot->core("settings")
-            ->create("Autouseradd", "Notify", true, "Should the User be Notified that he was added to the Bot?");
+            ->create("Autouseradd", "Private", false, "Should Ao private channel be included in user detection?");
+        $this->bot->core("settings")
+            ->create("Autouseradd", "Notify", false, "Should the User be Notified that he was added to the Bot?");
         // Fill checked array with current members, we won't need to readd them:
         $this->checked = array();
         $mems = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level = 2", MYSQLI_ASSOC);
@@ -60,14 +63,21 @@ class AutoUserAdd extends BasePassiveModule
             }
         }
     }
-
-
+	
     function register(&$module)
     {
         $this->hooks[] = & $module;
     }
 
-
+	
+	function pgjoin($name)
+    {
+		if($this->bot->core("settings")->get("Autouseradd", "Private")) {
+			$this->gmsg($name,"private","join");
+		}
+	}	
+	
+	
     function gmsg($name, $group, $msg)
     {
         if (!$this->bot->core("settings")->get("Autouseradd", "Enabled")) {

@@ -1,7 +1,7 @@
 <?php
 /*
 * MassMsg.php - Sends out mass messages and invites.
-*
+* Improved by Bitnykk with great help from Tyrence
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
 * Copyright (C) 2005-2020 J-Soft and the BeBot development team.
@@ -47,7 +47,7 @@ class MassMsg extends BaseActiveModule
         $this->help['command']['announce <message>'] = "Sends out announcement <message> as tells to all online members.";
         $this->help['command']['massinv <message>'] = "Sends out announcement <message> as tells to all online members and invites them to the private group.";
         $this->bot->core("settings")
-            ->create('MassMsg', 'MassMsg', 'Both', 'Who should get mass messages and invites?', 'Guild;Private;Both');
+            ->create('MassMsg', 'MassMsg', 'Both', 'Who should get mass messages and invites?', 'Guild;Private;Both;Online');
         $this->bot->core("settings")
             ->create(
                 'MassMsg',
@@ -108,6 +108,7 @@ class MassMsg extends BaseActiveModule
     function mass_msg($sender, $msg, $type)
     {
         //get a list of online users in the configured channel.
+		$status = array();
         $users = $this->bot->core('online')->list_users(
             $this->bot
                 ->core('settings')->get('MassMsg', 'MassMsg')
@@ -115,6 +116,14 @@ class MassMsg extends BaseActiveModule
         if ($users instanceof BotError) {
             return ($users);
         }
+		if($this->bot->core('settings')->get('MassMsg', 'MassMsg')=='Online') {
+			foreach ($users as $num => $recipient) {
+				$check = $this->bot->core("online")->get_online_state($recipient);
+				if($check['status']==0) {
+					unset($users[$num]);
+				}
+			}
+		}
         $msg = "##massmsg_type##$type from##end## ##highlight##$sender##end##: ##massmsg_msg##$msg##end##";
         $msg = $this->bot->core("colors")->parse($msg);
         $inchattell = $this->bot->core('settings')
@@ -169,7 +178,8 @@ class MassMsg extends BaseActiveModule
                     $status[$recipient]['sent'] = false;
                     $status[$recipient]['pg'] = true;
                 } else {
-                    $this->bot->send_tell($recipient, $message, 0, false, true, false);
+					if(strtolower($this->bot->game)=='ao'&&$this->bot->port>9000) $this->bot->aoc->send_tell($recipient, $message, "spam");
+                    else $this->bot->send_tell($recipient, $message, 1, false, true, false);					
                     $status[$recipient]['sent'] = true;
                 }
             } else {
@@ -184,7 +194,8 @@ class MassMsg extends BaseActiveModule
                     } else {
                         //Check if they've already gotten the tell so we don't spam unneccessarily.
                         if (!$status[$recipient]['sent']) {
-                            $this->bot->send_tell($recipient, $message, 0, false, true, false);
+							if(strtolower($this->bot->game)=='ao'&&$this->bot->port>9000) $this->bot->aoc->send_tell($recipient, $message, "spam");
+                            else $this->bot->send_tell($recipient, $message, 1, false, true, false);
                             $status[$recipient]['sent'] = true;
                         }
                         if ($this->bot->core("queue")->check_queue("invite")) {
@@ -200,12 +211,13 @@ class MassMsg extends BaseActiveModule
                 }
             }
         }
-        return ("Mass messages complete. " . $this->make_status_blob($status));
+        return (count($users)." mass messages/invites complete. " . $this->make_status_blob($status));
     }
 
 
     function make_status_blob($status_array)
     {
+		if(!is_array($status_array)||count($status_array)==0) return "Found no member to send message to.";
         $window = "<center>##blob_title##::: Status report for mass message :::##end##</center>\n";
         foreach ($status_array as $recipient => $status) {
             $window .= "\n##highlight##$recipient##end## - Message: ";
@@ -239,6 +251,11 @@ class MassMsg extends BaseActiveModule
         }
         return ($this->bot->core('tools')->make_blob('report', $window));
     }
+
+	function queue($name, $recipient)
+	{
+		$this->bot->core('chat')->pgroup_invite($recipient);
+	}		
 }
 
 ?>

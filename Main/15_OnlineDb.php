@@ -484,6 +484,8 @@ class OnlineDB_Core extends BasePassiveModule
     function list_users($channel)
     {
         $channel = strtolower($channel);
+		$table = "online";
+		$botpart = "AND botname = '".$this->bot->botname."' ";
         switch ($channel) {
             case 'gc':
             case 'guild':
@@ -499,11 +501,16 @@ class OnlineDB_Core extends BasePassiveModule
             case 'all':
                 $where_clause = 'status_gc = 1 OR status_pg = 1';
                 break;
+            case 'online':
+                $where_clause = 'user_level = 2 AND notify = 1';
+				$table = "users";
+				$botpart = "";
+                break;				
             default:
                 $this->error->set("Unknown channel '$channel' in online->list()");
                 return ($this->error);
         }
-        $query = "SELECT nickname FROM #___online WHERE ($where_clause) AND botname = '{$this->bot->botname}' ORDER BY nickname";
+        $query = "SELECT nickname FROM #___".$table." WHERE (".$where_clause.") ".$botpart."ORDER BY nickname";
         $users = $this->bot->db->select($query, MYSQLI_ASSOC);
         if (empty($users)) {
             $this->error->set("No users found in $channel");

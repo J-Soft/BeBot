@@ -1,4 +1,8 @@
 --------------
+Version 0.7.17
+--------------
+- Many modules improved/added for both AO & AoC (& few more bot fixes in various core/modules)
+--------------
 Version 0.7.16
 --------------
 - Discord relay added + IRC improved ; several features added or improved for both games ; AO icons enriched

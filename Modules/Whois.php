@@ -125,7 +125,18 @@ class Whois extends BaseActiveModule
             unset($this->name[$name]);
             unset($this->origin[$name]);
         }
-        $result = "##whois_name##" . $who["nickname"] . "##end## is a level ";
+        if (strtolower($this->bot->game) == 'ao') {
+			if($who["lastname"]!="") {
+				$result = "##whois_name##" . $who["nickname"] . "##end## '".$who["lastname"]."' is a level ";
+			} else {
+				$result = "##whois_name##" . $who["nickname"] . "##end## is a level ";
+			}
+			if($who["firstname"]!="") {
+				$result = "'".$who["firstname"]."' ".$result;
+			}			
+        } else {		
+			$result = "##whois_name##" . $who["nickname"] . "##end## is a level ";
+		}
         $result .= "##whois_level##" . $who["level"] . "##end##";
         if (strtolower($this->bot->game) == 'ao') {
             $result .= "/##whois_alienlevel##" . $who["at_id"] . "##end## " . $who["breed"];

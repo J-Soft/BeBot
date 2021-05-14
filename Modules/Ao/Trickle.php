@@ -331,14 +331,7 @@ class Trickle extends BaseActiveModule
                  'stat6',
                  'val6'
             )
-        ); //print_r($com);
-        if (
-			empty($com['stat1'])||empty($com['stat2'])||empty($com['stat3'])||empty($com['stat4'])||empty($com['stat5'])||empty($com['stat6'])||
-			!is_numeric($com['val1'])||!is_numeric($com['val2'])||!is_numeric($com['val3'])||!is_numeric($com['val4'])||!is_numeric($com['val5'])||!is_numeric($com['val6'])
-		) {
-            $this->error->set('You need to specify which stats & values (6x) to trickle from.');
-            return ($this->error);
-        }
+        );	
         $stats = array(
             'str',
             'sta',
@@ -348,21 +341,91 @@ class Trickle extends BaseActiveModule
             'psy'
         );
         //Check the validity of the stats
+		$error = false;
         for ($cnt = 1; $cnt < 7; $cnt++) {
             $statno = 'stat' . $cnt;
             //We only want the three first chars of the stat
-            $com[$statno] = substr($com[$statno], 0, 3);
+            $com[$statno] = @substr($com[$statno], 0, 3);
             if ((!in_array($com[$statno], $stats)) && (!empty($com[$statno]))) {
                 $this->error->set($this->error->get() . "'{$com[$statno]}' is not a recognized base stat.\n");
+				$error = true;
             }
         }
-        if ($this->error->status() == true) {
+        if ($error) {
             return $this->error;
+        }		
+		$check = $stats;
+		if(!empty($com['stat1'])) {
+			if (
+				!is_numeric($com['val1'])
+			) {
+				$this->error->set('Wrong value specified at 1st row. ');
+				return ($this->error);
+			} else {
+				unset($check[$com['stat1']]);
+			}
+        } else {
+			$this->error->set('You need to specify at least one stat & value to trickle from.');
+			return ($this->error);			
+		}
+		if(!empty($com['stat2'])) {
+			if (
+				!is_numeric($com['val2'])
+			) {
+				$this->error->set('Wrong value specified at 2nd row. ');
+				return ($this->error);
+			} else {
+				unset($check[$com['stat2']]);
+			}
+        }
+		if(!empty($com['stat3'])) {
+			if (
+				!is_numeric($com['val3'])
+			) {
+				$this->error->set('Wrong value specified at 3rd row. ');
+				return ($this->error);
+			} else {
+				unset($check[$com['stat3']]);
+			}
+        }
+		if(!empty($com['stat4'])) {
+			if (
+				!is_numeric($com['val4'])
+			) {
+				$this->error->set('Wrong value specified at 4th row. ');
+				return ($this->error);
+			} else {
+				unset($check[$com['stat4']]);
+			}
+        }
+		if(!empty($com['stat5'])) {
+			if (
+				!is_numeric($com['val5'])
+			) {
+				$this->error->set('Wrong value specified at 5th row. ');
+				return ($this->error);
+			} else {
+				unset($check[$com['stat5']]);
+			}
+        }
+		if(!empty($com['stat6'])) {
+			if (
+				!is_numeric($com['val6'])
+			) {
+				$this->error->set('Wrong value specified at 6th row. ');
+				return ($this->error);
+			} else {
+				unset($check[$com['stat6']]);
+			}
         }
         for ($cnt = 1; $cnt < 7; $cnt++) {
             if ((!empty($com['stat' . $cnt])) && (!empty($com['val' . $cnt]))) {
                 $stats[$com['stat' . $cnt]] = intval($com['val' . $cnt]);
-            }
+            } else {
+				$first = array_key_first($check);
+				$stats[$first] = 0;
+				unset($check[$first]);
+			}
         }
         $trickle = $this->Calc_trickle($stats);
         return ($this->CreateBlob($stats, $trickle));

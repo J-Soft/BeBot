@@ -289,7 +289,12 @@ class Roster_Core extends BasePassiveModule
         if ($this->bot->guildbot) {
             $this->update_guild();
         } else {
-            $this->update_raid();
+			if($this->bot->exists_module("raid") && $this->bot->core("raid")->raid) {
+				$this->bot->log("ROSTER", "UPDATE", "Skipping update as raid is running.");
+				Return;
+			} else {
+				$this->update_raid();
+			}
         }
     }
 

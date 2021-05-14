@@ -57,11 +57,15 @@ class News extends BaseActiveModule
 		           id INT NOT NULL auto_increment PRIMARY KEY,
 		           type INT default '1',
 		           time INT NOT NULL default '0',
-		           name VARCHAR(30) default NULL,
+		           name VARCHAR(255) default NULL,
 		           news TEXT
 		           )"
         );
-        //Regiser commands
+		if($this->bot->db->get_version("news")<2) {
+			$this->bot->db->query("ALTER TABLE #___news MODIFY COLUMN Name VARCHAR(255)");
+			$this -> bot -> db -> set_version("news", 2);
+		}
+        //Register commands
         $this->register_command('all', 'news', 'GUEST', array('add' => 'MEMBER'));
         $this->register_command('all', 'headline', 'GUEST', array('add' => 'ADMIN'));
         $this->register_command(
@@ -214,7 +218,7 @@ class News extends BaseActiveModule
     */
     function get_news($name)
     {
-        $newsdate = "";
+        $newsdate = ""; $inside = "";
         $result_headline = $this->bot->db->select(
             "SELECT id, time, name, news FROM #___news WHERE type = '2' ORDER BY time DESC LIMIT 0, 3"
         );
@@ -236,7 +240,12 @@ class News extends BaseActiveModule
 				$inside .= "##ao_infoheader##On " . 
 					$valdate
                     . " GMT ##ao_cctext##" . $val[2] . "##end## Reported:\n";
-                $inside .= "##ao_infotext##" . stripslashes($val[3]);
+				if (mb_detect_encoding($val[3], 'UTF-8', true)) {
+					$text = utf8_decode($val[3]);
+				} else {
+					$text = $val[3];
+				}					
+                $inside .= "##ao_infotext##" . stripslashes($text);
                 if (($this->bot->core("security")
                         ->check_access(
                             $name,
@@ -296,11 +305,16 @@ class News extends BaseActiveModule
     function get_last_headline()
     {
         $query = "SELECT name, news from #___news WHERE type = '2' ORDER BY time DESC LIMIT 1";
-        $news = $this->bot->db->select($query, MYSQLI_ASSOC);
+        $news = $this->bot->db->select($query, MYSQLI_ASSOC);		
         if (empty($news)) {
             return false;
         } else {
-            $news = $news[0]['name'] . ':##highlight## ' . $news[0]['news'] . "##end##\n";
+			if (mb_detect_encoding($news[0]['news'], 'UTF-8', true)) {
+				$text = utf8_decode($news[0]['news']);
+			} else {
+				$text = $news[0]['news'];
+			}				
+            $news = $news[0]['name'] . ':##highlight## ' . $text . "##end##\n";
             return $news;
         }
     }
@@ -334,7 +348,12 @@ class News extends BaseActiveModule
                 $inside .= "##ao_infoheader##" .
 					$valdate
                     . " GMT ##ao_cctext##" . $val[2] . "##end## wrote:\n";
-                $inside .= " ##ao_infotext##" . stripslashes($val[3]);
+				if (mb_detect_encoding($val[3], 'UTF-8', true)) {
+					$text = utf8_decode($val[3]);
+				} else {
+					$text = $val[3];
+				}						
+                $inside .= " ##ao_infotext##" . stripslashes($text);
                 if ($this->bot->core("security")->check_access(
                         $name,
                         $this->bot
@@ -359,6 +378,7 @@ class News extends BaseActiveModule
     */
     function set_news($name, $msg, $type)
     {
+		$msg = utf8_encode($msg);
         $this->bot->db->query(
             "INSERT INTO #___news (type, time, name, news) VALUES ('" . $type . "', " . time(
             ) . ", '" . $name . "', '" . addslashes($msg) . "')"

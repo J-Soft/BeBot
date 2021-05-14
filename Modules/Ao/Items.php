@@ -52,6 +52,7 @@ class VhItems extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
+		$this->register_module("items");
         $this->register_command('all', 'items', 'GUEST');
         $this->help['description'] = 'Searches the central database for information about an item.';
         $this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";
@@ -116,42 +117,49 @@ class VhItems extends BaseActiveModule
     function command_handler($name, $msg, $origin)
     {
         if (preg_match('/^items/i', $msg, $info)) {
-            $words = trim(substr($msg, strlen('items')));
-            if (!empty($words)) {
-                $parts = explode(' ', $words);
-                if (count($parts) > 1 && is_numeric($parts[0])) {
-                    $ql = $parts[0];
-                    unset($parts[0]);
-                    $search = implode(' ', $parts);
-                } else {
-                    $ql = 0;
-                    $search = $words;
-                }
-                $url = $this->server;
-                $url .= '?bot=BeBot';
-                $url .= '&output=aoml';
-                $url .= '&max=' . $this->max;
-                $url .= '&search=' . urlencode($search);
-                $url .= '&ql=' . $ql;
-                $url .= '&icons=' . $this->icons;
-                if ($this->color_header) {
-                    $url .= '&color_header=' . $this->color_header;
-                }
-                if ($this->color_highlight) {
-                    $url .= '&color_highlight=' . $this->color_highlight;
-                }
-                if ($this->color_normal) {
-                    $url .= '&color_normal=' . $this->color_normal;
-                }
-                $result = $this->bot->core("tools")->get_site($url, 1);
-                return $result;
-            } else {
-                return "Usage: items [quality] [item]";
-            }
+			return $this->itemsearch($msg,'aoml');
         } else {
             $this->bot->send_help($name);
         }
     }
+	
+	function itemsearch($msg,$format)
+	{
+	   $words = trim(substr($msg, strlen('items')));
+		if (!empty($words)) {
+			$parts = explode(' ', $words);
+			if (count($parts) > 1 && is_numeric($parts[0])) {
+				$ql = $parts[0];
+				unset($parts[0]);
+				$search = implode(' ', $parts);
+			} else {
+				$ql = 0;
+				$search = $words;
+			}
+			$url = $this->server;
+			$url .= '?bot=BeBot';
+			$url .= '&output='.$format;
+			$url .= '&max=' . $this->max;
+			$url .= '&search=' . urlencode($search);
+			$url .= '&ql=' . $ql;
+			$url .= '&icons=' . $this->icons;
+			if ($this->color_header) {
+				$url .= '&color_header=' . $this->color_header;
+			}
+			if ($this->color_highlight) {
+				$url .= '&color_highlight=' . $this->color_highlight;
+			}
+			if ($this->color_normal) {
+				$url .= '&color_normal=' . $this->color_normal;
+			}
+			$result = $this->bot->core("tools")->get_site($url, 1);
+			return $result;
+		} else {
+			return "Usage: items [quality] [item]";
+		}
+	}
+	
+	
 }
 
 ?>

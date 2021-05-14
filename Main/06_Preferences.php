@@ -237,10 +237,7 @@ class Preferences_core extends BasePassiveModule
         }
         if ($module != false && $setting == false) {
             //We're fetching a list of all preferences for a given module
-            $prefs = array_merge(
-                $this->cache['def'][strtolower($module)],
-                (array)$this->cache[$uid][strtolower($module)]
-            );
+            if(isset($this->cache[$uid])) { $prefs = array_merge($this->cache['def'][strtolower($module)], (array)$this->cache[$uid][strtolower($module)]); }
             return ($prefs);
         }
         $module = strtolower($module);
@@ -359,7 +356,8 @@ class Preferences_core extends BasePassiveModule
         $window = "<center>##blob_title##::: Preferences for $module :::##end##</center>\n";
         foreach ($pref_defs as $preference) {
             //Condition values for easier access later.
-            $current_value = $prefs[$preference['name']];
+			$current_value = "";
+            if(isset($prefs[$preference['name']])) $current_value = $prefs[$preference['name']];
             $value_list = explode(';', $preference['possible_values']);
             $window .= "##highlight##{$preference['name']}: ##end####blob_text##{$preference['description']}##end##\n";
             //Create a list of buttons for each option

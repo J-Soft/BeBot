@@ -14,7 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -66,16 +66,17 @@ class Points extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Points", "Transfer", false, "Can points be transfered?");
         $this->bot->core("settings")
-            ->create("Points", "To_Main", false, "Are points shared over all alts?");
+            ->create("Points", "To_Main", false, "Are points shared over all alts (hidden) ?", null, true);
         $this->help['description'] = 'Manage raid points';
         $this->help['command']['points [name]'] = "Shows the amount of points in [name]s account. If [name] is not given it shows the points in your account";
         $this->help['command']['points give <name> <points>'] = "Gives <points> points to player <name>";
         $this->help['command']['points add <name> <points> <why>'] = "Adds <points> points to player <name>s point account";
         $this->help['command']['points [del/rem] <name> <points> <why>'] = "Removes <points> points from player <name>s point account";
         $this->help['command']['points transfer <(on|off)>'] = "Turns ability to give points on or off.";
-        $this->help['command']['points tomain <(on|off)>'] = "Turns ability to give points from alts to main on or off.";
-        $this->help['command']['points all'] = "Shows the combined number of points on your main and alts.";
+        $this->help['command']['points tomain <(on|off)>'] = "Turns ability to concentrate points at main on (which turns alt confirmation on also) or off.";
+        $this->help['command']['points all'] = "Shows all players points for admin.";
         $this->help['command']['points top'] = "Shows the 25 biggest point accounts.";
+		$this->help['command']['points log'] = "Shows your character points log.";
         $this->register_command(
             "all",
             "points",
@@ -96,7 +97,7 @@ class Points extends BaseActiveModule
     function update_table()
     {
 		$updatepoints = false;
-        if ($this->bot->db->get_version("raid_points") == 4) {
+        if ($this->bot->db->get_version("raid_points") == 5) {
             return;
         }
         switch ($this->bot->db->get_version("raid_points")) {
@@ -151,9 +152,14 @@ class Points extends BaseActiveModule
                     "add",
                     "ALTER TABLE #___raid_points ADD raidingas VARCHAR(20) DEFAULT '' after raiding"
                 );
+			case 4:
+				$this->bot->db->query(
+					"UPDATE #___settings
+		            SET hidden = 1 WHERE setting = 'To_Main' "
+				);
             default:
         }
-        $this->bot->db->set_version("raid_points", 4);
+        $this->bot->db->set_version("raid_points", 5);
     }
 
 
@@ -166,7 +172,11 @@ class Points extends BaseActiveModule
 		if(!isset($msg[1])) { $msg[1]=""; }
         Switch (strtolower($msg[1])) {
             case 'give':
-                $this->give_points($name, $msg[2], $info[3]);
+				if ($this->bot->exists_module("bidding") && !empty($this->bot->core("bidding")->bid)) {
+					Return ("Error: giving point is ##highlight##forbidden##end## during a bid");
+				} else {
+					$this->give_points($name, $msg[2], $msg[3]);
+				}			
                 Break;
             case 'add':
                 if (strlen($msg[4]) < 5) {
@@ -182,7 +192,7 @@ class Points extends BaseActiveModule
                 $this->rem_points($name, $msg[2], $msg[3], $msg[4]);
                 Break;
             case 'transfer':
-                $this->transfer_points($name, $msg[2]);
+				$this->transfer_points($name, $msg[2]);
                 Break;
             case 'tomain':
                 $this->tomain_points($name, $msg[2]);
@@ -230,7 +240,7 @@ class Points extends BaseActiveModule
             $this->bot->send_tell($name, "You have ##highlight##$points##end## raidpoints.");
         } else {
             if ($this->bot->core("security")->check_access($name, "admin")) {
-                if (!$this->bot->core('player')->id($target)) {
+                if ($this->bot->core('player')->id($target) instanceof BotError) {
                     $this->bot->send_tell($name, "Player ##highlight##$target##end## does not exist.");
                 } else {
                     $result = $this->bot->db->select(
@@ -262,8 +272,6 @@ class Points extends BaseActiveModule
     */
     function all_points($name)
     {
-        //	if ($this -> bot -> core("security") -> check_access($name, "superadmin"))
-        //	{
         $this->bot->send_tell($name, "Fetching full list of points, this might take a while.");
         $result = $this->bot->db->select(
             "SELECT nickname, points FROM #___raid_points WHERE points > 0 ORDER BY points DESC"
@@ -284,9 +292,6 @@ class Points extends BaseActiveModule
             "All raidpoints :: " . $this->bot
                 ->core("tools")->make_blob("click to view", $inside)
         );
-        //	}
-        //	else
-        //	$this -> bot -> send_tell($name, "You must be a superadmin to do this");
     }
 
 
@@ -326,29 +331,34 @@ class Points extends BaseActiveModule
     */
     function tomain_points($name, $toggle)
     {
-        //if ($this -> bot -> core("security") -> check_access($name, "superadmin"))
-        //{
-        $toggle == strtolower($toggle);
+		$check = false; $stat = false;
+		$add = "";
+        $toggle = strtolower($toggle);
+		
         if ($toggle == "on") {
             $stat = true;
             $txt = "enabled";
-        }
-        if ($toggle == "check") {
+			$add = " All points have been transfered.";
+        } elseif ($toggle == "check") {
+			$check = true;
             if (!$this->bot->core("settings")->get("Points", "To_main")) {
-                Return ("ToMain is Off No Check Required");
+                $add = " To_main option is off ; points are given to any character.";
             } else {
-                $check = true;
+                $add = " To_main option is on ; points are concentrated on mains.";
             }
         } else {
             $stat = false;
             $txt = "disabled";
+			$add = " No points have been transfered.";
         }
+		
         if (!$check) {
             $this->bot->core("settings")->save("Points", "To_main", $stat);
         }
-        $add = "";
-        //if ($stat || $check)
+		
+        if ($stat)
         {
+			$this->bot->core("settings")->save("Alts", "Confirmation", true);
             $result = $this->bot->db->select("SELECT id, nickname, points FROM #___raid_points WHERE points > 0");
             foreach ($result as $res) {
                 if ($res[0] != $this->points_to($res[1])) {
@@ -366,14 +376,14 @@ class Points extends BaseActiveModule
                     } else {
                         $this->bot->db->query(
                             "UPDATE #___raid_points SET points = " . ($res[2] + $resu[0][1]) . " WHERE id = " . $this->points_to(
-                                $res[0]
+                                $res[1]
                             )
                         );
                     }
                 }
             }
-            $add = " All points have been transfered.";
         }
+		
         if ($check) {
             $this->bot->send_tell($name, $add);
         } else {
@@ -382,65 +392,64 @@ class Points extends BaseActiveModule
                 "Points going to the main character's account is now ##highlight##" . $txt . "##end##." . $add
             );
         }
-        //}
-        //else
-        //$this -> bot -> send_tell($name, "You must be a superadmin to do this");
     }
 
 
     function check_alts($main)
     {
-        $alts = $this->bot->core("alts")->get_alts($main);
-        if (!empty($alts)) {
-            foreach ($alts as $alt) {
-                $result = $this->bot->db->select(
-                    "SELECT id, nickname, points FROM #___raid_points WHERE points != 0 AND id = " . $this->points_to(
-                        $alt,
-                        false
-                    )
-                );
-                if (!empty($result)) {
-                    $res = $result[0];
-                    if ($res[0] != $this->points_to($res[1])) {
-                        $resu = $this->bot->db->select(
-                            "SELECT nickname, points FROM #___raid_points WHERE id = " . $this->points_to($res[1])
-                        );
-                        if (empty($resu)) {
-                            $this->bot->db->query(
-                                "INSERT INTO #___raid_points (id, nickname, points, raiding) VALUES (" . $this->points_to(
-                                    $res[1]
-                                ) . ", '" . $this->points_to_name($res[1]) . "', "
-                                . $res[2] . ", 0)"
-                            );
-                        } else {
-                            $this->bot->db->query(
-                                "UPDATE #___raid_points SET points = " . ($res[2] + $resu[0][1]) . " WHERE id = " . $this->points_to(
-                                    $res[0]
-                                )
-                            );
-                        }
-                        $check = $this->bot->db->select(
-                            "SELECT nickname, points FROM #___raid_points WHERE id = " . $this->points_to($res[1])
-                        );
-                        if (!empty($check) && ($check[0][1] != ($res[2] + $resu[0][1]))) {
-                            echo "Error With Transfering Points from Alt $alt to $main";
-                        } else {
-                            $this->bot->db->query("UPDATE #___raid_points SET points = 0 WHERE id = " . $res[0]);
-                        }
-                    }
-                }
-                $result = $this->bot->db->select(
-                    "SELECT id FROM #___raid_points WHERE raiding = 1 and id = " . $this->points_to($alt, false)
-                );
-                if (!empty($result)) {
-                    $res = $result[0];
-                    $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $res[0]);
-                    $this->bot->db->query(
-                        "UPDATE #___raid_points SET raiding = 1 WHERE id = " . $this->points_to($alt)
-                    );
-                }
-            }
-        }
+		if($this->bot->core("settings")->get("Points", "To_main")) {
+			$alts = $this->bot->core("alts")->get_alts($main);
+			if (!empty($alts)) {
+				foreach ($alts as $alt) {
+					$result = $this->bot->db->select(
+						"SELECT id, nickname, points FROM #___raid_points WHERE points != 0 AND id = " . $this->points_to(
+							$alt,
+							false
+						)
+					);
+					if (!empty($result)) {
+						$res = $result[0];
+						if ($res[0] != $this->points_to($res[1])) {
+							$resu = $this->bot->db->select(
+								"SELECT nickname, points FROM #___raid_points WHERE id = " . $this->points_to($res[1])
+							);
+							if (empty($resu)) {
+								$this->bot->db->query(
+									"INSERT INTO #___raid_points (id, nickname, points, raiding) VALUES (" . $this->points_to(
+										$res[1]
+									) . ", '" . $this->points_to_name($res[1]) . "', "
+									. $res[2] . ", 0)"
+								);
+							} else {
+								$this->bot->db->query(
+									"UPDATE #___raid_points SET points = " . ($res[2] + $resu[0][1]) . " WHERE id = " . $this->points_to(
+										$res[1]
+									)
+								);
+							}
+							$check = $this->bot->db->select(
+								"SELECT nickname, points FROM #___raid_points WHERE id = " . $this->points_to($res[1])
+							);
+							if (!empty($check) && ($check[0][1] != ($res[2] + $resu[0][1]))) {
+								echo "Error With Transfering Points from Alt $alt to $main";
+							} else {
+								$this->bot->db->query("UPDATE #___raid_points SET points = 0 WHERE id = " . $res[0]);
+							}
+						}
+					}
+					$result = $this->bot->db->select(
+						"SELECT id FROM #___raid_points WHERE raiding = 1 and id = " . $this->points_to($alt, false)
+					);
+					if (!empty($result)) {
+						$res = $result[0];
+						$this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $res[0]);
+						$this->bot->db->query(
+							"UPDATE #___raid_points SET raiding = 1 WHERE id = " . $this->points_to($alt)
+						);
+					}
+				}
+			}
+		}
     }
 
 
@@ -479,15 +488,29 @@ class Points extends BaseActiveModule
             $result = $this->bot->db->select(
                 "SELECT points FROM #___raid_points WHERE id = " . $this->points_to($name)
             );
+			
+			if($this->bot->core("settings")->get("Points", "To_Main")) {
+				$self = false;
+				$main = $this->points_to_name($who);
+				if($name==$main) $self = true;
+				$alts = $this->bot->core("alts")->get_alts($main);
+				foreach($alts AS $alt) {
+					if($name==$alt) $self = true;
+				}
+				if($self) {
+					$this->bot->send_tell($name, "No use to send points to yourself!");
+					return;
+				}
+			}
             if (!$result) {
                 $this->bot->send_tell($name, "You have no points.");
                 return;
             }
             if ($num > ($result[0][0])) {
-                $this->bot->send_tell($name, "You only have ##highlight''" . ($result[0][0]) . "##end## raid points.");
+                $this->bot->send_tell($name, "You don't have that much points.");
                 return;
             } else {
-                if (!$this->bot->core('player')->id($who)) {
+                if ($this->bot->core('player')->id($who) instanceof BotError) {
                     $this->bot->send_tell($name, "Player ##highlight##$who##end## does not exist.");
                     return;
                 } else {
@@ -528,7 +551,7 @@ class Points extends BaseActiveModule
             $this->bot->send_tell($name, "$num is not a valid points value.");
             return false;
         }
-        if (!$this->bot->core('player')->id($who)) {
+        if ($this->bot->core('player')->id($who) instanceof BotError) {
             $this->bot->send_tell($name, "Player ##highlight##$who##end## does not exist.");
             return false;
         } else {
@@ -568,7 +591,7 @@ class Points extends BaseActiveModule
             $this->bot->send_tell($name, "$num is not a valid points value.");
             return false;
         }
-        if (!$this->bot->core('player')->id($who)) {
+        if ($this->bot->core('player')->id($who) instanceof BotError) {
             $this->bot->send_tell($name, "Player ##highlight##$who##end## does not exist.");
             return false;
         } else {

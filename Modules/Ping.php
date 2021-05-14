@@ -131,14 +131,11 @@ class ping extends BaseActiveModule
         switch ($this->bot->dimension) {
             case 0:
                 return "chat.dt.funcom.com";
-            case 1:
+			case 5:
+			case 6:
                 return "chat.d1.funcom.com";
-            case 2:
-                return "chat.d2.funcom.com";
-            case 3:
-                return "chat.d3.funcom.com";
             default:
-                return false;
+                return "chat.d1.funcom.com";
         }
     }
 }
