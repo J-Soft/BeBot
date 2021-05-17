@@ -31,7 +31,7 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-define('BOT_VERSION', "0.7.17");
+define('BOT_VERSION', "0.7.18");
 define('BOT_VERSION_INFO', ".git(official)");
 define('BOT_VERSION_NAME', "BeBot");
 
@@ -39,7 +39,7 @@ define('BOT_VERSION_NAME', "BeBot");
 define('BOT_VERSION_SNAPSHOT', false);
 
 // Is this a stable release or a development release?
-define('BOT_VERSION_STABLE', true);
+define('BOT_VERSION_STABLE', false);
 
 $bot_version = BOT_VERSION;
 $php_version = phpversion();
