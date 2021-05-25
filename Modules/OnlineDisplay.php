@@ -47,6 +47,8 @@ class OnlineDisplay extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "online", "GUEST");
         $this->register_command("all", "sm", "GUEST");
+		$this->register_command("all", "recent", "GUEST");
+		$this -> register_alias("recent", "recents");
 		$this->register_module("onlinedisplay");
         // Register for logon notifies
         $this->register_event("logon_notify");
@@ -64,6 +66,7 @@ class OnlineDisplay extends BaseActiveModule
         $this->help['command']['online'] = 'Shows who is online in org or chatgroup.';
         $this->help['command']['online <prof>'] = "Shows all characters of " . $cp . " <prof> online in org or chatgroup.";
         $this->help['command']['sm'] = "Lists all characters online sorted alphabetical by name.";
+		$this->help['command']['recent'] = "Lists all characters logged the last 24 hours.";
         $this->bot->core("settings")
             ->create("Online", "Mode", $mode, "Which mode should be used in the online display?", "Basic;Fancy");
         $this->bot->core("settings")
@@ -227,7 +230,11 @@ class OnlineDisplay extends BaseActiveModule
             } else {
                 if (preg_match("/^sm$/i", $msg)) {
                     return $this->sm_msg($what);
-                }
+                } else {
+					if (preg_match("/^recent$/i", $msg)) {
+						return $this->recent_msg($what);
+					}
+				}
             }
         }
     }
@@ -661,6 +668,24 @@ class OnlineDisplay extends BaseActiveModule
         return $countonline[0][0] . " Members Online :: " . $this->bot
             ->core("tools")->make_blob("click to view", $msg);
     }
+	
+	function recent_msg($what)
+	{
+        $day = time() - 86400;
+		$recent = $this->bot->db->select("SELECT nickname FROM #___online WHERE status_gc_changetime > ".$day);
+        if (!empty($recent))
+		{
+                $count = 0;
+                $msg = "";
+                foreach ($recent as $toon)
+			{
+                        $msg .= $toon[0]." ";
+                        $count++;
+                        }
+                }
+       return $count." logons today :: ".$this->bot->core("tools")->make_blob("click to view",$msg);
+    }
+	
 }
 
 ?>
