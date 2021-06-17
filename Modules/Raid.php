@@ -64,6 +64,8 @@ class Raid extends BaseActiveModule
         $this->locked = false;
         $this->register_command("all", "c", "LEADER");
         $this->register_command("all", "raid", "GUEST");
+        $this->register_command("all", "raidhistory", "LEADER");
+        $this->register_command("all", "raidstats", "LEADER");
         if (strtolower($this->bot->game) == 'ao') {
             $this->register_event("pgleave");
             $this->register_event("pgjoin");
@@ -135,7 +137,10 @@ class Raid extends BaseActiveModule
             );
 
         $this->help['description'] = 'Module to manage and announce raids.';
+        $this->help['command']['raidhistory [x]'] = "Shows 10 archived raids ; option to skip x records from bottom links.";
+        $this->help['command']['raidstats <timestamp>'] = "Shows participants of give raid by timestamp of start.";
         $this->help['command']['raid start <description>'] = "Starts a raid with optional description.";
+        $this->help['command']['raid note <details>'] = "Adds optional note to current raid.";
         $this->help['command']['raid end'] = "Ends a raid.";
         $this->help['command']['raid join'] = "Join the active raid.";
         $this->help['command']['raid leave'] = "Leave the active raid.";
@@ -162,6 +167,16 @@ class Raid extends BaseActiveModule
 				end INT default '0',
 				UNIQUE (name, time))"
         );
+        $this->bot->db->query(
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("raid_details", "true") . "
+				(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				name VARCHAR(50),
+				description VARCHAR(50),
+				note VARCHAR(50),
+				time INT default '0',
+				end INT default '0',
+				UNIQUE (name, time))"
+        );		
         $this->restart_raid();
     }
 
@@ -174,6 +189,12 @@ class Raid extends BaseActiveModule
             case 'c':
                 $this->raid_command($name, $var[1]);
                 Break;
+            case 'raidhistory':
+                Return $this->raid_history($name, $var[1]);
+                Break;
+            case 'raidstats':
+                Return $this->raid_stats($name, $var[1]);
+                Break;				
             case 'raid':
                 $var = explode(" ", $msg, 4);
 				if(!isset($var[1])) { $var[1]=""; }
@@ -304,8 +325,62 @@ class Raid extends BaseActiveModule
     {
         $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
     }
+	
+    /*
+    This gets called for history
+    */
+    function raid_history($name, $skip)
+    {
+		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
+		$pager = 5; $range = $skip+$pager;		
+		$total = $this->bot->db->select("SELECT COUNT(DISTINCT(time)) FROM #___raid_log WHERE end > time");
+		$history = $this->bot->db->select("SELECT DISTINCT(time) FROM #___raid_log WHERE end > time ORDER BY time DESC LIMIT ".$skip.", ".$pager);
+		$inside = "";
+		foreach($history as $entry) {
+			$date = date('Y M D d H:i', $entry[0]);
+			$details = $this->bot->db->select("SELECT * FROM #___raid_details WHERE time =".$entry[0]);
+			if (count($details)==1) {
+				$rl = $details[0][1];
+				$desc = $details[0][2];
+				$note = $details[0][3];
+			} else {
+				$rl = "?";
+				$desc = "?";
+				$note = "?";
+			}
+			$inside .= $date." => ".$desc." by ".$name." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats")."\n\n";
+		}
+		if($range<$total[0][0]) {
+			$inside .= "\n".$this->bot->core("tools")->chatcmd("raidhistory ".$range, "Next");
+		}
+		Return ("Raid History ".$skip."-".$range." / ".$total[0][0]." :: " . $this->bot
+				->core("tools")->make_blob("click to view", $inside));
+    }
 
+    /*
+    This gets called for stats
+    */
+    function raid_stats($name, $ts)
+    {
+		if ( !is_numeric($ts) ) { Return "No timestamp provided"; }
+		$stats = $this->bot->db->select("SELECT * FROM #___raid_log WHERE time =".$ts);
+		$inside = "";
+		if(count($stats)>0) {
+			$duration = floor(($stats[0][4]-$stats[0][3])/60);
+			$inside .= count($stats)." joiner(s) for ".$duration." min(s) :\n";
+			foreach($stats as $stat) {
+				$inside .= $stat[1]." ";
+			}			
+		} else {
+			$inside .= "Noth found at timestamp";
+		}
+		Return ("Raid Stats ".$ts." :: " . $this->bot
+				->core("tools")->make_blob("click to view", $inside));		
+    }	
 
+    /*
+    This gets called on restart
+    */
     function restart_raid()
     {
         $raiding = $this->bot->db->select("SELECT nickname, raidingas FROM #___raid_points WHERE raiding = 1");
@@ -447,14 +522,10 @@ class Raid extends BaseActiveModule
                 $this->pause(true);
                 $this->save();
                 $this->register_event("cron", "1min");
+				$this->bot->db->query(
+					"INSERT INTO #___raid_details (name, description, time) VALUES ('$name', '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', " . time() . ")"
+				);				
                 return "Raid started. :: " . $this->control();
-                if (isset($this->bot->commands["tell"]["raidhistory"])) {
-                    $this->bot->db->query(
-                        "INSERT INTO #___raid_details (name, description, start) VALUES ('$name', '" . mysqli_real_escape_string($this->bot->db->CONN,
-                            $desc
-                        ) . "', " . time() . ")"
-                    );
-                }
             } else {
                 return "Raid already running.";
             }
@@ -489,12 +560,10 @@ class Raid extends BaseActiveModule
                 $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
                 $this->locked = false;
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
-                if (isset($this->bot->commands["tell"]["raidhistory"])) {
-                    $this->bot->db->query(
-                        "UPDATE #___raid_details SET end = " . time(
-                        ) . ", description = '" . $this->description . "', note = '" . $this->note . "' WHERE start = " . $this->start
-                    );
-                }
+				$this->bot->db->query(
+					"UPDATE #___raid_details SET end = " . time(
+					) . ", description = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', note = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->note) . "' WHERE time = " . $this->start
+				);
                 Return "Raid stopped. :: " . $this->control();
             } else {
                 return "No raid running.";
@@ -511,10 +580,10 @@ class Raid extends BaseActiveModule
     */
     function raid_command($name, $command)
     {
-        $msg = $this->bot->core("settings")->get('Raid', 'Cformat');
-        $msg = str_replace("##name##", $name, $msg);
-        $msg = str_replace("##msg##", $command, $msg);
-        $msg = str_replace("##nl##", "\n", $msg);
+		$msg = '
+##red##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##end##
+ ##orange##'.strtoupper($command).'##end##
+##red##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##end##';
         $this->bot->send_output($name, $msg, "both");
     }
 
@@ -548,12 +617,10 @@ class Raid extends BaseActiveModule
 					else $this->points[$user] = $points;
                     $userp = isset($this->points[$user]) ? $this->points[$user] : 0;
                     $inside .= "##highlight##" . $user . "##end##: ##highlight##" . $userp . "##end## points\n";
-                    if (isset($this->bot->commands["tell"]["raidhistory"])) {
-                        $this->bot->db->query(
-                            "INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points + "
-                            . $points
-                        );
-                    }
+					$this->bot->db->query(
+						"INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points + "
+						. $points
+					);
 
                 }
                 $this->bot->send_output(
@@ -614,12 +681,10 @@ class Raid extends BaseActiveModule
 					else $this->points[$user] = $points;
                     $userp = isset($this->points[$user]) ? $this->points[$user] : 0;
                     $inside .= "##highlight##" . $user . "##end##: ##highlight##" . $userp . "##end## points\n";
-                    if (isset($this->bot->commands["tell"]["raidhistory"])) {
-                        $this->bot->db->query(
-                            "INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points - "
-                            . $points
-                        );
-                    }
+					$this->bot->db->query(
+						"INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points - "
+						. $points
+					);
 
                 }
                 $this->bot->send_output(
@@ -1617,19 +1682,6 @@ class Raid extends BaseActiveModule
         $this->bot->core("settings")->save("Raid", "raidinfo", $info);
     }
 
-
-    /*function movein()
-    { // FIXME seems an unused function to be removed for release ?
-        if ($this->move > time()) {
-            $move = $this->move - time();
-            $minutes = floor($move / 60);
-            //$rest = $totalsec % (60*60);
-            //$seconds = $rest % 60;
-            Return ", Move in ##highlight##" . sprintf("%02dmins", $minutes) . " ##end##";
-        } else {
-            return false;
-        }
-    }*/
 }
 
 ?>
