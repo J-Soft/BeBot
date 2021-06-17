@@ -332,7 +332,7 @@ class Raid extends BaseActiveModule
     function raid_history($name, $skip)
     {
 		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
-		$pager = 5; $range = $skip+$pager;		
+		$pager = 20; $range = $skip+$pager;		
 		$total = $this->bot->db->select("SELECT COUNT(DISTINCT(time)) FROM #___raid_log WHERE end > time");
 		$history = $this->bot->db->select("SELECT DISTINCT(time) FROM #___raid_log WHERE end > time ORDER BY time DESC LIMIT ".$skip.", ".$pager);
 		$inside = "";
