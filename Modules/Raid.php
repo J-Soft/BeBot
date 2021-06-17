@@ -348,7 +348,7 @@ class Raid extends BaseActiveModule
 				$desc = "?";
 				$note = "?";
 			}
-			$inside .= $date." => ".$desc." by ".$name." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats")."\n\n";
+			$inside .= $date." => ".$desc." by ".$rl." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats")."\n\n";
 		}
 		if($range<$total[0][0]) {
 			$inside .= "\n".$this->bot->core("tools")->chatcmd("raidhistory ".$range, "Next");
