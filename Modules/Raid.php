@@ -332,8 +332,9 @@ class Raid extends BaseActiveModule
     function raid_history($name, $skip)
     {
 		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
-		$pager = 20; $range = $skip+$pager;		
+		$pager = 2; $range = $skip+$pager;		
 		$total = $this->bot->db->select("SELECT COUNT(DISTINCT(time)) FROM #___raid_log WHERE end > time");
+		if($range>$total[0][0]) { $range = $total[0][0]; }
 		$history = $this->bot->db->select("SELECT DISTINCT(time) FROM #___raid_log WHERE end > time ORDER BY time DESC LIMIT ".$skip.", ".$pager);
 		$inside = "";
 		foreach($history as $entry) {
@@ -350,8 +351,12 @@ class Raid extends BaseActiveModule
 			}
 			$inside .= $date." => ".$desc." by ".$rl." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats")."\n\n";
 		}
+		$back = $skip-$pager;
+		if($back>=0) {
+			$inside .= " ".$this->bot->core("tools")->chatcmd("raidhistory ".$back, "Back")." ";
+		}		
 		if($range<$total[0][0]) {
-			$inside .= "\n".$this->bot->core("tools")->chatcmd("raidhistory ".$range, "Next");
+			$inside .= " ".$this->bot->core("tools")->chatcmd("raidhistory ".$range, "Next")." ";
 		}
 		Return ("Raid History ".$skip."-".$range." / ".$total[0][0]." :: " . $this->bot
 				->core("tools")->make_blob("click to view", $inside));
