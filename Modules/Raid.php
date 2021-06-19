@@ -358,7 +358,8 @@ class Raid extends BaseActiveModule
 		if($range<$total[0][0]) {
 			$inside .= " ".$this->bot->core("tools")->chatcmd("raidhistory ".$range, "Next")." ";
 		}
-		Return ("Raid History ".$skip."-".$range." / ".$total[0][0]." :: " . $this->bot
+		$first = $skip+1;
+		Return ("Raid History ".$first."-".$range." / ".$total[0][0]." :: " . $this->bot
 				->core("tools")->make_blob("click to view", $inside));
     }
 
