@@ -175,7 +175,10 @@ class NewRis extends BaseActiveModule
 
 	function AutoRi($name)
 	{
-		if(count($this->ris)==0) $this -> bot -> send_tell($name,"No RI was yet created ... please do this first!");
+		if(count($this->ris)==0) { 
+			$this -> bot -> send_tell($name,"No RI was yet created ... please do this first!");
+			return false;
+		}
 
 		$sorted = array();
 		foreach($this->pgroup as $toon=>$array) {

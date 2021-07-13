@@ -371,7 +371,7 @@ class Roster_Core extends BasePassiveModule
                 }
             }
             unset($db_members_sql);
-            if (strtolower($this->bot->game) == 'ao' && count($db_members) > 0) {
+            if (strtolower($this->bot->game) == 'ao') { // wrong for new bots : && count($db_members) > 0
                 /*
                 Go through all members and make sure we are up to date.
                 */
