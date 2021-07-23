@@ -62,7 +62,9 @@ class Raid extends BaseActiveModule
         $this->announce = 0;
 		$this->limit = 0;
         $this->locked = false;
+        $this->register_command("all", "s", "LEADER");
         $this->register_command("all", "c", "LEADER");
+        $this->register_command("all", "f", "LEADER");
         $this->register_command("all", "raid", "GUEST");
         $this->register_command("all", "raidhistory", "LEADER");
         $this->register_command("all", "raidstats", "LEADER");
@@ -155,7 +157,9 @@ class Raid extends BaseActiveModule
         $this->help['command']['raid notin'] = "Sent tells to all user in privgroup saying they arnt in raid if they arnt.";
         $this->help['command']['raid notinkick'] = "Kicks all user in privgroup who arnt in raid.";
         $this->help['command']['raid list'] = "list all user who are or where in the raid and there status.";
-        $this->help['command']['c <message>'] = "Raid command. Display <message> in a highly visiable manner.";
+        $this->help['command']['s <message>'] = "Raid command. Display <message> in a highly visiable manner.";
+        $this->help['command']['c'] = "Raid command. Display cocoon warning in a highly visiable manner.";
+        $this->help['command']['f'] = "Raid command. Display fence alert in a highly visiable manner.";
         $this->help['notes'] = "All commands except join and leave are restricted to users with " . $this->bot
                 ->core("settings")->get('Raid', 'Command') . " or higher access.";
         $this->bot->db->query(
@@ -186,9 +190,15 @@ class Raid extends BaseActiveModule
         $var = explode(" ", $msg, 2);
 		if(!isset($var[1])) { $var[1]=""; }
         switch (strtolower($var[0])) {
-            case 'c':
+            case 's':
                 $this->raid_command($name, $var[1]);
                 Break;
+            case 'c':
+                $this->raid_cocoon($name);
+                Break;
+            case 'f':
+                $this->raid_fence($name);
+                Break;				
             case 'raidhistory':
                 Return $this->raid_history($name, $var[1]);
                 Break;
@@ -588,11 +598,34 @@ class Raid extends BaseActiveModule
     {
 		$msg = '
 ##red##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##end##
- ##orange##'.strtoupper($command).'##end##
+ ##orange##WARNING : '.$command.'!##end##
+##red##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##end##';
+        $this->bot->send_output($name, $msg, "both");
+    }
+	
+    /*
+    Issues a raid cocoon
+    */
+    function raid_cocoon($name)
+    {
+		$msg = '
+##red##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##end##
+ ##green##COCOON : assist and kill it asap please!##end##
 ##red##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##end##';
         $this->bot->send_output($name, $msg, "both");
     }
 
+    /*
+    Issues a raid fence
+    */
+    function raid_fence($name)
+    {
+		$msg = '
+##red##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##end##
+ ##yellow##FENCE : click floor item then check NCU!##end##
+##red##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##end##';
+        $this->bot->send_output($name, $msg, "both");
+    }	
 
     /*
     Adds a point to all raiders
