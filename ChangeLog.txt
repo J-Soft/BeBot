@@ -1,7 +1,12 @@
 --------------
+Version 0.7.19
+--------------
+- In preparation ...
+
+--------------
 Version 0.7.18
 --------------
-- in the making ...
+- Various fixes, addition of raidhistory, full archive of changelog
 
 --------------
 Version 0.7.17
