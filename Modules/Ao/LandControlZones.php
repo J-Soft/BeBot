@@ -1,7 +1,7 @@
 <?php
 /*
 * Database of the land control zones, based on code by Wolfbiter, modified by Pharexys.
-*
+* Improved by Bitnykk using Tyrence's API courtesy of Unk & Draex
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
 * Copyright (C) 2005-2020 J-Soft and the BeBot development team.
@@ -14,7 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -63,6 +63,8 @@ class LandControlZones extends BaseActiveModule
         $this->help['command']['lc 100 200'] = "Shows all towersites in the 100-200 range";
         $this->help['command']['lc 100 200 [name]'] = "Shows all towersites in the 100-200 range in [name]";
         $this->help['command']['lc'] = "Shows all Land Control Areas with a link to each area.";
+        $this->help['command']['hot'] = "Shows Hot Notum Fields clickable interface.";
+        $this->help['command']['hot [QL] [side]'] = "Shows Hot Notum Fields result(s).";
         if ($this->bot->core("settings")
             ->exists("LandControl", "SchemaVersion")
         ) {
@@ -107,6 +109,9 @@ class LandControlZones extends BaseActiveModule
         }
         $this->bot->db->set_version("land_control_zones", 6);
         $this->register_command("all", "lc", "MEMBER");
+		$this -> register_alias('lc', 'lca');
+		$this->bot->core("settings")->create("LandControl", "ApiUrl", "https://tower-api.jkbff.com/api/towers", "What is HTTP(s) JSON Tower API URL (Tyrence's by default) ?");
+        $this->register_command("all", "hot", "MEMBER");		
     }
 
 
@@ -126,11 +131,90 @@ class LandControlZones extends BaseActiveModule
             return $this->show_lc($info[1]);
         } elseif (preg_match("/^lc$/i", $msg, $info)) {
             return $this->show_lc("--all--");
-        }
+        } elseif (preg_match("/^hot (\d+) (.+)$/i", $msg, $info)) {
+            return $this->show_hot($info[1], strtolower($info[2]));
+        } elseif (preg_match("/^hot$/i", $msg, $info)) {
+            return $this->show_hot();
+        } 
         return false;
     }
 
+	
+    function show_hot($ql = null, $side = null)
+    {
+		$return = "";
+		if($ql==NULL || !is_numeric($ql) || $ql<0 || $ql>300 || $side==NULL || ($side!="clan"&&$side!="omni"&&$side!="neutral")) {
+			$return .= "Choose a side & QL range by clicking below :";
+			$return .= "<br><br>##orange##CLAN##end##";
+			$return .= "<br>".$this->bot->core("tools")->chatcmd("hot 0 clan", "0-50")." ".$this->bot->core("tools")->chatcmd("hot 50 clan", "50-100")
+			." ".$this->bot->core("tools")->chatcmd("hot 100 clan", "100-150")." ".$this->bot->core("tools")->chatcmd("hot 150 clan", "150-200")." ".
+			$this->bot->core("tools")->chatcmd("hot 200 clan", "200-250")." ".$this->bot->core("tools")->chatcmd("hot 250 clan", "250-300");
+			$return .= "<br><br>##blue##OMNI##end##";
+			$return .= "<br>".$this->bot->core("tools")->chatcmd("hot 0 omni", "0-50")." ".$this->bot->core("tools")->chatcmd("hot 50 omni", "50-100")
+			." ".$this->bot->core("tools")->chatcmd("hot 100 omni", "100-150")." ".$this->bot->core("tools")->chatcmd("hot 150 omni", "150-200")." ".
+			$this->bot->core("tools")->chatcmd("hot 200 omni", "200-250")." ".$this->bot->core("tools")->chatcmd("hot 250 omni", "250-300");
+			$return .= "<br><br>##yellow##neutral##end##";
+			$return .= "<br>".$this->bot->core("tools")->chatcmd("hot 0 neutral", "0-50")." ".$this->bot->core("tools")->chatcmd("hot 50 neutral", "50-100")
+			." ".$this->bot->core("tools")->chatcmd("hot 100 neutral", "100-150")." ".$this->bot->core("tools")->chatcmd("hot 150 neutral", "150-200")." ".
+			$this->bot->core("tools")->chatcmd("hot 200 neutral", "200-250")." ".$this->bot->core("tools")->chatcmd("hot 250 neutral", "250-300");			
+			
+		} else {
+			$secday = time() % 86400;
+			$apiurl = $this->bot->core("settings")->get("LandControl", "ApiUrl");
+			$mql = $ql+50;
+			$mint = $secday+3600;
+			if($mint>86400) $mint = $mint-86400;
+			$maxt = $secday+23400;
+			if($maxt>86400) $maxt = $maxt-86400;
+			$content = $this->bot->core("tools")->get_site($apiurl."?faction=".$side."&min_ql=".$ql."&max_ql=".$mql."&min_close_time=".$mint."&max_close_time=".$maxt);
+			if (!($content instanceof BotError)) {
+				if (strpos($content, '{"count":') !== false) {
+					$datas = json_decode($content);
+					$count = count($datas->results);
+					$return .= $count." ".$side." field(s) found as hot now or soon :";
+					foreach($datas->results AS $result) {						
+						if ($result->faction == "Omni") { $color = "blue"; }
+						elseif ($result->faction == "Clan") { $color = "orange"; }
+						else { $color = "yellow"; }		
+						$state = "Unknown";		
+						$diff = $result->close_time - $secday;
+						if ($diff<0) {
+							$diff = $diff+86400;
+						}
+						if ($diff<=3600) {
+							$min = ceil($diff/60);
+							$state = "##pink##CLOSING##end## (5%) off in ".$min." m";
+						} elseif ($diff<=21600) {
+							$min = ceil($diff/60);
+							if($min>60) {
+								$hour = floor($diff/3600);
+								$rest = $diff-($hour*3600);
+								$min = $hour." h ".ceil($rest/60);
+							}
+							$state = "##green##OPENED##end## (25%) off in ".$min." m";
+						} else {
+							$upin = $diff-21600;
+							$min = ceil($upin/60);
+							if($min>60) {
+								$hour = floor($upin/3600);
+								$rest = $upin-($hour*3600);
+								$min = $hour." h ".ceil($rest/60);
+							}						
+							$state = "##red##CLOSED##end## (75%) up in ".$min." m";
+						}
+						$return .= "<br><br>".$result->playfield_short_name." ".$result->site_number."x : ".$result->site_name
+						        . "<br> Range: " . $result->min_ql . "-" . $result->max_ql
+                                . "<br> Coord: " . $this->coords($result->x_coord,$result->y_coord,$result->playfield_id)
+                                . "<br> State: " . "QL ".$result->ql." CT of ".$result->faction." (##".$color."##".$result->org_name."##end##) ".$state;
+					}
+				}
+			}
+		}
+		return $this->bot->core("tools")
+                ->make_blob("Hot Notum Fields", $return."<br><br>Provided by Tyrence's API courtesy of Unk & Draex");		
+	}
 
+	
     function show_lc($iarea = null, $lrange = 0, $hrange = 300)
     {
 		$return = "";
@@ -169,58 +253,86 @@ class LandControlZones extends BaseActiveModule
                     $temp .= "<div align=center><u><font color=#10a5e5>" . $area[0] . " (" . $area[1] . ")</font></u></div>";
                     if ($lrange == $hrange) {
                         $lcs = $this->bot->db->select(
-                            "select id, lrange, hrange, area, huge, x, y, name from #___land_control_zones where area='" . $area[0] . "' AND lrange<=" . $lrange . " AND hrange>="
+                            "select id, lrange, hrange, area, huge, x, y, name, zoneid from #___land_control_zones where area='" . $area[0] . "' AND lrange<=" . $lrange . " AND hrange>="
                             . $hrange . " order by huge"
                         );
                     } else {
                         $lcs = $this->bot->db->select(
-                            "select id, lrange, hrange, area, huge, x, y, name from #___land_control_zones where area='" . $area[0] . "' AND lrange>=" . $lrange . " AND hrange<="
+                            "select id, lrange, hrange, area, huge, x, y, name, zoneid from #___land_control_zones where area='" . $area[0] . "' AND lrange>=" . $lrange . " AND hrange<="
                             . $hrange . " order by huge"
                         );
                     }
                     if (!empty($lcs)) {
                         foreach ($lcs as $lc) {
-                            $temp .= " Area: " . $lc[7] . "<br> Range: " . $this->conv($lc[1]) . "-" . $this->conv(
-                                    $lc[2]
-                                ) . "<br> Coords: " . $this->coords($lc[5]) . "x"
-                                . $this->coords($lc[6]) . "<br> Hugemap: " . $lc[4] . "<br><br>";
+                            $temp .= $lc[4] . "x : " . $lc[7]
+							      . "<br> Range: " . $lc[1] . "-" . $lc[2]
+                                  . "<br> Coord: " . $this->coords($lc[5],$lc[6],$lc[8])
+                                  . "<br> State: " . $this->state($lc[8],$lc[4])
+                                  . "<br><br>";
                         }
                         $return .= $temp;
                     }
                 }
                 return $this->bot->core("tools")
-                    ->make_blob("Land Control Areas", $return);
+                    ->make_blob("Land Control Areas", $return."<br><br>Enriched w/ Tyrence's API courtesy of Unk & Draex");
             } else {
                 return "No matches";
             }
         }
     }
 
-
-    function conv($num)
+	
+    function coords($x,$y,$zid)
     {
-        if (strlen($num) < 2) {
-            return $num;
-        } elseif (strlen($num) < 3) {
-            return $num;
-        } else {
-            return $num;
-        }
+        return $this->bot->core("tools")->chatcmd($x . " " . $y . " " . $zid, $x."x".$y."(".$zid.")", "waypoint");
     }
-
-
-    function coords($num)
+	
+	
+    function state($zid,$num)
     {
-        if (strlen($num) < 2) {
-            return $num;
-        } elseif (strlen($num) < 3) {
-            return $num;
-        } elseif (strlen($num) < 4) {
-            return $num;
-        } else {
-            return $num;
-        }
-    }
+		$secday = time() % 86400;
+		$return = "Unknown";
+		$apiurl = $this->bot->core("settings")->get("LandControl", "ApiUrl");
+		$content = $this->bot->core("tools")->get_site($apiurl."?playfield_id=".$zid."&site_number=".$num);
+		if (!($content instanceof BotError)) {
+			if (strpos($content, '{"count":1,') !== false) {
+				$datas = json_decode($content);
+				if ($datas->results[0]->ql != NULL && $datas->results[0]->org_name != NULL && $datas->results[0]->faction != NULL && $datas->results[0]->close_time != NULL) {
+					if ($datas->results[0]->faction == "Omni") { $color = "blue"; }
+					elseif ($datas->results[0]->faction == "Clan") { $color = "orange"; }
+					else { $color = "yellow"; }
+					$diff = $datas->results[0]->close_time - $secday;
+					if ($diff<0) {
+						$diff = $diff+86400;
+					}
+					if ($diff<=3600) {
+						$min = ceil($diff/60);
+						$state = "##pink##CLOSING##end## (5%) off in ".$min." m";
+					} elseif ($diff<=21600) {
+						$min = ceil($diff/60);
+						if($min>60) {
+							$hour = floor($diff/3600);
+							$rest = $diff-($hour*3600);
+							$min = $hour." h ".ceil($rest/60);
+						}
+						$state = "##green##OPENED##end## (25%) off in ".$min." m";
+					} else {
+						$upin = $diff-21600;
+						$min = ceil($upin/60);
+						if($min>60) {
+							$hour = floor($upin/3600);
+							$rest = $upin-($hour*3600);
+							$min = $hour." h ".ceil($rest/60);
+						}						
+						$state = "##red##CLOSED##end## (75%) up in ".$min." m";
+					}
+					$return = "QL ".$datas->results[0]->ql." CT of ".$datas->results[0]->faction." (##".$color."##".$datas->results[0]->org_name."##end##) ".$state;
+				}
+			}
+		}
+		return $return;
+    }	
+	
 }
 
 ?>
