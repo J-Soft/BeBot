@@ -1,7 +1,7 @@
 --------------
 Version 0.7.19
 --------------
-- In preparation ...
+- Colors and warning improvements, enriched informations about AO's Notum War fields
 
 --------------
 Version 0.7.18
