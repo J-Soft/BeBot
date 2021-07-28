@@ -143,7 +143,7 @@ class LandControlZones extends BaseActiveModule
     function show_hot($ql = null, $side = null)
     {
 		$return = "";
-		if($ql==NULL || !is_numeric($ql) || $ql<0 || $ql>300 || $side==NULL || ($side!="clan"&&$side!="omni"&&$side!="neutral")) {
+		if($ql==NULL || !is_numeric($ql) || $ql<0 || $ql>250 || $side==NULL || ($side!="clan"&&$side!="omni"&&$side!="neutral")) {
 			$return .= "Choose a side & QL range by clicking below :";
 			$return .= "<br><br>##orange##CLAN##end##";
 			$return .= "<br>".$this->bot->core("tools")->chatcmd("hot 0 clan", "0-50")." ".$this->bot->core("tools")->chatcmd("hot 50 clan", "50-100")
@@ -166,7 +166,7 @@ class LandControlZones extends BaseActiveModule
 			if($mint>86400) $mint = $mint-86400;
 			$maxt = $secday+23400;
 			if($maxt>86400) $maxt = $maxt-86400;
-			$content = $this->bot->core("tools")->get_site($apiurl."?faction=".$side."&min_ql=".$ql."&max_ql=".$mql."&min_close_time=".$mint."&max_close_time=".$maxt);
+			$content = $this->bot->core("tools")->get_site($apiurl."?limit=100&faction=".$side."&min_ql=".$ql."&max_ql=".$mql."&min_close_time=".$mint."&max_close_time=".$maxt);
 			if (!($content instanceof BotError)) {
 				if (strpos($content, '{"count":') !== false) {
 					$datas = json_decode($content);
