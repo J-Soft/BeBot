@@ -1445,7 +1445,7 @@ class Bot
             $info[1] = $var[0];
             $info[2] = $var2[0];
             $info[3] = $var2[1];
-        }
+        }		
         $info[2] = str_replace("<br>", "\n", $info[2]);
         $content = explode("\n", $info[2]);
         $page = 0;
@@ -1454,15 +1454,20 @@ class Bot
             if ((strlen($result[$page]) + strlen($line) + 12) < $this->maxsize) {
                 $result[$page] .= $line . "\n";
             } else {
-				$line = preg_replace('/<\/([^>]+)> /','</$1>#@?#', $line);
-				$words = explode("#@?#", $line);
+				$line = preg_replace('/<\/([^>]+)> /','</$1>#@?-_#', $line);
+				$words = explode("#@?-_#", $line);
+				$wcnt = count($words);
+				$wrow = 0;
 				foreach ($words as $word) {
 					if ((strlen($result[$page]) + strlen($word) + 12) < $this->maxsize) {
-						$result[$page] .= $word . " ";
+						if($wrow+1!=$wcnt) $result[$page] .= $word . " ";
+						elseif($wrow+1==$wcnt) $result[$page] .= $word . "\n";
 					} else {				
 						$page++;
-						$result[$page] = $word . " ";
+						if($wrow+1!=$wcnt) $result[$page] = $word . " ";
+						elseif($wrow+1==$wcnt) $result[$page] = $word . "\n";
 					}
+					$wrow++;
 				}
             }
         }
