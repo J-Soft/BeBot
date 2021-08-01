@@ -1,7 +1,8 @@
 --------------
 Version 0.7.19
 --------------
-- Colors and warning improvements, enriched informations about AO's Notum War fields
+- Both : Colors & warning improvements, new custom module for multiple relays, Twitch IRC chat compatibilized
+- AO : new !hot + !lc enriched informations for Notum War fields with Tyrence's API courtesy of Unk & Draex
 
 --------------
 Version 0.7.18

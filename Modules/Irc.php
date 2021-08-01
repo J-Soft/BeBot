@@ -89,6 +89,8 @@ class IRC extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Irc", "Server", "", "Which IRC server is used?");
         $this->bot->core("settings")
+            ->create("Irc", "OAuthTok", "", "What OAuth Token, if needed to connect (otherwise leave empty)?");
+        $this->bot->core("settings")
             ->create("Irc", "Port", "6667", "Which port is used to connect to the IRC server?");
         $this->bot->core("settings")
             ->create("Irc", "Channel", "#" . $this->bot->botname, "Which IRC channel should be used?");
@@ -877,13 +879,26 @@ class IRC extends BaseActiveModule
             $this->bot->core("settings")
                 ->get("Irc", "Port")
         );
-        $this->irc->login(
-            $this->bot->core("settings")
-                ->get("Irc", "Nick"),
-            'BeBot',
-            0,
-            'BeBot'
-        );
+        if($this->bot->core("settings")->get("Irc", "OAuthTok")==""||$this->bot->core("settings")->get("Irc", "OAuthTok")==" ") {
+			$this->irc->login(
+				$this->bot->core("settings")
+					->get("Irc", "Nick"),
+				'BeBot',
+				0,
+				'BeBot'
+			);
+		} else {
+			$this->irc->login(
+				$this->bot->core("settings")
+					->get("Irc", "Nick"),
+				$this->bot->core("settings")
+					->get("Irc", "Nick"),
+				0,
+				$this->bot->core("settings")
+					->get("Irc", "Nick"),
+				$this->bot->core("settings")->get("Irc", "OAuthTok")
+			);			
+		}
         $this->irc->join(
             array(
                  $this->bot->core("settings")

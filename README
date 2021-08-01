@@ -548,6 +548,17 @@ For more details & commands :
 If your bot can't connect to IRC, verify all !settings ...
 Possibly you mistyped something like server, channel, port or pass/key.
 
+Twitch
+------
+
+Chat of your Twitch account, shown beside your video stream, is IRC compatible.
+
+So to connect Bebot to your Twitch chat, do exactly as said upper for IRC, plus :
+- set account name (lowercase) as Nick (main account or another with chat access)
+- use 6667 as Port with irc.chat.twitch.tv as Server
+- set Channel as chat account #name (lowercase preceded by #)
+- enter OAuthTok you obtain on https://twitchapps.com/tmi/
+
 Discord
 -------
 
