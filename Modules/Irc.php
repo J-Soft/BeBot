@@ -59,8 +59,6 @@ class IRC extends BaseActiveModule
         $this->register_module("irc");
         $this->register_command("all", "irc", "SUPERADMIN");
         $this->register_command("all", "irconline", "GUEST");
-        $this->register_event("pgjoin");
-        $this->register_event("pgleave");
         $this->register_event("buddy");
         $this->register_event("connect");
         $this->register_event("disconnect");
@@ -478,52 +476,6 @@ class IRC extends BaseActiveModule
                     unset($this->whois[$name]);
                 }
             }
-        }
-    }
-
-
-    function pgjoin($name)
-    {
-        // Only handle this if connected to IRC server
-        if (!$this->bot->core("settings")->get("irc", "connected")) {
-            return;
-        }
-        if ($this->bot->core("settings")
-                ->get("Irc", "Announce")
-            && (
-				(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "both")
-			||	(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "pgroup")
-			)
-        ) {
-            $this->send_irc(
-                $this->bot->core("settings")
-                    ->get("Irc", "IrcGuestprefix"),
-                "",
-                chr(2) . chr(3) . '3***' . chr(2) . ' ' . $name . ' has joined the guest channel.'
-            );
-        }
-    }
-
-
-    function pgleave($name)
-    {
-        // Only handle this if connected to IRC server
-        if (!$this->bot->core("settings")->get("irc", "connected")) {
-            return;
-        }
-        if ($this->bot->core("settings")
-                ->get("Irc", "Announce")
-            && (
-				(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "both")
-			||	(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "pgroup")
-			)
-        ) {
-            $this->send_irc(
-                $this->bot->core("settings")
-                    ->get("Irc", "IrcGuestprefix"),
-                "",
-                chr(2) . chr(3) . '3***' . chr(2) . ' ' . $name . ' has left the guest channel.'
-            );
         }
     }
 
