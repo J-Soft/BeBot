@@ -1236,7 +1236,7 @@ class IRC extends BaseActiveModule
         $this->target = $target;
 		$msg = "No Tarasque/Cameloot timer found.";
 		if($this->bot->exists_module("taraviza")) {
-			$msg = $this->bot->core("taraviza")->show_tara($this->bot->core("settings")->get("Irc", "Channel"),"IRC");
+			$msg = $this->bot->core("taraviza")->show_tara("user");
 		}
         $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
     }	
@@ -1251,7 +1251,7 @@ class IRC extends BaseActiveModule
         $this->target = $target;
 		$msg = "No Vizaresh/Gauntlet timer found.";
 		if($this->bot->exists_module("taraviza")) {
-			$msg = $this->bot->core("taraviza")->show_viza($this->bot->core("settings")->get("Irc", "Channel"),"IRC");
+			$msg = $this->bot->core("taraviza")->show_viza("user");
 		}		
         $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
     }		
@@ -1397,6 +1397,8 @@ class IRC extends BaseActiveModule
             case $this->bot->commpre . 'level':
             case $this->bot->commpre . 'lvl':
             case $this->bot->commpre . 'pvp':
+            case $this->bot->commpre . 'tara':
+            case $this->bot->commpre . 'viza':
                 Break; //These should of been handled elsewere
             case 'is':
                 $data->message = $this->bot->commpre . $data->message;
@@ -1417,6 +1419,14 @@ class IRC extends BaseActiveModule
                 $data->message = $this->bot->commpre . $data->message;
                 $this->irc_level($irc, $data);
                 Break;
+			case 'tara':
+                $data->message = $this->bot->commpre . $data->message;
+                $this->irc_tara($irc, $data);
+                Break;
+			case 'viza':
+                $data->message = $this->bot->commpre . $data->message;
+                $this->irc_viza($irc, $data);
+                Break;				
             Default:
                 if ($data->type == SMARTIRC_TYPE_QUERY) {
                     $target = $data->nick;

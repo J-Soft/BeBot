@@ -177,7 +177,7 @@ class Taraviza extends BaseActiveModule
         if ($hour < 10) { $hour = "0".$hour; }
         if ($min < 10) { $min = "0".$min; }
 		$msg = "";
-		if($from=="user")$msg = "Gauntlet should start in about ".$hour."h".$min."m";
+		if($from=="user") $msg = "Gauntlet should start in about ".$hour."h".$min."m";
 		elseif($hour=="00") $msg = $min;
 		return $msg;
     }
