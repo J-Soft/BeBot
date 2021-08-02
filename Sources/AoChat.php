@@ -227,7 +227,7 @@ class AOChat
             die("AOChat: not expecting connect.\n");
         }
         $s = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if (!is_resource($s)) /* this is fatal */ {
+        if (!is_resource($s) && (!$s instanceof \Socket)) /* this is fatal */ {
             die("Could not create socket.\n");
         }
         $this->socket = $s;
@@ -325,7 +325,7 @@ class AOChat
 
         // Connect to the chat server
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if (!is_resource($this->socket)) /* this is fatal */ {
+        if (!is_resource($this->socket) && (!$this->socket instanceof \Socket)) /* this is fatal */ {
             die("Could not create socket.\n");
         }
         if (@socket_connect($this->socket, $this->ServerAddress, $this->ServerPort) === false) {
@@ -830,7 +830,7 @@ class AOChat
                     }
                     // Connect to the chat server
                     $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-                    if (!is_resource($this->socket)) /* this is fatal */ {
+                    if (!is_resource($this->socket) && (!$this->socket instanceof \Socket)) /* this is fatal */ {
                         die("Could not create socket.\n");
                     }
                     if (@socket_connect($this->socket, $this->ServerAddress, $this->ServerPort) === false) {
