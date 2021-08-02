@@ -500,7 +500,7 @@ class DiscordRelay extends BaseActiveModule
     function discord_tara($msg)
     {
 		if ($this->bot->exists_module("taraviza")) {
-			$sent = $this->bot->core("taraviza")->show_tara($msg,"Discord");
+			$sent = $this->bot->core("taraviza")->show_tara("user");
 		} else {
 			$sent = "No Tarasque/Cameloot timer found.";
 		}
@@ -513,7 +513,7 @@ class DiscordRelay extends BaseActiveModule
     function discord_viza($msg)
     {
 		if ($this->bot->exists_module("taraviza")) {
-			$sent = $this->bot->core("taraviza")->show_viza($msg,"Discord");
+			$sent = $this->bot->core("taraviza")->show_viza("user");
 		} else {
 			$sent = "No Vizaresh/Gauntlet timer found.";
 		}
