@@ -195,7 +195,7 @@ class AOChat
 
     function disconnect()
     {
-        if (is_resource($this->socket)) {
+        if (is_resource($this->socket) || $this->socket instanceof \Socket) {
             socket_close($this->socket);
         }
         $this->socket = null;
@@ -622,7 +622,7 @@ class AOChat
         $rlen = $len;
         while ($rlen > 0) {
             if (($tmp = socket_read($this->socket, $rlen)) === false) {
-                if (!is_resource($this->socket)) {
+                if (!is_resource($this->socket) && (!$this->socket instanceof \Socket)) {
                     $this->disconnect();
                     die("Read error: $last_error\n");
                 } else {
@@ -632,7 +632,7 @@ class AOChat
             }
             if ($tmp == "") {
                 echo("Read error: EOF\n");
-                if (!is_resource($this->socket)) {
+                if (!is_resource($this->socket) && (!$this->socket instanceof \Socket)) {
                     $this->disconnect();
                     die("Read error: Too many EOF errors, disconnecting.\n");
                 } else {
@@ -825,7 +825,7 @@ class AOChat
                     $this->bot->log("LOGIN", "ERROR", "Received login error. Retrying ...");
                     $this->login_num++;
                     // Disconnect from the territoryserver
-                    if (is_resource($this->socket)) {
+                    if (is_resource($this->socket) || $this->socket instanceof \Socket) {
                         socket_close($this->socket);
                     }
                     // Connect to the chat server
