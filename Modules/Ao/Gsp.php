@@ -1,6 +1,6 @@
 <?php
 /*
-* Gsp.php - Module Grid Stream Production
+* Gsp.php - Module Grid Stream Production (last track and events starts)
 * Inspired from Nadyita's work & based on https://gsp.torontocast.stream/streaminfo/
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
