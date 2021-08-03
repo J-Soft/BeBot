@@ -599,6 +599,7 @@ class Level extends BaseActiveModule
             }
             $mish[$mishlvl] = "";
         }
+		$mishlist = "";
         foreach ($mish as $key => $value) {
             $mishlist .= " " . $key;
         }

@@ -1144,7 +1144,9 @@ class IRC extends BaseActiveModule
         if (!$who) {
             $this->whois[$name] = $this->target;
         } elseif (!($who instanceof BotError)) {
-            $at = "(AT " . $who["at_id"] . " - " . $who["at"] . ") ";
+			if (strtolower($this->bot->game) == 'ao') {
+				$at = "(AT " . $who["at_id"] . " - " . $who["at"] . ") ";
+			}
             $result = "\"" . $who["nickname"] . "\"";
             if (!empty($who["firstname"]) && ($who["firstname"] != "Unknown")) {
                 $result = $who["firstname"] . " " . $result;
@@ -1210,6 +1212,7 @@ class IRC extends BaseActiveModule
 	
     function irc_whois(&$irc, &$data)
     {
+		$msg = "";
         if ($data->type == SMARTIRC_TYPE_QUERY) {
             $target = $data->nick;
         } else {
@@ -1329,15 +1332,39 @@ class IRC extends BaseActiveModule
         } else {
             $target = $this->bot->core("settings")->get("Irc", "Channel");
         }
-        $msg = explode(" ", $data->message, 2);
-        $msg = $this->bot->commands["tell"]["level"]->get_level($msg[1]);
-        $msg = $this->strip_formatting($msg);
+        if (strtolower($this->bot->game) == 'ao') {
+			$msg = explode(" ", $data->message, 2);
+			$msg = $this->bot->commands["tell"]["level"]->get_level($msg[1]);
+			$msg = $this->strip_formatting($msg);
+		} else {
+			$msg = "Unsupported command by context.";
+		}
         if (!empty($msg)) {
             $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
         }
     }
+	
+	
+    /*
+    Default command for irc
+    */
+    function irc_default(&$irc, &$data)
+    {
+        if ($data->type == SMARTIRC_TYPE_QUERY) {
+            $target = $data->nick;
+        } else {
+            $target = $this->bot->core("settings")->get("Irc", "Channel");
+        }
+        $msg = "Unsupported command by default.";
+        if (!empty($msg)) {
+            $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
+        }
+    }	
 
 
+	/*
+    Command distribution
+    */
     function irc_receive_msg(&$irc, &$data)
     {
         $msg = explode(" ", $data->message, 2);
@@ -1369,7 +1396,11 @@ class IRC extends BaseActiveModule
             case 'lvl':
             case 'pvp':
                 $data->message = $this->bot->commpre . $data->message;
-                $this->irc_level($irc, $data);
+				if (strtolower($this->bot->game) == 'ao') {
+					$this->irc_level($irc, $data);
+				} else {
+					$this->irc_default($irc, $data);
+				}
                 Break;
 			case 'tara':
                 $data->message = $this->bot->commpre . $data->message;

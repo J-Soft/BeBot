@@ -269,7 +269,7 @@ class Alts_Core extends BasePassiveModule
     /*
     Make a big blob
     */
-    function make_info_blob($whois, $main, $alts = '', $returntype)
+    function make_info_blob($whois, $main, $alts = '', $returntype = 0)
     {	$window = "";
         if (!empty($alts)) {
             $window = "##normal##:::  $main's alts  :::##end##\n\n";

@@ -72,7 +72,7 @@ class User_Core extends BasePassiveModule
     /*
     Add a user to the bot.
     */
-    function add($source, $name, $id = false, $user_level, $silent = 0)
+    function add($source, $name, $id = false, $user_level = 0, $silent = 0)
     {
         $change_level = false;
         $name = ucfirst(strtolower($name));
