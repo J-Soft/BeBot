@@ -255,7 +255,7 @@ class Raffle extends BaseActiveModule
         ) {
             $this->output(
                 "\n##raffle_highlight##----------------------------------------------------------##end##\n" . "  The raffle for ##raffle_highlight##" . $this->item
-                . "##end## wil be " . "##raffle_highlight##closing soon##end## :: " . $this->click_join("join") . "\n"
+                . "##end## will be " . "##raffle_highlight##closing soon##end## :: " . $this->click_join("join") . "\n"
                 . "##raffle_highlight##----------------------------------------------------------##end##"
             );
         } else {
@@ -339,13 +339,24 @@ class Raffle extends BaseActiveModule
     function raffle_start($name, $item)
     {
         if (empty($this->item)) {
-            $itemref = explode(" ", $item, 5);
-            if (strtolower($itemref[0]) == "&item&") {
-                $item = $this->bot->core("tools")
-                    ->make_item($itemref[1], $itemref[2], $itemref[3], $itemref[4], true);
-            }
-            $this->item = $item;
-            $this->item_blank = preg_replace("/<\/a>/U", "", preg_replace("/<a href(.+)>/sU", "", $item));
+			if (strtolower($this->bot->game)=="ao") {
+				$itemref = explode(" ", $item, 5);
+				if (strtolower($itemref[0]) == "&item&") {
+					$item = $this->bot->core("tools")
+						->make_item($itemref[1], $itemref[2], $itemref[3], $itemref[4], true);
+				}
+				$this->item = $item;
+				$this->item_blank = preg_replace("/<\/a>/U", "", preg_replace("/<a href(.+)>/sU", "", $item));
+			} else {
+				$parse = $this->bot->core('items')->parse_items($item);
+				if (count($parse)==9) {
+					$item = $parse['name'];
+					$this->item = $this->bot->core("tools")->chatcmd("items ".$item, $item);
+				} else {
+					$this->item = $item;
+				}
+				$this->item_blank = $item;
+			}
             $this->users = array();
             $this->admin = $name;
             $timer = $this->bot->core("settings")
