@@ -43,7 +43,8 @@ class Notify extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "notify", "LEADER");
         $this->help['description'] = "Handling of notify list.";
-        $this->help['command']['notify'] = "Shows the current notify list.";
+        $this->help['command']['notify'] = "Shows the full notify list (can spam if many buddies ...).";
+        $this->help['command']['notify count'] = "Shows the notify list count (no spam if many buddies).";		
         $this->help['command']['notify on <player>'] = "Adds <player> to the notify list.";
         $this->help['command']['notify off <player>'] = "Removes <player> of the notify list.";
         $this->help['command']['notify cache'] = "Lists all players on the notify list.";
@@ -80,6 +81,8 @@ class Notify extends BaseActiveModule
                     Default:
                         return $this->bot->core("notify")->list_cache();
                 }
+            case 'count':
+                return $this->show_notify_count();				
             case 'list':
             case '':
                 return $this->show_notify_list();
@@ -96,6 +99,14 @@ class Notify extends BaseActiveModule
         }
     }
 
+    function show_notify_count()
+    {
+        $notcount = $this->bot->db->select(
+            "SELECT COUNT(*) FROM #___users WHERE notify = 1"
+        );
+        return $notcount[0][0]." player(s) currently in notify list.";
+	}
+	
 
     function show_notify_list()
     {
