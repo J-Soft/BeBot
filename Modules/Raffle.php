@@ -51,7 +51,7 @@ class Raffle extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->output = "group";
+        $this->output = "both";
         $this->result = "";
         $this->register_command("all", "raffle", "GUEST");
         $this->help['description'] = 'Module to handle item lotteries';
@@ -349,9 +349,10 @@ class Raffle extends BaseActiveModule
 				$this->item_blank = preg_replace("/<\/a>/U", "", preg_replace("/<a href(.+)>/sU", "", $item));
 			} else {
 				$parse = $this->bot->core('items')->parse_items($item);
-				if (count($parse)==9) {
-					$item = $parse['name'];
-					$this->item = $this->bot->core("tools")->chatcmd("items ".$item, $item);
+				if (count($parse[0])==9) {
+					$itemname = $parse[0]['name'];
+					$item = $this->bot->core("tools")->chatcmd("items ".$itemname, $itemname);
+					$this->item = $this->bot->core('items')->make_item($parse[0]);
 				} else {
 					$this->item = $item;
 				}
@@ -399,7 +400,7 @@ class Raffle extends BaseActiveModule
             ) {
                 return "You did not start the raffle and are not a bot admin.";
             } else {
-                $inside = "##ao_ccheader##:::: Raffle Administration ::::##end##<font color=CCInfoHeader>\n\n";
+                $inside = "##ao_ccheader##:::: Raffle Administration ::::##end##<font color=#808080>\n\n";
                 $inside .= "Output channel: \n";
                 $inside .= $this->bot->core("tools")
                         ->chatcmd("raffle output guild", "Guild") . " ";

@@ -49,7 +49,7 @@ class Aocattribute extends BaseActiveModule
    $this -> register_command("all", "attribute", "MEMBER");
 
    $this -> help['description'] = 'Attribute trickle-down calculator';;
-   $this -> help['command']['attribute <name> <value>'] = "Shows bonuses gained with given attribute name (intel, const, streng, dext, wisd, comb, heal) and value (from 1 to 2000).";
+   $this -> help['command']['attribute <name> <value>'] = "Shows bonuses gained with given attribute name (intel, const, streng, dext, wisd, comb, heal) and value (anything over 1).";
   }
 
   function command_handler($name, $msg, $origin)
@@ -107,7 +107,6 @@ class Aocattribute extends BaseActiveModule
 
   function generate_list($attr, $value=1)
   {
-   if($value<1 || $value>2000) return "Value must be between 1 and 2000";
    $output = "<font face=&#39;HEADLINE&#39; color=#c0c0c0>" . $value . " " . $attr . "</font><br>";
    $linktitle = "Calculated values for ".$value." ".$attr." (Click for info)";
 
@@ -136,9 +135,8 @@ class Aocattribute extends BaseActiveModule
        array("Factor" => 0.5, "Prefix" => "+", "Title" => "Protection from Electrical/Fire/Cold", "Description" => "Increases protection from Electrical/Fire/Cold magic"),
        array("Factor" => 0.38, "Prefix" => "+", "Title" => "OOC Mana regeneration", "Description" => "Increases Out of Combat Mana regeneration")),
       "Constitution" => array(
-       array("Factor" => 8, "Prefix" => "+", "Title" => "Health (Soldier)", "Description" => "Increases Health points for Soldiers"),
-       array("Factor" => 6, "Prefix" => "+", "Title" => "Health (Ranger, HoX, Assassin)", "Description" => "Increases Health points for Ranger, HoX and Assassin"),
-       array("Factor" => 5, "Prefix" => "+", "Title" => "Health (Other classes)", "Description" => "Increases Health points for other classes"),
+       array("Factor" => 5, "Prefix" => "+", "Title" => "Health (Minimally, depends on your Class)", "Description" => "Increases Health points Minimum"),
+       array("Factor" => 8, "Prefix" => "+", "Title" => "Health (Maximally, depends on your Class)", "Description" => "Increases Health points Maximum"),
        array("Factor" => 2, "Prefix" => "+", "Title" => "Stamina", "Description" => "Increase Stamina points"),
        array("Factor" => 0.05, "Prefix" => "+", "Title" => "Natural Stamina regeneration", "Description" => "Increases Natural Stamina regeneration"),
        array("Factor" => 0.15, "Prefix" => "+", "Title" => "OOC Stamina regeneration", "Description" => "Increase Out of Combat Stamina regeneration"),
