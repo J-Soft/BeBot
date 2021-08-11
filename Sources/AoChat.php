@@ -243,6 +243,7 @@ class AOChat
         }
         /* For AO we expect the login seed when we connect to the chatserver */
         if (strtolower(AOCHAT_GAME) == 'ao') {
+			$this->bot->log("LOGIN", "NOTICE", "AOChat waiting for AO login seed ...");
             $packet = $this->get_packet();
             if (!is_object($packet) || $packet->type != AOCP_LOGIN_SEED) {
                 trigger_error(
