@@ -49,7 +49,7 @@ class Aocattribute extends BaseActiveModule
    $this -> register_command("all", "attribute", "MEMBER");
 
    $this -> help['description'] = 'Attribute trickle-down calculator';;
-   $this -> help['command']['attribute <name> <value>'] = "Shows bonuses gained with given attribute name/value.";
+   $this -> help['command']['attribute <name> <value>'] = "Shows bonuses gained with given attribute name (intel, const, streng, dext, wisd, comb, heal) and value (from 1 to 2000).";
   }
 
   function command_handler($name, $msg, $origin)
@@ -80,10 +80,19 @@ class Aocattribute extends BaseActiveModule
   {
    $aliases = array(
     "int" => "Intelligence",
+    "intel" => "Intelligence",
     "con" => "Constitution",
+    "const" => "Constitution",
     "str" => "Strength",
+    "streng" => "Strength",
     "dex" => "Dexterity",
-    "wis" => "Wisdom"
+    "dext" => "Dexterity",
+    "wis" => "Wisdom",
+    "wisd" => "Wisdom",
+    "cr" => "CombatRating",
+    "comb" => "CombatRating",
+    "hr" => "HealRating",
+    "heal" => "HealRating"
    );
 
    $lowercasename = trim(strtolower($name));
@@ -98,6 +107,7 @@ class Aocattribute extends BaseActiveModule
 
   function generate_list($attr, $value=1)
   {
+   if($value<1 || $value>2000) return "Value must be between 1 and 2000";
    $output = "<font face=&#39;HEADLINE&#39; color=#c0c0c0>" . $value . " " . $attr . "</font><br>";
    $linktitle = "Calculated values for ".$value." ".$attr." (Click for info)";
 
@@ -113,14 +123,14 @@ class Aocattribute extends BaseActiveModule
   {
    $attributelist = array(
       "Strength" => array(
-       array("Factor" => 3, "Prefix" => "+", "Title" => "Combat rating", "Description" => "Increases Combat rating when using melee weapons (except daggers)"),
+       array("Factor" => 3, "Prefix" => "+", "Title" => "Combat rating (except Daggers)", "Description" => "Increases Combat rating when using melee weapons (except Daggers)"),
        array("Factor" => 2, "Prefix" => "+", "Title" => "Armor", "Description" => "Increases Armor"),
        array("Factor" => 0.05, "Prefix" => "+", "Title" => "Natural Stamina regeneration", "Description" => "Increases Natural Stamina regeneration"),
        array("Factor" => 0.15, "Prefix" => "+", "Title" => "OOC Stamina regeneration", "Description" => "Increases Out of Combat Stamina regeneration"),
        array("Factor" => 2, "Prefix" => "+", "Title" => "Stamina", "Description" => "Increases Stamina"),
        array("Factor" => 0.15, "Prefix" => "+", "Title" => "OOC Health regeneration", "Description" => "Increases Out of Combat Health regeneration")),
       "Intelligence" => array(
-       array("Factor" => 0.6, "Prefix" => "+", "Title" => "Spell damage (mage)", "Description" => "Increases Spell damage for spells with Intelligence attribute (mage spells)"),
+       array("Factor" => 0.6, "Prefix" => "+", "Title" => "Spell damage (Mage)", "Description" => "Increases Spell damage for spells with Intelligence attribute (Mage spells)"),
        array("Factor" => 3, "Prefix" => "+", "Title" => "Mana", "Description" => "Increase Mana points"),
        array("Factor" => 0.07, "Prefix" => "+", "Title" => "Natural Mana regeneration", "Description" => "Increases Natural Mana regeneration"),
        array("Factor" => 0.5, "Prefix" => "+", "Title" => "Protection from Electrical/Fire/Cold", "Description" => "Increases protection from Electrical/Fire/Cold magic"),
@@ -129,7 +139,7 @@ class Aocattribute extends BaseActiveModule
        array("Factor" => 8, "Prefix" => "+", "Title" => "Health (Soldier)", "Description" => "Increases Health points for Soldiers"),
        array("Factor" => 6, "Prefix" => "+", "Title" => "Health (Ranger, HoX, Assassin)", "Description" => "Increases Health points for Ranger, HoX and Assassin"),
        array("Factor" => 5, "Prefix" => "+", "Title" => "Health (Other classes)", "Description" => "Increases Health points for other classes"),
-       array("Factor" => 3, "Prefix" => "+", "Title" => "Stamina", "Description" => "Increase Stamina points"),
+       array("Factor" => 2, "Prefix" => "+", "Title" => "Stamina", "Description" => "Increase Stamina points"),
        array("Factor" => 0.05, "Prefix" => "+", "Title" => "Natural Stamina regeneration", "Description" => "Increases Natural Stamina regeneration"),
        array("Factor" => 0.15, "Prefix" => "+", "Title" => "OOC Stamina regeneration", "Description" => "Increase Out of Combat Stamina regeneration"),
        array("Factor" => 0.15, "Prefix" => "+", "Title" => "OOC Health regeneration", "Description" => "Increases Out of Combat Health regeneration")),
@@ -140,11 +150,16 @@ class Aocattribute extends BaseActiveModule
        array("Factor" => 0.05, "Prefix" => "+", "Title" => "Natural Stamina regeneration", "Description" => "Increases Natural Stamina regeneration"),
        array("Factor" => 0.15, "Prefix" => "+", "Title" => "OOC Stamina regeneration", "Description" => "Increases Out of Combat Stamina regeneration")),
       "Wisdom" => array(
-       array("Factor" => 0.6, "Prefix" => "+", "Title" => "Spell damage (priest)", "Description" => "Increases Spell damage for spells with Wisdom attribute (priest spells)"),
+       array("Factor" => 0.6, "Prefix" => "+", "Title" => "Spell damage (Priest/DT)", "Description" => "Increases Spell damage for spells with Wisdom attribute (Priest/DT spells)"),
        array("Factor" => 3, "Prefix" => "+", "Title" => "Mana", "Description" => "Increases Mana points"),
        array("Factor" => 0.07, "Prefix" => "+", "Title" => "Natural Mana regeneration", "Description" => "Increases Natural Mana regeneration"),
        array("Factor" => 0.38, "Prefix" => "+", "Title" => "OOC Mana regeneration", "Description" => "Increase Out of Combat Mana regeneration"),
-       array("Factor" => 0.5, "Prefix" => "+", "Title" => "Protection (Holy/Unholy)", "Description" => "Increases Protection from Holy/Unholy magic"))
+       array("Factor" => 0.5, "Prefix" => "+", "Title" => "Protection (Holy/Unholy)", "Description" => "Increases Protection from Holy/Unholy magic")),
+      "CombatRating" => array(
+       array("Factor" => 0.0278, "Prefix" => "+", "Title" => "DPS", "Description" => "Increases Damage Per Second")),
+      "HealRating" => array(
+       array("Factor" => 0.135, "Prefix" => "+", "Title" => "Self Healing", "Description" => "Increases Self Healing"),
+       array("Factor" => 0.235, "Prefix" => "+", "Title" => "Cone Effect Healing", "Description" => "Increases Cone Effect Healing"))
       ); 
 
    return $attributelist[$attr];
