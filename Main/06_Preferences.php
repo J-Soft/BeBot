@@ -232,12 +232,34 @@ class Preferences_core extends BasePassiveModule
         }
         if ($module == false && $setting == false) {
             //We're fetching a list of all preferences for a user
-            if(isset($this->cache[$uid])) { $prefs = array_merge($this->cache['def'], (array)$this->cache[$uid]); }
+            if (isset($this->cache[$uid])) { $prefs = array_merge($this->cache['def'], (array)$this->cache[$uid]); }
+			else { // If no user preferences yet
+				$mods = $this->bot->db->select(
+					"SELECT DISTINCT(module) FROM #___preferences_def"
+				);
+				if (count($mods)>0) {
+					foreach ($mods as $mod) {
+						$lowmod = strtolower($mod[0]);
+						$prefs[$lowmod] = array();
+					}
+				}
+			}
             return ($prefs);
         }
         if ($module != false && $setting == false) {
             //We're fetching a list of all preferences for a given module
-            if(isset($this->cache[$uid])) { $prefs = array_merge($this->cache['def'][strtolower($module)], (array)$this->cache[$uid][strtolower($module)]); }
+            if(isset($this->cache[$uid]) && isset($this->cache[$uid][strtolower($module)])) { $prefs = array_merge($this->cache['def'][strtolower($module)], (array)$this->cache[$uid][strtolower($module)]); }
+			else { // If no user preferences yet
+				$sets = $this->bot->db->select(
+					"SELECT DISTINCT(name), default_value FROM #___preferences_def WHERE module='".$module."'"
+				);
+				if (count($sets)>0) {
+					foreach ($sets as $set) {
+						$lowset = strtolower($set[0]);
+						$prefs[$lowset] = $set[1];
+					}
+				}
+			}			
             return ($prefs);
         }
         $module = strtolower($module);
@@ -351,13 +373,14 @@ class Preferences_core extends BasePassiveModule
         $query = "SELECT name, description, default_value, possible_values FROM #___preferences_def WHERE module='$module'";
         $pref_defs = $this->bot->db->select($query, MYSQLI_ASSOC);
         //Grab current settings from the cache.
-        $prefs = $this->bot->core('prefs')->get($name, $module);
+        $prefs = $this->bot->core('prefs')->get($name, $module);	
         //Create a nice header for the window
         $window = "<center>##blob_title##::: Preferences for $module :::##end##</center>\n";
         foreach ($pref_defs as $preference) {
             //Condition values for easier access later.
 			$current_value = "";
-            if(isset($prefs[$preference['name']])) $current_value = $prefs[$preference['name']];
+			$index = strtolower($preference['name']);
+            if(isset($prefs[$index])) $current_value = $prefs[$index];		
             $value_list = explode(';', $preference['possible_values']);
             $window .= "##highlight##{$preference['name']}: ##end####blob_text##{$preference['description']}##end##\n";
             //Create a list of buttons for each option

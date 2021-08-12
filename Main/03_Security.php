@@ -2169,6 +2169,7 @@ class Security_Core extends BaseActiveModule
         $access = $this->bot->core("security")->get_access_level($player);
         $access = $this->get_access_name($access);
         $message = $player . "'s highest access level is " . strtoupper($access) . ".";
+		$groupmsg = "";
         if ($groups <> -1) {
             $groupmsg = " " . $player . " is a member of the following security groups: ";
             foreach ($groups as $gid) {
