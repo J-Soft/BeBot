@@ -339,25 +339,38 @@ class Raffle extends BaseActiveModule
     function raffle_start($name, $item)
     {
         if (empty($this->item)) {
+			$items = ""; $blanks = "";
 			if (strtolower($this->bot->game)=="ao") {
-				$itemref = explode(" ", $item, 5);
-				if (strtolower($itemref[0]) == "&item&") {
-					$item = $this->bot->core("tools")
-						->make_item($itemref[1], $itemref[2], $itemref[3], $itemref[4], true);
-				}
-				$this->item = $item;
-				$this->item_blank = preg_replace("/<\/a>/U", "", preg_replace("/<a href(.+)>/sU", "", $item));
-			} else {
-				$parse = $this->bot->core('items')->parse_items($item);
-				if (count($parse[0])==9) {
-					$itemname = $parse[0]['name'];
-					$item = $this->bot->core("tools")->chatcmd("items ".$itemname, $itemname);
-					$this->item = $this->bot->core('items')->make_item($parse[0]);
+				preg_match_all('|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|', $item, $matches, PREG_SET_ORDER);
+				if(count($matches)>0) {
+					foreach ($matches as $itemref) {
+						$items .= $this->bot->core("tools")
+							->make_item($itemref[1], $itemref[2], $itemref[3], $itemref[4], true)." ";
+						$blanks .= $this->bot->core("tools")
+							->chatcmd("items ".$itemref[4], $itemref[4])." ";
+					}
 				} else {
-					$this->item = $item;
+					$items = $item;
+					$blanks = preg_replace("/<\/a>/U", "", preg_replace("/<a href([^>]+)>/sU", "", $items));
 				}
-				$this->item_blank = $item;
+			} else {
+				preg_match_all('<a style="text-decoration:none" href="itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)"><font color=#([0-9a-f]*)>\[([\\-a-zäöüßA-ZÄÖÜ0-9_\'&\s\-\:\(\)\+]*)\]<\/font><\/a>', $item, $matches, PREG_SET_ORDER);
+				if(count($matches)>0) {
+					foreach ($matches as $itemref) {
+						$parse = $this->bot->core('items')
+							->parse_items($itemref[0]);
+						$items .= $this->bot->core("items")
+							->make_item($parse[0])." ";
+						$blanks .= $this->bot->core("tools")
+							->chatcmd("items ".$parse[0]['name'], $parse[0]['name'])." ";
+					}
+				} else {
+					$items = $item;
+					$blanks = preg_replace('/<\/a>/U', '', preg_replace('/<a style="text-decoration:none" href([^>]+)>/sU', '', $items));
+				}				
 			}
+			$this->item = $items;
+			$this->item_blank = $blanks;				
             $this->users = array();
             $this->admin = $name;
             $timer = $this->bot->core("settings")
