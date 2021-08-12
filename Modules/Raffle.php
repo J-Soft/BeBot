@@ -354,7 +354,7 @@ class Raffle extends BaseActiveModule
 					$blanks = preg_replace("/<\/a>/U", "", preg_replace("/<a href([^>]+)>/sU", "", $items));
 				}
 			} else {
-				preg_match_all('<a style="text-decoration:none" href="itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)"><font color=#([0-9a-f]*)>\[([\\-a-zäöüßA-ZÄÖÜ0-9_\'&\s\-\:\(\)\+]*)\]<\/font><\/a>', $item, $matches, PREG_SET_ORDER);
+				preg_match_all('|<a style="text-decoration:none" href="itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)"><font color=#([0-9a-f]*)>\[([\\-a-zäöüßA-ZÄÖÜ0-9_\'&\s\-\:\(\)\+]*)\]<\/font><\/a>|', $item, $matches, PREG_SET_ORDER);
 				if(count($matches)>0) {
 					foreach ($matches as $itemref) {
 						$parse = $this->bot->core('items')
@@ -387,7 +387,7 @@ class Raffle extends BaseActiveModule
                 }
             }
             $output = "\n##raffle_highlight##----------------------------------------------------------##end##\n";
-            $output .= "  ##raffle_highlight##" . $name . "##end## has started a raffle for ##raffle_highlight##" . $item . "##end## :: " . $this->click_join(
+            $output .= "  ##raffle_highlight##" . $name . "##end## has started a raffle for ##raffle_highlight##" . $this->item . "##end## :: " . $this->click_join(
                     "join"
                 );
             $output .= "\n##raffle_highlight##----------------------------------------------------------##end##";
@@ -421,7 +421,7 @@ class Raffle extends BaseActiveModule
                         ->chatcmd("raffle output group", "Group") . " ";
                 $inside .= $this->bot->core("tools")
                         ->chatcmd("raffle output both", "Both") . "\n\n";
-                $inside .= "Item: " . $this->item_blank . "\n\n";
+                $inside .= "Item(s): " . $this->item_blank . "\n\n";
                 $inside .= "- " . $this->bot->core("tools")
                         ->chatcmd("raffle join", "Join the raffle") . "\n";
                 $inside .= "- " . $this->bot->core("tools")
