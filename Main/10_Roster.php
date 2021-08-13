@@ -301,13 +301,7 @@ class Roster_Core extends BasePassiveModule
 
     function update_guild($force = false)
     {
-        /*** FIXME: This is not the right place to tell people that the bot went online!
-         * if ($this->startup && ! $force)
-         * {
-         * $msg = "Bot is online ::: ";
-         * $this->startup = FALSE;
-         * }
-         */
+		$upid = array(); $denot = array();
 		$members = array(); $db_member = array();
 		$this->lastrun = $this->bot->core("settings")
             ->get("members", "LastRosterUpdate");
@@ -429,9 +423,7 @@ class Roster_Core extends BasePassiveModule
                     Update the timestamp, but only if its a member.
                     */
                     if (!empty($db_member) && $db_member[2] <= 2) {
-                        $this->bot->db->query(
-                            "UPDATE #___users SET updated_at = '" . time() . "' WHERE char_id = '" . $member["id"] . "'"
-                        );
+						$upid[$member["id"]] = true;
                     }
                     /*
                     Make sure we don't delete the member in the final step
@@ -453,10 +445,7 @@ class Roster_Core extends BasePassiveModule
                         Catch newly added members and give them their first update timestamp
                         */
                         if ($dbmember[3] == 0) {
-                            $this->bot->db->query(
-                                "UPDATE #___users SET updated_at = '" . time(
-                                ) . "' WHERE char_id = '" . $dbmember[0] . "'"
-                            );
+							$upid[$dbmember[0]] = true;
                         }
                         /*
                         If we still have no updates for this member after 2 days, remove.
@@ -505,9 +494,7 @@ class Roster_Core extends BasePassiveModule
                         Catch newly added members and give them their first update timestamp
                         */
                         if ($member[0][2] == 0) {
-                            $this->bot->db->query(
-                                "UPDATE #___users SET updated_at = '" . time() . "' WHERE char_id = '" . $id . "'"
-                            );
+							$upid[$id] = true;
                         }
                         /*
                         If we still have no updates for this member after 2 days, remove.
@@ -628,7 +615,7 @@ class Roster_Core extends BasePassiveModule
                     // Do some sanity checking since funcom has broken chatserver
                     $uid = $this->bot->core("player")->id($user[0]);
                     if ($uid instanceof BotError) {
-                        $this->bot->db->query("UPDATE #___users SET notify = 0 WHERE nickname = '" . $user[0] . "'");
+						$denot[$user[0]] = true;
                     } else if (!$this->bot->core("chat")->buddy_exists($user[0])) {
                         $this->bot->core("chat")->buddy_add($user[0]);
                     }
@@ -644,6 +631,24 @@ class Roster_Core extends BasePassiveModule
             if ($this->rerolled > 0) {
                 $msg .= "::: " . $this->rerolled . " members was found to have rerolled ";
             }
+			if (count($upid)>0) {
+				$ciin = "";
+				foreach ($upid AS $key => $val) {
+					$ciin .= $key.",";
+				}		
+				$ciin = substr($ciin, 0, -1);
+				$this->bot->db->query(
+					"UPDATE #___users SET updated_at = '" . time() . "' WHERE char_id IN (" . $ciin . ")"
+				);
+			}
+			if (count($denot)>0) {
+				$nnin = "";
+				foreach ($denot AS $key => $val) {
+					$nnin .= "'".$key."',";
+				}				
+				$nnin = substr($nnin, 0, -1);				
+				$this->bot->db->query("UPDATE #___users SET notify = 0 WHERE nickname IN (" . $nnin . ")");
+			}
             $this->bot->core("settings")
                 ->save("members", "LastRosterUpdate", time());
             $this->bot->log("ROSTER", "UPDATE", "Roster update complete. $msg", true);
@@ -663,7 +668,7 @@ class Roster_Core extends BasePassiveModule
 
     function update_raid($force = false)
     {
-		$msg = "";
+		$msg = ""; $upid = array();
         if ($this->running) {
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_pgroup("Roster update is already running");
@@ -671,19 +676,12 @@ class Roster_Core extends BasePassiveModule
             return;
         }
         $this->running = true;
-        /*** FIXME: This is not the right place to tell people that the bot went online!
-         * if ($this->startup && ! $force)
-         * {
-         * $msg = "Bot is online ::: ";
-         * $this->startup = FALSE;
-         * }
-         */
         $this->lastrun = $this->bot->core("settings")
             ->get("members", "LastRosterUpdate");
         if (($this->lastrun + (60 * 60 * 6)) >= time() && $force == false) {
             $this->bot->log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
         } else {
-            $this->bot->log("ROSTER", "UPDATE", "Starting roster update");
+            $this->bot->log("ROSTER", "UPDATE", "Starting raid roster update");
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_pgroup("##normal##" . $msg . "Roster update starting ::: System busy##end##");
             }
@@ -715,9 +713,7 @@ class Roster_Core extends BasePassiveModule
                                 "INFO",
                                 $member[1] . " is in members table but Apears to have been Deleted, skipping removal for now"
                             );
-                            $this->bot->db->query(
-                                "UPDATE #___users SET updated_at = " . time() . " WHERE char_id = '" . $member[0] . "'"
-                            );
+							$upid[$member[0]] = true;
                         }
                     } /*
                     Catch rerolled characters.
@@ -743,7 +739,7 @@ class Roster_Core extends BasePassiveModule
                         */
                         else {
                             if ($member[4] != 0) {
-                                $this->bot->db->query("UPDATE #___users SET updated_at = 0 WHERE char_id = " . $id);
+								$upid[$id] = true;
                             }
                             /*
                             Make sure we have an entry in the whois cache for the character.
@@ -764,6 +760,16 @@ class Roster_Core extends BasePassiveModule
                     }
                 }
             }
+			if (count($upid)>0) {
+				$ciin = "";
+				foreach ($upid AS $key => $val) {
+					$ciin .= $key.",";
+				}		
+				$ciin = substr($ciin, 0, -1);
+				$this->bot->db->query(
+					"UPDATE #___users SET updated_at = '" . time() . "' WHERE char_id IN (" . $ciin . ")"
+				);
+			}			
             $this->bot->log(
                 "CRON",
                 "ROSTER",
