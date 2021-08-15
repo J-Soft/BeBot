@@ -948,22 +948,30 @@ class AOChat
                 break;
             // Events currently being debugged for possible inclusion
             case AOCP_MSG_VICINITYA:
-                $bot->log("MAIN", "INC", "Vicinity announcement");
-                /*if (is_resource($this->debug)) {
-                    fwrite($this->debug, "<<<<<\n");
-                    fwrite($this->debug, print_r($packet->args, true));
-                    fwrite($this->debug, "\n=====\n");
-                }*/
+				list ($id, $message) = $packet->args;				
+				if (preg_match("/You feel the core of your being shift, as the source makes room for a divine presence. '([^']+)' has reached enlightenment./i",$message,$info)) {
+					$event = new sfEvent($this, 'Core.on_sl220', array(
+																			 'player' => $info[1]
+																		));
+					$this->bot->dispatcher->notify($event);					
+				}
                 break;
-            // Events we ignore
-            // some notice, e.g. after buddy add
+            case AOCP_MSG_SYSTEM:
+				list ($message) = $packet->args;
+				if (preg_match("/ICC planet-wide announcement: ([^ ]+) has been awarded the highest honorary rank for outstanding dedication to the defence of Rubi-Ka./i",$message,$info)) {
+					$event = new sfEvent($this, 'Core.on_ai30', array(
+																			 'player' => $info[1]
+																		));
+					$this->bot->dispatcher->notify($event);					
+				}				
+                break;
+			// Events we ignore
+				// some notice, e.g. after buddy add
             case AOCP_CHAT_NOTICE:
                 // Character list upon login
             case AOCP_LOGIN_CHARLIST:
                 // AO server pings
             case AOCP_PING:
-                // AO AI 30 & SL 220 ignored
-            case AOCP_MSG_SYSTEM:		
                 break;
             default:
                 $bot->log("MAIN", "TYPE", "Unhandled packet of type $type. Args: " . serialize($packet->args));
