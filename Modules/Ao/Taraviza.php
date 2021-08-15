@@ -145,7 +145,7 @@ class Taraviza extends BaseActiveModule
         $take = $this -> bot -> db -> select("SELECT * FROM tara");
         foreach ($take as $line){ $timer = $line[0]; }
         $now = time();
-        while ($timer <= $now) { $timer = $timer + 32400; } // 9H cycle
+        while ($timer <= $now) { $timer = $timer + 34200; } // 9H30 cycle
         $left = $timer - $now;
         $hour = floor($left/3600);
         $left = $left - ($hour*3600);
@@ -167,7 +167,7 @@ class Taraviza extends BaseActiveModule
         $take = $this -> bot -> db -> select("SELECT * FROM viza");
         foreach ($take as $line){ $timer = $line[0]; }
         $now = time();
-        while ($timer <= $now) { $timer = $timer + 61200; } // 17H cycle
+        while ($timer <= $now) { $timer = $timer + 61620; } // 17H07 cycle
         $left = $timer - $now;
         $hour = floor($left/3600);
         $left = $left - ($hour*3600);
