@@ -111,7 +111,7 @@ class Ding extends BaseActiveModule
             );
 			if(isset($user_check[0]['user_level']) && $user_check[0]['user_level']>0) {
 				$user_update = $this->bot->db->select(
-					"UPDATE #___whois SET defender_rank_id=30 WHERE nickname = '" . $data['player'] . "'",
+					"UPDATE #___whois SET defender_rank_id='30' WHERE nickname = '" . $data['player'] . "'",
 					MYSQLI_ASSOC
 				);
 				$this->bot->send_tell($data['player'], "GG for your AI lvl 30!!!");
