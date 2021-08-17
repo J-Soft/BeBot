@@ -55,15 +55,15 @@ class Raffle extends BaseActiveModule
         $this->result = "";
         $this->register_command("all", "raffle", "GUEST");
         $this->help['description'] = 'Module to handle item lotteries';
-        $this->help['command']['raffle start <item>'] = "Starts a raffle for item <item>.";
+        $this->help['command']['raffle start <item(s)>'] = "Starts a raffle over provided item(s) or reference(s).";
         $this->help['command']['raffle reannounce'] = "Announces the current raffle again.";
         $this->help['command']['raffle cancel'] = "Cancels the current raffle.";
         $this->help['command']['raffle closing'] = "Close the current raffle.";
         $this->help['command']['raffle result'] = "Announce the winner(s) of the last raffle.";
-        $this->help['command']['raffle output <(group|guild|both)>'] = "Chooses which channel raffles should be announced to.";
+        $this->help['command']['raffle output <(group|guild|both)>'] = "Chooses which channel(s) raffle should be announced to.";
         $this->help['command']['raffle join'] = "Joins the current raffle.";
         $this->help['command']['raffle leave'] = "Leaves the current raffle.";
-        $this->help['notes'] = "Notes for the help goes in here.";
+        $this->help['notes'] = "If your provide several items/refs, in AO you may separate them with spaces, while in AoC you shouldn't.";
         $this->bot->core("settings")
             ->create("Raffle", "timer", 0, "How Long shold a Raffle Last? 0 = disabled");
         $this->bot->core("colors")
@@ -362,7 +362,7 @@ class Raffle extends BaseActiveModule
 						$items .= $this->bot->core("items")
 							->make_item($parse[0])." ";
 						$blanks .= $this->bot->core("tools")
-							->chatcmd("items ".$parse[0]['name'], $parse[0]['name'])." ";
+							->chatcmd("items ".$parse[0]['lowid'], $parse[0]['name'])." ";
 					}
 				} else {
 					$items = $item;
