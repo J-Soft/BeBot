@@ -134,7 +134,7 @@ class TimerAA extends BaseActiveModule
         if (!is_numeric($timeraa_cooldown)) {
           if ($timeraa_cooldown === "done" OR $timeraa_cooldown === "finished") {
 			if (empty($chk_time)) {
-				$sql1 = "INSERT INTO #___timer_aa VALUES('', '$timeraa_username', '$timeraa_start', '$timeraa_start', '0', 'Disabled', '1')";
+				$sql1 = "INSERT INTO #___timer_aa (timeraa_username, timeraa_cooldown, timeraa_start, timeraa_end, timeraa_name) VALUES('$timeraa_username', '$timeraa_start', '$timeraa_start', '0', 'Disabled', '1')";
 			} else {
 				$sql1 = "UPDATE #___timer_aa SET timeraa_username='$timeraa_username', timeraa_start='$timeraa_start', timeraa_cooldown='0', timeraa_name='Finished', finished='1' WHERE timeraa_username='$timeraa_username'";
 			}
@@ -148,7 +148,7 @@ class TimerAA extends BaseActiveModule
         $timeraa_end      = $this->utime_add($timeraa_start, $timeraa_cooldown);
 
         if (empty($chk_time)) {
-           $sql = "INSERT INTO #___timer_aa (timeraa_username, timeraa_cooldown, timeraa_start, timeraa_end, timeraa_name) VALUES ('$timeraa_username', '$timeraa_cooldown', '$timeraa_start', '$timeraa_end', '$timeraa_name')";
+           $sql = "INSERT INTO #___timer_aa (timeraa_username, timeraa_cooldown, timeraa_start, timeraa_end, timeraa_name) VALUES('$timeraa_username', '$timeraa_cooldown', '$timeraa_start', '$timeraa_end', '$timeraa_name')";
         }
         else {
            $sql = "UPDATE #___timer_aa SET timeraa_username='$timeraa_username', timeraa_cooldown='$timeraa_cooldown', timeraa_start='$timeraa_start', timeraa_end='$timeraa_end', timeraa_name='$timeraa_name', finished='0' WHERE timeraa_username='$name'";
