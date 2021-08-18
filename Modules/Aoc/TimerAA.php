@@ -134,7 +134,7 @@ class TimerAA extends BaseActiveModule
         if (!is_numeric($timeraa_cooldown)) {
           if ($timeraa_cooldown === "done" OR $timeraa_cooldown === "finished") {
 			if (empty($chk_time)) {
-				$sql1 = "INSERT INTO #___timer_aa (timeraa_username, timeraa_start, timeraa_end, , timeraa_cooldown, timeraa_name, finished) VALUES('$timeraa_username', '$timeraa_start', '$timeraa_start', '0', 'Disabled', '1')";
+				$sql1 = "INSERT INTO #___timer_aa (timeraa_username, timeraa_start, timeraa_end, timeraa_cooldown, timeraa_name, finished) VALUES('$timeraa_username', '$timeraa_start', '$timeraa_start', '0', 'Disabled', '1')";
 			} else {
 				$sql1 = "UPDATE #___timer_aa SET timeraa_username='$timeraa_username', timeraa_start='$timeraa_start', timeraa_cooldown='0', timeraa_name='Finished', finished='1' WHERE timeraa_username='$timeraa_username'";
 			}
