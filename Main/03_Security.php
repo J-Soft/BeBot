@@ -150,7 +150,7 @@ class Security_Core extends BaseActiveModule
 
         $this->owner = ucfirst(strtolower($bot->owner));
         $this->super_admin = array();
-        if (!empty($bot->super_admin)) {
+        if (!empty($bot->super_admin) && count($bot->super_admin)>0) {
             foreach ($bot->super_admin as $user => $value) {
                 $this->super_admin[ucfirst(strtolower($user))] = $value;
             }
