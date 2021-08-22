@@ -41,7 +41,7 @@ class Notify extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "notify", "LEADER");
+        $this->register_command("all", "notify", "ADMIN");
         $this->help['description'] = "Handling of notify list.";
         $this->help['command']['notify'] = "Shows the full notify list (can spam if many buddies ...).";
         $this->help['command']['notify count'] = "Shows the notify list count (no spam if many buddies).";		
