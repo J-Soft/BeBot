@@ -707,7 +707,8 @@ class OnlineDisplay extends BaseActiveModule
         } else {
 			$msg = "No logon information found.";
 		}
-       return $count." toons logged today from ".$plays." players :: ".$this->bot->core("tools")->make_blob("click to view",$msg);
+		$msg = str_replace("(1)", "", $msg);
+		return $count." toons logged today from ".$plays." players :: ".$this->bot->core("tools")->make_blob("click to view",$msg);
     }
 	
 }
