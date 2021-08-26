@@ -50,7 +50,10 @@ class Aocattribute extends BaseActiveModule
    $this -> register_alias('attribute', 'attributes');   
 
    $this -> help['description'] = 'Attribute trickle-down calculator';;
-   $this -> help['command']['attribute <name> <value>'] = "Shows bonuses gained with given attribute name (intel, const, streng, dext, wisd, comb, heal) and value (anything over 1).";
+   
+   $this -> help['command']['attribute <name> <value>'] = "Shows bonuses gained with given attribute name and value (anything over 1)."; 
+   $this -> help['notes'] = "Intelligence = int / intel\n\nConstitution = con / const\n\nStrength = str / streng\n\nDexterity = dex / dext\n\nWisdom = wis / wisd\n\nCombat Rating = cr or comb\n\nHeal Rating = hr / heal.";   
+   
   }
 
   function command_handler($name, $msg, $origin)
