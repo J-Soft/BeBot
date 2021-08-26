@@ -137,6 +137,13 @@ class Raid extends BaseActiveModule
                 "Specify the delay between raid announces.",
                 '30;60;120;180;340;400;600;900'
             );
+        $this->bot->core("settings")
+            ->create(
+                "Raid",
+                "MoreBots",
+                "",
+                "Anymore bots (sharing same DB) that should be included in the raid stats? This has to be a comma-separated list."
+            );			
 
         $this->help['description'] = 'Module to manage and announce raids.';
         $this->help['command']['raidhistory [x]'] = "Shows 10 archived raids ; option to skip x records from bottom links.";
@@ -344,29 +351,41 @@ class Raid extends BaseActiveModule
     */
     function top_raid($asker, $source)
     {
+		if($this->bot->core("settings")->get("Raid", "Morebots")!="") {
+			$bots = explode(",", $this->bot->core("settings")->get("Raid", "Morebots"));
+		} else {
+			$bots = array();
+		}
+		$bots[] = $this->bot->botname;
 		$inside = "";
 		$mains = array();
-		$leaders = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM #___raid_details GROUP BY name ORDER BY cnt DESC;");
-		if (!empty($leaders)) {
-			foreach($leaders as $leader) {
-				$name = $leader[0];
-				$cnt = $leader[1];
-				$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
-				if(isset($checka[0][0])&&count($checka)==1) {
-					$main = $checka[0][0];
-					if(!array_key_exists($main, $mains)) {
-						$mains[$main] = $cnt;
+		foreach($bots as $bot) {
+			$leaders = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM ".$bot."_raid_details GROUP BY name ORDER BY cnt DESC");
+			if (!empty($leaders)) {
+				foreach($leaders as $leader) {
+					$name = $leader[0];
+					$cnt = $leader[1];
+					$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
+					if(isset($checka[0][0])&&count($checka)==1) {
+						$main = $checka[0][0];
+						if(!array_key_exists($main, $mains)) {
+							$mains[$main] = $cnt;
+						} else {
+							$mains[$main] = $mains[$main]+$cnt;
+						}
 					} else {
-						$mains[$main] = $mains[$main]+$cnt;
+						if(!array_key_exists($name, $mains)) {
+							$mains[$name] = $cnt;
+						} else {
+							$mains[$name] = $mains[$name]+$cnt;
+						}
 					}
-				} else {
-					if(!array_key_exists($name, $mains)) {
-						$mains[$name] = $cnt;
-					} else {
-						$mains[$name] = $mains[$name]+$cnt;
-					}
-				}
+				}			
 			}
+		}
+		if(count($mains)>0) {	
+			natcasesort($mains);
+			$mains = array_reverse($mains, true);		
 			$shown = 0;
 			$inside .= "\n\nTOP #10 ##highlight##LEADERS##end## (raids) \n";
 			foreach ($mains as $main => $tot)
@@ -375,30 +394,36 @@ class Raid extends BaseActiveModule
 				if($shown<11) {
 					$inside .= " #".$shown." : ".$main." (".$tot.") \n";
 				}
-			}				
+			}
 		}
 		$mains = array();
-		$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM #___raid_log GROUP BY name ORDER BY cnt DESC;");
-		if (!empty($players)) {
-			foreach($players as $player) {
-				$name = $player[0];
-				$cnt = $player[1];
-				$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
-				if(isset($checka[0][0])&&count($checka)==1) {
-					$main = $checka[0][0];
-					if(!array_key_exists($main, $mains)) {
-						$mains[$main] = $cnt;
+		foreach($bots as $bot) {
+			$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM ".$bot."_raid_log WHERE end > time GROUP BY name ORDER BY cnt DESC");
+			if (!empty($players)) {
+				foreach($players as $player) {
+					$name = $player[0];
+					$cnt = $player[1];
+					$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
+					if(isset($checka[0][0])&&count($checka)==1) {
+						$main = $checka[0][0];
+						if(!array_key_exists($main, $mains)) {
+							$mains[$main] = $cnt;
+						} else {
+							$mains[$main] = $mains[$main]+$cnt;
+						}
 					} else {
-						$mains[$main] = $mains[$main]+$cnt;
+						if(!array_key_exists($name, $mains)) {
+							$mains[$name] = $cnt;
+						} else {
+							$mains[$name] = $mains[$name]+$cnt;
+						}
 					}
-				} else {
-					if(!array_key_exists($name, $mains)) {
-						$mains[$name] = $cnt;
-					} else {
-						$mains[$name] = $mains[$name]+$cnt;
-					}
-				}
+				}			
 			}
+		}
+		if(count($mains)>0) {
+			natcasesort($mains);
+			$mains = array_reverse($mains, true);
 			$shown = 0;
 			$inside .= "\n\nTOP #10 ##highlight##RAIDERS##end## (raids) \n";
 			foreach ($mains as $main => $tot)
@@ -407,8 +432,8 @@ class Raid extends BaseActiveModule
 				if($shown<11) {
 					$inside .= " #".$shown." : ".$main." (".$tot.") \n";
 				}
-			}				
-		}		
+			}			
+		}
 		$output = "Top #10 Leaders and Raiders :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 		if ($source == "tell") {
 			$this->bot->send_tell($asker,$output);
