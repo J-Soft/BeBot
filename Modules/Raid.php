@@ -156,7 +156,8 @@ class Raid extends BaseActiveModule
             = "put a copy and paste of the results of a raid check in <text> to have bot output a missing notice and to get a short list with kick links.";
         $this->help['command']['raid notin'] = "Sent tells to all user in privgroup saying they arnt in raid if they arnt.";
         $this->help['command']['raid notinkick'] = "Kicks all user in privgroup who arnt in raid.";
-        $this->help['command']['raid list'] = "list all user who are or where in the raid and there status.";
+        $this->help['command']['raid list'] = "List all user who are or where in the raid and there status.";
+        $this->help['command']['raid top'] = "List top 10 leaders and readers per raid (declared alts included).";
         $this->help['command']['s <message>'] = "Raid command. Display <message> in a highly visiable manner.";
         $this->help['command']['c'] = "Raid command. Display cocoon warning in a highly visiable manner.";
         $this->help['command']['f'] = "Raid command. Display fence alert in a highly visiable manner.";
@@ -216,6 +217,8 @@ class Raid extends BaseActiveModule
                     case 'stop':
                     case 'end':
                         Return $this->end_raid($name);
+                    case 'top':
+                        Return $this->top_raid($name, $type);						
                     case 'join':
                         return $this->join_raid($name);
                     case 'leave':
@@ -225,7 +228,7 @@ class Raid extends BaseActiveModule
                         }
                         Break;
                     case 'kick':
-                        Return $this->kick_raid($name, $var[2], $var[3], $origin);
+                        Return $this->kick_raid($name, $var[2], $var[3], $type);
                     case 'check':
                         if (!empty($var[3])) {
                             $desc = $var[2] . " " . $var[3];
@@ -337,6 +340,84 @@ class Raid extends BaseActiveModule
     }
 	
     /*
+    This gets called for top
+    */
+    function top_raid($asker, $source)
+    {
+		$inside = "";
+		$mains = array();
+		$leaders = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM #___raid_details GROUP BY name ORDER BY cnt DESC;");
+		if (!empty($leaders)) {
+			foreach($leaders as $leader) {
+				$name = $leader[0];
+				$cnt = $leader[1];
+				$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
+				if(isset($checka[0][0])&&count($checka)==1) {
+					$main = $checka[0][0];
+					if(!array_key_exists($main, $mains)) {
+						$mains[$main] = $cnt;
+					} else {
+						$mains[$main] = $mains[$main]+$cnt;
+					}
+				} else {
+					if(!array_key_exists($name, $mains)) {
+						$mains[$name] = $cnt;
+					} else {
+						$mains[$name] = $mains[$name]+$cnt;
+					}
+				}
+			}
+			$shown = 0;
+			$inside .= "\n\nTOP #10 ##highlight##LEADERS##end## (raids) \n";
+			foreach ($mains as $main => $tot)
+			{
+				$shown++;
+				if($shown<11) {
+					$inside .= " #".$shown." : ".$main." (".$tot.") \n";
+				}
+			}				
+		}
+		$mains = array();
+		$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM #___raid_log GROUP BY name ORDER BY cnt DESC;");
+		if (!empty($players)) {
+			foreach($players as $player) {
+				$name = $player[0];
+				$cnt = $player[1];
+				$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
+				if(isset($checka[0][0])&&count($checka)==1) {
+					$main = $checka[0][0];
+					if(!array_key_exists($main, $mains)) {
+						$mains[$main] = $cnt;
+					} else {
+						$mains[$main] = $mains[$main]+$cnt;
+					}
+				} else {
+					if(!array_key_exists($name, $mains)) {
+						$mains[$name] = $cnt;
+					} else {
+						$mains[$name] = $mains[$name]+$cnt;
+					}
+				}
+			}
+			$shown = 0;
+			$inside .= "\n\nTOP #10 ##highlight##RAIDERS##end## (raids) \n";
+			foreach ($mains as $main => $tot)
+			{
+				$shown++;
+				if($shown<11) {
+					$inside .= " #".$shown." : ".$main." (".$tot.") \n";
+				}
+			}				
+		}		
+		$output = "Top #10 Leaders and Raiders :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
+		if ($source == "tell") {
+			$this->bot->send_tell($asker,$output);
+		} else {
+			$this->bot->send_output($asker,$output,"both");
+		}
+	}
+	
+    /*
     This gets called for history
     */
     function raid_history($name, $skip)
@@ -351,15 +432,17 @@ class Raid extends BaseActiveModule
 			$date = date('Y M D d H:i', $entry[0]);
 			$details = $this->bot->db->select("SELECT * FROM #___raid_details WHERE time =".$entry[0]);
 			if (count($details)==1) {
+				$id = "#".$details[0][0];
 				$rl = $details[0][1];
 				$desc = $details[0][2];
 				$note = $details[0][3];
 			} else {
+				$id = "#?";
 				$rl = "?";
 				$desc = "?";
 				$note = "?";
 			}
-			$inside .= $date." => ".$desc." by ".$rl." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats")."\n\n";
+			$inside .= $id." ".$date." => ".$desc." by ".$rl." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats")."\n\n";
 		}
 		$back = $skip-$pager;
 		if($back>=0) {
@@ -535,6 +618,7 @@ class Raid extends BaseActiveModule
                     "##highlight##$name##end## has started the raid :: " . $this->clickjoin(),
                     "both"
                 );
+				$this->top_raid($name,'auto');
                 $this->pause(true);
                 $this->save();
                 $this->register_event("cron", "1min");
@@ -580,6 +664,7 @@ class Raid extends BaseActiveModule
 					"UPDATE #___raid_details SET end = " . time(
 					) . ", description = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', note = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->note) . "' WHERE time = " . $this->start
 				);
+				$this->top_raid($name,'auto');				
                 Return "Raid stopped. :: " . $this->control();
             } else {
                 return "No raid running.";
