@@ -360,7 +360,7 @@ class Raid extends BaseActiveModule
 		$inside = "";
 		$mains = array();
 		foreach($bots as $bot) {
-			$leaders = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM ".$bot."_raid_details GROUP BY name ORDER BY cnt DESC");
+			$leaders = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM ".strtolower($bot)."_raid_details GROUP BY name ORDER BY cnt DESC");
 			if (!empty($leaders)) {
 				foreach($leaders as $leader) {
 					$name = $leader[0];
@@ -398,7 +398,7 @@ class Raid extends BaseActiveModule
 		}
 		$mains = array();
 		foreach($bots as $bot) {
-			$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM ".$bot."_raid_log WHERE end > time GROUP BY name ORDER BY cnt DESC");
+			$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM ".strtolower($bot)."_raid_log WHERE end > time GROUP BY name ORDER BY cnt DESC");
 			if (!empty($players)) {
 				foreach($players as $player) {
 					$name = $player[0];
