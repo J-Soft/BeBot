@@ -47,6 +47,7 @@ class Aocattribute extends BaseActiveModule
    parent::__construct($bot, get_class($this));
 
    $this -> register_command("all", "attribute", "MEMBER");
+   $this -> register_alias('attribute', 'attributes');   
 
    $this -> help['description'] = 'Attribute trickle-down calculator';;
    $this -> help['command']['attribute <name> <value>'] = "Shows bonuses gained with given attribute name (intel, const, streng, dext, wisd, comb, heal) and value (anything over 1).";
