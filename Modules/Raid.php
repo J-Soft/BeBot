@@ -164,7 +164,7 @@ class Raid extends BaseActiveModule
         $this->help['command']['raid notin'] = "Sent tells to all user in privgroup saying they arnt in raid if they arnt.";
         $this->help['command']['raid notinkick'] = "Kicks all user in privgroup who arnt in raid.";
         $this->help['command']['raid list'] = "List all user who are or where in the raid and there status.";
-        $this->help['command']['raid top'] = "List top 10 leaders and readers per raid (declared alts included).";
+        $this->help['command']['raid top'] = "List top 5 leaders and readers per raid (declared alts included).";
         $this->help['command']['s <message>'] = "Raid command. Display <message> in a highly visiable manner.";
         $this->help['command']['c'] = "Raid command. Display cocoon warning in a highly visiable manner.";
         $this->help['command']['f'] = "Raid command. Display fence alert in a highly visiable manner.";
@@ -358,83 +358,53 @@ class Raid extends BaseActiveModule
 		}
 		$bots[] = $this->bot->botname;
 		$inside = "";
-		$mains = array();
-		foreach($bots as $bot) {
-			$leaders = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM ".strtolower($bot)."_raid_details GROUP BY name ORDER BY cnt DESC");
-			if (!empty($leaders)) {
-				foreach($leaders as $leader) {
-					$name = $leader[0];
-					$cnt = $leader[1];
-					$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
-					if(isset($checka[0][0])&&count($checka)==1) {
-						$main = $checka[0][0];
-						if(!array_key_exists($main, $mains)) {
-							$mains[$main] = $cnt;
+		$limit = time()-2592000;
+		$loads = array();
+		$loads[] = array("type"=>"Raiders","lapse"=>"of the month","table"=>"raid_log","where"=>" WHERE end > time AND time >=".$limit);
+		$loads[] = array("type"=>"Raiders","lapse"=>"of all times","table"=>"raid_log","where"=>" WHERE end > time");
+		$loads[] = array("type"=>"Leaders","lapse"=>"of the month","table"=>"raid_details","where"=>" WHERE time >=".$limit);
+		$loads[] = array("type"=>"Leaders","lapse"=>"of all times","table"=>"raid_details","where"=>"");
+		foreach($loads as $load) {
+			$mains = array();
+			foreach($bots as $bot) {
+				$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM ".strtolower($bot)."_".$load['table']."".$load['where']." GROUP BY name ORDER BY cnt DESC");
+				if (!empty($players)) {
+					foreach($players as $player) {
+						$name = $player[0];
+						$cnt = $player[1];
+						$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
+						if(isset($checka[0][0])&&count($checka)==1) {
+							$main = $checka[0][0];
+							if(!array_key_exists($main, $mains)) {
+								$mains[$main] = $cnt;
+							} else {
+								$mains[$main] = $mains[$main]+$cnt;
+							}
 						} else {
-							$mains[$main] = $mains[$main]+$cnt;
+							if(!array_key_exists($name, $mains)) {
+								$mains[$name] = $cnt;
+							} else {
+								$mains[$name] = $mains[$name]+$cnt;
+							}
 						}
-					} else {
-						if(!array_key_exists($name, $mains)) {
-							$mains[$name] = $cnt;
-						} else {
-							$mains[$name] = $mains[$name]+$cnt;
-						}
+					}			
+				}
+			}
+			if(count($mains)>0) {
+				natcasesort($mains);
+				$mains = array_reverse($mains, true);
+				$shown = 0;
+				$inside .= "\n\nTOP #5 ##highlight##".$load['type']."##end## ".$load['lapse']." \n";
+				foreach ($mains as $main => $tot)
+				{
+					$shown++;
+					if($shown<6) {
+						$inside .= " #".$shown." : ".$main." (".$tot.") \n";
 					}
 				}			
 			}
 		}
-		if(count($mains)>0) {	
-			natcasesort($mains);
-			$mains = array_reverse($mains, true);		
-			$shown = 0;
-			$inside .= "\n\nTOP #10 ##highlight##LEADERS##end## (raids) \n";
-			foreach ($mains as $main => $tot)
-			{
-				$shown++;
-				if($shown<11) {
-					$inside .= " #".$shown." : ".$main." (".$tot.") \n";
-				}
-			}
-		}
-		$mains = array();
-		foreach($bots as $bot) {
-			$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM ".strtolower($bot)."_raid_log WHERE end > time GROUP BY name ORDER BY cnt DESC");
-			if (!empty($players)) {
-				foreach($players as $player) {
-					$name = $player[0];
-					$cnt = $player[1];
-					$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
-					if(isset($checka[0][0])&&count($checka)==1) {
-						$main = $checka[0][0];
-						if(!array_key_exists($main, $mains)) {
-							$mains[$main] = $cnt;
-						} else {
-							$mains[$main] = $mains[$main]+$cnt;
-						}
-					} else {
-						if(!array_key_exists($name, $mains)) {
-							$mains[$name] = $cnt;
-						} else {
-							$mains[$name] = $mains[$name]+$cnt;
-						}
-					}
-				}			
-			}
-		}
-		if(count($mains)>0) {
-			natcasesort($mains);
-			$mains = array_reverse($mains, true);
-			$shown = 0;
-			$inside .= "\n\nTOP #10 ##highlight##RAIDERS##end## (raids) \n";
-			foreach ($mains as $main => $tot)
-			{
-				$shown++;
-				if($shown<11) {
-					$inside .= " #".$shown." : ".$main." (".$tot.") \n";
-				}
-			}			
-		}
-		$output = "Top #10 Leaders and Raiders :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
+		$output = "Top #5 Leaders and Raiders :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 		if ($source == "tell") {
 			$this->bot->send_tell($asker,$output);
 		} else {
