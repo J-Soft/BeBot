@@ -153,6 +153,7 @@ class Raid extends BaseActiveModule
         $this->help['command']['raid start <description>'] = "Starts a raid with optional description.";
         $this->help['command']['raid note <details>'] = "Adds optional note to current raid.";
         $this->help['command']['raid end'] = "Ends a raid.";
+        $this->help['command']['raid cancel'] = "Cancels a raid.";
         $this->help['command']['raid join'] = "Join the active raid.";
         $this->help['command']['raid leave'] = "Leave the active raid.";
         $this->help['command']['raid reward <points>'] = "Reward <points> to all raiders.";
@@ -226,6 +227,9 @@ class Raid extends BaseActiveModule
                     case 'stop':
                     case 'end':
                         Return $this->end_raid($name);
+                    case 'cancel':
+                    case 'abort':
+                        Return $this->cancel_raid($name);						
                     case 'top':
                         Return $this->top_raid($name, $type);						
                     case 'join':
@@ -671,6 +675,45 @@ class Raid extends BaseActiveModule
                 ->get('Raid', 'Command') . " to do this";
         }
     }
+	
+	
+    /*
+    Cancels a Raid
+    */
+    function cancel_raid($name)
+    {
+        if ($this->bot->core("security")->check_access(
+            $name,
+            $this->bot
+                ->core("settings")->get('Raid', 'Command')
+        )
+        ) {
+            if ($this->raid) {
+                $this->bot->db->query("DELETE FROM #___raid_log WHERE time = " . $this->start);
+				$this->bot->db->query(
+					"DELETE FROM #___raid_details WHERE time = " . $this->start
+				);				
+                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
+                $this->raid = false;
+				$this->limit = 0;
+                $this->user = array();
+                $this->move = false;
+                $this->announce = false;
+                $this->user2 = array();
+                $this->locked = false;
+                $this->unregister_event("cron", "1min");
+                $this->bot->send_output($name, "##highlight##$name##end## has cancelled the raid.", "both");
+                $this->bot->core("settings")->save("Raid", "raidinfo", "false");
+				$this->top_raid($name,'auto');				
+                Return "Raid cancelled. :: " . $this->control();
+            } else {
+                return "No raid running.";
+            }
+        } else {
+            return "You must be a " . $this->bot->core("settings")
+                ->get('Raid', 'Command') . " to do this";
+        }
+    }	
 
 
     /*
