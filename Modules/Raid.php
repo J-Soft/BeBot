@@ -51,6 +51,7 @@ class Raid extends BaseActiveModule
 	var $showtank = false;
 	var $showcallers = false;
 	var $type;
+	var $note;
 
 
     function __construct(&$bot)
@@ -60,6 +61,7 @@ class Raid extends BaseActiveModule
         $this->user = array();
 		$this->user2 = array();
         $this->announce = 0;
+		$this->note = "";
 		$this->limit = 0;
         $this->locked = false;
         $this->register_command("all", "s", "LEADER");
@@ -590,6 +592,10 @@ class Raid extends BaseActiveModule
         ) {
             if (!$this->raid) {
                 $this->description = $desc;
+                $this->start = time();		
+				$this->bot->db->query(
+					"INSERT INTO #___raid_details (name, description, time) VALUES ('$name', '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', " . $this->start . ")"
+				);				
                 $this->announce = true;
                 $this->minlevel = $this->bot->core("settings")
                     ->get("Raid", "minlevel");
@@ -607,7 +613,6 @@ class Raid extends BaseActiveModule
                 $this->showcallers = $this->bot->core("settings")
                     ->get("Raid", "showcallers");
                 $this->pgleave = array();
-                $this->start = time();
                 $this->bot->send_output(
                     $name,
                     "##highlight##$name##end## has started the raid :: " . $this->clickjoin(),
@@ -616,10 +621,7 @@ class Raid extends BaseActiveModule
 				$this->top_raid($name,'auto');
                 $this->pause(true);
                 $this->save();
-                $this->register_event("cron", "1min");
-				$this->bot->db->query(
-					"INSERT INTO #___raid_details (name, description, time) VALUES ('$name', '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', " . time() . ")"
-				);				
+                $this->register_event("cron", "1min");			
                 return "Raid started. :: " . $this->control();
             } else {
                 return "Raid already running.";
@@ -644,21 +646,21 @@ class Raid extends BaseActiveModule
         ) {
             if ($this->raid) {
                 $this->bot->db->query("UPDATE #___raid_log SET end = " . time() . " WHERE time = " . $this->start);
+				$this->bot->db->query(
+					"UPDATE #___raid_details SET end = " . time(
+					) . ", description = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', note = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->note) . "' WHERE time = " . $this->start
+				);				
+                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
                 $this->raid = false;
 				$this->limit = 0;
                 $this->user = array();
                 $this->move = false;
                 $this->announce = false;
                 $this->user2 = array();
+                $this->locked = false;
                 $this->unregister_event("cron", "1min");
                 $this->bot->send_output($name, "##highlight##$name##end## has stopped the raid.", "both");
-                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
-                $this->locked = false;
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
-				$this->bot->db->query(
-					"UPDATE #___raid_details SET end = " . time(
-					) . ", description = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', note = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->note) . "' WHERE time = " . $this->start
-				);
 				$this->top_raid($name,'auto');				
                 Return "Raid stopped. :: " . $this->control();
             } else {
