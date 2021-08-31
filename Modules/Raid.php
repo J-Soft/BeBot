@@ -223,7 +223,15 @@ class Raid extends BaseActiveModule
 				if(!isset($var[3])) { $var[3]=""; }
                 switch (strtolower($var[1])) {
                     case 'start':
-                        Return $this->start_raid($name, $var[2], $var[3]);
+						if($var[2]=="") {
+							Return "Please add 1 or 2 word(s) as raid name (e.g.: !raid start Instanced Pande)";
+						} else {
+							$desc = $var[2];
+							if($var[3]!="") {
+								$desc .= " ".$var[3];
+							}
+							Return $this->start_raid($name, $desc);
+						}
                     case 'stop':
                     case 'end':
                         Return $this->end_raid($name);
