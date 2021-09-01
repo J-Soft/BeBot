@@ -111,7 +111,7 @@ class BotStatistics_Core extends BasePassiveModule
 
     function start()
     {
-        if ($this->bot->dimension>=90) {
+        if (strtolower($this->bot->game)=='ao'&&$this->bot->dimension>=90) {
             $dim = $this->bot->dimension-90;
         } else {
 			$dim = $this->bot->dimension;
