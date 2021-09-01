@@ -145,6 +145,14 @@ class Raid extends BaseActiveModule
                 "MoreBots",
                 "",
                 "Anymore bots (sharing same DB) that should be included in the raid stats? This has to be a comma-separated list."
+            );
+        $this->bot->core("settings")
+            ->create(
+                "Raid",
+                "AutoEnd",
+                8,
+                "After how many hours a running raid is assumed forgotten and ended automatically?",
+                '4;8;12'
             );			
 
         $this->help['description'] = 'Module to manage and announce raids.';
@@ -280,13 +288,16 @@ class Raid extends BaseActiveModule
                         Return $this->pause(false);
                     case 'announce':
                         Return $this->set_announce($name, $var[2]);
-                    case 'description':
-                        if (!empty($var[3])) {
-                            $desc = $var[2] . " " . $var[3];
-                        } else {
-                            $desc = $var[2];
-                        }
-                        Return $this->set_description($name, $desc);
+                    case 'description':					
+						if($var[2]=="") {
+							Return "Please add 1 or 2 word(s) as raid name (e.g.: !raid description Sector 35)";
+						} else {
+							$desc = $var[2];
+							if($var[3]!="") {
+								$desc .= " ".$var[3];
+							}
+							Return $this->set_description($name, $desc);
+						}					                        
                     case 'level':
                     case 'minlevel':
                         Return $this->change_level($name, $var[2]);
@@ -650,7 +661,7 @@ class Raid extends BaseActiveModule
     */
     function end_raid($name)
     {
-        if ($this->bot->core("security")->check_access(
+        if ($name==$this->bot->botname||$this->bot->core("security")->check_access(
             $name,
             $this->bot
                 ->core("settings")->get('Raid', 'Command')
@@ -1365,6 +1376,13 @@ class Raid extends BaseActiveModule
             );
             $this->announcel = time();
         }
+		
+		if ($this->raid) {
+			$autoend = $this->bot->core("settings")->get("Raid", "AutoEnd")*3600;
+			if(time()>=$this->start+$autoend){
+				$this->end_raid($this->bot->botname);
+			}
+		}		
     }
 
 
