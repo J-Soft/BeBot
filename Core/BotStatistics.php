@@ -111,12 +111,17 @@ class BotStatistics_Core extends BasePassiveModule
 
     function start()
     {
+        if ($this->bot->dimension>=90) {
+            $dim = $this->bot->dimension-90;
+        } else {
+			$dim = $this->bot->dimension;
+		}
         $result = $this->bot->db->select(
-            "SELECT bot, dim, online, time FROM " . $this->DB . "#___bots WHERE bot = '" . $this->bot->botname . "' AND dim = '" . $this->bot->dimension . "'"
+            "SELECT bot, dim, online, time FROM " . $this->DB . "#___bots WHERE bot = '" . $this->bot->botname . "' AND dim = '" . $dim . "'"
         );
         if (empty($result)) {
             $this->bot->db->query(
-                "INSERT INTO " . $this->DB . "#___bots (bot, dim, online, time, start) VALUES ('" . $this->bot->botname . "', '" . $this->bot->dimension . "', " . time(
+                "INSERT INTO " . $this->DB . "#___bots (bot, dim, online, time, start) VALUES ('" . $this->bot->botname . "', '" . $dim . "', " . time(
                 ) . ", 0, "
                 . time() . ")"
             );
@@ -130,7 +135,7 @@ class BotStatistics_Core extends BasePassiveModule
             }
             $this->bot->db->query(
                 "UPDATE " . $this->DB . "#___bots SET online = " . time(
-                ) . " WHERE bot = '" . $this->bot->botname . "' AND dim = '" . $this->bot->dimension . "'"
+                ) . " WHERE bot = '" . $this->bot->botname . "' AND dim = '" . $dim . "'"
             );
 			$this->online=true;
         }
@@ -138,7 +143,7 @@ class BotStatistics_Core extends BasePassiveModule
 
 
     function check_bots($name, $origin, $bot = false, $dim = false)
-    {
+    { 
         if (!$dim) {
             $dim = $this->bot->dimension;
         }
