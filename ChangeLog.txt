@@ -1,7 +1,7 @@
 --------------
 Version 0.7.19
 --------------
-- Both : Colors & warnings improvements, custom module for multiple relays, Twitch chat compatibilized/improved, PHP 8+ quick runnability check
+- Both : color/preference/warning/roster/raid/stat improvements, custom multiple relays, Twitch chat compatibilized/improved, PHP 8+ runnability
 - AO : !gsp inspired by Nadyita's code, new !hot + !lc enriched informations for Notum War fields with Tyrence's API courtesy of Unk & Draex
 - AoC : new specific !attribute module (thanks to Ruskebusk & Meathooks) + few more improvements over various generic modules (!raffle & more)
 
