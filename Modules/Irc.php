@@ -59,8 +59,6 @@ class IRC extends BaseActiveModule
         $this->register_module("irc");
         $this->register_command("all", "irc", "SUPERADMIN");
         $this->register_command("all", "irconline", "GUEST");
-        $this->register_event("pgjoin");
-        $this->register_event("pgleave");
         $this->register_event("buddy");
         $this->register_event("connect");
         $this->register_event("disconnect");
@@ -88,6 +86,8 @@ class IRC extends BaseActiveModule
         $this->bot->core("settings")->save("irc", "connected", false);
         $this->bot->core("settings")
             ->create("Irc", "Server", "", "Which IRC server is used?");
+        $this->bot->core("settings")
+            ->create("Irc", "OAuthTok", "", "What OAuth Token, if needed to connect (otherwise leave empty)?");
         $this->bot->core("settings")
             ->create("Irc", "Port", "6667", "Which port is used to connect to the IRC server?");
         $this->bot->core("settings")
@@ -480,52 +480,6 @@ class IRC extends BaseActiveModule
     }
 
 
-    function pgjoin($name)
-    {
-        // Only handle this if connected to IRC server
-        if (!$this->bot->core("settings")->get("irc", "connected")) {
-            return;
-        }
-        if ($this->bot->core("settings")
-                ->get("Irc", "Announce")
-            && (
-				(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "both")
-			||	(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "pgroup")
-			)
-        ) {
-            $this->send_irc(
-                $this->bot->core("settings")
-                    ->get("Irc", "IrcGuestprefix"),
-                "",
-                chr(2) . chr(3) . '3***' . chr(2) . ' ' . $name . ' has joined the guest channel.'
-            );
-        }
-    }
-
-
-    function pgleave($name)
-    {
-        // Only handle this if connected to IRC server
-        if (!$this->bot->core("settings")->get("irc", "connected")) {
-            return;
-        }
-        if ($this->bot->core("settings")
-                ->get("Irc", "Announce")
-            && (
-				(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "both")
-			||	(strtolower($this->bot->core("settings")->get("Irc", "Chat")) == "pgroup")
-			)
-        ) {
-            $this->send_irc(
-                $this->bot->core("settings")
-                    ->get("Irc", "IrcGuestprefix"),
-                "",
-                chr(2) . chr(3) . '3***' . chr(2) . ' ' . $name . ' has left the guest channel.'
-            );
-        }
-    }
-
-
     /*
     * Change server to connect to
     */
@@ -877,13 +831,26 @@ class IRC extends BaseActiveModule
             $this->bot->core("settings")
                 ->get("Irc", "Port")
         );
-        $this->irc->login(
-            $this->bot->core("settings")
-                ->get("Irc", "Nick"),
-            'BeBot',
-            0,
-            'BeBot'
-        );
+        if($this->bot->core("settings")->get("Irc", "OAuthTok")==""||$this->bot->core("settings")->get("Irc", "OAuthTok")==" ") {
+			$this->irc->login(
+				$this->bot->core("settings")
+					->get("Irc", "Nick"),
+				'BeBot',
+				0,
+				'BeBot'
+			);
+		} else {
+			$this->irc->login(
+				$this->bot->core("settings")
+					->get("Irc", "Nick"),
+				$this->bot->core("settings")
+					->get("Irc", "Nick"),
+				0,
+				$this->bot->core("settings")
+					->get("Irc", "Nick"),
+				$this->bot->core("settings")->get("Irc", "OAuthTok")
+			);			
+		}
         $this->irc->join(
             array(
                  $this->bot->core("settings")
@@ -1177,7 +1144,9 @@ class IRC extends BaseActiveModule
         if (!$who) {
             $this->whois[$name] = $this->target;
         } elseif (!($who instanceof BotError)) {
-            $at = "(AT " . $who["at_id"] . " - " . $who["at"] . ") ";
+			if (strtolower($this->bot->game) == 'ao') {
+				$at = "(AT " . $who["at_id"] . " - " . $who["at"] . ") ";
+			}
             $result = "\"" . $who["nickname"] . "\"";
             if (!empty($who["firstname"]) && ($who["firstname"] != "Unknown")) {
                 $result = $who["firstname"] . " " . $result;
@@ -1221,7 +1190,7 @@ class IRC extends BaseActiveModule
         $this->target = $target;
 		$msg = "No Tarasque/Cameloot timer found.";
 		if($this->bot->exists_module("taraviza")) {
-			$msg = $this->bot->core("taraviza")->show_tara($this->bot->core("settings")->get("Irc", "Channel"),"IRC");
+			$msg = $this->bot->core("taraviza")->show_tara("user");
 		}
         $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
     }	
@@ -1236,13 +1205,14 @@ class IRC extends BaseActiveModule
         $this->target = $target;
 		$msg = "No Vizaresh/Gauntlet timer found.";
 		if($this->bot->exists_module("taraviza")) {
-			$msg = $this->bot->core("taraviza")->show_viza($this->bot->core("settings")->get("Irc", "Channel"),"IRC");
+			$msg = $this->bot->core("taraviza")->show_viza("user");
 		}		
         $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
     }		
 	
     function irc_whois(&$irc, &$data)
     {
+		$msg = "";
         if ($data->type == SMARTIRC_TYPE_QUERY) {
             $target = $data->nick;
         } else {
@@ -1362,15 +1332,39 @@ class IRC extends BaseActiveModule
         } else {
             $target = $this->bot->core("settings")->get("Irc", "Channel");
         }
-        $msg = explode(" ", $data->message, 2);
-        $msg = $this->bot->commands["tell"]["level"]->get_level($msg[1]);
-        $msg = $this->strip_formatting($msg);
+        if (strtolower($this->bot->game) == 'ao') {
+			$msg = explode(" ", $data->message, 2);
+			$msg = $this->bot->commands["tell"]["level"]->get_level($msg[1]);
+			$msg = $this->strip_formatting($msg);
+		} else {
+			$msg = "Unsupported command by context.";
+		}
         if (!empty($msg)) {
             $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
         }
     }
+	
+	
+    /*
+    Default command for irc
+    */
+    function irc_default(&$irc, &$data)
+    {
+        if ($data->type == SMARTIRC_TYPE_QUERY) {
+            $target = $data->nick;
+        } else {
+            $target = $this->bot->core("settings")->get("Irc", "Channel");
+        }
+        $msg = "Unsupported command by default.";
+        if (!empty($msg)) {
+            $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
+        }
+    }	
 
 
+	/*
+    Command distribution
+    */
     function irc_receive_msg(&$irc, &$data)
     {
         $msg = explode(" ", $data->message, 2);
@@ -1382,6 +1376,8 @@ class IRC extends BaseActiveModule
             case $this->bot->commpre . 'level':
             case $this->bot->commpre . 'lvl':
             case $this->bot->commpre . 'pvp':
+            case $this->bot->commpre . 'tara':
+            case $this->bot->commpre . 'viza':
                 Break; //These should of been handled elsewere
             case 'is':
                 $data->message = $this->bot->commpre . $data->message;
@@ -1400,8 +1396,20 @@ class IRC extends BaseActiveModule
             case 'lvl':
             case 'pvp':
                 $data->message = $this->bot->commpre . $data->message;
-                $this->irc_level($irc, $data);
+				if (strtolower($this->bot->game) == 'ao') {
+					$this->irc_level($irc, $data);
+				} else {
+					$this->irc_default($irc, $data);
+				}
                 Break;
+			case 'tara':
+                $data->message = $this->bot->commpre . $data->message;
+                $this->irc_tara($irc, $data);
+                Break;
+			case 'viza':
+                $data->message = $this->bot->commpre . $data->message;
+                $this->irc_viza($irc, $data);
+                Break;				
             Default:
                 if ($data->type == SMARTIRC_TYPE_QUERY) {
                     $target = $data->nick;

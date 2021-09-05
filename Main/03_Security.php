@@ -17,7 +17,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -150,7 +150,7 @@ class Security_Core extends BaseActiveModule
 
         $this->owner = ucfirst(strtolower($bot->owner));
         $this->super_admin = array();
-        if (!empty($bot->super_admin)) {
+        if (!empty($bot->super_admin) && is_array($bot->super_admin) && count($bot->super_admin)>0) {
             foreach ($bot->super_admin as $user => $value) {
                 $this->super_admin[ucfirst(strtolower($user))] = $value;
             }
@@ -2169,6 +2169,7 @@ class Security_Core extends BaseActiveModule
         $access = $this->bot->core("security")->get_access_level($player);
         $access = $this->get_access_name($access);
         $message = $player . "'s highest access level is " . strtoupper($access) . ".";
+		$groupmsg = "";
         if ($groups <> -1) {
             $groupmsg = " " . $player . " is a member of the following security groups: ";
             foreach ($groups as $gid) {

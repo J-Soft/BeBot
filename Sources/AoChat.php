@@ -195,7 +195,7 @@ class AOChat
 
     function disconnect()
     {
-        if (is_resource($this->socket)) {
+        if (is_resource($this->socket) || $this->socket instanceof \Socket) {
             socket_close($this->socket);
         }
         $this->socket = null;
@@ -227,7 +227,7 @@ class AOChat
             die("AOChat: not expecting connect.\n");
         }
         $s = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if (!is_resource($s)) /* this is fatal */ {
+        if (!is_resource($s) && (!$s instanceof \Socket)) /* this is fatal */ {
             die("Could not create socket.\n");
         }
         $this->socket = $s;
@@ -243,6 +243,7 @@ class AOChat
         }
         /* For AO we expect the login seed when we connect to the chatserver */
         if (strtolower(AOCHAT_GAME) == 'ao') {
+			$this->bot->log("LOGIN", "NOTICE", "AOChat waiting for AO login seed ...");
             $packet = $this->get_packet();
             if (!is_object($packet) || $packet->type != AOCP_LOGIN_SEED) {
                 trigger_error(
@@ -325,7 +326,7 @@ class AOChat
 
         // Connect to the chat server
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if (!is_resource($this->socket)) /* this is fatal */ {
+        if (!is_resource($this->socket) && (!$this->socket instanceof \Socket)) /* this is fatal */ {
             die("Could not create socket.\n");
         }
         if (@socket_connect($this->socket, $this->ServerAddress, $this->ServerPort) === false) {
@@ -622,7 +623,7 @@ class AOChat
         $rlen = $len;
         while ($rlen > 0) {
             if (($tmp = socket_read($this->socket, $rlen)) === false) {
-                if (!is_resource($this->socket)) {
+                if (!is_resource($this->socket) && (!$this->socket instanceof \Socket)) {
                     $this->disconnect();
                     die("Read error: $last_error\n");
                 } else {
@@ -632,7 +633,7 @@ class AOChat
             }
             if ($tmp == "") {
                 echo("Read error: EOF\n");
-                if (!is_resource($this->socket)) {
+                if (!is_resource($this->socket) && (!$this->socket instanceof \Socket)) {
                     $this->disconnect();
                     die("Read error: Too many EOF errors, disconnecting.\n");
                 } else {
@@ -825,12 +826,12 @@ class AOChat
                     $this->bot->log("LOGIN", "ERROR", "Received login error. Retrying ...");
                     $this->login_num++;
                     // Disconnect from the territoryserver
-                    if (is_resource($this->socket)) {
+                    if (is_resource($this->socket) || $this->socket instanceof \Socket) {
                         socket_close($this->socket);
                     }
                     // Connect to the chat server
                     $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-                    if (!is_resource($this->socket)) /* this is fatal */ {
+                    if (!is_resource($this->socket) && (!$this->socket instanceof \Socket)) /* this is fatal */ {
                         die("Could not create socket.\n");
                     }
                     if (@socket_connect($this->socket, $this->ServerAddress, $this->ServerPort) === false) {
@@ -947,22 +948,30 @@ class AOChat
                 break;
             // Events currently being debugged for possible inclusion
             case AOCP_MSG_VICINITYA:
-                $bot->log("MAIN", "INC", "Vicinity announcement");
-                /*if (is_resource($this->debug)) {
-                    fwrite($this->debug, "<<<<<\n");
-                    fwrite($this->debug, print_r($packet->args, true));
-                    fwrite($this->debug, "\n=====\n");
-                }*/
+				list ($id, $message) = $packet->args;				
+				if (preg_match("/You feel the core of your being shift, as the source makes room for a divine presence. '([^']+)' has reached enlightenment./i",$message,$info)) {
+					$event = new sfEvent($this, 'Core.on_sl220', array(
+																			 'player' => $info[1]
+																		));
+					$this->bot->dispatcher->notify($event);					
+				}
                 break;
-            // Events we ignore
-            // some notice, e.g. after buddy add
+            case AOCP_MSG_SYSTEM:
+				list ($message) = $packet->args;
+				if (preg_match("/ICC planet-wide announcement: ([^ ]+) has been awarded the highest honorary rank for outstanding dedication to the defence of Rubi-Ka./i",$message,$info)) {
+					$event = new sfEvent($this, 'Core.on_ai30', array(
+																			 'player' => $info[1]
+																		));
+					$this->bot->dispatcher->notify($event);					
+				}				
+                break;
+			// Events we ignore
+				// some notice, e.g. after buddy add
             case AOCP_CHAT_NOTICE:
                 // Character list upon login
             case AOCP_LOGIN_CHARLIST:
                 // AO server pings
             case AOCP_PING:
-                // AO AI 30 & SL 220 ignored
-            case AOCP_MSG_SYSTEM:		
                 break;
             default:
                 $bot->log("MAIN", "TYPE", "Unhandled packet of type $type. Args: " . serialize($packet->args));

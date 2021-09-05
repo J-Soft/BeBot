@@ -14,7 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -39,6 +39,7 @@ class BotStatisticsUI extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "bots", "MEMBER");
+        $this->register_command("all", "environ", "SUPERADMIN");
     }
 
 
@@ -53,11 +54,27 @@ class BotStatisticsUI extends BaseActiveModule
                 if ($reply !== false) {
                     Return ($reply);
                 }
+            case 'environ':
+                $reply = $this->check_environ($name, $origin, $var[1]);
+                if ($reply !== false) {
+                    Return ($reply);
+                }				
             default:
                 Return ("##error##Error : Broken plugin, received unhandled command: ##highlight##" . $var[0] . "##end## in Bots.php##end##");
         }
     }
 
+    function check_environ($name, $origin, $msg)
+    {
+		$php_version = phpversion();
+		$sql_version = mysqli_get_server_info($this->bot->db->CONN);
+		$os = getenv("OSTYPE");
+		if (empty($os)) {
+			$os = getenv("OS");
+		}
+		$msg = BOT_VERSION_NAME . " v." . BOT_VERSION." -- OS: ".$os." -- PHP: ".$php_version." -- SQL: ".$sql_version;
+		Return $msg;		
+	}
 
     function check_bots($name, $origin, $msg)
     {

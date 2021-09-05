@@ -59,16 +59,16 @@ class Skills extends BaseActiveModule
 		$this -> register_command('all', 'weapon', 'GUEST');
 		$this -> register_alias("weapon", "weap");		
 
-		$this -> help['command']['Aimedshot [Aimed Shot skill] [Weapon attack] [Weapon recharge]']="Command to get AS multiplier, recharge and cap.";
-		$this -> help['command']['Brawl [Brawl skill]']="Command to get Brawl recharge, damage and stun details.";
-		$this -> help['command']['Burst [Burst skill] [Weapon attack] [Weapon recharge] [Burst delay]']="Command to get Burst recharge and cap.";
-		$this -> help['command']['Dimach [Dimach kill] [Profession]']="Command to get Dimach recharge and details.";
-		$this -> help['command']['Fullauto [Full Auto skill] [Weapon attack] [Weapon recharge] [Full Auto delay]']="Command to get Full Auto details.";
-		$this -> help['command']['Fastattack [Fast Attack skill] [Weapon attack]']="Command to get Fast Attack recharge and cap.";
-		$this -> help['command']['Flingshot [Fling skill] [Weapon attack] ']="Command to get Fling Shot recharge and cap.";
-		$this -> help['command']['Mafist [Martial Art skill] [Profession]']="Command to get MA Fist recharge and details.";
-		$this -> help['command']['Nanoinit [Nano Init skill] [Nano Attack]']="Command to get Nano Init details.";
-		$this -> help['command']['Weapon [game item]']="Command to see posted game item details.";
+		$this -> help['command']['aimedshot [Aimed Shot skill] [Weapon attack] [Weapon recharge]']="Command to get AS multiplier, recharge and cap.";
+		$this -> help['command']['brawl [Brawl skill]']="Command to get Brawl recharge, damage and stun details.";
+		$this -> help['command']['burst [Burst skill] [Weapon attack] [Weapon recharge] [Burst delay]']="Command to get Burst recharge and cap.";
+		$this -> help['command']['dimach [Dimach kill] [Profession]']="Command to get Dimach recharge and details.";
+		$this -> help['command']['fullauto [Full Auto skill] [Weapon attack] [Weapon recharge] [Full Auto delay]']="Command to get Full Auto details.";
+		$this -> help['command']['fastattack [Fast Attack skill] [Weapon attack]']="Command to get Fast Attack recharge and cap.";
+		$this -> help['command']['flingshot [Fling skill] [Weapon attack] ']="Command to get Fling Shot recharge and cap.";
+		$this -> help['command']['mafist [Martial Art skill] [Profession]']="Command to get MA Fist recharge and details.";
+		$this -> help['command']['nanoinit [Nano Init skill] [Nano Attack]']="Command to get Nano Init details.";
+		$this -> help['command']['weapon [game item]']="Command to see posted game item details.";
 
 	}
 

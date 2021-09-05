@@ -66,7 +66,7 @@ class OnlineDisplay extends BaseActiveModule
         $this->help['command']['online'] = 'Shows who is online in org or chatgroup.';
         $this->help['command']['online <prof>'] = "Shows all characters of " . $cp . " <prof> online in org or chatgroup.";
         $this->help['command']['sm'] = "Lists all characters online sorted alphabetical by name.";
-		$this->help['command']['recent'] = "Lists all characters logged the last 24 hours.";
+		$this->help['command']['recent'] = "Lists logons of last 24 hours by known main names (with logons of declared alts).";
         $this->bot->core("settings")
             ->create("Online", "Mode", $mode, "Which mode should be used in the online display?", "Basic;Fancy");
         $this->bot->core("settings")
@@ -672,18 +672,43 @@ class OnlineDisplay extends BaseActiveModule
 	function recent_msg($what)
 	{
         $day = time() - 86400;
-		$recent = $this->bot->db->select("SELECT nickname FROM #___online WHERE status_gc_changetime > ".$day);
+		$count = 0;
+		$plays = 0;
+		$msg = "";
+		$mains = array();
+		$recent = $this->bot->db->select("SELECT DISTINCT(nickname) FROM #___online WHERE status_gc_changetime > ".$day);
         if (!empty($recent))
 		{
-                $count = 0;
-                $msg = "";
+				$count = count($recent);
                 foreach ($recent as $toon)
-			{
-                        $msg .= $toon[0]." ";
-                        $count++;
-                        }
-                }
-       return $count." logons today :: ".$this->bot->core("tools")->make_blob("click to view",$msg);
+				{
+					$name = $toon[0];						
+					$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");											
+					if(isset($checka[0][0])&&count($checka)==1) {
+						$main = $checka[0][0];
+						if(!array_key_exists($main, $mains)) {
+							$mains[$main] = 1;
+						} else {
+							$mains[$main] = $mains[$main]+1;
+						}
+					} else {
+						if(!array_key_exists($name, $mains)) {
+							$mains[$name] = 1;
+						} else {
+							$mains[$name] = $mains[$name]+1;
+						}
+					}				
+				}
+				foreach ($mains as $main => $alts)
+				{
+					$msg .= " ".$main."(".$alts.") ";
+				}
+				$plays = count($mains);
+        } else {
+			$msg = "No logon information found.";
+		}
+		$msg = str_replace("(1)", "", $msg);
+		return $count." toons logged today from ".$plays." players :: ".$this->bot->core("tools")->make_blob("click to view",$msg);
     }
 	
 }

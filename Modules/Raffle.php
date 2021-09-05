@@ -51,19 +51,19 @@ class Raffle extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->output = "group";
+        $this->output = "both";
         $this->result = "";
         $this->register_command("all", "raffle", "GUEST");
         $this->help['description'] = 'Module to handle item lotteries';
-        $this->help['command']['raffle start <item>'] = "Starts a raffle for item <item>.";
+        $this->help['command']['raffle start <item(s)>'] = "Starts a raffle over provided item(s) or reference(s).";
         $this->help['command']['raffle reannounce'] = "Announces the current raffle again.";
         $this->help['command']['raffle cancel'] = "Cancels the current raffle.";
         $this->help['command']['raffle closing'] = "Close the current raffle.";
         $this->help['command']['raffle result'] = "Announce the winner(s) of the last raffle.";
-        $this->help['command']['raffle output <(group|guild|both)>'] = "Chooses which channel raffles should be announced to.";
+        $this->help['command']['raffle output <(group|guild|both)>'] = "Chooses which channel(s) raffle should be announced to.";
         $this->help['command']['raffle join'] = "Joins the current raffle.";
         $this->help['command']['raffle leave'] = "Leaves the current raffle.";
-        $this->help['notes'] = "Notes for the help goes in here.";
+        $this->help['notes'] = "If your provide several items/refs, in AO you may separate them with spaces, while in AoC you shouldn't.";
         $this->bot->core("settings")
             ->create("Raffle", "timer", 0, "How Long shold a Raffle Last? 0 = disabled");
         $this->bot->core("colors")
@@ -255,7 +255,7 @@ class Raffle extends BaseActiveModule
         ) {
             $this->output(
                 "\n##raffle_highlight##----------------------------------------------------------##end##\n" . "  The raffle for ##raffle_highlight##" . $this->item
-                . "##end## wil be " . "##raffle_highlight##closing soon##end## :: " . $this->click_join("join") . "\n"
+                . "##end## will be " . "##raffle_highlight##closing soon##end## :: " . $this->click_join("join") . "\n"
                 . "##raffle_highlight##----------------------------------------------------------##end##"
             );
         } else {
@@ -339,13 +339,38 @@ class Raffle extends BaseActiveModule
     function raffle_start($name, $item)
     {
         if (empty($this->item)) {
-            $itemref = explode(" ", $item, 5);
-            if (strtolower($itemref[0]) == "&item&") {
-                $item = $this->bot->core("tools")
-                    ->make_item($itemref[1], $itemref[2], $itemref[3], $itemref[4], true);
-            }
-            $this->item = $item;
-            $this->item_blank = preg_replace("/<\/a>/U", "", preg_replace("/<a href(.+)>/sU", "", $item));
+			$items = ""; $blanks = "";
+			if (strtolower($this->bot->game)=="ao") {
+				preg_match_all('|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|', $item, $matches, PREG_SET_ORDER);
+				if(count($matches)>0) {
+					foreach ($matches as $itemref) {
+						$items .= $this->bot->core("tools")
+							->make_item($itemref[1], $itemref[2], $itemref[3], $itemref[4], true)." ";
+						$blanks .= $this->bot->core("tools")
+							->chatcmd("items ".$itemref[4], $itemref[4])." ";
+					}
+				} else {
+					$items = $item;
+					$blanks = preg_replace("/<\/a>/U", "", preg_replace("/<a href([^>]+)>/sU", "", $items));
+				}
+			} else {
+				preg_match_all('|<a style="text-decoration:none" href="itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)"><font color=#([0-9a-f]*)>\[([\\-a-zäöüßA-ZÄÖÜ0-9_\'&\s\-\:\(\)\+]*)\]<\/font><\/a>|', $item, $matches, PREG_SET_ORDER);
+				if(count($matches)>0) {
+					foreach ($matches as $itemref) {
+						$parse = $this->bot->core('items')
+							->parse_items($itemref[0]);
+						$items .= $this->bot->core("items")
+							->make_item($parse[0])." ";
+						$blanks .= $this->bot->core("tools")
+							->chatcmd("items ".$parse[0]['lowid'], $parse[0]['name'])." ";
+					}
+				} else {
+					$items = $item;
+					$blanks = preg_replace('/<\/a>/U', '', preg_replace('/<a style="text-decoration:none" href([^>]+)>/sU', '', $items));
+				}				
+			}
+			$this->item = $items;
+			$this->item_blank = $blanks;				
             $this->users = array();
             $this->admin = $name;
             $timer = $this->bot->core("settings")
@@ -362,7 +387,7 @@ class Raffle extends BaseActiveModule
                 }
             }
             $output = "\n##raffle_highlight##----------------------------------------------------------##end##\n";
-            $output .= "  ##raffle_highlight##" . $name . "##end## has started a raffle for ##raffle_highlight##" . $item . "##end## :: " . $this->click_join(
+            $output .= "  ##raffle_highlight##" . $name . "##end## has started a raffle for ##raffle_highlight##" . $this->item . "##end## :: " . $this->click_join(
                     "join"
                 );
             $output .= "\n##raffle_highlight##----------------------------------------------------------##end##";
@@ -388,7 +413,7 @@ class Raffle extends BaseActiveModule
             ) {
                 return "You did not start the raffle and are not a bot admin.";
             } else {
-                $inside = "##ao_ccheader##:::: Raffle Administration ::::##end##<font color=CCInfoHeader>\n\n";
+                $inside = "##ao_ccheader##:::: Raffle Administration ::::##end##<font color=#808080>\n\n";
                 $inside .= "Output channel: \n";
                 $inside .= $this->bot->core("tools")
                         ->chatcmd("raffle output guild", "Guild") . " ";
@@ -396,7 +421,7 @@ class Raffle extends BaseActiveModule
                         ->chatcmd("raffle output group", "Group") . " ";
                 $inside .= $this->bot->core("tools")
                         ->chatcmd("raffle output both", "Both") . "\n\n";
-                $inside .= "Item: " . $this->item_blank . "\n\n";
+                $inside .= "Item(s): " . $this->item_blank . "\n\n";
                 $inside .= "- " . $this->bot->core("tools")
                         ->chatcmd("raffle join", "Join the raffle") . "\n";
                 $inside .= "- " . $this->bot->core("tools")

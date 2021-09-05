@@ -48,12 +48,12 @@ class ServerConnection
 
     public function Connect()
     {
-        if (is_resource($this->m_Socket)) {
+        if (is_resource($this->m_Socket) || $this->m_Socket instanceof \Socket) {
             socket_close($this->m_Socket);
         }
 
         $this->m_Socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if (!is_resource($this->m_Socket)) {
+        if (!is_resource($this->m_Socket) && (!$this->m_Socket instanceof \Socket)) {
             echo("[" . $this->m_LogName . "] Could not create a socket\n");
             return false;
         }
@@ -77,7 +77,7 @@ class ServerConnection
     /// @author Chaoz
     public function Disconnect($reason)
     {
-        if (is_resource($this->m_Socket)) {
+        if (is_resource($this->m_Socket) || $this->m_Socket instanceof \Socket) {
             echo("[" . $this->m_LogName . "] Disconnected. [$reason]\n");
             socket_close($this->m_Socket);
         }
@@ -235,7 +235,7 @@ class ServerConnection
 
         while ($rlen > 0) {
             if (($tmp = socket_read($this->m_Socket, $rlen)) === false) {
-                if (!is_resource($this->m_Socket)) {
+                if (!is_resource($this->m_Socket) && (!$this->m_Socket instanceof \Socket)) {
                     $this->Disconnect("Socket read error");
                     die("Read error: $last_error\n");
                 } else {
@@ -248,7 +248,7 @@ class ServerConnection
                 $this->Disconnect("Socket EOF error");
                 echo("Read error: EOF\n");
 
-                if (!is_resource($this->m_Socket)) {
+                if (!is_resource($this->m_Socket) && (!$this->m_Socket instanceof \Socket)) {
                     die("Read error: Too many EOF errors, disconnecting.\n");
                 } else {
                     return null;

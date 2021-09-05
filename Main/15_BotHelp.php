@@ -199,22 +199,24 @@ class BotHelp_Core extends BaseActiveModule
             $help = $com->help;
             if(isset($help['description'])) $window .= '##highlight##' . $help['description'] . '##end##<br><br>';
             $module_commands = array();
-            foreach ($help['command'] as $key => $value) {
-                // Only show help for the specific command, not all help for module!
-                $parts = explode(' ', $key, 2);
-                if (strcasecmp($command, $parts[0]) == 0) {
-                    $key = str_replace('<', '&lt;', $key);
-                    $value = str_replace('<', '&lt;', $value);
-                    $window .= " ##highlight##<pre>$key##end## - ##blob_text##$value##end##<br>";
-                } else {
-                    if ($this->bot->core("access_control")
-                        ->check_for_access($name, $parts[0])
-                    ) {
-                        $module_commands[$parts[0]] = $this->bot->core("tools")
-                            ->chatcmd("help " . $parts[0], $parts[0]);
-                    }
-                }
-            }
+			if (isset($help['command'])) {
+				foreach ($help['command'] as $key => $value) {
+					// Only show help for the specific command, not all help for module!
+					$parts = explode(' ', $key, 2);
+					if (strcasecmp($command, $parts[0]) == 0) {
+						$key = str_replace('<', '&lt;', $key);
+						$value = str_replace('<', '&lt;', $value);
+						$window .= " ##highlight##<pre>$key##end## - ##blob_text##$value##end##<br>";
+					} else {
+						if ($this->bot->core("access_control")
+							->check_for_access($name, $parts[0])
+						) {
+							$module_commands[$parts[0]] = $this->bot->core("tools")
+								->chatcmd("help " . $parts[0], $parts[0]);
+						}
+					}
+				}
+			}
             if(isset($help['notes'])) { $window .= '<br>##blob_title##NOTES:##end##<br>##blob_text##' . $help['notes'] . '##end##'; }
             if (!empty($module_commands)) {
                 ksort($module_commands);

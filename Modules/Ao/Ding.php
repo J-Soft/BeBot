@@ -42,6 +42,22 @@ class Ding extends BaseActiveModule
 	{
 		// Initialize the base module
 		parent::__construct($bot, get_class($this));
+		
+		// SL/AI Events
+        $this->bot->dispatcher->connect(
+            'Core.on_sl220',
+            array(
+                 $this,
+                 'sl220'
+            )
+        );
+        $this->bot->dispatcher->connect(
+            'Core.on_ai30',
+            array(
+                 $this,
+                 'ai30'
+            )
+        );		
 
 		// Register command
 		$this->register_command('all', 'ding', 'GUEST');
@@ -68,6 +84,40 @@ class Ding extends BaseActiveModule
 				return($this->error->message());
 		}
 	}
+	
+    public function sl220($data)
+    {
+		if(isset($data['player'])) {
+            $user_check = $this->bot->db->select(
+                "SELECT user_level FROM #___users WHERE nickname = '" . $data['player'] . "'",
+                MYSQLI_ASSOC
+            );
+			if(isset($user_check[0]['user_level']) && $user_check[0]['user_level']>0) {
+				$user_update = $this->bot->db->select(
+					"UPDATE #___whois SET level=220 WHERE nickname = '" . $data['player'] . "'",
+					MYSQLI_ASSOC
+				);
+				$this->bot->send_tell($data['player'], "GG for your 220 ding!!!");
+			}
+		}
+	}
+
+    public function ai30($data)
+    {
+		if(isset($data['player'])) {
+            $user_check = $this->bot->db->select(
+                "SELECT user_level FROM #___users WHERE nickname = '" . $data['player'] . "'",
+                MYSQLI_ASSOC
+            );
+			if(isset($user_check[0]['user_level']) && $user_check[0]['user_level']>0) {
+				$user_update = $this->bot->db->select(
+					"UPDATE #___whois SET defender_rank_id='30' WHERE nickname = '" . $data['player'] . "'",
+					MYSQLI_ASSOC
+				);
+				$this->bot->send_tell($data['player'], "GG for your AI lvl 30!!!");
+			}			
+		}
+	}	
 	
 	function send_ding($name, $level)
 	{

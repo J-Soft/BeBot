@@ -80,6 +80,7 @@ class TimerAA extends BaseActiveModule
         $this -> help['command']['timeraa showall <nick>'] = "Show how long time left on running AA trainings for all user chars.";
         $this -> help['command']['timeraa set 18'] = "Set the training time for current AA. Only use hours.";
         $this -> help['command']['timeraa set 18 <name of AA>'] = "Set the training time for current AA. Only use hours, with optional name of AA.";
+        $this -> help['command']['timeraa set done|finished'] = "Finishes your current AA timer, or disables if none existed.";
         $this -> help['notes'] = sprintf("(C) Module By Getrix@Fury<br />Version: ##lightbeige##%s##end##", $this->version);
     }
 	
@@ -128,10 +129,16 @@ class TimerAA extends BaseActiveModule
         if ($firstspace != 0)
             $timeraa_name = substr($args, $firstspace + 1);
 
+		$chk_time = $this -> bot -> db -> select("SELECT * FROM #___timer_aa WHERE timeraa_username='$name'");
+		
         if (!is_numeric($timeraa_cooldown)) {
           if ($timeraa_cooldown === "done" OR $timeraa_cooldown === "finished") {
-            $sql1 = "UPDATE #___timer_aa SET timeraa_username='$timeraa_username', timeraa_start='$timeraa_start', timeraa_cooldown='0', timeraa_name='Finished', finished='1' WHERE timeraa_username='$timeraa_username'";
-            $query = $this->bot->db->query($sql1);
+			if (empty($chk_time)) {
+				$sql1 = "INSERT INTO #___timer_aa (timeraa_username, timeraa_start, timeraa_end, timeraa_cooldown, timeraa_name, finished) VALUES('$timeraa_username', '$timeraa_start', '$timeraa_start', '0', 'Disabled', '1')";
+			} else {
+				$sql1 = "UPDATE #___timer_aa SET timeraa_username='$timeraa_username', timeraa_start='$timeraa_start', timeraa_cooldown='0', timeraa_name='Finished', finished='1' WHERE timeraa_username='$timeraa_username'";
+			}
+			$query = $this->bot->db->query($sql1);				
             return "##lime##$timeraa_username##end## is done training AA timers and will not be notified upon logon!";
           }else {
             return $timeraa_cooldown." is not a number";
@@ -140,9 +147,8 @@ class TimerAA extends BaseActiveModule
 
         $timeraa_end      = $this->utime_add($timeraa_start, $timeraa_cooldown);
 
-        $chk_time = $this -> bot -> db -> select("SELECT * FROM #___timer_aa WHERE timeraa_username='$name'");
         if (empty($chk_time)) {
-           $sql = "INSERT INTO #___timer_aa (timeraa_username, timeraa_cooldown, timeraa_start, timeraa_end, timeraa_name) VALUES ('$timeraa_username', '$timeraa_cooldown', '$timeraa_start', '$timeraa_end', '$timeraa_name')";
+           $sql = "INSERT INTO #___timer_aa (timeraa_username, timeraa_cooldown, timeraa_start, timeraa_end, timeraa_name) VALUES('$timeraa_username', '$timeraa_cooldown', '$timeraa_start', '$timeraa_end', '$timeraa_name')";
         }
         else {
            $sql = "UPDATE #___timer_aa SET timeraa_username='$timeraa_username', timeraa_cooldown='$timeraa_cooldown', timeraa_start='$timeraa_start', timeraa_end='$timeraa_end', timeraa_name='$timeraa_name', finished='0' WHERE timeraa_username='$name'";

@@ -1819,8 +1819,9 @@ class Net_SmartIRC_base
             $this->_checkbuffer();
 
             if ($this->_usesockets == true) {
-                $sread = array($this->_socket);
-                $result = @socket_select($sread, $w = null, $e = null, 0);
+				$sread = array($this->_socket);
+				$w = null; $e = null;
+				$result = @socket_select($sread, $w, $e, 0);				
 
                 if ($result == 1) {
                     // the socket got data to read
@@ -2239,10 +2240,10 @@ class Net_SmartIRC_base
      */
     function _updatestate()
     {
-        $rtype = get_resource_type($this->_socket);
-        if ((is_resource(
-                $this->_socket
-            )) && ($this->_socket !== false) && ($rtype == 'socket' || $rtype == 'Socket' || $rtype == 'stream')
+        if (
+		( ($this->_socket instanceof \Socket) && ($this->_socket !== false) )
+		||
+		( (is_resource($this->_socket)) && ($this->_socket !== false) && (get_resource_type($this->_socket) == 'socket' || get_resource_type($this->_socket) == 'Socket' || get_resource_type($this->_socket) == 'stream') )
         ) {
 
             $this->_state = true;

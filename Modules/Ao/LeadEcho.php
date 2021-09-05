@@ -16,7 +16,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -122,8 +122,14 @@ class LeadEcho extends BaseActiveModule
             return "##error##" . $caller . ", you can't take lead from " . $this->bot
                 ->core("settings")->get("Leader", "Name") . "##end##";
         }
-        // All checks done, now we can set the new leader:
+        // All checks done, now we can set the new leader:		
         $this->bot->core("settings")->save("leader", "name", $leadername);
+		if ($this->bot->exists_module("raid")&&$this->bot->core("raid")->raid) {
+			$current = $this->bot->db->select("SELECT id FROM #___raid_details WHERE end=0 ORDER BY time DESC LIMIT 1");			
+			if(isset($current[0][0])&&$current[0][0]>0) {
+				$update = $this->bot->db->query("UPDATE #___raid_details SET name='".$leadername."' WHERE id=".$current[0][0]);
+			}
+		}
         return "##highlight##" . $leadername . " ##end##has lead now!" . $repeatstring;
     }
 

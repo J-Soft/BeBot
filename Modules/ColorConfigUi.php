@@ -147,18 +147,28 @@ class ColorConfig extends BaseActiveModule
         if (empty($cols)) {
             return "No colors defined! How can this be?";
         }
+		$scur = $this->bot->db->select("SELECT color_code FROM #___color_schemes WHERE module='".$module."' AND name='".$scheme."' LIMIT 1");
+		if(isset($scur[0][0])&&$scur[0][0]!='') { $cur=$scur[0][0]; } else { $cur='?unknown?'; }
         $blob = "##ao_infotext##Select a color to use for##end## ##" . $module . "_" . $scheme . "##" . $module . "_" . $scheme;
         $blob .= "##end####ao_infotext##:##end##\n";
         foreach ($this->bot->core("colors")->get_theme() as $color => $code) {
             $blob .= "\n##" . $color . "##" . $color . " ##end##";
-            $blob .= $this->bot->core("tools")
-                ->chatcmd("color set " . $module . " " . $scheme . " " . $color, "Select!");
+			if($cur==$color) {
+				$blob .= "Current!";
+			} else {
+				$blob .= $this->bot->core("tools")
+					->chatcmd("color set " . $module . " " . $scheme . " " . $color, "Select!");
+			}
         }
         foreach ($cols as $col) {
             $blob .= "\n##" . $col[0] . "##" . $col[0] . " ##end##";
-            $blob .= $this->bot->core("tools")
-                ->chatcmd("color set " . $module . " " . $scheme . " " . $col[0], "Select!");
-        }
+			if($cur==$col[0]) {
+				$blob .= "Current!";
+			} else {
+				$blob .= $this->bot->core("tools")
+					->chatcmd("color set " . $module . " " . $scheme . " " . $col[0], "Select!");
+			}
+		}
         return $this->bot->core("tools")->make_blob("Pick a color!", $blob);
     }
 

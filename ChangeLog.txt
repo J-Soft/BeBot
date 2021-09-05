@@ -1,12 +1,26 @@
 --------------
+Version 0.7.19
+--------------
+- Both : color/preference/warning/roster/raid/stat improvements, custom multiple relays, Twitch chat compatibilized/improved, PHP 8+ runnability
+- AO : !gsp inspired by Nadyita's code, new !hot + !lc enriched informations for Notum War fields with Tyrence's API courtesy of Unk & Draex
+- AoC : new specific !attribute module (thanks to Ruskebusk & Meathooks) + few more improvements over various generic modules (!raffle & more)
+
+--------------
 Version 0.7.18
 --------------
-- in the making ...
+- Various fixes, addition of raidhistory, full archive of changelog
 
 --------------
 Version 0.7.17
 --------------
 - Many modules improved/added for both AO & AoC (& few more bot fixes in various core/modules)
+27 For AO
+ from bebot archive : Aggdef Cluster Ding Onlineorg Orgs Procs Rcalc Skills Twink Aiarmor (A)XP Announcer Aigen
+ from buda/tyr : Nanoline Recipes Stats Whatbuff Guide/AOU Perks Spirits Whompa Bossloot Whereis Ladder Dyna Ofab Route
+2 For both
+ Recruit TeamSpeak
+3 For AoC
+ Timeraa Bound Rweapon
 
 --------------
 Version 0.7.16

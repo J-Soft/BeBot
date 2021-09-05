@@ -166,6 +166,9 @@ class MassMsg extends BaseActiveModule
                     $blobs[(int)$massmsg][(int)$massinv] = $blob;
                 }
                 $message = $msg . $blobs[(int)$massmsg][(int)$massinv];
+				if(strtolower($this->bot->game)=='ao'&&$this->bot->port>9000) {
+					$message = str_replace("<pre>",$this->bot->commpre,$message);
+				}
             } else {
                 $message = $msg;
             }
