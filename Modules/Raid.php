@@ -645,7 +645,8 @@ class Raid extends BaseActiveModule
                 $this->pause(true);
                 $this->save();
                 $this->register_event("cron", "1min");			
-                return "Raid started. :: " . $this->control();
+				$this->join_raid($name);				
+                return "Raid started. :: " . $this->control();	
             } else {
                 return "Raid already running.";
             }
