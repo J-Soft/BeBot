@@ -1,4 +1,9 @@
 --------------
+Version 0.7.20
+--------------
+- ... in the making ...
+
+--------------
 Version 0.7.19
 --------------
 - Both : color/preference/warning/roster/raid/stat improvements, custom multiple relays, Twitch chat compatibilized/improved, PHP 8+ runnability
