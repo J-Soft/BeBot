@@ -295,6 +295,9 @@ class Bot
         //Create an array of files loadable.
         while ($module = $folder->read()) {
             $is_disabled = $this->ini->get($module, $section);
+			if($is_disabled == "") {
+				$is_disabled = $this->ini->get($module, "Custom_Modules");
+			}
             if (!is_dir($module) && !preg_match("/^_/", $module) && preg_match(
                     "/\.php$/i",
                     $module
