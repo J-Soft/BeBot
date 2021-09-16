@@ -128,6 +128,7 @@ class Relay extends BaseActiveModule
                 '',
                 'What other prefixes should be Checked in the in the Relay Group seperated by ; eg @;.;#'
             );
+		$this -> bot -> core("settings") -> create("Relay", 'nearSyntax', '', 'What syntax (eg: @) to send a message to relay (leave empty to relay everything)?');
         $this->bot->core("settings")
             ->create("Relay", "Color", false, "color outgoing message to the relay?");
         $this->bot->core("settings")
@@ -155,6 +156,7 @@ class Relay extends BaseActiveModule
             ->create("Relay", 'ShowMain', false, "Should we display the name of the characters main when relaying?");
         $this->bot->core("settings")
             ->create("Relay", 'TruncateMain', '6', "How many characters of the main's name to display?", '4;6;8;10;13');
+		$this->bot->core("settings")->create("Relay", 'IRC', FALSE, "Relay to IRC?");			
         $this->bot->core("colors")->define_scheme("relay", "channel", "normal");
         $this->bot->core("colors")->define_scheme("relay", "name", "normal");
         $this->bot->core("colors")->define_scheme("relay", "message", "normal");
@@ -263,7 +265,9 @@ class Relay extends BaseActiveModule
             ) {
                 $this->bot->send_pgroup($txt);
             }
-            $this->relay_to_irc($txt);
+			if ($this -> bot -> core("settings") -> get('Relay', 'Irc') == TRUE) {
+				$this->relay_to_irc($txt);
+			}
         }
     }
 
@@ -340,7 +344,9 @@ class Relay extends BaseActiveModule
             ) {
                 $this->bot->send_pgroup($txt);
             }
-            $this->relay_to_irc($txt);
+			if ($this -> bot -> core("settings") -> get('Relay', 'Irc') == TRUE) {
+				$this->relay_to_irc($txt);
+			}
         }
     }
 
@@ -390,7 +396,15 @@ class Relay extends BaseActiveModule
     */
     function relay_to_pgroup($name, $msg, $type = "notchat")
     {
-        if ($this->bot->core("settings")->get('Relay', 'Status')) {
+		$near = $this -> bot -> core("settings") -> get('Relay', 'nearSyntax');
+		echo " ".$near." ";
+        if ($this->bot->core("settings")->get('Relay', 'Status') && (
+			preg_match("/^" . $near . " (.+)/i", $msg, $info)
+			|| $near == ''
+			) ) {
+			if ($near != '' && substr($msg, 0, 1) == $near) {
+				$msg = substr($msg, 1);
+			}
             $namestr = "";
             $mainstr = "";
             $main = "";
@@ -504,7 +518,14 @@ class Relay extends BaseActiveModule
     */
     function relay_to_gc($name, $msg)
     {
-        if ($this->bot->core("settings")->get('Relay', 'Status')) {
+		$near = $this -> bot -> core("settings") -> get('Relay', 'nearSyntax');
+        if ($this->bot->core("settings")->get('Relay', 'Status')&& (
+			preg_match("/^" . $near . " (.+)/i", $msg, $info)
+			|| $near == ''
+			) ) {
+			if ($near != '' && substr($msg, 0, 1) == $near) {
+				$msg = substr($msg, 1);
+			}				
             $namestr = "";
             if ($name != "0") {
                 $namestr = $this->get_namestring($name);
