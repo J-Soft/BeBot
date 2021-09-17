@@ -188,13 +188,13 @@ class Relay extends BaseActiveModule
     public function pginvite($data)
     {
         $group = $data['source'];
-        echo "Debug received group invite: " . $group . "\n";
+        //echo "Debug received group invite: " . $group . "\n";
         if (strtolower(
                 $this->bot->core("settings")
                     ->get('Relay', 'Relay')
             ) == strtolower($group)
         ) {
-            echo "Debug: joining " . $group . "\n";
+            //echo "Debug: joining " . $group . "\n";
             $this->bot->core("chat")->pgroup_join($group);
         }
     }
@@ -317,6 +317,7 @@ class Relay extends BaseActiveModule
             $txt = preg_replace("/(.+)#&%" . $type . "%&#/U", "", $txt);
             $txt = str_replace("#&%chat%&#", "", $txt);
             $txt = str_replace("#&%notchat%&#", "", $txt);
+			$link = $txt;
             $ignore = $this->bot->core("settings")->get('Relay', 'Ignore');
             $ignore = explode(";", $ignore);
             foreach ($ignore as $k => $ig) {
@@ -324,17 +325,19 @@ class Relay extends BaseActiveModule
             }
             $ignore = implode("|", $ignore);
             $ignore = "(" . $ignore . ")";
-            if (preg_match("/(.+)#relay_name##" . $ignore . ":##end## ##relay_message##(.+)##end##/i", $txt)) {
+            if (preg_match("/(.+)##relay_name##" . $ignore . ":##end##(.+)/i", $txt)) {
                 $this->bot->log("RELAY", "IGNORE", $txt);
                 Return;
-            }
+            } else {
+				$link = preg_replace("/##relay_name##([^:]+):##end##/i", "<a href=\"user:" . "/" . "/$1\">$1</a>:", $link);
+			}
             if ($this->bot->core("settings")
                     ->get('Relay', 'Inc') == "Both"
                 || $this->bot
                     ->core("settings")
                     ->get('Relay', 'Inc') == "Guildchat"
             ) {
-                $this->bot->send_gc($txt);
+                $this->bot->send_gc($link);
             }
             if ($this->bot->core("settings")
                     ->get('Relay', 'Inc') == "Both"
@@ -342,7 +345,7 @@ class Relay extends BaseActiveModule
                     ->core("settings")
                     ->get('Relay', 'Inc') == "Privgroup"
             ) {
-                $this->bot->send_pgroup($txt);
+                $this->bot->send_pgroup($link);
             }
 			if ($this -> bot -> core("settings") -> get('Relay', 'Irc') == TRUE) {
 				$this->relay_to_irc($txt);
@@ -397,7 +400,6 @@ class Relay extends BaseActiveModule
     function relay_to_pgroup($name, $msg, $type = "notchat")
     {
 		$near = $this -> bot -> core("settings") -> get('Relay', 'nearSyntax');
-		echo " ".$near." ";
         if ($this->bot->core("settings")->get('Relay', 'Status') && (
 			preg_match("/^" . $near . " (.+)/i", $msg, $info)
 			|| $near == ''
@@ -507,7 +509,7 @@ class Relay extends BaseActiveModule
     function relay_to_irc($msg)
     {
         $msg = preg_replace("/##end##/U", "", $msg);
-        $msg = preg_replace("/##(.+)##/U", "", $msg);
+        $msg = preg_replace("/##([^#]+)##/U", "", $msg);
         $this->bot->send_irc("", "", $msg);
     }
 
@@ -829,7 +831,8 @@ class Relay extends BaseActiveModule
                 if (!empty($online)) {
                     foreach ($online as $on) {
                         $on = explode(",", $on);
-                        $this->inc_com($name, "buddy 1 $on[0] $on[1] $on[2]", $source);
+						if(isset($on[2])) { $lvl = $on[2]; } else { $lvl = 0; }
+                        $this->inc_com($name, "buddy 1 $on[0] $on[1] $lvl", $source);
                     }
                 }
                 Break;
@@ -854,7 +857,9 @@ class Relay extends BaseActiveModule
                         break;
                     case "pg":
                         $column = "status_pg";
+                        $leveln = "";						
                         $level = "";
+                        $levele = "";						
                         break;
                     default:
                         $column = false;
