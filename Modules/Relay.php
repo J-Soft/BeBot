@@ -131,10 +131,10 @@ class Relay extends BaseActiveModule
 		$this -> bot -> core("settings") -> create("Relay", 'nearSyntax', '', 'What syntax (eg: @) to send a message to relay (leave empty to relay everything)?');
         $this->bot->core("settings")
             ->create("Relay", "Color", false, "color outgoing message to the relay?");
-        $this->bot->core("settings")
+        /*$this->bot->core("settings")
             ->create("Relay", "Encrypt", false, "Should messages be Encrypted?");
         $this->bot->core("settings")
-            ->create("Relay", "Key", "", "Encription Key for Sending and Recieving Messages?");
+            ->create("Relay", "Key", "", "Encription Key for Sending and Recieving Messages?");*/
         $this->bot->core("settings")
             ->create(
                 'Relay',
@@ -295,11 +295,11 @@ class Relay extends BaseActiveModule
         ) {
             $txt = $input['args'];
             $txt = explode(" ", $txt, 2);
-            if ($txt[0] == '&$enc$&') {
+            /*if ($txt[0] == '&$enc$&') {
                 $txt = $this->dec($txt[1]);
-            } else {
+            } else {*/
                 $txt = implode(" ", $txt);
-            }
+            //}
             Switch ($this->bot->core("settings")->get('Relay', 'Orgnameon')) {
                 case 'Both':
                     $type = "FALSE";
@@ -495,10 +495,10 @@ class Relay extends BaseActiveModule
                 $this->bot->send_tell($dest, $prefix . $msg, 0, false, true, $color);
                 break;
             case 'pgroup':
-                if (!$alt && $this->bot->core("settings")->get('Relay', 'Encrypt')) {
+                /*if (!$alt && $this->bot->core("settings")->get('Relay', 'Encrypt')) {
                     $msg = $this->enc($msg);
                     $msg = '&$enc$& ' . $msg;
-                }
+                }*/
                 $this->bot->send_pgroup($prefix . $msg, $dest, true, $color);
                 break;
         }
@@ -831,8 +831,7 @@ class Relay extends BaseActiveModule
                 if (!empty($online)) {
                     foreach ($online as $on) {
                         $on = explode(",", $on);
-						if(isset($on[2])) { $lvl = $on[2]; } else { $lvl = 0; }
-                        $this->inc_com($name, "buddy 1 $on[0] $on[1] $lvl", $source);
+                        $this->inc_com($name, "buddy 1 $on[0] $on[1] 0", $source);
                     }
                 }
                 Break;
@@ -844,16 +843,12 @@ class Relay extends BaseActiveModule
                 $nickname = ucfirst(strtolower($msg[2]));
                 $where = strtolower($msg[3]);
                 $newstatus = $msg[1];
-                if ($where != "pg" && !is_numeric($msg[4])) {
-                    echo "Invalid Level ($msg[4]) for $msg[2]\n";
-                    $msg[4] = 0;
-                }
                 switch ($where) {
                     case "gc":
                         $column = "status_gc";
                         $leveln = ", level";
-                        $level = ", " . $msg[4];
-                        $levele = ", level = " . $msg[4];
+                        $level = ", 0";
+                        $levele = ", level = 0";
                         break;
                     case "pg":
                         $column = "status_pg";
@@ -872,13 +867,14 @@ class Relay extends BaseActiveModule
                     $sql .= "ON DUPLICATE KEY UPDATE " . $column . " = '" . $newstatus . "', " . $column . "_changetime = '" . time(
                         ) . "'" . $levele;
                     $this->bot->db->query($sql);
+					$this->bot->core("whois")->lookup($nickname);
                 }
                 Break;
         }
     }
 
 
-    function enc($string)
+    /*function enc($string)
     {
         if (!extension_loaded("mcrypt")) {
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -890,9 +886,8 @@ class Relay extends BaseActiveModule
                 return ("Relay Encription Requires the mcrypt PHP extension.");
             }
         }
-        /*
-        Make sure the mhash module is loaded.
-        */
+
+        //Make sure the mhash module is loaded.
         if (!extension_loaded("mhash")) {
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                 $module = 'mhash.dll';
@@ -929,10 +924,10 @@ class Relay extends BaseActiveModule
         //$return['decrypted'] = $decrypted_string;
         $return = "$encrypted_string $hmac $iv";
         return $return;
-    }
+    }*/
 
 
-    function dec($txt)
+    /*function dec($txt)
     {
         $txt = explode(" ", $txt);
         $key = $this->bot->core("settings")->get("Relay", "Key");
@@ -942,10 +937,10 @@ class Relay extends BaseActiveModule
         } else {
             return ($this->decrypt_data($data['iv'], $data['ciphrtxt'], $key));
         }
-    }
+    }*/
 
 
-    function decrypt_data($iv, $ciphrtxt, $key)
+    /*function decrypt_data($iv, $ciphrtxt, $key)
     {
         // There is no hex2bin, pack() does the job.
         $iv = pack("H*", $iv);
@@ -957,23 +952,21 @@ class Relay extends BaseActiveModule
         // For some reason there is always some junk on the string until it gets timmed.
         $decrypted_string = trim($decrypted_string);
         return $decrypted_string;
-    }
+    }*/
 
 
     /*
     This function verifies the data's authenticity and integrity.
     */
-    function verify_rec_data($rec_string, $rec_hmac, $rec_iv, $key)
+    /*function verify_rec_data($rec_string, $rec_hmac, $rec_iv, $key)
     {
-        /*
         //DEBUG
-        $output = "<br>Debug Output:<br>";
-        $output .= "<br>Key: ".$key."<br>";
-        $output .= "<br>IV: ".$rec_iv."<br>";
-        $output .= "<br>HMAC: ".$rec_hmac."<br>";
-        $output .= "<br>String: ".$rec_string."<br>";
-        print_r($output);
-        */
+        //$output = "<br>Debug Output:<br>";
+        //$output .= "<br>Key: ".$key."<br>";
+        //$output .= "<br>IV: ".$rec_iv."<br>";
+        //$output .= "<br>HMAC: ".$rec_hmac."<br>";
+        //$output .= "<br>String: ".$rec_string."<br>";
+        //print_r($output);
         // String has to be long enough to be valid.
         if (!preg_match("/^[0-9A-Fa-f].+$/", $rec_string)) {
             return ("Invalid String, Expected Hex Characters only.");
@@ -1013,7 +1006,7 @@ class Relay extends BaseActiveModule
             $return['ciphrtxt'] = $rec_string;
         }
         return $return;
-    }
+    }*/
 
 
     /*
