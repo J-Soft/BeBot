@@ -152,8 +152,8 @@ class Relay extends BaseActiveModule
                 false,
                 'Should Bot Send a Special Tag to Say What Type of Message its Relaying, Note (Other Bots are Required to Have a Module that Supports This Feature)'
             );
-        $this->bot->core("settings")
-            ->create("Relay", 'ShowMain', false, "Should we display the name of the characters main when relaying?");
+        /*$this->bot->core("settings")
+            ->create("Relay", 'ShowMain', false, "Should we display the name of the characters main when relaying?");*/
         $this->bot->core("settings")
             ->create("Relay", 'TruncateMain', '6', "How many characters of the main's name to display?", '4;6;8;10;13');
 		$this->bot->core("settings")->create("Relay", 'IRC', FALSE, "Relay to IRC?");			
@@ -824,7 +824,7 @@ class Relay extends BaseActiveModule
             case 'online':
                 $sql = "UPDATE #___online SET status_gc = '0', status_pg = '0' WHERE botname = '" . $name . "'";
                 $this->bot->db->query($sql);
-                if ($msg[1] == "" || !$msg[1]) {
+                if (!isset($msg[1]) || $msg[1] == "" || !$msg[1]) {
                     Return;
                 }
                 $online = explode(";", $msg[1]);
@@ -1015,7 +1015,7 @@ class Relay extends BaseActiveModule
     function get_namestring($name)
     {
         $mainstr = "";
-        if ($this->bot->core("settings")->get('Relay', 'ShowMain') != "") {
+        /*if ($this->bot->core("settings")->get('Relay', 'ShowMain') != "") {
             $main = $this->bot->core("alts")->main($name);
             if ($main && (strcasecmp($main, $name) != 0)) {
                 $truncatelen = ($this->bot->core("settings")
@@ -1026,7 +1026,7 @@ class Relay extends BaseActiveModule
                 }
                 $mainstr = " ##relay_mainname##(" . $main . ")##end##";
             }
-        }
+        }*/
         $namestr = "##relay_name##" . $name . $mainstr . ":##end## ";
         return $namestr;
     }
