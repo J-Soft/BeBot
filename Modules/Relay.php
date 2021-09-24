@@ -781,8 +781,7 @@ class Relay extends BaseActiveModule
                     $level = $on[3];
                     if ($on[1] == 1) {
                         $onmsg .= $on[0] . ",gc,$level;";
-                    }
-                    if ($on[2] == 1) {
+                    } elseif ($on[2] == 1) {
                         $onmsg .= $on[0] . ",pg;";
                     }
                 }
