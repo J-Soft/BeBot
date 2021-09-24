@@ -40,7 +40,7 @@ class Preferences_GUI extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         //Create access settings for this module
-        $this->register_command("all", "preferences", "MEMBER", array('default' => 'SUPERADMIN'));
+        $this->register_command("all", "preferences", "GUEST", array('default' => 'SUPERADMIN'));
         $this->register_alias("preferences", "prefs");
         $this->help['description'] = 'Player Preferences';
         $this->help['command']['preferences'] = "Shows the preferences interface.";
