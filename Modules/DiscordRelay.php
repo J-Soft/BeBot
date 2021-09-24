@@ -322,6 +322,26 @@ class DiscordRelay extends BaseActiveModule
 	}
 	
     /*
+    This gets called by all various modules to send alerts
+    */
+    function disc_alert($msg)
+    {	
+		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
+			$channel = $this->bot->core("settings")->get("discord", "ChannelId");
+			$token = $this->bot->core("settings")->get("discord", "BotToken");
+			if ($channel>0 && $token!="") {
+				$route = "/channels/{$channel}/messages";
+				$sent = $this->cleanString($msg);
+				$data = array("content" => $sent);
+				$result = discord_post($route, $token, $data);
+				if(isset($result['message'])&& isset($result['code'])) {
+					$this->bot->log("DISCORD", "ERROR", "Missed configuration : do !settings discord to fix");
+				}				
+			}
+		}
+	}
+	
+    /*
     This gets called on a msg in the private group
     */
     function privgroup($name, $msg)
