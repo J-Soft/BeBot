@@ -74,6 +74,10 @@ class MassMsg extends BaseActiveModule
             ->create('MassMsg', 'receive_message', 'Do you want to receive mass-messages?', 'Yes', 'Yes;No');
         $this->bot->core('prefs')
             ->create('MassMsg', 'receive_invites', 'Do you want to receive mass-invites?', 'Yes', 'No;Yes');
+        $this->bot->core("settings")
+            ->create("MassMsg", "AlertDisc", false, "Do we alert Discord of Mass Msg/Inv ?");
+        $this->bot->core("settings")
+            ->create("MassMsg", "AlertIrc", false, "Do we alert Irc of Mass Msg/Inv ?");				
         $this->bot->core("colors")->define_scheme("massmsg", "type", "aqua");
         $this->bot->core("colors")->define_scheme("massmsg", "msg", "orange");
         $this->bot->core("colors")
@@ -106,7 +110,13 @@ class MassMsg extends BaseActiveModule
 
 
     function mass_msg($sender, $msg, $type)
-    {
+    {		
+		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("MassMsg", "AlertDisc")) {
+			$this->bot->core("discord")->disc_alert("@everyone ".$sender." announced : " .$msg);
+		}
+		if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("MassMsg", "AlertIrc")) {
+			$this->bot->core("irc")->send_irc("", "", $sender." announced : " .$msg);
+		}
         //get a list of online users in the configured channel.
 		$status = array();
         $users = $this->bot->core('online')->list_users(
