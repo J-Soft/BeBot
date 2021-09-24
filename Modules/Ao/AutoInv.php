@@ -169,9 +169,19 @@ class AutoInv extends BaseActiveModule
             Return;
         }
         if ($this->bot->core("settings")->get("Autoinv", "Activated")) {
+			$uadirog = false; // user access depending if raidbot or guildbot
+			if (!$this->bot->guildbot) { // raidbot
+				if($this->bot->core("security")->check_access($user, "GUEST")) { // guest or +
+					$uadirog = true;
+				}			
+			} else { // guildbot
+				if($this->bot->core("security")->get_access_level_player($user) == 1) { // guest only
+					$uadirog = true;
+				}
+			}
             if ($this->bot->core('prefs')
                     ->get($user, 'AutoInv', 'receive_auto_invite') == 'On'
-                && $this->bot->core("security")->get_access_level_player($user) == 1
+                && $uadirog
                 && !($this->bot
                     ->core("online")->in_chat($user))
             ) {
