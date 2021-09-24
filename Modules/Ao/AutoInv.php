@@ -171,7 +171,7 @@ class AutoInv extends BaseActiveModule
         if ($this->bot->core("settings")->get("Autoinv", "Activated")) {
             if ($this->bot->core('prefs')
                     ->get($user, 'AutoInv', 'receive_auto_invite') == 'On'
-                && $this->bot->core("security")->check_access($user, "GUEST")
+                && $this->bot->core("security")->get_access_level_player($user) == 1
                 && !($this->bot
                     ->core("online")->in_chat($user))
             ) {
