@@ -199,7 +199,7 @@ class Announcer extends BaseActiveModule
 					$this->bot->core("discord")->disc_alert($msg, $chan);
 				}
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Announcer", "AlertIrc")) {
-					$this->bot->core("irc")->send_irc("", "", $msg_message);
+					$this->bot->core("irc")->send_irc("", "", $msg);
 				}				
 			}
 
