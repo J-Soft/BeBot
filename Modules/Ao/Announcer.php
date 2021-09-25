@@ -192,12 +192,14 @@ class Announcer extends BaseActiveModule
 			if (!in_array($relay_Sender,$ignoredSender)) {
 				if ($this->bot->core("settings")->get("Announcer", "OrgOn")) $this -> bot -> send_gc($relay_message); 
 				if ($this->bot->core("settings")->get("Announcer", "PrivOn")) $this -> bot -> send_pgroup($relay_message);
+				$msg = preg_replace("/##end##/U", "", $relay_message);
+				$msg = preg_replace("/##([^#]+)##/U", "", $msg);
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Announcer", "AlertDisc")) {
 					if($this->bot->core("settings")->get("Announcer", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Announcer", "DiscChanId"); } else { $chan = ""; }
-					$this->bot->core("discord")->disc_alert($relay_message, $chan);
+					$this->bot->core("discord")->disc_alert($msg, $chan);
 				}
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Announcer", "AlertIrc")) {
-					$this->bot->core("irc")->send_irc("", "", $relay_message);
+					$this->bot->core("irc")->send_irc("", "", $msg_message);
 				}				
 			}
 
