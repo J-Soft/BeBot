@@ -60,6 +60,12 @@ class Announcer extends BaseActiveModule
 		$this->bot->core("settings")->create("Announcer", "OrgOn", false, "Should the bot be relaying from Botnet to guild channel ?", "On;Off");
 		$this->bot->core("settings")->create("Announcer", "PrivOn", false, "Should the bot be relaying from Botnet to private channel ?", "On;Off");
 		$this->bot->core("settings")->create("Announcer", "BotName", "Darknet", "What's the Botnet main BotName (Darknet by default) ?", "Darknet");
+        $this->bot->core("settings")
+            ->create("Announcer", "AlertDisc", false, "Do we alert Discord of Botnet spam ?");
+        $this->bot->core("settings")
+            ->create("Announcer", "DiscChan", false, "What Discord ChannelId in case we separate Botnet spam from main Discord channel (leave empty for all in main channel) ?");
+        $this->bot->core("settings")
+            ->create("Announcer", "AlertIrc", false, "Do we alert Irc of Botnet spam ?");		
 		
 	}
 
@@ -186,6 +192,13 @@ class Announcer extends BaseActiveModule
 			if (!in_array($relay_Sender,$ignoredSender)) {
 				if ($this->bot->core("settings")->get("Announcer", "OrgOn")) $this -> bot -> send_gc($relay_message); 
 				if ($this->bot->core("settings")->get("Announcer", "PrivOn")) $this -> bot -> send_pgroup($relay_message);
+				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Announcer", "AlertDisc")) {
+					if($this->bot->core("settings")->get("Announcer", "DiscChan")) { $chan = $this->bot->core("settings")->get("Announcer", "DiscChan"); } else { $chan = ""; }
+					$this->bot->core("discord")->disc_alert($relay_message, $chan);
+				}
+				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Announcer", "AlertIrc")) {
+					$this->bot->core("irc")->send_irc("", "", $relay_message);
+				}				
 			}
 
                         return true;

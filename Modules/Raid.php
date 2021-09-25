@@ -157,6 +157,8 @@ class Raid extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Raid", "AlertDisc", false, "Do we alert Discord of raid activity ?");
         $this->bot->core("settings")
+            ->create("Raid", "DiscChan", false, "What Discord ChannelId in case we separate raid alerts from main Discord channel (leave empty for all in main channel) ?");
+        $this->bot->core("settings")
             ->create("Raid", "AlertIrc", false, "Do we alert Irc of raid activity ?");			
 			
         $this->help['description'] = 'Module to manage and announce raids.';
@@ -651,7 +653,8 @@ class Raid extends BaseActiveModule
                 $this->register_event("cron", "1min");			
 				$this->join_raid($name);
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
-					$this->bot->core("discord")->disc_alert("@everyone ".$name." started raid : " .$this->description);
+					if($this->bot->core("settings")->get("Raid", "DiscChan")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChan"); } else { $chan = ""; }
+					$this->bot->core("discord")->disc_alert("@everyone ".$name." started raid : " .$this->description, $chan);
 				}
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
 					$this->bot->core("irc")->send_irc("", "", $name." started raid : " .$this->description);
@@ -697,7 +700,8 @@ class Raid extends BaseActiveModule
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
 				$this->top_raid($name,'auto');		
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
-					$this->bot->core("discord")->disc_alert("Raid stopped");
+					if($this->bot->core("settings")->get("Raid", "DiscChan")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChan"); } else { $chan = ""; }
+					$this->bot->core("discord")->disc_alert("Raid stopped", $chan);
 				}				
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
 					$this->bot->core("irc")->send_irc("", "", "Raid stopped ");
@@ -742,7 +746,8 @@ class Raid extends BaseActiveModule
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
 				$this->top_raid($name,'auto');				
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
-					$this->bot->core("discord")->disc_alert("Raid cancelled");
+					if($this->bot->core("settings")->get("Raid", "DiscChan")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChan"); } else { $chan = ""; }
+					$this->bot->core("discord")->disc_alert("Raid cancelled", $chan);
 				}				
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
 					$this->bot->core("irc")->send_irc("", "", "Raid cancelled");

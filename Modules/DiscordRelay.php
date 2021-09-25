@@ -324,10 +324,14 @@ class DiscordRelay extends BaseActiveModule
     /*
     This gets called by all various modules to send alerts
     */
-    function disc_alert($msg)
+    function disc_alert($msg, $chan="")
     {	
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
-			$channel = $this->bot->core("settings")->get("discord", "ChannelId");
+			if($chan!=""&&$chan!=" ") {
+				$channel = $chan;
+			} else {
+				$channel = $this->bot->core("settings")->get("discord", "ChannelId");				
+			}
 			$token = $this->bot->core("settings")->get("discord", "BotToken");
 			if ($channel>0 && $token!="") {
 				$route = "/channels/{$channel}/messages";
