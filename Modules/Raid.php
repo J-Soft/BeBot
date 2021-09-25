@@ -157,7 +157,7 @@ class Raid extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Raid", "AlertDisc", false, "Do we alert Discord of raid activity ?");
         $this->bot->core("settings")
-            ->create("Raid", "DiscChan", false, "What Discord ChannelId in case we separate raid alerts from main Discord channel (leave empty for all in main channel) ?");
+            ->create("Raid", "DiscChan", "", "What Discord ChannelId in case we separate raid alerts from main Discord channel (leave empty for all in main channel) ?");
         $this->bot->core("settings")
             ->create("Raid", "AlertIrc", false, "Do we alert Irc of raid activity ?");			
 			

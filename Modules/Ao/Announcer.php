@@ -63,7 +63,7 @@ class Announcer extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Announcer", "AlertDisc", false, "Do we alert Discord of Botnet spam ?");
         $this->bot->core("settings")
-            ->create("Announcer", "DiscChan", false, "What Discord ChannelId in case we separate Botnet spam from main Discord channel (leave empty for all in main channel) ?");
+            ->create("Announcer", "DiscChan", "", "What Discord ChannelId in case we separate Botnet spam from main Discord channel (leave empty for all in main channel) ?");
         $this->bot->core("settings")
             ->create("Announcer", "AlertIrc", false, "Do we alert Irc of Botnet spam ?");		
 		

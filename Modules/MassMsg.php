@@ -77,7 +77,7 @@ class MassMsg extends BaseActiveModule
         $this->bot->core("settings")
             ->create("MassMsg", "AlertDisc", false, "Do we alert Discord of Mass Msg/Inv ?");
         $this->bot->core("settings")
-            ->create("MassMsg", "DiscChan", false, "What Discord ChannelId in case we separate announces from main Discord channel (leave empty for all in main channel) ?");			
+            ->create("MassMsg", "DiscChan", "", "What Discord ChannelId in case we separate announces from main Discord channel (leave empty for all in main channel) ?");			
         $this->bot->core("settings")
             ->create("MassMsg", "AlertIrc", false, "Do we alert Irc of Mass Msg/Inv ?");				
         $this->bot->core("colors")->define_scheme("massmsg", "type", "aqua");
