@@ -157,7 +157,7 @@ class Raid extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Raid", "AlertDisc", false, "Do we alert Discord of raid activity ?");
         $this->bot->core("settings")
-            ->create("Raid", "DiscChan", "", "What Discord ChannelId in case we separate raid alerts from main Discord channel (leave empty for all in main channel) ?");
+            ->create("Raid", "DiscChanId", "", "What Discord ChannelId in case we separate raid alerts from main Discord channel (leave empty for all in main channel) ?");
         $this->bot->core("settings")
             ->create("Raid", "AlertIrc", false, "Do we alert Irc of raid activity ?");			
 			
@@ -653,7 +653,7 @@ class Raid extends BaseActiveModule
                 $this->register_event("cron", "1min");			
 				$this->join_raid($name);
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
-					if($this->bot->core("settings")->get("Raid", "DiscChan")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChan"); } else { $chan = ""; }
+					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
 					$this->bot->core("discord")->disc_alert("@everyone ".$name." started raid : " .$this->description, $chan);
 				}
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
@@ -700,7 +700,7 @@ class Raid extends BaseActiveModule
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
 				$this->top_raid($name,'auto');		
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
-					if($this->bot->core("settings")->get("Raid", "DiscChan")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChan"); } else { $chan = ""; }
+					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
 					$this->bot->core("discord")->disc_alert("Raid stopped", $chan);
 				}				
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
@@ -746,7 +746,7 @@ class Raid extends BaseActiveModule
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
 				$this->top_raid($name,'auto');				
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
-					if($this->bot->core("settings")->get("Raid", "DiscChan")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChan"); } else { $chan = ""; }
+					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
 					$this->bot->core("discord")->disc_alert("Raid cancelled", $chan);
 				}				
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {

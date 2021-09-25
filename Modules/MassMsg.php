@@ -77,7 +77,7 @@ class MassMsg extends BaseActiveModule
         $this->bot->core("settings")
             ->create("MassMsg", "AlertDisc", false, "Do we alert Discord of Mass Msg/Inv ?");
         $this->bot->core("settings")
-            ->create("MassMsg", "DiscChan", "", "What Discord ChannelId in case we separate announces from main Discord channel (leave empty for all in main channel) ?");			
+            ->create("MassMsg", "DiscChanId", "", "What Discord ChannelId in case we separate announces from main Discord channel (leave empty for all in main channel) ?");			
         $this->bot->core("settings")
             ->create("MassMsg", "AlertIrc", false, "Do we alert Irc of Mass Msg/Inv ?");				
         $this->bot->core("colors")->define_scheme("massmsg", "type", "aqua");
@@ -114,7 +114,7 @@ class MassMsg extends BaseActiveModule
     function mass_msg($sender, $msg, $type)
     {		
 		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("MassMsg", "AlertDisc")) {
-			if($this->bot->core("settings")->get("MassMsg", "DiscChan")) { $chan = $this->bot->core("settings")->get("MassMsg", "DiscChan"); } else { $chan = ""; }
+			if($this->bot->core("settings")->get("MassMsg", "DiscChanId")) { $chan = $this->bot->core("settings")->get("MassMsg", "DiscChanId"); } else { $chan = ""; }
 			$this->bot->core("discord")->disc_alert("@everyone ".$sender." announced : " .$msg, $chan);
 		}
 		if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("MassMsg", "AlertIrc")) {			
