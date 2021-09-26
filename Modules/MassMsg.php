@@ -115,7 +115,7 @@ class MassMsg extends BaseActiveModule
     {		
 		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("MassMsg", "AlertDisc")) {
 			if($this->bot->core("settings")->get("MassMsg", "DiscChanId")) { $chan = $this->bot->core("settings")->get("MassMsg", "DiscChanId"); } else { $chan = ""; }
-			$this->bot->core("discord")->disc_alert("@everyone ".$sender." announced : " .$msg, $chan);
+			$this->bot->core("discord")->disc_alert($sender." announced : " .$msg, $chan);
 		}
 		if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("MassMsg", "AlertIrc")) {			
 			$this->bot->core("irc")->send_irc("", "", $sender." announced : " .$msg);

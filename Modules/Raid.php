@@ -654,7 +654,7 @@ class Raid extends BaseActiveModule
 				$this->join_raid($name);
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
 					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
-					$this->bot->core("discord")->disc_alert("@everyone ".$name." started raid : " .$this->description, $chan);
+					$this->bot->core("discord")->disc_alert($name." started raid : " .$this->description, $chan);
 				}
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
 					$this->bot->core("irc")->send_irc("", "", $name." started raid : " .$this->description);
