@@ -49,7 +49,7 @@ class Alts extends BaseActiveModule
         $this->register_command("all", "altadmin", "ADMIN");
         $this->help['description'] = "Shows information about alternative characters.";
         $this->help['command']['alts [player]'] = "Shows information about [player]. If no player is given it shows information about your alts";
-        $this->help['command']['alts add <player>'] = "Adds <player> as your alt.";
+        $this->help['command']['alts add <player>'] = "Adds <player> as your alt (can add more than 1 coma-separated eg: Toon1,Toon2,etc).";
         $this->help['command']['alts del <player>'] = "Removes <player> from your alt list.";
         $this->help['command']['alts confirm <main>'] = "Confirms you as alt of <main>.";
         $this->help['command']['altadmin add <main> <alt>'] = "Adds <alt> as alt to <main>.";
@@ -69,6 +69,7 @@ class Alts extends BaseActiveModule
     {
         $security = false;
         $vars = explode(' ', strtolower($msg));
+		if(!isset($vars[1])) $vars[1] = "";
         $command = $vars[0];
         if (($this->bot->core("settings")
                     ->get("Alts", "Security") == true)
@@ -82,7 +83,15 @@ class Alts extends BaseActiveModule
             case 'alts':
                 switch ($vars[1]) {
                     case 'add':
-                        return $this->add_alt($name, $vars[2]);
+						if(strpos($vars[2], ',') !== false) {
+							$toons = explode(',', $vars[2]);
+							foreach($toons as $toon) {
+								$this->add_alt($name, $toon);
+							}
+							return "Alts have been sorted out.";
+						} else {							
+							return $this->add_alt($name, $vars[2]);
+						}
                     case 'del':
                     case 'rem':
                         return $this->del_alt($name, $vars[2]);
