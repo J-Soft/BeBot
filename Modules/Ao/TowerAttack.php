@@ -14,7 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -178,6 +178,12 @@ class TowerAttack extends BaseActiveModule
                 "This is the time after last attack on same org that the attack with be suppressed for in seconds",
                 "10;20;30;60;120;180;300"
             );
+        $this->bot->core("settings")
+            ->create("TowerAttack", "AlertDisc", false, "Do we alert Discord of Tower Attacks ?");
+        $this->bot->core("settings")
+            ->create("TowerAttack", "DiscChanId", "", "What Discord ChannelId in case we separate Tower Attacks from main Discord channel (leave empty for all in main channel) ?");
+        $this->bot->core("settings")
+            ->create("TowerAttack", "AlertIrc", false, "Do we alert Irc of Tower Attacks ?");			
         $this->update_table();
         $this->help['description'] = 'Handle tower attack events.';
         $this->help['command']['battle'] = "Shows recent tower attacks.";
@@ -321,6 +327,19 @@ class TowerAttack extends BaseActiveModule
             ->make_blob("click to view", $battle);
     }
 
+    /*
+    This gets called to relay spotted messages below
+    */
+    function relay_msg($msg)
+	{
+		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("TowerAttack", "AlertDisc")) {
+			if($this->bot->core("settings")->get("TowerAttack", "DiscChanId")) { $chan = $this->bot->core("settings")->get("TowerAttack", "DiscChanId"); } else { $chan = ""; }
+			$this->bot->core("discord")->disc_alert($msg, $chan);
+		}
+		if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("TowerAttack", "AlertIrc")) {
+			$this->bot->core("irc")->send_irc("", "", $msg);
+		}		
+	}
 
     /*
     This gets called on a msg in the group
@@ -335,6 +354,7 @@ class TowerAttack extends BaseActiveModule
             $info
         )
         ) {
+			$this->relay_msg($msg);
             $infos["off_guild"] = $info[2];
             $infos["off_side"] = ucfirst(strtolower($info[1]));
             $infos["off_player"] = $info[3];
@@ -351,6 +371,7 @@ class TowerAttack extends BaseActiveModule
                 $info
             )
             ) {
+				$this->relay_msg($msg);
                 $infos["off_guild"] = "";
                 $infos["off_side"] = "";
                 $infos["off_player"] = $info[1];
@@ -367,6 +388,7 @@ class TowerAttack extends BaseActiveModule
                     $info
                 )
                 ) {
+					$this->relay_msg($msg);
                     if (!$this->bot->core("settings")->get("TowerAttack", "ReadOnly")) {
                         $this->bot->db->query(
                             "INSERT INTO #___tower_result (time, win_guild, win_side, lose_guild, " . "lose_side, zone) VALUES ('" . time(
@@ -385,6 +407,7 @@ class TowerAttack extends BaseActiveModule
                         $info
                     )
                     ) {
+						$this->relay_msg($msg);
                         $this->relay_tower_damage($info[1], $info[2], $info[3], $info[4], $info[5]);
                     } else {
                         if (preg_match(
@@ -393,6 +416,7 @@ class TowerAttack extends BaseActiveModule
                             $info
                         )
                         ) {
+							$this->relay_msg($msg);
                             $this->relay_tower_damage($info[1], $info[2], $info[3], $info[4]);
                         } else {
                             if (preg_match(
@@ -401,6 +425,7 @@ class TowerAttack extends BaseActiveModule
                                 $info
                             )
                             ) {
+								$this->relay_msg($msg);
                                 $this->relay_tower_damage($info[1], $info[2], $info[3]);
                             }
                         }

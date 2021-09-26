@@ -14,7 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -135,6 +135,12 @@ class AlienAttack extends BaseActiveModule
             );
         $this->spam = false;
         $setting = $this->bot->core("settings")->get('AlienAttack', 'Spam');
+        $this->bot->core("settings")
+            ->create("AlienAttack", "AlertDisc", false, "Do we alert Discord of Alien Attacks ?");
+        $this->bot->core("settings")
+            ->create("AlienAttack", "DiscChanId", "", "What Discord ChannelId in case we separate Alien Attacks from main Discord channel (leave empty for all in main channel) ?");
+        $this->bot->core("settings")
+            ->create("AlienAttack", "AlertIrc", false, "Do we alert Irc of Alien Attacks ?");		
         if ($setting == "tell" || $setting == "both") {
             $result = $this->bot->db->select(
                 "SELECT time FROM #___org_city WHERE action = 'off' ORDER BY time DESC LIMIT 0, 1"
@@ -351,6 +357,13 @@ class AlienAttack extends BaseActiveModule
                             "##highlight##" . $player . "##end## turned the cloaking device in our city ##highlight##off##end##!",
                             $channel
                         );
+						if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("AlienAttack", "AlertDisc")) {
+							if($this->bot->core("settings")->get("AlienAttack", "DiscChanId")) { $chan = $this->bot->core("settings")->get("AlienAttack", "DiscChanId"); } else { $chan = ""; }
+							$this->bot->core("discord")->disc_alert($player . " turned the cloaking device in our city off!", $chan);
+						}
+						if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("AlienAttack", "AlertIrc")) {
+							$this->bot->core("irc")->send_irc("", "", $player . " turned the cloaking device in our city off!");
+						}						
                     } else {
                         if (preg_match("/(.+) turned the cloaking device in your city on./i", $msg, $info)) {
                             $action = "on";
@@ -387,6 +400,13 @@ class AlienAttack extends BaseActiveModule
                                 "##highlight##" . $player . "##end## turned the cloaking device in our city back ##highlight##on##end##!",
                                 $channel
                             );
+							if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("AlienAttack", "AlertDisc")) {
+								if($this->bot->core("settings")->get("AlienAttack", "DiscChanId")) { $chan = $this->bot->core("settings")->get("AlienAttack", "DiscChanId"); } else { $chan = ""; }
+								$this->bot->core("discord")->disc_alert($player . " turned the cloaking device in our city on!", $chan);
+							}
+							if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("AlienAttack", "AlertIrc")) {
+								$this->bot->core("irc")->send_irc("", "", $player . " turned the cloaking device in our city on!");
+							}							
                         } else {
                             if (preg_match(
                                 "/(.+) initiated removal of the organization headquarters in (.+)/i",
