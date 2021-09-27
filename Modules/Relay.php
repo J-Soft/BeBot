@@ -82,7 +82,7 @@ class Relay extends BaseActiveModule
         				msg TEXT)"
         );
         $this->bot->core("settings")
-            ->create('Relay', 'Priv', 'Both', 'Where should private group relay to', 'Both;Guildchat;Relaybots;None');
+            ->create('Relay', 'Priv', 'Both', 'Where should local private group relay to', 'Both;Guildchat;Relaybots;None');
         $this->bot->core("settings")
             ->create('Relay', 'Org', 'Both', 'Where should guild chat group relay to', 'Both;Privgroup;Relaybots;None');
         $this->bot->core("settings")
@@ -128,7 +128,7 @@ class Relay extends BaseActiveModule
                 '',
                 'What other prefixes should be Checked in the in the Relay Group seperated by ; eg @;.;#'
             );
-		$this -> bot -> core("settings") -> create("Relay", 'nearSyntax', '', 'What syntax (eg: @) to send a message to relay (leave empty to relay everything)?');
+		$this -> bot -> core("settings") -> create("Relay", 'nearSyntax', '', 'What syntax (eg: @) to send message towards external tell or pgroup relay (leave empty to relay everything ; please note internal relay org <-> private bypasses it) ?');
         $this->bot->core("settings")
             ->create("Relay", "Color", false, "color outgoing message to the relay?");
         /*$this->bot->core("settings")
@@ -157,15 +157,18 @@ class Relay extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Relay", 'TruncateMain', '6', "How many characters of the main's name to display?", '4;6;8;10;13');
 		$this->bot->core("settings")->create("Relay", 'IRC', FALSE, "Relay to IRC?");			
+		$this->bot->core("settings")->create("Relay", 'Disc', FALSE, "Relay to Discord?");
+        $this->bot->core("settings")
+            ->create("Relay", "DiscChanId", "", "What Discord ChannelId in case we separate Relay messages from main Discord channel (leave empty for all in main channel) ?");		
         $this->bot->core("colors")->define_scheme("relay", "channel", "normal");
         $this->bot->core("colors")->define_scheme("relay", "name", "normal");
         $this->bot->core("colors")->define_scheme("relay", "message", "normal");
         $this->bot->core("colors")
             ->define_scheme("relay", "mainname", "normal");
-        $this->help['description'] = "Plugin to enable relay between guilds and private groups.";
+        $this->help['description'] = "Plugin to enable relay between guilds and private groups, plus optional alliance relay with other org(s).";
         $this->help['command']['gcr <message>'] = "Has the bot say a message (useful for testing or other purposes).";
         $this->help['notes']
-            = "How to use a private group relay:<BR><BR>Step 1<BR>Create a new bot to use as the relay.  Add the bots that will be using the relay as members.  Configure the relaybot to autoinvite the bots that will be using it.  (It is highly recommended to disable nearly all plugins on the relaybot.  As you are only using it for relaying purposes, there should be no reason why anyone needs access to it other than the bots and yourself.)<BR><BR>Step 2<BR>Install the Relay.php plugin onto the bots that will be using the relay.  Make sure to disable GuildRelay_GUILD.php and Relay_GUILD.php as this will conflict with them.<BR><BR>Step 3<BR>Give the bots that will be relaying the correct access level and permissions to use <pre>gcr. (So if Bot1 is relaying to Bot2 via Relay1, Bot1 needs access to <pre>gcr on Bot2 via pgmsg, and vice versa.)<BR><BR>Step 4<BR>Restart the bots if you haven't already, and configure your settings to your specifications.<BR><BR>Step 5<BR>Enjoy lightning quick relay messages, and less bot lag (due to no longer queueing the relay messages via /tell).";
+            = "How to use a private group relay:<BR><BR>Step 1<BR>Create a new bot to use as the relay.  Add the bots that will be using the relay as members.  Configure the relaybot to autoinvite the bots that will be using it.  (It is highly recommended to disable nearly all plugins on the relaybot.  As you are only using it for relaying purposes, there should be no reason why anyone needs access to it other than the bots and yourself.)<BR><BR>Step 2<BR>Install the Relay.php plugin onto the bots that will be using the relay.  Make sure to disable GuildRelay_GUILD.php and Relay_GUILD.php as this will conflict with them.<BR><BR>Step 3<BR>Give the bots that will be relaying the correct access level and permissions to use <pre>gcr. (So if Bot1 is relaying to Bot2 via Relay1, Bot1 needs access to <pre>gcr on Bot2 via pgmsg, and vice versa.)<BR><BR>Step 4<BR>Restart the bots if you haven't already, and configure your settings to your specifications.<BR><BR>Step 5<BR>Enjoy lightning quick relay messages, and less bot lag (due to no longer queueing the relay messages via /tell)  ; also enjoy optional online list sharing via !gcrc";
         $this->update();
         $this->db_relay = false;
         $this->lastsent = 0;
@@ -221,7 +224,7 @@ class Relay extends BaseActiveModule
 
 
     /*
-    This gets called on a tell with the command
+    This gets called on a tell with relay command
     */
     function tell($name, $msg)
     {
@@ -265,13 +268,21 @@ class Relay extends BaseActiveModule
             ) {
                 $this->bot->send_pgroup($txt);
             }
-			if ($this -> bot -> core("settings") -> get('Relay', 'Irc') == TRUE) {
-				$this->relay_to_irc($txt);
+			$txt = preg_replace("/##end##/U", "", $txt);
+			$txt = preg_replace("/##([^#]+)##/U", "", $txt);
+			if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Relay", "Disc")) {
+				if($this->bot->core("settings")->get("Relay", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Relay", "DiscChanId"); } else { $chan = ""; }
+				$this->bot->core("discord")->disc_alert($txt, $chan);
+			}			
+			if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get('Relay', 'Irc')) {
+				$this->bot->core("irc")->send_irc("", "", $txt);
 			}
         }
     }
 
-
+    /*
+    This gets called on a private group relay command
+    */
     function extpgmsg($pgroup, $name, $msg, $db = false)
     {
         $input = $this->parse_com(
@@ -347,8 +358,14 @@ class Relay extends BaseActiveModule
             ) {
                 $this->bot->send_pgroup($link);
             }
-			if ($this -> bot -> core("settings") -> get('Relay', 'Irc') == TRUE) {
-				$this->relay_to_irc($txt);
+			$txt = preg_replace("/##end##/U", "", $txt);
+			$txt = preg_replace("/##([^#]+)##/U", "", $txt);
+			if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Relay", "Disc")) {
+				if($this->bot->core("settings")->get("Relay", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Relay", "DiscChanId"); } else { $chan = ""; }
+				$this->bot->core("discord")->disc_alert($txt, $chan);
+			}			
+			if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get('Relay', 'Irc')) {
+				$this->bot->core("irc")->send_irc("", "", $txt);
 			}
         }
     }
@@ -390,6 +407,7 @@ class Relay extends BaseActiveModule
 
     function command_handler($name, $msg, $origin)
     {
+		// no direct command allowed in this module
     }
 
 
@@ -400,10 +418,8 @@ class Relay extends BaseActiveModule
     function relay_to_pgroup($name, $msg, $type = "notchat")
     {
 		$near = $this -> bot -> core("settings") -> get('Relay', 'nearSyntax');
-        if ($this->bot->core("settings")->get('Relay', 'Status') && (
-			preg_match("/^" . $near . " (.+)/i", $msg, $info)
-			|| $near == ''
-			) ) {
+		$check = preg_match("/^" . $near . " (.+)/i", $msg, $info);
+        if ($this->bot->core("settings")->get('Relay', 'Status')) {
 			if ($near != '' && substr($msg, 0, 1) == $near) {
 				$msg = substr($msg, 1);
 			}
@@ -434,6 +450,10 @@ class Relay extends BaseActiveModule
                     || $this->bot
                         ->core("settings")
                         ->get('Relay', 'Org') == "Relaybots")
+				&& (
+					$check
+					|| $near == ''
+					)
             ) {
                 $this->relay_to_bot($relaystring, true, false, $type);
             }
@@ -504,16 +524,6 @@ class Relay extends BaseActiveModule
         }
     }
 
-
-    // Relays $msg to IRC module (and from there after formatting to IRC channel)
-    function relay_to_irc($msg)
-    {
-        $msg = preg_replace("/##end##/U", "", $msg);
-        $msg = preg_replace("/##([^#]+)##/U", "", $msg);
-        $this->bot->send_irc("", "", $msg);
-    }
-
-
     /*
     This gets called on a msg in the private group.
     This is where we send our message to org chat and to our relay.
@@ -521,10 +531,8 @@ class Relay extends BaseActiveModule
     function relay_to_gc($name, $msg)
     {
 		$near = $this -> bot -> core("settings") -> get('Relay', 'nearSyntax');
-        if ($this->bot->core("settings")->get('Relay', 'Status')&& (
-			preg_match("/^" . $near . " (.+)/i", $msg, $info)
-			|| $near == ''
-			) ) {
+		$check = preg_match("/^" . $near . " (.+)/i", $msg, $info);
+        if ($this->bot->core("settings")->get('Relay', 'Status')) {
 			if ($near != '' && substr($msg, 0, 1) == $near) {
 				$msg = substr($msg, 1);
 			}				
@@ -550,6 +558,10 @@ class Relay extends BaseActiveModule
                     || $this->bot
                         ->core("settings")
                         ->get('Relay', 'Priv') == "Relaybots")
+				&& (
+					$check
+					|| $near == ''
+					)
             ) {
                 $this->relay_to_bot($relaystring);
             }
