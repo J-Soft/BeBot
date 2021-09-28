@@ -114,6 +114,14 @@ class DiscordRelay extends BaseActiveModule
                 "Announce",
                 true,
                 "Should we announce logons and logoffs as controlled by the Logon module to Discord?"
+            );	
+        $this->bot->core("settings")
+            ->create(
+                "discord",
+                "ItemRef",
+                "AOItems",
+                "Should AOItems or AUNO be used for links in item refs?",
+                "AOItems;AUNO"
             );			
 	}
 	
@@ -327,6 +335,38 @@ class DiscordRelay extends BaseActiveModule
 			}
 		}
 	}
+
+    /*
+    This gets called just below to clean text of msg
+    */	
+    function strip_formatting($msg)
+    {
+        if (strtolower(
+                $this->bot->core("settings")
+                    ->get("discord", "Itemref")
+            ) == "auno"
+        ) {
+            $rep = "http://auno.org/ao/db.php?id=\\1&id2=\\2&ql=\\3";
+        } else {
+            $rep = "http://aoitems.com/item/\\1/\\2/\\3";
+        }
+        $msg = preg_replace(
+            "/<a href=\"itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\">(.*)<\/a>/iU",
+            "\\4" . " " . "(" . $rep . ")",
+            $msg
+        );
+        $msg = preg_replace(
+            "/<a style=\"text-decoration:none\" href=\"itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\">(.*)<\/a>/iU",
+            "\\4" . " " . "(" . $rep . ")",
+            $msg
+        );
+        $msg = preg_replace("/<a href=\"(.+)\">/isU", "\\1", $msg);
+        $msg = preg_replace("/<a style=\"text-decoration:none\" href=\"(.+)\">/isU", "\\1", $msg);
+        $msg = preg_replace("/<\/a>/iU", "", $msg);
+        $msg = preg_replace("/<font(.+)>/iU", "", $msg);
+        $msg = preg_replace("/<\/font>/iU", "", $msg);
+        return $msg;
+    }	
 	
     /*
     This gets called by all various modules to send alerts
@@ -342,7 +382,8 @@ class DiscordRelay extends BaseActiveModule
 			$token = $this->bot->core("settings")->get("discord", "BotToken");
 			if ($channel>0 && $token!="") {
 				$route = "/channels/{$channel}/messages";
-				$sent = $this->cleanString($msg);
+				$form = $this->strip_formatting($msg);
+				$sent = $this->cleanString($form);
 				$data = array("content" => $sent);
 				$result = discord_post($route, $token, $data);
 				if(isset($result['message'])&& isset($result['code'])) {
