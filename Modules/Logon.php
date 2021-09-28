@@ -290,8 +290,10 @@ class Logon extends BaseActiveModule
             }
             $this->bot->core("relay")->relay_to_bot($pre . $txt);
         }
-
-        if ($this->bot->core("settings")->get("Irc", "Announce")) {
+		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("discord", "Announce")) {
+			$this->bot->core("discord")->disc_alert($txt, "");
+		}
+        if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Irc", "Announce")) {
             $this->bot->send_irc(
                 $this->bot->core("settings")
                     ->get("Irc", "Ircguildprefix"),

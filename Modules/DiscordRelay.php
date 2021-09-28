@@ -107,7 +107,14 @@ class DiscordRelay extends BaseActiveModule
         $this->bot->core("settings")
             ->create("discord", "BotToken", "", "Bot Token obtain from https://discord.com/developers/applications ?");
         $this->bot->core("settings")
-            ->create("discord", "WhatChat", "both", "Which channel(s) should be relayed into Discord and vice versa ?", "gc;pgroup;both");			
+            ->create("discord", "WhatChat", "both", "Which channel(s) should be relayed into Discord and vice versa ?", "gc;pgroup;both");
+        $this->bot->core("settings")
+            ->create(
+                "discord",
+                "Announce",
+                true,
+                "Should we announce logons and logoffs as controlled by the Logon module to Discord?"
+            );			
 	}
 	
     /*
