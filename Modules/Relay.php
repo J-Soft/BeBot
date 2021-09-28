@@ -272,8 +272,7 @@ class Relay extends BaseActiveModule
 			$txt = preg_replace("/##([^#]+)##/U", "", $txt);
 			if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Relay", "Disc")) {
 				if($this->bot->core("settings")->get("Relay", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Relay", "DiscChanId"); } else { $chan = ""; }
-				$sf = $this->bot->core("irc")->strip_formatting($txt);
-				$this->bot->core("discord")->disc_alert($sf, $chan);
+				$this->bot->core("discord")->disc_alert($txt, $chan);
 			}			
 			if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get('Relay', 'Irc')) {
 				$this->bot->core("irc")->send_irc("", "", $txt);
