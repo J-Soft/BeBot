@@ -255,9 +255,10 @@ class IRC extends BaseActiveModule
             chr(3) . chr(3) . "\\4" . chr(3) . " " . chr(3) . "(" . $rep . ")" . chr(3) . chr(3),
             $msg
         );
-        $msg = preg_replace("/<a href=\"(.+)\">/isU", "[link]", $msg);
-        $msg = preg_replace("/<a style=\"text-decoration:none\" href=\"(.+)\">/isU", "[link]", $msg);
-        $msg = preg_replace("/<\/a>/iU", "[/link]", $msg);
+		$msg = preg_replace("/<a href=\"user:\/\/(.+)\">(.+)<\/a>/isU", "\\2", $msg);
+        $msg = preg_replace("/<a href=\"(.+)\">/isU", "\\1", $msg);
+        $msg = preg_replace("/<a style=\"text-decoration:none\" href=\"(.+)\">/isU", "\\1", $msg);
+        $msg = preg_replace("/<\/a>/iU", "", $msg);
         $msg = preg_replace("/<font(.+)>/iU", "", $msg);
         $msg = preg_replace("/<\/font>/iU", "", $msg);
         return $msg;
