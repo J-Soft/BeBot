@@ -325,7 +325,8 @@ class DiscordRelay extends BaseActiveModule
 				$token = $this->bot->core("settings")->get("discord", "BotToken");
 				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
-					$sent = "[Guildchat] ".ucfirst($name).": ".$this->cleanString($msg);
+					$form = $this->strip_formatting($msg);			
+					$sent = "[Guildchat] ".ucfirst($name).": ".$this->cleanString($form);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
 					if(isset($result['message'])&& isset($result['code'])) {
@@ -360,6 +361,7 @@ class DiscordRelay extends BaseActiveModule
             "\\4" . " " . "(" . $rep . ")",
             $msg
         );
+		$msg = preg_replace("/<a href='user:\/\/(.+)\'>(.+)<\/a>/isU", "\\2", $msg);
 		$msg = preg_replace("/<a href=\"user:\/\/(.+)\">(.+)<\/a>/isU", "\\2", $msg);
         $msg = preg_replace("/<a href=\"(.+)\">/isU", "\\1", $msg);
         $msg = preg_replace("/<a style=\"text-decoration:none\" href=\"(.+)\">/isU", "\\1", $msg);
@@ -373,7 +375,7 @@ class DiscordRelay extends BaseActiveModule
     This gets called by all various modules to send alerts
     */
     function disc_alert($msg, $chan="")
-    {	echo " DEBUG1 : ".$msg." ! ";
+    {
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			if($chan!=""&&$chan!=" ") {
 				$channel = $chan;
@@ -384,9 +386,7 @@ class DiscordRelay extends BaseActiveModule
 			if ($channel>0 && $token!="") {
 				$route = "/channels/{$channel}/messages";
 				$form = $this->strip_formatting($msg);
-				echo " DEBUG2 : ".$form." ! ";
 				$sent = $this->cleanString($form);
-				echo " DEBUG3 : ".$sent." ! ";
 				$data = array("content" => $sent);
 				$result = discord_post($route, $token, $data);
 				if(isset($result['message'])&& isset($result['code'])) {
@@ -407,7 +407,8 @@ class DiscordRelay extends BaseActiveModule
 				$token = $this->bot->core("settings")->get("discord", "BotToken");
 				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
-					$sent = "[Privchat] ".ucfirst($name).": ".$this->cleanString($msg);
+					$form = $this->strip_formatting($msg);
+					$sent = "[Privchat] ".ucfirst($name).": ".$this->cleanString($form);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
 					if(isset($result['message'])&& isset($result['code'])) {
