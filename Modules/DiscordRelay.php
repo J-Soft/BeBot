@@ -361,8 +361,8 @@ class DiscordRelay extends BaseActiveModule
             "\\4" . " " . "(" . $rep . ")",
             $msg
         );
-		$msg = preg_replace("/<a href='user:\/\/(.+)\'>(.+)<\/a>/isU", "\\2", $msg);
-		$msg = preg_replace("/<a href=\"user:\/\/(.+)\">(.+)<\/a>/isU", "\\2", $msg);
+		$msg = preg_replace("/<a href='user:\/\/(.+)\'>/isU", "", $msg);
+		$msg = preg_replace("/<a href=\"user:\/\/(.+)\">/isU", "", $msg);
         $msg = preg_replace("/<a href=\"(.+)\">/isU", "\\1", $msg);
         $msg = preg_replace("/<a style=\"text-decoration:none\" href=\"(.+)\">/isU", "\\1", $msg);
         $msg = preg_replace("/<\/a>/iU", "", $msg);
