@@ -52,6 +52,7 @@ class Raid extends BaseActiveModule
 	var $showcallers = false;
 	var $type;
 	var $note;
+	var $ddin = false;
 
 
     function __construct(&$bot)
@@ -158,6 +159,8 @@ class Raid extends BaseActiveModule
             ->create("Raid", "AlertDisc", false, "Do we alert Discord of raid activity ?");
         $this->bot->core("settings")
             ->create("Raid", "DiscChanId", "", "What Discord ChannelId in case we separate raid alerts from main Discord channel (leave empty for all in main channel) ?");
+        $this->bot->core("settings")
+            ->create("Raid", "DiscTag", "", "Should we add a Discord Tag (e.g. @here or @everyone) to raid starts for notifying Discord users (leave empty for no notification) ?");
         $this->bot->core("settings")
             ->create("Raid", "AlertIrc", false, "Do we alert Irc of raid activity ?");			
 			
@@ -524,6 +527,7 @@ class Raid extends BaseActiveModule
             $this->paused = true;
             $this->start = $info[1];
 			$this->limit = $info[6];
+			$this->ddin = false;
             $this->register_event("cron", "1min");
             echo "Raid Restarted for " . $info[0] . "\n";
             foreach ($raiding as $raider) {
@@ -652,9 +656,11 @@ class Raid extends BaseActiveModule
                 $this->save();
                 $this->register_event("cron", "1min");			
 				$this->join_raid($name);
+				$this->ddin = false;
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
 					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
-					$this->bot->core("discord")->disc_alert($name." started raid : " .$this->description, $chan);
+					if($this->bot->core("settings")->get("Raid", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Raid", "DiscTag")." "; } else { $dctag = ""; }
+					$this->bot->core("discord")->disc_alert($dctag.$name." started raid : " .$this->description, $chan);
 				}
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
 					$this->bot->core("irc")->send_irc("", "", $name." started raid : " .$this->description);
@@ -695,6 +701,7 @@ class Raid extends BaseActiveModule
                 $this->announce = false;
                 $this->user2 = array();
                 $this->locked = false;
+				$this->ddin = true;
                 $this->unregister_event("cron", "1min");
                 $this->bot->send_output($name, "##highlight##$name##end## has stopped the raid.", "both");
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
@@ -741,6 +748,7 @@ class Raid extends BaseActiveModule
                 $this->announce = false;
                 $this->user2 = array();
                 $this->locked = false;
+				$this->ddin = false;
                 $this->unregister_event("cron", "1min");
                 $this->bot->send_output($name, "##highlight##$name##end## has cancelled the raid.", "both");
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");

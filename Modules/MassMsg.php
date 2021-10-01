@@ -79,6 +79,8 @@ class MassMsg extends BaseActiveModule
         $this->bot->core("settings")
             ->create("MassMsg", "DiscChanId", "", "What Discord ChannelId in case we separate announces from main Discord channel (leave empty for all in main channel) ?");			
         $this->bot->core("settings")
+            ->create("MassMsg", "DiscTag", "", "Should we add a Discord Tag (e.g. @here or @everyone) to announces/invites for notifying Discord users (leave empty for no notification) ?");
+        $this->bot->core("settings")
             ->create("MassMsg", "AlertIrc", false, "Do we alert Irc of Mass Msg/Inv ?");				
         $this->bot->core("colors")->define_scheme("massmsg", "type", "aqua");
         $this->bot->core("colors")->define_scheme("massmsg", "msg", "orange");
@@ -115,7 +117,8 @@ class MassMsg extends BaseActiveModule
     {		
 		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("MassMsg", "AlertDisc")) {
 			if($this->bot->core("settings")->get("MassMsg", "DiscChanId")) { $chan = $this->bot->core("settings")->get("MassMsg", "DiscChanId"); } else { $chan = ""; }
-			$this->bot->core("discord")->disc_alert($sender." announced : " .$msg, $chan);
+			if($this->bot->core("settings")->get("MassMsg", "DiscTag")) { $dctag = $this->bot->core("settings")->get("MassMsg", "DiscTag")." "; } else { $dctag = ""; }
+			$this->bot->core("discord")->disc_alert($dctag.$sender." announced : " .$msg, $chan);
 		}
 		if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("MassMsg", "AlertIrc")) {			
 			$this->bot->core("irc")->send_irc("", "", $sender." announced : " .$msg);

@@ -183,6 +183,8 @@ class TowerAttack extends BaseActiveModule
         $this->bot->core("settings")
             ->create("TowerAttack", "DiscChanId", "", "What Discord ChannelId in case we separate Tower Attacks from main Discord channel (leave empty for all in main channel) ?");
         $this->bot->core("settings")
+            ->create("TowerAttack", "DiscTag", "", "Should we add a Discord Tag (e.g. @here or @everyone) to Towers Attacks for notifying Discord users (leave empty for no notification) ?");
+        $this->bot->core("settings")
             ->create("TowerAttack", "AlertIrc", false, "Do we alert Irc of Tower Attacks ?");			
         $this->update_table();
         $this->help['description'] = 'Handle tower attack events.';
@@ -334,7 +336,8 @@ class TowerAttack extends BaseActiveModule
 	{
 		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("TowerAttack", "AlertDisc")) {
 			if($this->bot->core("settings")->get("TowerAttack", "DiscChanId")) { $chan = $this->bot->core("settings")->get("TowerAttack", "DiscChanId"); } else { $chan = ""; }
-			$this->bot->core("discord")->disc_alert($msg, $chan);
+			if($this->bot->core("settings")->get("TowerAttack", "DiscTag")) { $dctag = $this->bot->core("settings")->get("TowerAttack", "DiscTag")." "; } else { $dctag = ""; }
+			$this->bot->core("discord")->disc_alert($dctag.$msg, $chan);
 		}
 		if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("TowerAttack", "AlertIrc")) {
 			$this->bot->core("irc")->send_irc("", "", $msg);

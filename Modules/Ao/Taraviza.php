@@ -74,6 +74,8 @@ class Taraviza extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Taraviza", "DiscChanId", "", "What Discord ChannelId in case we separate worldbosses spawns from main Discord channel (leave empty for all in main channel) ?");
         $this->bot->core("settings")
+            ->create("Taraviza", "DiscTag", "", "Should we add a Discord Tag (e.g. @here or @everyone) to worldbosses spams for notifying Discord users (leave empty for no notification) ?");			
+        $this->bot->core("settings")
             ->create("Taraviza", "AlertIrc", false, "Do we alert Irc of worldbosses spawns ?");		
 		$this->register_event("cron", "1min");
 	}
@@ -114,7 +116,8 @@ class Taraviza extends BaseActiveModule
 				}
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Taraviza", "AlertDisc")) {
 					if($this->bot->core("settings")->get("Taraviza", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Taraviza", "DiscChanId"); } else { $chan = ""; }
-					$this->bot->core("discord")->disc_alert($text, $chan);
+					if($this->bot->core("settings")->get("Taraviza", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Taraviza", "DiscTag")." "; } else { $dctag = ""; }
+					$this->bot->core("discord")->disc_alert($dctag.$text, $chan);
 				}
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Taraviza", "AlertIrc")) {
 					$this->bot->core("irc")->send_irc("", "", $text);
@@ -135,7 +138,8 @@ class Taraviza extends BaseActiveModule
 				}
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Taraviza", "AlertDisc")) {
 					if($this->bot->core("settings")->get("Taraviza", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Taraviza", "DiscChanId"); } else { $chan = ""; }
-					$this->bot->core("discord")->disc_alert($text, $chan);
+					if($this->bot->core("settings")->get("Taraviza", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Taraviza", "DiscTag")." "; } else { $dctag = ""; }
+					$this->bot->core("discord")->disc_alert($dctag.$text, $chan);
 				}
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Taraviza", "AlertIrc")) {
 					$this->bot->core("irc")->send_irc("", "", $text);
