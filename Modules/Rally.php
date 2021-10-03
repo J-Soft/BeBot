@@ -69,8 +69,8 @@ class Rally extends BaseActiveModule
     }
 
 	function table_update() {
-		$check = $this->bot->db->select('SELECT 1 FROM #___land_control_zones LIMIT 1');
-		if($check !== FALSE) {
+		$check = $this->bot->db->select("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '".$this->bot->botname."_land_control_zones'");
+		if($check[0][0] == 1) {
 			$countsel = $this->bot->db->select("SELECT COUNT(*) FROM #___land_control_zones");
 			if (!empty($countsel)) {
 				$count = $countsel[0][0];
