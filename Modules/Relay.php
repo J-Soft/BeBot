@@ -129,6 +129,7 @@ class Relay extends BaseActiveModule
                 'What other prefixes should be Checked in the in the Relay Group seperated by ; eg @;.;#'
             );
 		$this -> bot -> core("settings") -> create("Relay", 'nearSyntax', '', 'What syntax (eg: @) to send message towards external tell or pgroup relay (leave empty to relay everything ; please note internal relay org <-> private bypasses it) ?');
+		$this -> bot -> core("settings") -> create("Relay", 'farSyntax', '', 'What syntax (eg: !) to format gcr/gcrc commands inside pgroup relay (leave empty to use the same command_prefix bot already has in its conf file for all inner commands) ?');
         $this->bot->core("settings")
             ->create("Relay", "Color", false, "color outgoing message to the relay?");
         /*$this->bot->core("settings")
@@ -373,6 +374,7 @@ class Relay extends BaseActiveModule
 
     function extprivgroup($group, $name, $msg)
     {
+		$found = false;
         if (strtolower(
                 $this->bot->core("settings")
                     ->get('Relay', 'Relay')
@@ -464,17 +466,20 @@ class Relay extends BaseActiveModule
     // Relays $msg without any further modifications to other bot(s).
     // If $chat is true $msg will be relayed as chat with added "<pre>gcr " prefix.
     // If $chat is false $msg will be relayed as it is without any addon, this can be used to relay commands to the other bot(s).
+    // If farSyntax is set, it will override bot's inner conf command_prefix for sending except in case of DB relay
     function relay_to_bot($msg, $chat = true, $alt = false, $type = "notchat")
     {
         if (!$this->bot->core("settings")->get('Relay', 'Status')) {
             return;
         }
-
+		$far = $this -> bot -> core("settings") -> get('Relay', 'farSyntax');
         $type = strtolower($type);
         if ($alt) {
-            $prefix = "<pre>$alt ";
+			if($far!='') $prefix = $far.$alt." ";
+            else $prefix = "<pre>".$alt." ";
         } elseif ($chat) {
-            $prefix = "<pre>gcr ";
+            if($far!='') $prefix = $far."gcr ";
+			else $prefix = "<pre>gcr ";
             if ($this->bot->core("settings")->get('Relay', 'TypeTag')) {
                 $msg = str_replace(
                     "[##relay_channel##" . $this->bot
