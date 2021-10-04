@@ -406,26 +406,47 @@ class Raid extends BaseActiveModule
 		if($this->ddin) {
 			if($this->bot->core("security")->get_access_level($name)>=128) {
 				if(preg_match('/<a href="text:\/\/([^"]+)">(?:.*)Damage(?:.*)<\/a>/i', $msg, $info)) {
+					$added = array();
 					$last = $this->bot->db->select("SELECT time FROM #___raid_log WHERE end > time ORDER BY id DESC LIMIT 1");
+					$time = $last[0][0];
 					for($i=1;$i<37;$i++) {
 						$trigger = false;
-						if(preg_match('/'.$i.'. (?:[^ ]+) \((?:[^\)]+)\) ([a-zA-Z0-9]+)<br>/i', $info[1], $toon)) {
-							if(!is_numeric($toon[1])) {
+						if(preg_match('/'.$i.'. ([^ ]+) \((?:[^\)]+)\) ([a-zA-Z0-9]+)<br>/i', $info[1], $toon)) { // AODM
+							if(!is_numeric($toon[2])&&$toon[1]!='') {
+								$char = ucfirst($toon[2]);
+								$dmgd = $toon[1];
+								$unit = substr($dmgd, -1);
+								if($unit=='K') {
+									$num = floatval(str_replace(',', '.', str_replace('.', '', substr($toon[1], 0, -1))));
+									$dmgd = round($num*1000);
+								} elseif($unit=='M') {
+									$num = floatval(str_replace(',', '.', str_replace('.', '', substr($toon[1], 0, -1))));
+									$dmgd = round($num*1000000);
+								} elseif($unit=='B') {
+									$num = floatval(str_replace(',', '.', str_replace('.', '', substr($toon[1], 0, -1))));
+									$dmgd = round($num*1000000000);
+								} else {
+									$dmgd = round($dmgd);
+								}
 								$trigger = true;
 							}
-						} elseif(preg_match('/'.$i.'. ([a-zA-Z0-9]+) \((?:[^\)]+)\)/i', $info[1], $toon)) {
-							if(!is_numeric($toon[1])) {
+						} elseif(preg_match('/'.$i.'. ([a-zA-Z0-9]+) \( ([^ ]+) \/ (?:[^ ]+) \/ (?:[^ ]+) \/ (?:[^ ]+) \)/i', $info[1], $toon)) { // Tiny
+							if(!is_numeric($toon[1])&&$toon[2]!='') {
+								$char = ucfirst($toon[1]);
+								$dmgd = round(floatval(str_replace(',', '.', str_replace('.', '', $toon[2]))));
 								$trigger = true;
 							}
 						}
 						if($trigger) {
-							$id = $this->bot->core("player")->id($toon[1]);
-							if ($id && !($id instanceof BotError)) {
-								$char = $toon[1];
-								$time = $last[0][0];
+							$id = $this->bot->core("player")->id($char);
+							if ($id && !($id instanceof BotError)) {								
 								$verif = $this->bot->db->select("SELECT COUNT(*) FROM #___raid_log WHERE name = '".$char."' AND time =".$time);
 								if($verif[0][0]==1) {
-									$this->bot->db->query("INSERT INTO #___raid_damage (name, time, rank) VALUES ('" . $char . "', $time, " . $i . ") ON DUPLICATE KEY UPDATE time = $time");
+									if(!array_key_exists($char, $added)) {
+										$added[$char] = $dmgd;
+									} else {
+										$added[$char] = $added[$char]+$dmgd;
+									}																	
 									$this->ddin = false;
 								}
 							}
@@ -433,6 +454,9 @@ class Raid extends BaseActiveModule
 						}
 					}
 					if(!$this->ddin) {
+						foreach($added as $char => $dmgd) {
+							$this->bot->db->query("INSERT INTO #___raid_damage (name, time, rank) VALUES ('" . $char . "', $time, " . $dmgd . ") ON DUPLICATE KEY UPDATE time = $time");
+						}
 						$this->bot->send_tell($name,"Your damage stats have been submitted to the bot.");
 					} else {
 						$this->bot->send_tell($name,"There was errors in your damage stats, nothing recorded.");
@@ -480,37 +504,23 @@ class Raid extends BaseActiveModule
 					foreach($players as $player) {
 						$name = $player[0];
 						$cnt = $player[1];
-						if($load['table']=='raid_damage') $rnk = 100*$player[2];
+						if($load['table']=='raid_damage') $rnk = round(floatval($player[2]/1000000000),4);
 						$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
 						if(isset($checka[0][0])&&count($checka)==1) {
 							$main = $checka[0][0];
 							if(!array_key_exists($main, $mains)) {
-								if($load['table']=='raid_damage') {
-									$mains[$main] = $rnk.";".$cnt;
-								}
+								if($load['table']=='raid_damage') $mains[$main] = $rnk;
 								else $mains[$main] = $cnt;
 							} else {
-								if($load['table']=='raid_damage') {
-									$exp = explode(";",$mains[$main]);
-									$rnk = $rnk+$exp[0];
-									$cnt = $cnt+$exp[1];
-									$mains[$main] = $rnk.";".$cnt;
-								}
+								if($load['table']=='raid_damage') $mains[$main] = $mains[$main]+$rnk;
 								else $mains[$main] = $mains[$main]+$cnt;
 							}
 						} else {
 							if(!array_key_exists($name, $mains)) {
-								if($load['table']=='raid_damage') {
-									$mains[$name] = $rnk.";".$cnt;
-								}
+								if($load['table']=='raid_damage') $mains[$name] = $rnk;
 								else $mains[$name] = $cnt;
 							} else {
-								if($load['table']=='raid_damage') {
-									$exp = explode(";",$mains[$name]);								
-									$rnk = $rnk+$exp[0];
-									$cnt = $cnt+$exp[1];									
-									$mains[$name] = $rnk.";".$cnt;
-								}
+								if($load['table']=='raid_damage') $mains[$name] = $mains[$name]+$rnk;
 								else $mains[$name] = $mains[$name]+$cnt;
 							}
 						}
@@ -518,27 +528,21 @@ class Raid extends BaseActiveModule
 				}
 			}
 			if(count($mains)>0) {
-				if($load['table']=='raid_damage') {
-					foreach($mains as $main => $tot) {
-						$exp = explode(";",$mains[$main]);			
-						$mains[$main] = floatval($exp[0]/($exp[1]*$exp[1]));
-					}
-				}
 				natcasesort($mains);			
-				if($load['table']!='raid_damage') $mains = array_reverse($mains, true);
+				$mains = array_reverse($mains, true);
 				$shown = 0;
 				$inside .= "\n\nTOP 5 ##highlight##".$load['type']."##end## ".$load['lapse']." \n";
 				foreach ($mains as $main => $tot)
 				{
 					$shown++;
 					if($shown<6) {
-						if($load['table']=='raid_damage') $tot = floatval($tot/100);
-						$inside .= " #".$shown." : ".$main." (".round($tot,2).") \n";
+						if($load['table']=='raid_damage') $tot = round($tot,2);
+						$inside .= " #".$shown." : ".$main." (".$tot.") \n";
 					}
 				}			
 			}
 		}
-		$inside .= "\nNote: Raiders in number of joins, Damagers in dd ranks over squared raids ratio, Leaders in number of raids leaded.";
+		$inside .= "\nNote: Raiders in number of joins, Damagers in Billions of points landed, Leaders in number of raids leaded.";
 		$output = "Top 5 in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 		if ($source == "tell") {
 			$this->bot->send_tell($asker,$output);
