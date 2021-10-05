@@ -153,7 +153,7 @@ class LandControlZones extends BaseActiveModule
 			$return .= "<br>".$this->bot->core("tools")->chatcmd("hot 0 omni", "0-50")." ".$this->bot->core("tools")->chatcmd("hot 50 omni", "50-100")
 			." ".$this->bot->core("tools")->chatcmd("hot 100 omni", "100-150")." ".$this->bot->core("tools")->chatcmd("hot 150 omni", "150-200")." ".
 			$this->bot->core("tools")->chatcmd("hot 200 omni", "200-250")." ".$this->bot->core("tools")->chatcmd("hot 250 omni", "250-300");
-			$return .= "<br><br>##yellow##neutral##end##";
+			$return .= "<br><br>##yellow##NEUTRAL##end##";
 			$return .= "<br>".$this->bot->core("tools")->chatcmd("hot 0 neutral", "0-50")." ".$this->bot->core("tools")->chatcmd("hot 50 neutral", "50-100")
 			." ".$this->bot->core("tools")->chatcmd("hot 100 neutral", "100-150")." ".$this->bot->core("tools")->chatcmd("hot 150 neutral", "150-200")." ".
 			$this->bot->core("tools")->chatcmd("hot 200 neutral", "200-250")." ".$this->bot->core("tools")->chatcmd("hot 250 neutral", "250-300");			
