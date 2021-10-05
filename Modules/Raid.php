@@ -164,7 +164,10 @@ class Raid extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Raid", "DiscTag", "", "Should we add a Discord Tag (e.g. @here or @everyone) to raid starts for notifying Discord users (leave empty for no notification) ?");
         $this->bot->core("settings")
-            ->create("Raid", "AlertIrc", false, "Do we alert Irc of raid activity ?");			
+            ->create("Raid", "AlertIrc", false, "Do we alert Irc of raid activity ?");	
+        $this->bot->core("settings")->create("Raid", "TopMonth", false, "Do we show monthly Top 5 ?");			
+        $this->bot->core("settings")->create("Raid", "TopYear", false, "Do we show yearly Top 5 ?");			
+        $this->bot->core("settings")->create("Raid", "TopAll", true, "Do we show all times Top 5 ?");			
 			
         $this->help['description'] = 'Module to manage and announce raids.';
         $this->help['command']['raidhistory [x]'] = "Shows 10 archived raids ; option to skip x records from bottom links.";
@@ -488,14 +491,24 @@ class Raid extends BaseActiveModule
 		}
 		$bots[] = $this->bot->botname;
 		$inside = "";
-		$limit = time()-2592000;
 		$loads = array();
-		$loads[] = array("type"=>"Raiders","lapse"=>"of the month","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$limit);
-		$loads[] = array("type"=>"Damagers","lapse"=>"of the month","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$limit);
-		$loads[] = array("type"=>"Leaders","lapse"=>"of the month","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$limit);
-		$loads[] = array("type"=>"Raiders","lapse"=>"of all times","table"=>"raid_log","other"=>"","where"=>" WHERE end > time");
-		$loads[] = array("type"=>"Damagers","lapse"=>"of all times","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>"");		
-		$loads[] = array("type"=>"Leaders","lapse"=>"of all times","table"=>"raid_details","other"=>"","where"=>"");
+		if($this->bot->core("settings")->get("Raid", "TopMonth")) {
+			$month = time()-2592000;
+			$loads[] = array("type"=>"Raiders","lapse"=>"of the month","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$month);
+			$loads[] = array("type"=>"Damagers","lapse"=>"of the month","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$month);
+			$loads[] = array("type"=>"Leaders","lapse"=>"of the month","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$month);
+		}
+		if($this->bot->core("settings")->get("Raid", "TopYear")) {
+			$year = time()-31536000;
+			$loads[] = array("type"=>"Raiders","lapse"=>"of the year","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$year);
+			$loads[] = array("type"=>"Damagers","lapse"=>"of the year","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$year);
+			$loads[] = array("type"=>"Leaders","lapse"=>"of the year","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$year);		
+		}
+		if($this->bot->core("settings")->get("Raid", "TopAll")) {
+			$loads[] = array("type"=>"Raiders","lapse"=>"of all times","table"=>"raid_log","other"=>"","where"=>" WHERE end > time");
+			$loads[] = array("type"=>"Damagers","lapse"=>"of all times","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>"");		
+			$loads[] = array("type"=>"Leaders","lapse"=>"of all times","table"=>"raid_details","other"=>"","where"=>"");
+		}
 		foreach($loads as $load) {
 			$mains = array();
 			foreach($bots as $bot) {
@@ -531,18 +544,18 @@ class Raid extends BaseActiveModule
 				natcasesort($mains);			
 				$mains = array_reverse($mains, true);
 				$shown = 0;
-				$inside .= "\n\nTOP 5 ##highlight##".$load['type']."##end## ".$load['lapse']." \n";
+				$inside .= "\n##highlight##".$load['type']."##end## ".$load['lapse']." \n";
 				foreach ($mains as $main => $tot)
 				{
 					$shown++;
 					if($shown<6) {
 						if($load['table']=='raid_damage') $tot = round($tot,2);
-						$inside .= " #".$shown." : ".$main." (".$tot.") \n";
+						$inside .= " #".$shown." ".$main." (".$tot.") \n";
 					}
 				}			
 			}
 		}
-		$inside .= "\nNote: Raiders in number of joins, Damagers in Billions of points landed, Leaders in number of raids leaded.";
+		$inside .= "\n\nNote: Raiders in number of raid joined, Damagers in billions of points recorded, Leaders in number of raids leaded.";
 		$output = "Top 5 in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 		if ($source == "tell") {
 			$this->bot->send_tell($asker,$output);
