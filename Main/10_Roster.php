@@ -254,7 +254,7 @@ class Roster_Core extends BasePassiveModule
                         $this->add("Org Message", $id, $person, $inviter);
                         $this->bot->send_gc("Welcome##highlight## $person##end##!!!");
                     } else {
-						if (preg_match("/(.+) has left the organization because of alignment change./i", $msg, $info)) {
+						if (preg_match("/(.+) kicked from organization \(alignment changed\)./i", $msg, $info)) {
 							$person = $info[1];
 							$id = $this->bot->core("player")->id($person);
 							$this->del("Org Message", $id, $person, "from Side Message");

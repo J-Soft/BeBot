@@ -137,8 +137,7 @@ class OrgHistory extends BaseActiveModule
     This gets called on a msg in the group
     */
     function gmsg($name, $group, $msg)
-    {
-echo " // OH: ".$group.":".$msg." // ";		
+    {		
 		$record = false;
         if (preg_match(
             "/(.+) has left the organization./i",
@@ -201,7 +200,7 @@ echo " // OH: ".$group.":".$msg." // ";
 							$record = true;
 						} else {
 							if (preg_match(
-								"/(.+) has left the organization because of alignment change./i",
+								"/(.+) kicked from organization \(alignment changed\)./i",
 								$msg,
 								$info
 							)
