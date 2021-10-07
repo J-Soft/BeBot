@@ -153,6 +153,7 @@ define('AOEM_AI_REMOVE_INIT', 0x33);
 define('AOEM_AI_REMOVE', 0x34);
 define('AOEM_AI_HQ_REMOVE_INIT', 0x35);
 define('AOEM_AI_HQ_REMOVE', 0x36);
+define('AOEM_ORG_TAX', 0x37);
 
 
 class AOChat

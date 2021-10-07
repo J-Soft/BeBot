@@ -139,6 +139,7 @@ class OrgHistory extends BaseActiveModule
     function gmsg($name, $group, $msg)
     {
 echo " // DEBUG: ".$group.":".$msg." // ";		
+// has left the organization because of alignment change !!!
 		$record = false;
         if (preg_match(
             "/(.+) has left the organization./i",

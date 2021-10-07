@@ -144,6 +144,11 @@ $GLOBALS["msg_cat"] = array(
             "Blammo! {NAME} has launched an orbital attack!",
             "s{NAME}"
         ),
+        0x89226052 => array(
+            'AOEM_ORG_TAX',
+            "Your leader, {NAME}, just changed the organizational tax. The new tax is {NEW} credits (the old value was {OLD}).",
+            "s{NAME}/s{NEW}/s{OLD}"
+        ),		
     ),
     1001 => array(
         0x01 => array(
