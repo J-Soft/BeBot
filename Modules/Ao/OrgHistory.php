@@ -87,8 +87,6 @@ class OrgHistory extends BaseActiveModule
         $blob = "##blob_title##:::: Org Event History Results ::::##end##\n\n";
 		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
 		$pager = 20; $range = $skip+$pager;		
-		$total = $this->bot->db->select("SELECT COUNT(*) FROM #___org_history");
-		if($range>$total[0][0]) { $range = $total[0][0]; }
 		$where = "";
 		$kword = "";
 		$link = "";
@@ -97,6 +95,8 @@ class OrgHistory extends BaseActiveModule
 			$link = " ".$kword;
 			$where = " WHERE (actor='".$kword."' OR action='".$kword."' OR actee='".$kword."')";
 		}
+		$total = $this->bot->db->select("SELECT COUNT(*) FROM #___org_history".$where);
+		if($range>$total[0][0]) { $range = $total[0][0]; }		
         $result = $this->bot->db->select(
             "SELECT * FROM #___org_history".$where." ORDER BY time DESC LIMIT ".$skip.", ".$pager , MYSQLI_ASSOC
         );
