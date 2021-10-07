@@ -137,7 +137,7 @@ $GLOBALS["msg_cat"] = array(
         0xc477095 => array(
             'AOEM_ORG_VOTE',
             "Voting notice: {SUBJECT}\nCandidates: {CHOICES}\nDuration: {DURATION} minutes",
-            "s{SUBJECT}/s{MINUTES}/s{CHOICES}"
+            "s{SUBJECT}/u{MINUTES}/s{CHOICES}"
         ),
         0xa8241d4 => array(
             'AOEM_ORG_STRIKE',
@@ -147,7 +147,7 @@ $GLOBALS["msg_cat"] = array(
         0x5517b44 => array(
             'AOEM_ORG_TAX',
             "Your leader, {NAME}, just changed the organizational tax. The new tax is {NEW} credits (the old value was {OLD}).",
-            "s{NAME}/s{NEW}/s{OLD}"
+            "s{NAME}/u{NEW}/u{OLD}"
         ),		
     ),
     1001 => array(
