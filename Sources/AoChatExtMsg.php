@@ -238,6 +238,7 @@ class AOExtMsg
         $msg = substr($msg, 2);
         $category = $this->b85g($msg);
         $instance = $this->b85g($msg);
+echo " ++ CHECK CAT:".$category." INST:".$instance." ++ ";
         if (!isset($GLOBALS["msg_cat"][$category]) || !isset($GLOBALS["msg_cat"][$category][$instance])) {
             echo "\nAOChat ExtMsg Debug: Unknown Cat: $category Instance: $instance\n\n";
             return false;
@@ -284,7 +285,6 @@ class AOExtMsg
     {
         $n = 0;
         for ($i = 0; $i < 5; $i++) {
-echo " ?".ord($str[$i])."? ";
             $n = $n * 85 + ord($str[$i]) - 33;
         }
         $str = substr($str, 5);

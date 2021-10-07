@@ -240,24 +240,12 @@ class Roster_Core extends BasePassiveModule
                 $this->bot->send_gc(
                     "##highlight##$person ##end##has been kicked from the org by##highlight## $source##end##"
                 );
-                $this->bot->send_irc(
-                    $this->bot->core("settings")
-                        ->get("Irc", "Ircguildprefix"),
-                    "",
-                    "$person has been Kicked from Org by $source"
-                );
             } else {
                 if (preg_match("/(.+) has left the organization./i", $msg, $info)) {
                     $person = $info[1];
                     $id = $this->bot->core("player")->id($person);
                     $this->del("Org Message", $id, $person, "from Org Message");
                     $this->bot->send_gc("##highlight##$person ##end##has left the org");
-                    $this->bot->send_irc(
-                        $this->bot->core("settings")
-                            ->get("Irc", "Ircguildprefix"),
-                        "",
-                        "$person has Left the Org"
-                    );
                 } else {
                     if (preg_match("/(.+) invited (.+) to your organization./i", $msg, $info)) {
                         $inviter = $info[1];
@@ -265,13 +253,14 @@ class Roster_Core extends BasePassiveModule
                         $id = $this->bot->core("player")->id($person);
                         $this->add("Org Message", $id, $person, $inviter);
                         $this->bot->send_gc("Welcome##highlight## $person##end##!!!");
-                        $this->bot->send_irc(
-                            $this->bot->core("settings")
-                                ->get("Irc", "Ircguildprefix"),
-                            "",
-                            "$person has been invited to the org by $inviter"
-                        );
-                    }
+                    } else {
+						if (preg_match("/(.+) has left the organization because of alignment change./i", $msg, $info)) {
+							$person = $info[1];
+							$id = $this->bot->core("player")->id($person);
+							$this->del("Org Message", $id, $person, "from Side Message");
+							$this->bot->send_gc("##highlight##$person ##end##has sideleft the org");
+						}
+					}					
                 }
             }
         }

@@ -105,7 +105,7 @@ class OrgHistory extends BaseActiveModule
         }
         foreach ($result as $res) {
 			if($res['actee']==$res['actor']) { $by = ""; } else { $by = " by ".$res['actor']; }
-            $blob .= date("Y-m-d H:i", $timestamp)." : ".$res['actee']." ".$res['action'].$by." (OrgId=".$res['organization'].")\n";
+            $blob .= date("Y-m-d H:i", $res['time'])." : ".$res['actee']." ".$res['action'].$by." (OrgId=".$res['organization'].")\n";
         }
 		$back = $skip-$pager;
 		if($back>=0) {
@@ -139,7 +139,6 @@ class OrgHistory extends BaseActiveModule
     function gmsg($name, $group, $msg)
     {
 echo " // OH: ".$group.":".$msg." // ";		
-// has left the organization because of alignment change !!!
 		$record = false;
         if (preg_match(
             "/(.+) has left the organization./i",
@@ -186,9 +185,48 @@ echo " // OH: ".$group.":".$msg." // ";
 						$this->relay_msg($msg);
 						$infos["actor"] = $info[1];
 						$infos["action"] = "leaded";
-						$infos["actee"] = $info[1];
+						$infos["actee"] = "The Guild";
 						$record = true;
-                    }
+                    } else {
+						if (preg_match(
+							"/Your leader, (.+), just changed the organizational tax. The new tax is (.+) credits \(the old value was (.+)\)./i",
+							$msg,
+							$info
+						)
+						) {
+							$this->relay_msg($msg);
+							$infos["actor"] = $info[1];
+							$infos["action"] = "taxchanged";
+							$infos["actee"] = "The Guild";
+							$record = true;
+						} else {
+							if (preg_match(
+								"/(.+) has left the organization because of alignment change./i",
+								$msg,
+								$info
+							)
+							) {
+								$this->relay_msg($msg);
+								$infos["actor"] = $info[1];
+								$infos["action"] = "sidechanged";
+								$infos["actee"] = $info[1];
+								$record = true;
+							} else {
+								if (preg_match(
+									"/(.+) changed the organization governing form to (.+)./i",
+									$msg,
+									$info
+								)
+								) {
+									$this->relay_msg($msg);
+									$infos["actor"] = $info[1];
+									$infos["action"] = "formchanged";
+									$infos["actee"] = "The Guild";
+									$record = true;
+								}  
+							}
+						}						
+					}					
                 }
             }
         }
