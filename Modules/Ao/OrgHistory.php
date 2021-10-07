@@ -136,6 +136,7 @@ class OrgHistory extends BaseActiveModule
     */
     function gmsg($name, $group, $msg)
     {
+echo " // DEBUG: ".$msg." // ";		
 		$record = false;
         if (preg_match(
             "/^(.+) just left your organization.$/i",
