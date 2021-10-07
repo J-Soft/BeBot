@@ -63,6 +63,7 @@ class OrgHistory extends BaseActiveModule
         $this->help['description'] = 'Handle org events history.';
         $this->help['command']['orghistory'] = "Shows all org events history with pagination.";
         $this->help['command']['orghistory [keyword]'] = "Searches for org events history.";
+		$this->help['notes'] = "The bot MUST be able to at least see the Org Bank for this module to work (means promoted to Member into Department, Faction or Republic forms).";
     }
 
     function command_handler($name, $msg, $channel)
