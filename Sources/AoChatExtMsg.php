@@ -275,7 +275,7 @@ echo " ++ CHECK CAT:".$category." INST:".$instance." ++ ";
     {
         $n = 0;
         for ($i = 0; $i < 5; $i++) {
-echo " ?".$str[$i]."? ";
+echo " ?".ord($str[$i])."? ";
             $n = $n * 85 + ord($str[$i]) - 33;
         }
         $str = substr($str, 5);
