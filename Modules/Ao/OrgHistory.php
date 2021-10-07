@@ -51,9 +51,9 @@ class OrgHistory extends BaseActiveModule
 				time INT)"
         );
         $this->register_command("all", "orghistory", "GUEST");
-		//if ($bot->guildbot) {
+		if ($bot->guildbot) {
 			$this->register_event("gmsg", "Org Msg");
-		//}
+		}
         $this->bot->core("settings")
             ->create("OrgHistory", "AlertDisc", false, "Do we alert Discord of Org Events ?");
         $this->bot->core("settings")
