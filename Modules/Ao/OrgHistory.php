@@ -194,7 +194,7 @@ echo " // OH: ".$group.":".$msg." // ";
         }
         if ($record) {
             $infos["time"] = time();
-            $infos["organization"] = $this->bot->guild_id;
+            $infos["organization"] = $this->bot->guildid;
 			$this->bot->db->query(
 				"INSERT INTO #___org_history (actor, action, actee, organization, time) VALUES (
 				'" . mysqli_real_escape_string($this->bot->db->CONN,
