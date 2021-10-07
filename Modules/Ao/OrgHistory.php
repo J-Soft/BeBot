@@ -138,7 +138,7 @@ class OrgHistory extends BaseActiveModule
     */
     function gmsg($name, $group, $msg)
     {
-echo " // DEBUG: ".$group.":".$msg." // ";		
+echo " // OH: ".$group.":".$msg." // ";		
 // has left the organization because of alignment change !!!
 		$record = false;
         if (preg_match(
@@ -178,15 +178,15 @@ echo " // DEBUG: ".$group.":".$msg." // ";
 					$record = true;
                 } else {
                     if (preg_match(
-                        "/(.+) removed inactive character (.+) from your organization./i",
+                        "/Leadership has been given to (.+)./i",
                         $msg,
                         $info
                     )
                     ) {
 						$this->relay_msg($msg);
 						$infos["actor"] = $info[1];
-						$infos["action"] = "removed";
-						$infos["actee"] = $info[2];
+						$infos["action"] = "leaded";
+						$infos["actee"] = $info[1];
 						$record = true;
                     }
                 }

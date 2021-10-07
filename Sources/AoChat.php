@@ -140,6 +140,9 @@ define('AOEM_ORG_DISBAND', 0x13);
 define('AOEM_ORG_FORM', 0x14);
 define('AOEM_ORG_VOTE', 0x15);
 define('AOEM_ORG_STRIKE', 0x16);
+define('AOEM_ORG_ENDVOTE', 0x17);
+define('AOEM_ORG_TAX', 0x18);
+define('AOEM_ORG_LEAD', 0x19);
 define('AOEM_NW_ATTACK', 0x20);
 define('AOEM_NW_ABANDON', 0x21);
 define('AOEM_NW_OPENING', 0x22);
@@ -153,7 +156,6 @@ define('AOEM_AI_REMOVE_INIT', 0x33);
 define('AOEM_AI_REMOVE', 0x34);
 define('AOEM_AI_HQ_REMOVE_INIT', 0x35);
 define('AOEM_AI_HQ_REMOVE', 0x36);
-define('AOEM_ORG_TAX', 0x37);
 
 
 class AOChat
