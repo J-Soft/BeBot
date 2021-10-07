@@ -52,7 +52,6 @@ class OrgHistory extends BaseActiveModule
         );
         $this->register_command("all", "orghistory", "GUEST");
 		//if ($bot->guildbot) {
-			$this->register_event("gmsg", "org");
 			$this->register_event("gmsg", "Org Msg");
 		//}
         $this->bot->core("settings")

@@ -223,6 +223,7 @@ class AOExtMsg
         $msg = substr($msg, 2);
         $category = $this->b85g($msg);
         $instance = $this->b85g($msg);
+echo " ++ CHECK CAT:".$category." INST:".$instance." ++ ";
         if (!isset($GLOBALS["msg_cat"][$category]) || !isset($GLOBALS["msg_cat"][$category][$instance])) {
             echo "\nAOChat ExtMsg Debug: Unknown Cat: $category Instance: $instance\n\n";
             return false;
