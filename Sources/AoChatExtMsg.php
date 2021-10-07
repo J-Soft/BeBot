@@ -147,7 +147,7 @@ $GLOBALS["msg_cat"] = array(
         0x89226052 => array(
             'AOEM_ORG_TAX',
             "Your leader, {NAME}, just changed the organizational tax. The new tax is {NEW} credits (the old value was {OLD}).",
-            "s{NAME}/s{NEW}/s{OLD}"
+            "s{NAME}/u{NEW}/u{OLD}"
         ),		
     ),
     1001 => array(
@@ -275,6 +275,7 @@ echo " ++ CHECK CAT:".$category." INST:".$instance." ++ ";
     {
         $n = 0;
         for ($i = 0; $i < 5; $i++) {
+echo " ?".$str[$i]."? ";
             $n = $n * 85 + ord($str[$i]) - 33;
         }
         $str = substr($str, 5);
