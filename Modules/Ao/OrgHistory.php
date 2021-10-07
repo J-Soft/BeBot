@@ -139,7 +139,7 @@ class OrgHistory extends BaseActiveModule
 echo " // DEBUG: ".$msg." // ";		
 		$record = false;
         if (preg_match(
-            "/^(.+) just left your organization.$/i",
+            "/(.+) has left the organization./i",
             $msg,
             $info
         )
@@ -151,7 +151,7 @@ echo " // DEBUG: ".$msg." // ";
             $record = true;
         } else {
             if (preg_match(
-                "/^(.+) kicked (.+) from your organization.$/i",
+                "/(.+) kicked (.+) from the organization./i",
                 $msg,
                 $info
             )
@@ -163,7 +163,7 @@ echo " // DEBUG: ".$msg." // ";
                 $record = true;
             } else {
                 if (preg_match(
-                    "/^(.+) invited (.+) to your organization.$/i",
+                    "/(.+) invited (.+) to your organization./i",
                     $msg,
                     $info
                 )
@@ -175,7 +175,7 @@ echo " // DEBUG: ".$msg." // ";
 					$record = true;
                 } else {
                     if (preg_match(
-                        "/^(.+) removed inactive character (.+) from your organization.$/i",
+                        "/(.+) removed inactive character (.+) from your organization./i",
                         $msg,
                         $info
                     )
