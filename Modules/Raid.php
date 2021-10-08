@@ -465,8 +465,6 @@ class Raid extends BaseActiveModule
 						$this->bot->send_tell($name,"There was errors in your damage stats, nothing recorded.");
 					}
 				}
-			} else {
-				$this->bot->send_tell($name,"You need RL+ rank to submit damage stats to the bot.");
 			}
 		}
 	}
