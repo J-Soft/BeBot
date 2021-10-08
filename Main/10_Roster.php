@@ -231,39 +231,37 @@ class Roster_Core extends BasePassiveModule
 
     function gmsg($name, $group, $msg)
     {
-        if ($name == "0") {
-            if (preg_match("/(.+) kicked (.+) from the organization./i", $msg, $info)) {
-                $person = $info[2];
-                $source = $info[1];
-                $id = $this->bot->core("player")->id($person);
-                $this->del("Org Message", $id, $person, "from Org Message, kicked by $source");
-                $this->bot->send_gc(
-                    "##highlight##$person ##end##has been kicked from the org by##highlight## $source##end##"
-                );
-            } else {
-                if (preg_match("/(.+) has left the organization./i", $msg, $info)) {
-                    $person = $info[1];
-                    $id = $this->bot->core("player")->id($person);
-                    $this->del("Org Message", $id, $person, "from Org Message");
-                    $this->bot->send_gc("##highlight##$person ##end##has left the org");
-                } else {
-                    if (preg_match("/(.+) invited (.+) to your organization./i", $msg, $info)) {
-                        $inviter = $info[1];
-                        $person = $info[2];
-                        $id = $this->bot->core("player")->id($person);
-                        $this->add("Org Message", $id, $person, $inviter);
-                        $this->bot->send_gc("Welcome##highlight## $person##end##!!!");
-                    } else {
-						if (preg_match("/(.+) kicked from organization \(alignment changed\)./i", $msg, $info)) {
-							$person = $info[1];
-							$id = $this->bot->core("player")->id($person);
-							$this->del("Org Message", $id, $person, "from Side Message");
-							$this->bot->send_gc("##highlight##$person ##end##has sideleft the org");
-						}
-					}					
-                }
-            }
-        }
+		if (preg_match("/(.+) kicked (.+) from the organization./i", $msg, $info)) {
+			$person = $info[2];
+			$source = $info[1];
+			$id = $this->bot->core("player")->id($person);
+			$this->del("Org Message", $id, $person, "from Org Message, kicked by $source");
+			$this->bot->send_gc(
+				"##highlight##$person ##end##has been kicked from the org by##highlight## $source##end##"
+			);
+		} else {
+			if (preg_match("/(.+) has left the organization./i", $msg, $info)) {
+				$person = $info[1];
+				$id = $this->bot->core("player")->id($person);
+				$this->del("Org Message", $id, $person, "from Org Message");
+				$this->bot->send_gc("##highlight##$person ##end##has left the org");
+			} else {
+				if (preg_match("/(.+) invited (.+) to your organization./i", $msg, $info)) {
+					$inviter = $info[1];
+					$person = $info[2];
+					$id = $this->bot->core("player")->id($person);
+					$this->add("Org Message", $id, $person, $inviter);
+					$this->bot->send_gc("Welcome##highlight## $person##end##!!!");
+				} else {
+					if (preg_match("/(.+) kicked from organization \(alignment changed\)./i", $msg, $info)) {
+						$person = $info[1];
+						$id = $this->bot->core("player")->id($person);
+						$this->del("Org Message", $id, $person, "from Side Message");
+						$this->bot->send_gc("##highlight##$person ##end##has sideleft the org");
+					}
+				}					
+			}
+		}
     }
 
 
