@@ -57,6 +57,7 @@ class BanManager extends BaseActiveModule
         $this->help['command']['banlist'] = "Shows the list of all currently banned characters.";
         $this->help['command']['ban'] = $this->help['command']['banlist'];
         $this->help['command']['ban list'] = $this->help['command']['banlist'];
+        $this->help['command']['ban history'] = "Shows previously banned toons last issues with details.";
         $this->help['command']['ban add <name> <reason>'] = "Bans <name> for <reason> from the bot forever - or until manually unbanned.";
         $this->help['command']['ban add <name> <time> <reason>']
             = "Bans <name> for <reason> from the bot for <time>. <time> has a base unit of days. Using 'm' for minutes, 'h' for hours and 'd' for days directly behind the number you can change the time unit. '6h' as time would ban the character for 6h, after which the ban will be automatically deleted. The bot checks every minute for bans that have run out.";
@@ -88,6 +89,8 @@ class BanManager extends BaseActiveModule
     {
         if (preg_match("/^ban$/i", $msg) || preg_match("/^ban list$/i", $msg)) {
             return $this->show_ban_list();
+        } elseif (preg_match("/^ban history$/i", $msg)) {
+            return $this->ban_history();
         } elseif (preg_match("/^ban add ([a-z0-9-]+) ([0-9]+[mhd]?)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], $info[2], "");
         } elseif (preg_match("/^ban add ([a-z0-9-]+)$/i", $msg, $info)) {
@@ -104,7 +107,55 @@ class BanManager extends BaseActiveModule
         return $this->bot->send_help($name, "ban");
     }
 
-
+	
+    function ban_history()
+    {
+		$now = time();
+        $banned = $this->bot->db->select(
+            "SELECT nickname, banned_by, banned_at, banned_for, banned_until FROM #___users WHERE banned_until < ".$now." AND banned_until IS NOT NULL AND banned_at IS NOT NULL ORDER BY banned_at DESC"
+        );
+        if (empty($banned)) {
+            return "Nobody was banned!";
+        }
+        $total = 0;
+        $banlist = "##blob_title## ::: All previously banned characters for " . $this->bot->botname . " :::##end##\n";
+        foreach ($banned as $ban) {
+            $blob = "\n" . $ban[0] . " " . $this->bot->core("tools")
+                    ->chatcmd("whois " . $ban[0], "[WHOIS]") . "\n";
+            $blob .= $this->bot->core("colors")
+                    ->colorize("blob_text", "Banned by: ") . stripslashes($ban[1]) . "\n";
+            $blob .= $this->bot->core("colors")
+                    ->colorize("blob_text", "Banned at: ") . gmdate(
+                    $this->bot
+                        ->core("settings")
+                        ->get("Time", "FormatString"),
+                    $ban[2]
+                ) . "\n";
+            $blob .= $this->bot->core("colors")
+                    ->colorize("blob_text", "Reason: ") . stripslashes($ban[3]) . "\n";
+            if ($ban[4] > 0) {
+                $blob .= $this->bot->core("colors")
+                    ->colorize(
+                        "blob_text",
+                        "Temporary ban until " . gmdate(
+                            $this->bot
+                                ->core("settings")
+                                ->get("Time", "FormatString"),
+                            $ban[4]
+                        ) . ".\n"
+                    );
+            } else {
+                $blob .= $this->bot->core("colors")
+                    ->colorize("blob_text", "Permanent ban.\n");
+            }
+            $banlist .= $blob;
+            $total++;
+        }
+        return ("##highlight##" . $total . "##end## Characters previously Banned ::: " . $this->bot
+                ->core("tools")->make_blob("click to view", $banlist));
+    }
+	
+	
     function show_ban_list()
     {
         $banned = $this->bot->db->select(
