@@ -178,7 +178,7 @@ class Announcer extends BaseActiveModule
 			$relay_Sender = "";
 			$font_pattern = '/\<([\/]*)font([^\>]*)\>/';
 			$relay_message = preg_replace($font_pattern,'',$relay_message);
-
+echo "|".$relay_message."|";
 	            if (preg_match("/^\[([^\]]*)\]\ (.*) \[([^\]]*)\] \[([^\]]*)\]$/", $relay_message, $matches)) {
 					$relay_Type		= $matches[1];
 					$relay_Text		= $matches[2];
