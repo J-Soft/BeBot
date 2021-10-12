@@ -182,18 +182,23 @@ class Announcer extends BaseActiveModule
 	            if (preg_match("/^\[([^\]]*)\]\ (.*) \[([^\]]*)\] \[([^\]]*)\]$/", $relay_message, $matches)) {
 					$relay_Type		= $matches[1];
 					$relay_Text		= $matches[2];
-					$relay_Sender		= $matches[3];
-					$relay_Append		= "";
+					$relay_Sender	= $matches[3];
+					$relay_Append	= "";
 	            } elseif (preg_match("/^\[([^\]]*)\]\ (.*)\[([^\]]*)\]$/", $relay_message, $matches)) {
 					$relay_Type		= $matches[1];
 					$relay_Text		= $matches[2];
-					$relay_Sender		= $matches[3];
-					$relay_Append		= "";
+					$relay_Sender	= $matches[3];
+					$relay_Append	= "";
+                } elseif (preg_match("/^<font color=#(?:[a-z0-9]+)><font color=#(?:[a-z0-9]+)>(?:[^<]+)<\/font> <font color=#(?:[a-z0-9]+)>([^<]+)<\/font>: <font color=#(?:[a-z0-9]+)>([^<]+)<\/font>(?:.+)$/i", $relay_message, $matches)) {
+					$relay_Type		= "Message";
+					$relay_Text		= $matches[2];
+					$relay_Sender	= $matches[1];
+					$relay_Append	= "";
                 } else {
 					$relay_Type		= "Announce";
 					$relay_Text		= $relay_message;
-					$relay_Sender		= $name;
-					$relay_Append		= "";						
+					$relay_Sender	= $name;
+					$relay_Append	= "";						
 				}
 
 			if ($relay_Sender && $relay_Text) {
