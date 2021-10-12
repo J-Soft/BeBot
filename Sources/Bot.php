@@ -1064,7 +1064,7 @@ class Bot
     */
     function inc_tell($args)
     {
-$this->log("CORE", "DEBUG", "inc_tell ...");		
+$this->log("CORE", "DEBUG", "inc_tell ... ");		
         //Get the name of the user. It's easier to handle... or is it?
         $user = $this->core("player")->name($args[0]);
         $found = false;
@@ -1075,6 +1075,7 @@ $this->log("CORE", "DEBUG", "inc_tell ...");
             return;
         }
         //Silently ignore tells from other bots.
+print_r($this->other_bots);
         if (isset($this->other_bots[$user])&&$this->other_bots[$user]==true) //TO DO: Do we ever ucfirst(strtolower()) the other bots?
         {
 $this->log("CORE", "DEBUG", "Tell from otherbot $user ...");			
