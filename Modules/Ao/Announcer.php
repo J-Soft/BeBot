@@ -176,7 +176,7 @@ class Announcer extends BaseActiveModule
 		if ($found)
         {
 			$relay_Sender = "";
-			
+print_r($relay_message);			
 			if (preg_match("/^<font color=#(?:[a-z0-9]+)><font color=#(?:[a-z0-9]+)>(?:[^<]+)<\/font> <font color=#(?:[a-z0-9]+)>([^<]+)<\/font>: <font color=#(?:[a-z0-9]+)>([^<]+)<\/font>\n(?:.+)$/i", $relay_message, $matches)) {
 					$relay_Type		= "Message";
 					$relay_Text		= $matches[2];
