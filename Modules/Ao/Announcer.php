@@ -176,31 +176,33 @@ class Announcer extends BaseActiveModule
 		if ($found)
         {
 			$relay_Sender = "";
-			$font_pattern = '/\<([\/]*)font([^\>]*)\>/';
-			$relay_message = preg_replace($font_pattern,'',$relay_message);
-echo "|".$relay_message."|";
-	            if (preg_match("/^\[([^\]]*)\]\ (.*) \[([^\]]*)\] \[([^\]]*)\]$/", $relay_message, $matches)) {
-					$relay_Type		= $matches[1];
-					$relay_Text		= $matches[2];
-					$relay_Sender	= $matches[3];
-					$relay_Append	= "";
-	            } elseif (preg_match("/^\[([^\]]*)\]\ (.*)\[([^\]]*)\]$/", $relay_message, $matches)) {
-					$relay_Type		= $matches[1];
-					$relay_Text		= $matches[2];
-					$relay_Sender	= $matches[3];
-					$relay_Append	= "";
-                } elseif (preg_match("/^(?:[^ ]+) ([^:]+): (.+)\nYou can disable receipt of mass messages and invites in the Preferences for (?:.+)$/i", $relay_message, $matches)) {
+			
+			if (preg_match("/^<font color=#(?:[a-z0-9]+)><font color=#(?:[a-z0-9]+)>(?:[^<]+)<\/font> <font color=#(?:[a-z0-9]+)>([^<]+)<\/font>: <font color=#(?:[a-z0-9]+)>([^<]+)<\/font>(?:.+)$/i", $relay_message, $matches)) {
 					$relay_Type		= "Message";
 					$relay_Text		= $matches[2];
 					$relay_Sender	= $matches[1];
 					$relay_Append	= "";
-                } else {
+            } else {
+				$font_pattern = '/\<([\/]*)font([^\>]*)\>/';
+				$relay_message = preg_replace($font_pattern,'',$relay_message);
+				if (preg_match("/^\[([^\]]*)\]\ (.*) \[([^\]]*)\] \[([^\]]*)\]$/", $relay_message, $matches)) {
+					$relay_Type		= $matches[1];
+					$relay_Text		= $matches[2];
+					$relay_Sender	= $matches[3];
+					$relay_Append	= "";
+				} elseif (preg_match("/^\[([^\]]*)\]\ (.*)\[([^\]]*)\]$/", $relay_message, $matches)) {
+					$relay_Type		= $matches[1];
+					$relay_Text		= $matches[2];
+					$relay_Sender	= $matches[3];
+					$relay_Append	= "";
+				} else {
 					$relay_Type		= "Announce";
 					$relay_Text		= $relay_message;
 					$relay_Sender	= $name;
 					$relay_Append	= "";						
 				}
-
+			}
+				
 			if ($relay_Sender && $relay_Text) {
 				if (preg_match("/^<a href=.*\>([^\<]*)\<\/a\>[\s]*$/",$relay_Sender,$relaySenderLink)) {
 					$relay_Sender = $relaySenderLink[1];
