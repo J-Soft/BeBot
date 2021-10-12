@@ -901,9 +901,9 @@ class AOChat
                 // Tells should always be commands
                 list ($id, $message) = $packet->args;
 echo " | id:".$id." msg:".$message." | ";
-                $signal = new signal_message('aochat', $id, $message);
-                $dispatcher->post($signal, 'onTell');
-                unset($signal);
+                //$signal = new signal_message('aochat', $id, $message);
+                //$dispatcher->post($signal, 'onTell');
+                //unset($signal);
 
                 $event = new sfEvent($this, 'Core.on_tell', array(
                                                                  'source' => $id,
