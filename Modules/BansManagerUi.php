@@ -125,7 +125,7 @@ class BanManager extends BaseActiveModule
     function ban_search($skip = 0, $string = null)
     {
 		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
-		$pager = 2; $range = $skip+$pager;			
+		$pager = 20; $range = $skip+$pager;			
 		$now = time();
 		$where = " WHERE banned_by IS NOT NULL AND banned_for IS NOT NULL";
 		$kword = "";
@@ -133,7 +133,7 @@ class BanManager extends BaseActiveModule
 		if($string) {
 			$kword = $string;
 			$link = " ".$kword;
-			$where = " WHERE banned_by LIKE '%".$string."%' OR banned_for LIKE '%".$string."%' OR nickname LIKE '%".$string."%'";
+			$where = " WHERE banned_until IS NOT NULL AND banned_at IS NOT NULL AND (banned_by LIKE '%".$string."%' OR banned_for LIKE '%".$string."%' OR nickname LIKE '%".$string."%')";
 		}		
 		$total = $this->bot->db->select("SELECT COUNT(*) FROM #___users".$where);
 		if($range>$total[0][0]) { $range = $total[0][0]; }		
@@ -191,7 +191,7 @@ class BanManager extends BaseActiveModule
     function ban_history($skip = 0)
     {
 		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
-		$pager = 2; $range = $skip+$pager;			
+		$pager = 20; $range = $skip+$pager;			
 		$now = time();
 		$total = $this->bot->db->select("SELECT COUNT(*) FROM #___users WHERE banned_until < ".$now." AND banned_until IS NOT NULL AND banned_at IS NOT NULL");
 		if($range>$total[0][0]) { $range = $total[0][0]; }			
@@ -249,7 +249,7 @@ class BanManager extends BaseActiveModule
     function show_ban_list($skip = 0)
     {
 		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
-		$pager = 2; $range = $skip+$pager;	
+		$pager = 20; $range = $skip+$pager;	
 		$total = $this->bot->db->select("SELECT COUNT(*) FROM #___users WHERE user_level = -1");
 		if($range>$total[0][0]) { $range = $total[0][0]; }		
         $banned = $this->bot->db->select(
