@@ -900,7 +900,7 @@ class AOChat
                 // Event is a tell
                 // Tells should always be commands
                 list ($id, $message) = $packet->args;
-echo " | id:".$id." msg:".$message." | ";
+
                 //$signal = new signal_message('aochat', $id, $message);
                 //$dispatcher->post($signal, 'onTell');
                 //unset($signal);
