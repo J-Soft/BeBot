@@ -1064,6 +1064,7 @@ class Bot
     */
     function inc_tell($args)
     {
+$this->log("CORE", "DEBUG", "inc_tell ...");		
         //Get the name of the user. It's easier to handle... or is it?
         $user = $this->core("player")->name($args[0]);
         $found = false;
@@ -1076,6 +1077,7 @@ class Bot
         //Silently ignore tells from other bots.
         if (isset($this->other_bots[$user])) //TO DO: Do we ever ucfirst(strtolower()) the other bots?
         {
+$this->log("CORE", "DEBUG", "Tell from otherbot $user ...");			
             return;
         }
         if (preg_match("/is AFK .Away from keyboard./i", $args[1]) || preg_match(
@@ -1085,9 +1087,11 @@ class Bot
             || preg_match("/I am away from my keyboard right now,(.+)your message has been logged./i", $args[1])
             || preg_match("/Away From Keyboard/i", $args[1])
         ) {
+$this->log("CORE", "DEBUG", "Msg from otherbot $user ...");						
             //We probably sendt someone a tell when not here. Let's leave it at that.
             return;
         }
+$this->log("CORE", "DEBUG", "Decoding from $user ...");		
         $args[1] = utf8_decode($args[1]);
         $this->log("TELL", "INC", $user . ": " . $args[1]);
         $found = $this->handle_command_input($user, $args[1], "tell");
