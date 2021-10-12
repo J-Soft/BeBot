@@ -189,7 +189,7 @@ class Announcer extends BaseActiveModule
 					$relay_Text		= $matches[2];
 					$relay_Sender	= $matches[3];
 					$relay_Append	= "";
-                } elseif (preg_match("/^<font color=#(?:[a-z0-9]+)><font color=#(?:[a-z0-9]+)>(?:[^<]+)<\/font> <font color=#(?:[a-z0-9]+)>([^<]+)<\/font>: <font color=#(?:[a-z0-9]+)>([^<]+)<\/font>(?:.+)$/i", $relay_message, $matches)) {
+                } elseif (preg_match("/^(?:[^ ]+) ([^:]+): (.+) You can disable receipt of mass messages and invites in the Preferences for (?:.+)$/i", $relay_message, $matches)) {
 					$relay_Type		= "Message";
 					$relay_Text		= $matches[2];
 					$relay_Sender	= $matches[1];
