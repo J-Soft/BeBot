@@ -49,6 +49,8 @@ class BanManager extends BaseActiveModule
             "ban",
             "GUEST",
             array(
+                 "history" => "LEADER",
+                 "search" => "LEADER",
                  "add" => "ADMIN",
                  "del" => "ADMIN"
             )
@@ -58,12 +60,15 @@ class BanManager extends BaseActiveModule
         $this->help['command']['ban'] = $this->help['command']['banlist'];
         $this->help['command']['ban list'] = $this->help['command']['banlist'];
         $this->help['command']['ban history'] = "Shows previously banned toons last issues with details.";
+        $this->help['command']['ban search'] = "Searches among currently + previously banned toons.";
         $this->help['command']['ban add <name> <reason>'] = "Bans <name> for <reason> from the bot forever - or until manually unbanned.";
         $this->help['command']['ban add <name> <time> <reason>']
             = "Bans <name> for <reason> from the bot for <time>. <time> has a base unit of days. Using 'm' for minutes, 'h' for hours and 'd' for days directly behind the number you can change the time unit. '6h' as time would ban the character for 6h, after which the ban will be automatically deleted. The bot checks every minute for bans that have run out.";
         $this->help['command']['ban del <name>'] = "Unbans <name>.";
         $this->help['command']['ban rem <name>'] = "Unbans <name>.";
         $this->bot->core("command_alias")->register("ban list", "banlist");
+        $this->bot->core("command_alias")->register("ban history", "banhistory");
+        $this->bot->core("command_alias")->register("ban search", "bansearch");
         $this->bot->core("command_alias")->register("ban", "blacklist");
         $this->register_event("cron", "5min");
         $this->bot->core("settings")
@@ -80,6 +85,7 @@ class BanManager extends BaseActiveModule
             foreach ($unbans as $unban) {
                 $this->bot->core("security")
                     ->rem_ban("Cron", $unban[0], "Temporary ban ran out,");
+				$this->auto_user_readd($unban[0]);
             }
         }
     }
@@ -87,10 +93,18 @@ class BanManager extends BaseActiveModule
 
     function command_handler($name, $msg, $origin)
     {
-        if (preg_match("/^ban$/i", $msg) || preg_match("/^ban list$/i", $msg)) {
-            return $this->show_ban_list();
+        if (preg_match("/^ban (\d+)$/i", $msg, $info) || preg_match("/^ban list (\d+)$/i", $msg, $info)) {
+            return $this->show_ban_list($info[1]);
+        } elseif (preg_match("/^ban$/i", $msg) || preg_match("/^ban list$/i", $msg)) {
+            return $this->show_ban_list(0);
+        } elseif (preg_match("/^ban history (\d+)$/i", $msg, $info)) {
+            return $this->ban_history($info[1]);
         } elseif (preg_match("/^ban history$/i", $msg)) {
-            return $this->ban_history();
+            return $this->ban_history(0);
+        } elseif (preg_match("/^ban search (\d+) (.+)$/i", $msg, $info)) {
+            return $this->ban_search($info[1], $info[2]);
+        } elseif (preg_match("/^ban search (.+)$/i", $msg, $info)) {
+            return $this->ban_search(0, $info[1]);
         } elseif (preg_match("/^ban add ([a-z0-9-]+) ([0-9]+[mhd]?)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], $info[2], "");
         } elseif (preg_match("/^ban add ([a-z0-9-]+)$/i", $msg, $info)) {
@@ -108,16 +122,85 @@ class BanManager extends BaseActiveModule
     }
 
 	
-    function ban_history()
+    function ban_search($skip = 0, $string = null)
     {
+		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
+		$pager = 2; $range = $skip+$pager;			
 		$now = time();
+		$where = " WHERE banned_by IS NOT NULL AND banned_for IS NOT NULL";
+		$kword = "";
+		$link = "";		
+		if($string) {
+			$kword = $string;
+			$link = " ".$kword;
+			$where = " WHERE banned_by LIKE '%".$string."%' OR banned_for LIKE '%".$string."%' OR nickname LIKE '%".$string."%'";
+		}		
+		$total = $this->bot->db->select("SELECT COUNT(*) FROM #___users".$where);
+		if($range>$total[0][0]) { $range = $total[0][0]; }		
         $banned = $this->bot->db->select(
-            "SELECT nickname, banned_by, banned_at, banned_for, banned_until FROM #___users WHERE banned_until < ".$now." AND banned_until IS NOT NULL AND banned_at IS NOT NULL ORDER BY banned_at DESC"
+            "SELECT nickname, banned_by, banned_at, banned_for, banned_until FROM #___users".$where." ORDER BY banned_at DESC LIMIT ".$skip.", ".$pager
+        );
+        if (empty($banned)) {
+            return "Nobody found banned!";
+        }
+        $banlist = "##blob_title## ::: Searched banned characters for " . $this->bot->botname . " :::##end##\n";
+        foreach ($banned as $ban) {
+            $blob = "\n" . $ban[0] . " " . $this->bot->core("tools")
+                    ->chatcmd("whois " . $ban[0], "[WHOIS]") . "\n";
+            $blob .= $this->bot->core("colors")
+                    ->colorize("blob_text", "Banned by: ") . stripslashes($ban[1]) . "\n";
+            $blob .= $this->bot->core("colors")
+                    ->colorize("blob_text", "Banned at: ") . gmdate(
+                    $this->bot
+                        ->core("settings")
+                        ->get("Time", "FormatString"),
+                    $ban[2]
+                ) . "\n";
+            $blob .= $this->bot->core("colors")
+                    ->colorize("blob_text", "Reason: ") . stripslashes($ban[3]) . "\n";
+            if ($ban[4] > 0) {
+                $blob .= $this->bot->core("colors")
+                    ->colorize(
+                        "blob_text",
+                        "Temporary ban until " . gmdate(
+                            $this->bot
+                                ->core("settings")
+                                ->get("Time", "FormatString"),
+                            $ban[4]
+                        ) . ".\n"
+                    );
+            } else {
+                $blob .= $this->bot->core("colors")
+                    ->colorize("blob_text", "Permanent ban.\n");
+            }
+            $banlist .= $blob;
+        }
+		$back = $skip-$pager;
+		if($back>=0) {
+			$banlist .= " ".$this->bot->core("tools")->chatcmd("bansearch ".$back.$link, "Back")." ";
+		}		
+		if($range<$total[0][0]) {
+			$banlist .= " ".$this->bot->core("tools")->chatcmd("bansearch ".$range.$link, "Next")." ";
+		}	
+		$first = $skip+1;		
+        return ("##highlight##".$first."-".$range." / ".$total[0][0] ."##end## Characters searched as Banned ::: " . $this->bot
+                ->core("tools")->make_blob("click to view", $banlist));
+    }	
+	
+	
+    function ban_history($skip = 0)
+    {
+		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
+		$pager = 2; $range = $skip+$pager;			
+		$now = time();
+		$total = $this->bot->db->select("SELECT COUNT(*) FROM #___users WHERE banned_until < ".$now." AND banned_until IS NOT NULL AND banned_at IS NOT NULL");
+		if($range>$total[0][0]) { $range = $total[0][0]; }			
+        $banned = $this->bot->db->select(
+            "SELECT nickname, banned_by, banned_at, banned_for, banned_until FROM #___users WHERE banned_until < ".$now." AND banned_until IS NOT NULL AND banned_at IS NOT NULL ORDER BY banned_at DESC LIMIT ".$skip.", ".$pager
         );
         if (empty($banned)) {
             return "Nobody was banned!";
         }
-        $total = 0;
         $banlist = "##blob_title## ::: All previously banned characters for " . $this->bot->botname . " :::##end##\n";
         foreach ($banned as $ban) {
             $blob = "\n" . $ban[0] . " " . $this->bot->core("tools")
@@ -149,22 +232,32 @@ class BanManager extends BaseActiveModule
                     ->colorize("blob_text", "Permanent ban.\n");
             }
             $banlist .= $blob;
-            $total++;
         }
-        return ("##highlight##" . $total . "##end## Characters previously Banned ::: " . $this->bot
+		$back = $skip-$pager;
+		if($back>=0) {
+			$banlist .= " ".$this->bot->core("tools")->chatcmd("banhistory ".$back.$link, "Back")." ";
+		}		
+		if($range<$total[0][0]) {
+			$banlist .= " ".$this->bot->core("tools")->chatcmd("banhistory ".$range.$link, "Next")." ";
+		}
+		$first = $skip+1;		
+        return ("##highlight##".$first."-".$range." / ".$total[0][0] ."##end## Characters previously Banned ::: " . $this->bot
                 ->core("tools")->make_blob("click to view", $banlist));
     }
 	
 	
-    function show_ban_list()
+    function show_ban_list($skip = 0)
     {
+		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
+		$pager = 2; $range = $skip+$pager;	
+		$total = $this->bot->db->select("SELECT COUNT(*) FROM #___users WHERE user_level = -1");
+		if($range>$total[0][0]) { $range = $total[0][0]; }		
         $banned = $this->bot->db->select(
-            "SELECT nickname, banned_by, banned_at, banned_for, banned_until FROM #___users WHERE user_level = -1 ORDER BY nickname"
+            "SELECT nickname, banned_by, banned_at, banned_for, banned_until FROM #___users WHERE user_level = -1 ORDER BY nickname LIMIT ".$skip.", ".$pager
         );
         if (empty($banned)) {
             return "Nobody is banned!";
         }
-        $total = 0;
         $banlist = "##blob_title## ::: All banned characters for " . $this->bot->botname . " :::##end##\n";
         foreach ($banned as $ban) {
             $blob = "\n" . $ban[0] . " " . $this->bot->core("tools")
@@ -198,9 +291,16 @@ class BanManager extends BaseActiveModule
                     ->colorize("blob_text", "Permanent ban.\n");
             }
             $banlist .= $blob;
-            $total++;
         }
-        return ("##highlight##" . $total . "##end## Characters Banned ::: " . $this->bot
+		$back = $skip-$pager;
+		if($back>=0) {
+			$banlist .= " ".$this->bot->core("tools")->chatcmd("banlist ".$back.$link, "Back")." ";
+		}		
+		if($range<$total[0][0]) {
+			$banlist .= " ".$this->bot->core("tools")->chatcmd("banlist ".$range.$link, "Next")." ";
+		}
+		$first = $skip+1;		
+        return ("##highlight##".$first."-".$range." / ".$total[0][0] ."##end## Characters Banned ::: " . $this->bot
                 ->core("tools")->make_blob("click to view", $banlist));
     }
 
@@ -251,8 +351,15 @@ class BanManager extends BaseActiveModule
             return "##highlight##" . $user . " ##end##is no valid character name!";
         }
         $ban = $this->bot->core("security")->rem_ban($source, $user, $source);
+		$this->auto_user_readd($user);
         return $ban;
     }
+	
+    function auto_user_readd($name)
+    {
+		if ($this->bot->exists_module("autouseradd")) $this->bot->core("autouseradd")->checked[$name] = false;
+	}
+	
 }
 
 ?>
