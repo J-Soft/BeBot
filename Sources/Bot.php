@@ -1075,7 +1075,7 @@ $this->log("CORE", "DEBUG", "inc_tell ...");
             return;
         }
         //Silently ignore tells from other bots.
-        if (isset($this->other_bots[$user])) //TO DO: Do we ever ucfirst(strtolower()) the other bots?
+        if (isset($this->other_bots[$user])&&$this->other_bots[$user]==true) //TO DO: Do we ever ucfirst(strtolower()) the other bots?
         {
 $this->log("CORE", "DEBUG", "Tell from otherbot $user ...");			
             return;
