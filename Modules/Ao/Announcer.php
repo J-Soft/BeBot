@@ -189,7 +189,7 @@ echo "|".$relay_message."|";
 					$relay_Text		= $matches[2];
 					$relay_Sender	= $matches[3];
 					$relay_Append	= "";
-                } elseif (preg_match("/^(?:[^ ]+) ([^:]+): (.+) You can disable receipt of mass messages and invites in the Preferences for (?:.+)$/i", $relay_message, $matches)) {
+                } elseif (preg_match("/^(?:[^ ]+) ([^:]+): (.+)\nYou can disable receipt of mass messages and invites in the Preferences for (?:.+)$/i", $relay_message, $matches)) {
 					$relay_Type		= "Message";
 					$relay_Text		= $matches[2];
 					$relay_Sender	= $matches[1];
