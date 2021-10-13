@@ -31,7 +31,7 @@
  * Website:	http://bebot.link/
   ***************************************************************************************************
  * Changelog:
- *	2021-10-13	0.0.7	Adapted for PHP7+ & Bebot 0.7.x serie ; added clear idle users function.
+ *	2021-10-13	0.0.7	Adapted for PHP7+ & Bebot 0.7.x serie ; added idle clear/count & never seen.
  *	2018-06-03	0.0.6	Remove Yellow Gremlin integration.
 						Corrent checking/removing alts and not using correct table names.
  *	2011-02-07	0.0.5	Add utf8_decode to support special chars in output. Fix help section.
