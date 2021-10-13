@@ -237,7 +237,7 @@ class UserAdmin extends BaseActiveModule {
 		$output .= $this -> section_overview('Users', array(
 			array('title' => 'Total Users', 'count' => count($users), 'links' => array($this -> make_cmd('list', 'userlist all'))),
 			array('title' => 'Members', 'count' => $member_count, 'links' => array($this -> make_cmd('list', 'userlist member'))),
-			array('title' => 'Guests', 'count' => $guest_count, 'links' => array($this -> make_cmd('list', 'userlist guest'), $this -> make_cmd('clear', 'userlist clear guest'))),
+			array('title' => 'Guests', 'count' => $guest_count, 'links' => array($this -> make_cmd('list', 'userlist guest'), $this -> make_cmd('manage', 'guest'), $this -> make_cmd('clear', 'userlist clear guest'))),
 			array('title' => 'Anonymous (deleted)', 'count' => $anonymous_count, 'links' => array($this -> make_cmd('list', 'userlist anonymous'), $this -> make_cmd('clear', 'userlist clear anonymous'))),
 			array('title' => 'Never seen', 'count' => count($never), 'links' => array($this -> make_cmd('list', 'userlist never'), $this -> make_cmd('clear', 'userlist clear never'))),
 			array('title' => 'Banned', 'count' => $banned_count, 'links' => array($this -> make_cmd('list', 'userlist banned'), $this -> make_cmd('clear', 'userlist clear banned'))),
