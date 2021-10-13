@@ -309,7 +309,7 @@ class BanManager extends BaseActiveModule
     {
         $id = $this->bot->core('player')->id($user);
         $user = ucfirst(strtolower($user));
-        if ($id == 0) {
+        if ($id instanceof BotError || $id == 0) {
             return "##highlight##" . $user . " ##end##is no valid character name!";
         }
         if ($reason == "") {
