@@ -63,6 +63,7 @@ class UserAdmin extends BaseActiveModule {
 		$this -> help['command']['useradmin memberlist'] = "Displays a list of all of the bot's members.";
 		$this -> help['command']['useradmin memberlist main'] = "Displays a list of all of the bot's members which are main characters.";
 		$this -> help['command']['useradmin memberlist alt'] = "Displays a list of all of the bot's members which are alt characters.";
+		$this -> help['command']['useradmin memberlist cidle <#>'] = "Count of members who have been idle for <#> days.";
 		$this -> help['command']['useradmin memberlist idle <#>'] = "List of members sorted by last seen who have been idle for <#> days.";
 		$this -> help['command']['useradmin memberlist clear <#>'] = "Remove all users who have been idle for <#> days ; ALWAYS backup first as these datas might then be unrecoverable (except for AO org members possibly readded by rosterupdate).";
 		$this -> help['command']['useradmin altlist list obsolete'] = "List obsolete entries in the alts table for characters who are no longer members of the bot.";
@@ -92,6 +93,9 @@ class UserAdmin extends BaseActiveModule {
 		else if (preg_match('/^useradmin memberlist (main|alt)$/i', $msg, $m)) {
 			$rv = $this -> list_members($m[1]);
 		}
+		else if (preg_match('/^useradmin memberlist (cidle) ([\d]+)$/i', $msg, $m)) {
+			$rv = $this -> list_members($m[1], intval($m[2]));
+		}		
 		else if (preg_match('/^useradmin memberlist (idle) ([\d]+)$/i', $msg, $m)) {
 			$rv = $this -> list_members($m[1], intval($m[2]));
 		}
@@ -239,7 +243,8 @@ class UserAdmin extends BaseActiveModule {
 
 		$output .= $this -> section_overview('Members', array(
 			array('title' => 'Total Members', 'count' => $member_count, 'links' => array($this -> make_cmd('list', 'memberlist'))),
-			array('title' => '##green##List##end## Idle Members', 'count' => null, 'links' => array($this -> make_cmd('30', 'memberlist idle 30'), $this -> make_cmd('60', 'memberlist idle 60'), $this -> make_cmd('90', 'memberlist idle 90'), $this -> make_cmd('180', 'memberlist idle 180'), $this -> make_cmd('270', 'memberlist idle 270'), $this -> make_cmd('360', 'memberlist idle 360'))),
+			array('title' => '##green##Count##end## Idle Members', 'count' => null, 'links' => array($this -> make_cmd('30', 'memberlist cidle 30'), $this -> make_cmd('60', 'memberlist cidle 60'), $this -> make_cmd('90', 'memberlist cidle 90'), $this -> make_cmd('180', 'memberlist cidle 180'), $this -> make_cmd('270', 'memberlist cidle 270'), $this -> make_cmd('360', 'memberlist cidle 360'))),
+			array('title' => '##orange##List##end## Idle Members', 'count' => null, 'links' => array($this -> make_cmd('30', 'memberlist idle 30'), $this -> make_cmd('60', 'memberlist idle 60'), $this -> make_cmd('90', 'memberlist idle 90'), $this -> make_cmd('180', 'memberlist idle 180'), $this -> make_cmd('270', 'memberlist idle 270'), $this -> make_cmd('360', 'memberlist idle 360'))),
 			array('title' => '##red##Clear##end## Idle Members', 'count' => null, 'links' => array($this -> make_cmd('90', 'memberlist clear 90'), $this -> make_cmd('180', 'memberlist clear 180'), $this -> make_cmd('360', 'memberlist clear 360'), $this -> make_cmd('720', 'memberlist clear 720'))),						
 			array('title' => 'Main chars', 'count' => $main_count, 'links' => array($this -> make_cmd('list', 'memberlist main'))),
 			array('title' => 'Alt chars', 'count' => $alt_count, 'links' => array($this -> make_cmd('list', 'memberlist alt'))),
@@ -374,7 +379,7 @@ class UserAdmin extends BaseActiveModule {
 	function list_members($filter = null, $limit = 0) {
 		if ($filter) $filter = ucfirst(strtolower($filter));
 		$cond = array('u.user_level' => MEMBER);
-		if ($filter == 'Idle') {
+		if ($filter == 'Idle' || $filter == 'Cidle') {
 			if ($limit > 0) {
 				$offset_time = time() - ($limit * 24 * 60 * 60); // limit is used to determine days since last seen
 				$cond['u.last_seen >'] = 0;
@@ -383,13 +388,15 @@ class UserAdmin extends BaseActiveModule {
 			$users = $this -> load_users($cond, ' ORDER BY u.last_seen DESC');
 			if (count($users) > 0) {
 				$output = $this -> blob_header(count($users). ' idle members last '. $limit .' days') ."<b></b>\n";
-				foreach ($users as $char_id => $u) {
-					$output .= sprintf("%s @ %s :: [ %s | %s | %s ]\n",
-						$u['nickname'],
-						$u['last_seen_date'],
-						$this -> make_cmd('alts', $u['nickname'], 'alts'),
-						$this -> make_cmd('whois', $u['nickname'], 'whois'),
-						$this -> make_cmd('delete', $u['nickname'], 'member del'));
+				if ($filter == 'Idle') {
+					foreach ($users as $char_id => $u) {
+						$output .= sprintf("%s @ %s :: [ %s | %s | %s ]\n",
+							$u['nickname'],
+							$u['last_seen_date'],
+							$this -> make_cmd('alts', $u['nickname'], 'alts'),
+							$this -> make_cmd('whois', $u['nickname'], 'whois'),
+							$this -> make_cmd('delete', $u['nickname'], 'member del'));
+					}
 				}
 				return sprintf("Found ##seablue##%d##end## idle members the last %d day(s) :: %s", count($users), $limit, $this -> make_blob('Show', $output));
 			}
