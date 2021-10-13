@@ -63,6 +63,7 @@ class LandControlZones extends BaseActiveModule
         $this->help['command']['lc [QL]'] = "Shows all towersites of given QL (in range of +10 to limit results).";
         $this->help['command']['hot'] = "Shows hot towersites clickable interface.";
         $this->help['command']['hot [QL] [side]'] = "Shows hot towersites of given side and QL (in range of +50 to limit results).";
+        $this->help['command']['plant'] = "Shows towersites currently available to be planted.";		
 		$this->help['notes'] = "The external Hot/Cold API requires cautions of limited use ; abusing it (pull every qls/zones, eg) may get your bot/server banned and unable to read it.";
         if ($this->bot->core("settings")
             ->exists("LandControl", "SchemaVersion")
@@ -114,6 +115,7 @@ class LandControlZones extends BaseActiveModule
 			$this->bot->core("settings")->save("LandControl", "ApiUrl", "https://tower-api.jkbff.com/v1/api/towers");
 		}
         $this->register_command("all", "hot", "MEMBER");		
+        $this->register_command("all", "plant", "MEMBER");		
     }
 
 
@@ -129,6 +131,8 @@ class LandControlZones extends BaseActiveModule
             return $this->show_hot($info[1], strtolower($info[2]));
         } elseif (preg_match("/^hot$/i", $msg, $info)) {
             return $this->show_hot();
+        } elseif (preg_match("/^plant$/i", $msg, $info)) {
+            return $this->show_plant();
         } 
         return false;
     }
@@ -221,6 +225,25 @@ class LandControlZones extends BaseActiveModule
 		return $this->bot->core("tools")
                 ->make_blob("Land Control Areas", $return."<br><br>*: Hot/Cold states provided by Tyrence's API courtesy of Unk & Draex");			
     }
+	
+
+    function show_plant()
+    {
+		$return = "";
+		$search = "?limit=50&enabled=1&planted=0";
+		$apiurl = $this->bot->core("settings")->get("LandControl", "ApiUrl");
+		$content = $this->bot->core("tools")->get_site($apiurl.$search);
+		if (!($content instanceof BotError)) {
+			if (strpos($content, '{"count":') !== false) {
+				$datas = json_decode($content);
+				$count = count($datas->results);
+				$return .= $count." unplanted field(s) found :";
+				$return .= $this->format($content);
+			}
+		}
+		return $this->bot->core("tools")
+                ->make_blob("Land Control Areas", $return."<br><br>*: Hot/Cold states provided by Tyrence's API courtesy of Unk & Draex");			
+    }	
 
 	
 	function format($content)
@@ -233,25 +256,30 @@ class LandControlZones extends BaseActiveModule
 			elseif ($result->faction == "Clan") { $color = "orange"; }
 			else { $color = "gray"; }		
 			$state = "Unknown (?) current state ...";		
-			if($result->penalty_duration>0) $penal = $result->penalty_until - time();
+			if($result->penalty_duration!=null&&$result->penalty_duration>0&&$result->penalty_until!=null&&$result->penalty_until>0) $penal = $result->penalty_until - time();
 			else $penal = 0;
 			if($penal<0) $penal = 0;
-			$diff = $result->close_time - $secday;
-			if ($diff<0) $diff = $diff+86400;
-			if ($diff<=3600&&$diff>$penal) {
-				$state = "##yellow##CLOSING##end## (5%) off in ".$this->times($diff)." m";
-			} elseif ($diff<=21600&&$diff>$penal) {
-				$state = "##green##OPENED##end## (25%) off in ".$this->times($diff)." m";
-			} elseif ($penal>0) {
-				$state = "##yellow##PENALIZED##end## (25%) off in ".$this->times($penal)." m";
-			} else {
-				$upin = $diff-21600;				
-				$state = "##red##CLOSED##end## (75%) up in ".$this->times($upin)." m";
+			if($result->close_time!=null&&$result->close_time>0) {
+				$diff = $result->close_time - $secday;
+				if ($diff<0) $diff = $diff+86400;
+				if ($diff<=3600&&$diff>$penal) {
+					$state = "##yellow##CLOSING##end## (5%) off in ".$this->times($diff)." m";
+				} elseif ($diff<=21600&&$diff>$penal) {
+					$state = "##green##OPENED##end## (25%) off in ".$this->times($diff)." m";
+				} elseif ($penal>0) {
+					$state = "##yellow##PENALIZED##end## (25%) off in ".$this->times($penal)." m";
+				} else {
+					$upin = $diff-21600;				
+					$state = "##red##CLOSED##end## (75%) up in ".$this->times($upin)." m";
+				}
 			}
+			if($result->ql==null) { $rql="?"; } else { $rql=$result->ql; }
+			if($result->faction==null) { $rf="?"; } else { $rf=$result->faction; }
+			if($result->org_name==null) { $ron="?"; } else { $ron=$result->org_name; }
 			$return .= "<br><br>".$result->playfield_short_name." ".$result->site_number."x"
 					. "<br> Range: " . $result->min_ql . "-" . $result->max_ql
 					. "<br> Coord: " . $this->coords($result->x_coord,$result->y_coord,$result->playfield_id,$result->site_name)
-					. "<br> Infos: " . "QL ".$result->ql." CT of ".$result->faction." ##".$color."##".$result->org_name."##end##"
+					. "<br> Infos: " . "QL ".$rql." CT of ".$rf." ##".$color."##".$ron."##end##"
 					. "<br> State*: " . $state;
 		}	
 		return $return;
