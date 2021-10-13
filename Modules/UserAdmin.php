@@ -58,8 +58,8 @@ class UserAdmin extends BaseActiveModule {
 		$this -> help['description'] = "This module allows a superadmin to manage member data including buddy list.";
 		$this -> help['command']['useradmin'] = "Show overview of members, buddies and stats.";
 		$this -> help['command']['useradmin userlist'] = "Displays a list of all of the bot's users.";
-		$this -> help['command']['useradmin userlist <all|member|guest|anonymous|banned>'] = "Displays a filtered list of the bot's users.";
-		$this -> help['command']['useradmin userlist clear <guest|anonymous|banned>'] = "Purge users from the bot's users.";
+		$this -> help['command']['useradmin userlist <all|member|guest|anonymous|banned|never>'] = "Displays a filtered list of the bot's users.";
+		$this -> help['command']['useradmin userlist clear <guest|anonymous|banned|never>'] = "Purge users from the bot's users.";
 		$this -> help['command']['useradmin memberlist'] = "Displays a list of all of the bot's members.";
 		$this -> help['command']['useradmin memberlist main'] = "Displays a list of all of the bot's members which are main characters.";
 		$this -> help['command']['useradmin memberlist alt'] = "Displays a list of all of the bot's members which are alt characters.";
@@ -81,10 +81,10 @@ class UserAdmin extends BaseActiveModule {
 		if (preg_match('/^useradmin userlist$/i', $msg)) {
 			$rv = $this -> list_users();
 		}
-		else if (preg_match('/^useradmin userlist (all|member|guest|anonymous|banned)$/i', $msg, $m)) {
+		else if (preg_match('/^useradmin userlist (all|member|guest|anonymous|banned|never)$/i', $msg, $m)) {
 			$rv = $this -> list_users(strtolower($m[1]));
 		}
-		else if (preg_match('/^useradmin userlist clear (guest|anonymous|banned)$/i', $msg, $m)) {
+		else if (preg_match('/^useradmin userlist clear (guest|anonymous|banned|never)$/i', $msg, $m)) {
 			$rv = $this -> clear_users(strtolower($m[1]));
 		}
 		else if (preg_match('/^useradmin memberlist$/i', $msg)) {
@@ -199,6 +199,7 @@ class UserAdmin extends BaseActiveModule {
 		$whois = $this -> load_whois();
 		$alts = $this -> load_alts();
 		$users = $this -> load_users();
+		$never = $this -> load_never();
 
 		foreach ($users as $u) {
 			if ($u['user_level'] == MEMBER) {
@@ -238,6 +239,7 @@ class UserAdmin extends BaseActiveModule {
 			array('title' => 'Members', 'count' => $member_count, 'links' => array($this -> make_cmd('list', 'userlist member'))),
 			array('title' => 'Guests', 'count' => $guest_count, 'links' => array($this -> make_cmd('list', 'userlist guest'), $this -> make_cmd('clear', 'userlist clear guest'))),
 			array('title' => 'Anonymous (deleted)', 'count' => $anonymous_count, 'links' => array($this -> make_cmd('list', 'userlist anonymous'), $this -> make_cmd('clear', 'userlist clear anonymous'))),
+			array('title' => 'Never seen', 'count' => count($never), 'links' => array($this -> make_cmd('list', 'userlist never'), $this -> make_cmd('clear', 'userlist clear never'))),
 			array('title' => 'Banned', 'count' => $banned_count, 'links' => array($this -> make_cmd('list', 'userlist banned'), $this -> make_cmd('clear', 'userlist clear banned'))),
 		));
 
@@ -448,8 +450,10 @@ class UserAdmin extends BaseActiveModule {
 		if ($level == 'all' || !$level) {
 			$users = $this -> load_users();
 			$output = $this -> blob_header('Userlist') ."<b></b>\n";
-		}
-		else if (in_array($level, array('member', 'guest', 'anonymous', 'banned'))) {
+		} elseif ($level == 'never') {
+			$users = $this -> load_never();
+			$output = $this -> blob_header('Never seen list') ."<b></b>\n";
+		} elseif (in_array($level, array('member', 'guest', 'anonymous', 'banned'))) {
 			$lvl = $this -> user_level_decode($level);
 			$users = $this -> load_users(array('u.user_level' => $lvl));
 			$output = $this -> blob_header('Userlist :: '. $level ."<b></b>\n");
@@ -479,9 +483,12 @@ class UserAdmin extends BaseActiveModule {
 			$lvl = $this -> user_level_decode($level);
 			if ($this -> bot -> db -> query("DELETE FROM #___users WHERE user_level = ". $lvl)) return "Cleared ". $level ." entries from <botname>'s users table.";
 			else return "##red##Error clearing ". $level ." entries from <botname>'s users table.##end##";
+		} elseif($level == 'never') {
+			if ($this -> bot -> db -> query("DELETE FROM #___users WHERE user_level >= 0 AND last_seen = 0")) return "Cleared all never seen entries from <botname>'s users table.";
+			else return "##red##Error clearing all never seen entries from <botname>'s users table.##end##";			
 		} elseif(is_numeric($level)&&$level>=90) {
 			$offset_time = time() - ($level * 24 * 60 * 60); // limit is used to determine days since last seen
-			if ($this -> bot -> db -> query("DELETE FROM #___users WHERE last_seen > 0 AND last_seen < ". $offset_time)) return "Cleared at least ". $level ." days old entries from <botname>'s users table.";
+			if ($this -> bot -> db -> query("DELETE FROM #___users WHERE user_level = 2 AND last_seen > 0 AND last_seen < ". $offset_time)) return "Cleared at least ". $level ." days old entries from <botname>'s users table.";
 			else return "##red##Error clearing at least ". $level ." days old idle entries from <botname>'s users table.##end##";			
 		}
 		return false;
@@ -552,6 +559,17 @@ class UserAdmin extends BaseActiveModule {
 		}
 		return $users;
 	}
+	
+	function load_never() {
+		$never = array();
+		if ($rows = $this -> bot -> db -> select("SELECT u.char_id, u.nickname, u.last_seen, FROM_UNIXTIME(u.last_seen) AS last_seen_str, IF(u.last_seen, DATE_FORMAT(FROM_UNIXTIME(u.last_seen), '%Y-%m-%d'), 'N/A') AS last_seen_date, u.added_at, u.banned_at, u.deleted_at, u.user_level FROM #___users u WHERE user_level >= 0 AND last_seen = 0 ORDER BY u.nickname", MYSQLI_ASSOC)) {
+			foreach ($rows as $r) {
+				$r['nickname'] = utf8_decode($r['nickname']);
+				$never[$r['char_id']] = $r;
+			}
+		}
+		return $never;
+	}	
 
 	function load_alts($cond = array(), $orderby = ' ORDER BY alt') {
 		$alts = array();
