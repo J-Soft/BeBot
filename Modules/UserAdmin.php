@@ -64,15 +64,15 @@ class UserAdmin extends BaseActiveModule {
 		$this -> help['command']['useradmin memberlist main'] = "Displays a list of all of the bot's members which are main characters.";
 		$this -> help['command']['useradmin memberlist alt'] = "Displays a list of all of the bot's members which are alt characters.";
 		$this -> help['command']['useradmin memberlist idle <#>'] = "List of members sorted by last seen who have been idle for <#> days.";
-		$this -> help['command']['useradmin memberlist clear <#>'] = "Remove all users who have been idle for <#> days ; ALWAYS backup first as these datas might then be unrecoverable (except for AO org members possibly readded by <pre>rosterupdate).";
+		$this -> help['command']['useradmin memberlist clear <#>'] = "Remove all users who have been idle for <#> days ; ALWAYS backup first as these datas might then be unrecoverable (except for AO org members possibly readded by rosterupdate).";
 		$this -> help['command']['useradmin altlist list obsolete'] = "List obsolete entries in the alts table for characters who are no longer members of the bot.";
 		$this -> help['command']['useradmin altlist clear obsolete'] = "Remove entries from the alts table for characters who are no longer members of the bot. Note: Semi-safe to run.. if people add alts before they are invited to guild, this might get lost though.";
 		$this -> help['command']['useradmin buddylist'] = "Displays a list of all of the bot's buddies.";
 		$this -> help['command']['useradmin buddylist missing'] = "Displays a list of members not currently added to the bot's buddylist.";
-		$this -> help['command']['useradmin buddylist clear'] = "Wipes all of the bots buddies from the bot's buddylist. Note: Safe to run, you can always re-add members by running <pre>rosterupdate.";
+		$this -> help['command']['useradmin buddylist clear'] = "Wipes all of the bots buddies from the bot's buddylist. Note: Safe to run, you can always re-add members by running rosterupdate.";
 		$this -> help['command']['useradmin buddy add <id>'] = "Add a character identified by id to the bot's buddylist.";
-		$this -> help['command']['useradmin buddy remove <id>'] = "Remove a character identified by id from the bot's buddylist. Note: Safe to run, you can always re-add members by running <pre>rosterupdate.";
-		$this -> help['command']['useradmin whois clear <all|member|guest|anonymous|banned|obsolete>'] = "Remove entries from the <pre>whois database. Note: Safe to run, <pre>whois database will build itself up again when characters gets added to bot or people run <pre>whois.";
+		$this -> help['command']['useradmin buddy remove <id>'] = "Remove a character identified by id from the bot's buddylist. Note: Safe to run, you can always re-add members by running rosterupdate.";
+		$this -> help['command']['useradmin whois clear <all|member|guest|anonymous|banned|obsolete>'] = "Remove entries from the whois database. Note: Safe to run, whois database will build itself up again when characters gets added to bot or people run whois.";
 		$this -> help['notes'] = "Important DISCLAIMER:\nAny use of this module is 100% at your own risk.\nYou will be sole responsible if you happen to delete unrecoverable datas by mistake.\nSo always backup your full database first before doing anymore command you may regret - too late.";
 	}
 
