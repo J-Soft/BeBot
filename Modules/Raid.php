@@ -493,7 +493,12 @@ class Raid extends BaseActiveModule
 		foreach($bots as $bot) {
 			$leads = $this->bot->db->select("SELECT DISTINCT(name) FROM ".strtolower($bot)."_raid_details WHERE end > time");
 			foreach($leads as $lead) {
-				array_push($leaders,$lead[0]);
+				$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$lead[0]."'");
+				if(isset($checka[0][0])&&count($checka)==1) {
+					array_push($leaders,$checka[0][0]);
+				} else {
+					array_push($leaders,$lead[0]);
+				}
 			}
 		}	
 		$loads = array();
