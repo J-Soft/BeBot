@@ -489,6 +489,13 @@ class Raid extends BaseActiveModule
 		}
 		$bots[] = $this->bot->botname;
 		$inside = "";
+		$leaders = array();
+		foreach($bots as $bot) {
+			$leads = $this->bot->db->select("SELECT DISTINCT(name) FROM ".strtolower($bot)."_raid_details WHERE end > time");
+			foreach($leads as $lead) {
+				array_push($leaders,$lead[0]);
+			}
+		}	
 		$loads = array();
 		if($this->bot->core("settings")->get("Raid", "TopMonth")) {
 			$month = time()-2592000;
@@ -545,10 +552,12 @@ class Raid extends BaseActiveModule
 				$inside .= "\n##highlight##".$load['type']."##end## ".$load['lapse']." \n";
 				foreach ($mains as $main => $tot)
 				{
-					$shown++;
-					if($shown<6) {
-						if($load['table']=='raid_damage') $tot = round($tot,2);
-						$inside .= " #".$shown." ".$main." (".$tot.") \n";
+					if(!in_array($main,$leaders)||$load['type']=='Leaders') {
+						$shown++;
+						if($shown<6) {
+							if($load['table']=='raid_damage') $tot = round($tot,2);
+							$inside .= " #".$shown." ".$main." (".$tot.") \n";
+						}
 					}
 				}			
 			}
