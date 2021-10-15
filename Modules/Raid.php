@@ -601,7 +601,7 @@ class Raid extends BaseActiveModule
 				}			
 			}
 		}
-		$inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded (ranked leaders are expelled of Raiders and Damagers).";
+		$inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded (all leaders are expelled of Raiders and Damagers).";
 		$output = "Top 5 in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 		if ($source == "tell") {
 			$this->bot->send_tell($asker,$output);
