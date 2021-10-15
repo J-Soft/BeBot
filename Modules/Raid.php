@@ -490,17 +490,44 @@ class Raid extends BaseActiveModule
 		$bots[] = $this->bot->botname;
 		$inside = "";
 		$leaders = array();
+		$owner = $this->bot->core("security")->owner;
+		$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$owner."'");
+		if(isset($checka[0][0])&&count($checka)==1) {
+			if(!in_array($checka[0][0],$leaders)) {
+				array_push($leaders,$checka[0][0]);
+			}
+		} else {
+			if(!in_array($owner,$leaders)) {
+				array_push($leaders,$owner);
+			}
+		}		
+		foreach($this->bot->super_admin as $sadmin => $value) {
+			$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$sadmin."'");
+			if(isset($checka[0][0])&&count($checka)==1) {
+				if(!in_array($checka[0][0],$leaders)) {
+					array_push($leaders,$checka[0][0]);
+				}
+			} else {
+				if(!in_array($sadmin,$leaders)) {
+					array_push($leaders,$sadmin);
+				}
+			}
+		}
 		foreach($bots as $bot) {
-			$leads = $this->bot->db->select("SELECT DISTINCT(name) FROM ".strtolower($bot)."_raid_details WHERE end > time");
+			$leads = $this->bot->db->select("SELECT DISTINCT(name) FROM ".strtolower($bot)."_security_members WHERE gid IN (1,2,3)");
 			foreach($leads as $lead) {
 				$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$lead[0]."'");
 				if(isset($checka[0][0])&&count($checka)==1) {
-					array_push($leaders,$checka[0][0]);
+					if(!in_array($checka[0][0],$leaders)) {
+						array_push($leaders,$checka[0][0]);
+					}
 				} else {
-					array_push($leaders,$lead[0]);
+					if(!in_array($lead[0],$leaders)) {
+						array_push($leaders,$lead[0]);
+					}
 				}
 			}
-		}			
+		}
 		$loads = array();
 		if($this->bot->core("settings")->get("Raid", "TopMonth")) {
 			$month = time()-2592000;
