@@ -489,6 +489,18 @@ class Raid extends BaseActiveModule
 		}
 		$bots[] = $this->bot->botname;
 		$inside = "";
+		$leaders = array();
+		foreach($bots as $bot) {
+			$leads = $this->bot->db->select("SELECT DISTINCT(name) FROM ".strtolower($bot)."_raid_details WHERE end > time");
+			foreach($leads as $lead) {
+				$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$lead[0]."'");
+				if(isset($checka[0][0])&&count($checka)==1) {
+					array_push($leaders,$checka[0][0]);
+				} else {
+					array_push($leaders,$lead[0]);
+				}
+			}
+		}			
 		$loads = array();
 		if($this->bot->core("settings")->get("Raid", "TopMonth")) {
 			$month = time()-2592000;
@@ -579,7 +591,7 @@ class Raid extends BaseActiveModule
 				$inside .= "\n##highlight##".$load['type']."##end## ".$load['lapse']." \n";
 				foreach ($mains as $main => $tot)
 				{
-					if(!$this->bot->core("security")->check_access($main, "LEADER")||$load['type']=='Leaders') {
+					if(!in_array($main,$leaders)||$load['type']=='Leaders') {
 						$shown++;
 						if($shown<6) {
 							if($load['table']=='raid_damage') $tot = round($tot,2);
