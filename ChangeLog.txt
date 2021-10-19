@@ -2,11 +2,11 @@
 Release 0.7.20 - Oct 2021
 -------------------------
 - For both: gcr/c relay for chats+online (AO: Nad/Tyr also patched & compatible) ; wider Discord/Irc options ; multiple alts add ; ban improvements ; UserAdmin interface
-- For AO: corrected autoinvite at guest level ; added damage meter supports (AODM+Tiny) to Raid ; added new OrgHistory module ; enforced Tower API support
+- For AO: corrected autoinvite at guest level ; added damage meter supports (AODM+Tiny) into Raid ; added new OrgHistory module ; enforced Tower API support
 - For AoC: nothing specific in this patch
 
 -------------------------
-Release 0.7.19 - Set 2021
+Release 0.7.19 - Sep 2021
 -------------------------
 - Both : color/preference/warning/roster/raid/stat improvements, custom multiple relays, Twitch chat compatibilized/improved, PHP 8+ runnability
 - AO : !gsp inspired by Nadyita's code, new !hot + !lc enriched informations for Notum War fields with Tyrence's API courtesy of Unk & Draex
