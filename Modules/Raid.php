@@ -490,64 +490,27 @@ class Raid extends BaseActiveModule
 		$bots[] = $this->bot->botname;
 		$inside = "";
 		$leaders = array();
-		$owner = $this->bot->core("security")->owner;
-		$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$owner."'");
-		if(isset($checka[0][0])&&count($checka)==1) {
-			if(!in_array($checka[0][0],$leaders)) {
-				array_push($leaders,$checka[0][0]);
-			}
-		} else {
-			if(!in_array($owner,$leaders)) {
-				array_push($leaders,$owner);
-			}
-		}		
-		foreach($this->bot->super_admin as $sadmin => $value) {
-			$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$sadmin."'");
-			if(isset($checka[0][0])&&count($checka)==1) {
-				if(!in_array($checka[0][0],$leaders)) {
-					array_push($leaders,$checka[0][0]);
-				}
-			} else {
-				if(!in_array($sadmin,$leaders)) {
-					array_push($leaders,$sadmin);
-				}
-			}
-		}
-		foreach($bots as $bot) {
-			$leads = $this->bot->db->select("SELECT DISTINCT(name) FROM ".strtolower($bot)."_security_members WHERE gid IN (1,2,3)");
-			foreach($leads as $lead) {
-				$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$lead[0]."'");
-				if(isset($checka[0][0])&&count($checka)==1) {
-					if(!in_array($checka[0][0],$leaders)) {
-						array_push($leaders,$checka[0][0]);
-					}
-				} else {
-					if(!in_array($lead[0],$leaders)) {
-						array_push($leaders,$lead[0]);
-					}
-				}
-			}
-		}
 		$loads = array();
 		if($this->bot->core("settings")->get("Raid", "TopMonth")) {
 			$month = time()-2592000;
+			$loads[] = array("type"=>"Leaders","lapse"=>"of the month","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$month);
 			$loads[] = array("type"=>"Raiders","lapse"=>"of the month","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$month);
 			$loads[] = array("type"=>"Damagers","lapse"=>"of the month","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$month);
-			$loads[] = array("type"=>"Leaders","lapse"=>"of the month","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$month);
 		}
 		if($this->bot->core("settings")->get("Raid", "TopYear")) {
 			$year = time()-31536000;
+			$loads[] = array("type"=>"Leaders","lapse"=>"of the year","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$year);	
 			$loads[] = array("type"=>"Raiders","lapse"=>"of the year","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$year);
 			$loads[] = array("type"=>"Damagers","lapse"=>"of the year","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$year);
-			$loads[] = array("type"=>"Leaders","lapse"=>"of the year","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$year);		
 		}
 		if($this->bot->core("settings")->get("Raid", "TopAll")) {
+			$loads[] = array("type"=>"Leaders","lapse"=>"of all times","table"=>"raid_details","other"=>"","where"=>"");
 			$loads[] = array("type"=>"Raiders","lapse"=>"of all times","table"=>"raid_log","other"=>"","where"=>" WHERE end > time");
 			$loads[] = array("type"=>"Damagers","lapse"=>"of all times","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>"");		
-			$loads[] = array("type"=>"Leaders","lapse"=>"of all times","table"=>"raid_details","other"=>"","where"=>"");
 		}
 		foreach($loads as $load) {
 			$mains = array();
+			if($load['type']=='Leaders') $leaders = array();
 			foreach($bots as $bot) {
 				if($load['type']=='Raiders') {
 					$raids = $this->bot->db->select("SELECT DISTINCT(time)".$load['other']." FROM ".strtolower($bot)."_".$load['table']."".$load['where']." ORDER BY time DESC");
@@ -621,6 +584,7 @@ class Raid extends BaseActiveModule
 					if(!in_array($main,$leaders)||$load['type']=='Leaders') {
 						$shown++;
 						if($shown<6) {
+							if($load['type']=='Leaders') array_push($leaders,$main);
 							if($load['table']=='raid_damage') $tot = round($tot,2);
 							$inside .= " #".$shown." ".$main." (".$tot.") \n";
 						}
@@ -628,7 +592,7 @@ class Raid extends BaseActiveModule
 				}			
 			}
 		}
-		$inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded (all leaders are expelled of Raiders and Damagers).";
+		$inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded (top 5 Leaders are expelled of following Raiders & Damagers).";
 		$output = "Top 5 in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 		if ($source == "tell") {
 			$this->bot->send_tell($asker,$output);
