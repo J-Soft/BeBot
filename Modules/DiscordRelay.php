@@ -145,7 +145,7 @@ class DiscordRelay extends BaseActiveModule
                         break;										
 				}
 			case 'discordonline':
-				return $this->discord_online($name);
+				return $this->discord_online($name, "output");
 				break;					
 		}
 	}
@@ -164,7 +164,7 @@ class DiscordRelay extends BaseActiveModule
     /*
     Discord online check
     */	
-    function discord_online($name = "")
+    function discord_online($name = "", $output= "output")
     {
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			$guild = $this->bot->core("settings")->get("discord", "ServerId");
@@ -196,18 +196,22 @@ class DiscordRelay extends BaseActiveModule
 				}
 			}	
 			if (($name != "") && ($name != "c")) {
-				$this->bot->send_tell($name,$sent);
+				if($output=="output") $this->bot->send_tell($name,$sent);
+				else return $sent;
 			} else {
 				if ($name == "") {
-					$this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
+					if($output=="output") $this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
+					else return $sent;
 				}
 			}	
 		} else {
 			if (($name != "") && ($name != "c")) {
-				$this->bot->send_tell($name,"Discord relay isn't activated");
+				if($output=="output") $this->bot->send_tell($name,"Discord relay isn't activated");
+				else return "Discord relay isn't activated";
 			} else {
 				if ($name == "") {
-					$this->bot->send_output("", "Discord relay isn't activated",$this->bot->core("settings")->get("discord", "WhatChat"));
+					if($output=="output") $this->bot->send_output("", "Discord relay ain't activated",$this->bot->core("settings")->get("discord", "WhatChat"));
+					else return "Discord relay ain't activated";
 				}
 			}			
 		}
