@@ -612,21 +612,22 @@ class Raid extends BaseActiveModule
 		if($range>$total[0][0]) { $range = $total[0][0]; }
 		$history = $this->bot->db->select("SELECT DISTINCT(time) FROM #___raid_log WHERE end > time ORDER BY time DESC LIMIT ".$skip.", ".$pager);
 		$inside = "";
+		$cur = 0;
 		foreach($history as $entry) {
+			$id = $total[0][0]-($skip+$cur);
+			$cur++;
 			$date = date('Y M D d H:i', $entry[0]);
 			$details = $this->bot->db->select("SELECT * FROM #___raid_details WHERE time =".$entry[0]);
 			if (count($details)==1) {
-				$id = "#".$details[0][0];
 				$rl = $details[0][1];
 				$desc = $details[0][2];
 				$note = $details[0][3];
 			} else {
-				$id = "#?";
 				$rl = "?";
 				$desc = "?";
 				$note = "?";
 			}
-			$inside .= $id." ".$date." => ".$desc." by ".$rl." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats")."\n\n";
+			$inside .= "#".$id." ".$date." : ".$desc." by ".$rl." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats")."\n\n";
 		}
 		$back = $skip-$pager;
 		if($back>=0) {
