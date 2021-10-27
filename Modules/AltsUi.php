@@ -52,9 +52,11 @@ class Alts extends BaseActiveModule
         $this->help['command']['alts add <player>'] = "Adds <player> as your alt (can add more than 1 coma-separated eg: Toon1,Toon2,etc).";
         $this->help['command']['alts del <player>'] = "Removes <player> from your alt list.";
         $this->help['command']['alts confirm <main>'] = "Confirms you as alt of <main>.";
+		$this->help['command']['alts newmain <alt>'] = "Makes declared <alt> the new main of all declared alts.";
         $this->help['command']['altadmin add <main> <alt>'] = "Adds <alt> as alt to <main>.";
         $this->help['command']['altadmin del <main> <alt>'] = "Removes <alt> as alt from <main>.";
         $this->help['command']['altadmin confirm <main> <alt>'] = "Confirms <alt> as alt of <main>.";
+		$this->help['command']['altadmin newmain <alt>'] = "Makes declared <alt> the new main of all declared alts.";
         $this->bot->core("settings")
             ->create(
                 "Alts",
@@ -99,6 +101,8 @@ class Alts extends BaseActiveModule
                         return $this->display_alts($name);
                     case 'confirm':
                         return $this->confirm($name, $vars[2]);
+                    case 'newmain':
+                        return $this->newmain($name, $vars[2], 0);						
                     default:
                         return $this->display_alts($vars[1]);
                 }
@@ -127,6 +131,8 @@ class Alts extends BaseActiveModule
                         return $this->del_alt($vars[2], $vars[3]);
                     case 'confirm':
                         return $this->confirm($vars[3], $vars[2]);
+                    case 'newmain':
+                        return $this->newmain($name, $vars[2], 1);						
                     default:
                         return "Unknown Subcommand: ##highlight##" . $vars[1] . "##end##";
                 }
@@ -166,6 +172,60 @@ class Alts extends BaseActiveModule
         return $retstr;
     }
 
+    /*
+    Changes given alt to new main
+    */
+    function newmain($name, $alt, $admin = 0)
+    {
+		$security = false;
+        $name = ucfirst(strtolower($name));
+        $alt = ucfirst(strtolower($alt));
+        if (($this->bot->core("settings")
+                    ->get("Alts", "Security") == true)
+            && ($this->bot
+                    ->core("settings")
+                    ->get("Security", "UseAlts") == true)
+            && ($admin == 0)
+        ) {
+            $security = true;
+        }
+        //Check that $name is a valid character
+        if ($this->bot->core('player')->id($name) instanceof BotError) {
+            return "##error##Character ##highlight##$name##end## does not exist.##end##";
+        }
+        //Check that that $alt is a valid character
+        if ($this->bot->core('player')->id($alt) instanceof BotError) {
+            return "##error##Character ##highlight##$alt##end## does not exist.##end##";
+        }	
+        //Establish the $main of the $alt
+        $main = $this->bot->core("alts")->main($alt);
+        //Check that $alt is already its own $main
+        if ($alt == $main) {
+            return "##error##Character ##highlight##$alt##end## is already a main or has no alt.##end##";
+        }
+        //Check if user levelled sender is the main of the alt being mained
+        if ($name != $main && $admin == 0) {
+            return "##error##User ##highlight##$name##end## must be Admin or $alt's main to make $alt new main.##end##";
+        }		
+        if ($security) {
+            // Check if the alt being mained has lower security
+            if ($this->bot->core("security")
+                    ->get_access_level($main) > $this->bot->core("security")
+                    ->get_access_level($alt)
+            ) {
+                return "##error##Character ##highlight##$alt##end## is of lower user level than ##highlight##$main##end## and cannot be changed to main.##end##";
+            }
+        }		
+        $alt = ucfirst(strtolower($alt));
+        $main = ucfirst(strtolower($main));
+		$this->bot->db->query("UPDATE #___alts SET alt = '$main', main = '$alt' WHERE alt = '$alt' AND main = '$main'");
+		$this->bot->db->query("UPDATE #___alts SET main = '$alt' WHERE main = '$main'");
+		$this->bot->core("alts")->create_caches();
+        if ($this->bot->exists_module("points")) {
+            $this->bot->core("points")->check_alts($alt);
+        }
+        return "##highlight##$alt##end## has been changed to new main.";		
+	}
 
     /*
     Adds an alt to your alt list
@@ -209,7 +269,7 @@ class Alts extends BaseActiveModule
             }
         }
 
-        //Check that the main is not already registered but unconfirmed, this is only needed is main is not different
+        //Check that the main is not already registered but unconfirmed, this is only needed if main is not different
         if ($name == $main) {
             $query = "SELECT main, confirmed FROM #___alts WHERE alt='$name'";
             $result = $this->bot->db->select($query);
@@ -220,12 +280,12 @@ class Alts extends BaseActiveModule
             }
         }
         if ($security) {
-            // Check if the Alt being Added has Higher Security
+            // Check if the alt being added has higher security
             if ($this->bot->core("security")
                     ->get_access_level($name) < $this->bot->core("security")
                     ->get_access_level($alt)
             ) {
-                return "##error##Character ##highlight##$alt##end## is Higher User Level and Cannot be Added as your Alt.##end##";
+                return "##error##Character ##highlight##$alt##end## is of higher user level and cannot be added as your alt.##end##";
             }
         }
         $alt = ucfirst(strtolower($alt));
@@ -244,7 +304,7 @@ class Alts extends BaseActiveModule
                 "Alt Confirmation :: " . $this->bot
                     ->core("tools")->make_blob("Click to view", $inside)
             );
-            return "##highlight##$alt##end## has been registered but Now requires Confirmation, to confirm do ##highlight##<pre>alts confirm $main##end## on $alt";
+            return "##highlight##$alt##end## has been registered but now requires confirmation, to confirm do ##highlight##<pre>alts confirm $main##end## from $alt";
         }
         $this->bot->db->query("INSERT INTO #___alts (alt, main) VALUES ('$alt', '$main')");
         $this->bot->core("alts")->add_alt($main, $alt);
