@@ -59,6 +59,12 @@ class Gsp extends BaseActiveModule
                 "To which channel(s) should GSP events be announced?",
                 "guild;pgroup;both;none"
             );
+        $this->bot->core("settings")
+            ->create("Gsp", "AlertDisc", false, "Do we alert Discord of Gsp events ?");
+        $this->bot->core("settings")
+            ->create("Gsp", "DiscChanId", "", "What Discord ChannelId in case we separate Gsp events from main Discord channel (leave empty for all in main channel) ?");
+        $this->bot->core("settings")
+            ->create("Gsp", "AlertIrc", false, "Do we alert Irc of Gsp events ?");			
         $this->help['description'] = "Shows elements about GSP live/track.";
         $this->help['command']['gsp'] = "Shows track currently played on GSP.";
         $this->help['notes'] = "GSP event start is announced automatically if set so.";	
@@ -141,6 +147,13 @@ class Gsp extends BaseActiveModule
 							if ($channels == "guild" || $channels == "both") {
 								$this->bot->send_gc($msg);
 							}
+							if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Gsp", "AlertDisc")) {
+								if($this->bot->core("settings")->get("Gsp", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Gsp", "DiscChanId"); } else { $chan = ""; }
+								$this->bot->core("discord")->disc_alert($msg, $chan);
+							}
+							if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Gsp", "AlertIrc")) {
+								$this->bot->core("irc")->send_irc("", "", $msg);
+							}							
 						}
 						$this->live = $live;
 						$this->name = $name;

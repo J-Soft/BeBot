@@ -38,7 +38,7 @@
 $AutoUserAdd = new AutoUserAdd($bot);
 class AutoUserAdd extends BasePassiveModule
 {
-    private $checked;
+    var $checked;
 
 
     function __construct(&$bot)
@@ -84,7 +84,7 @@ class AutoUserAdd extends BasePassiveModule
             Return;
         }
         // Add all characters when they are noticed in chat the first time:
-        if (!isset($this->checked[$name])) {
+        if (!isset($this->checked[$name])||$this->checked[$name]==false) {
             $this->checked[$name] = true;
             $result = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '" . $name . "'");
             if (!empty($result)) {

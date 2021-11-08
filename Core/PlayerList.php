@@ -111,7 +111,7 @@ class PlayerList extends BasePassiveModule
             $this->bot->log(
                 "DEBUG",
                 "PlayerList",
-                "FIXME: Core/PlayerList.php function id recieving BotError as " . $uname . "\nError is: " . $uname->get(
+                "FIXME: Core/PlayerList.php function id receiving BotError as " . $uname . "\nError is: " . $uname->get(
                 ) . "\n"
             );
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());

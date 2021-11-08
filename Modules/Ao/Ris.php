@@ -69,6 +69,7 @@ class NewRis extends BaseActiveModule
         $this -> register_command("all", "riadmin", "LEADER");
         $this -> register_command("all", "riname", "LEADER");
         $this -> register_command("all", "risend", "LEADER");
+	$this -> register_alias('risend', 'sendri');		
         $this -> register_command("all", "ritake", "GUEST");
 		$this -> register_command("all", "riauto", "LEADER");
         $this -> register_command("all", "ritest", "OWNER");
@@ -461,7 +462,7 @@ class NewRis extends BaseActiveModule
 		}
 		else
 		{
-			$this->bot->send_tell($executer,"Usage: <pre>sendri &lt;RINumber&gt; &lt;TargetBotName&gt;##end##");
+			$this->bot->send_tell($executer,"Usage: <pre>risend &lt;RINumber&gt; &lt;TargetBotName&gt;##end##");
 		}
 	}
 
@@ -674,13 +675,13 @@ class NewRis extends BaseActiveModule
 		//print_r($result);
 		if ( !($result instanceof BotError) && !empty($result) && count($result)>0 && !isset($result["error"]) 
 		   && isset($result["level"]) && is_numeric($result["level"]) && $result["level"]>0 
-		   && isset($result["profession"]) && $result["profession"]!=""
-		   && isset($result["org"]) && $result["org"]!="" )
+		   && isset($result["profession"]) && $result["profession"]!="" )
 		{
 			$member[0] = $name;
 			$member[1] = $result["level"];
 			$member[2] = $result["profession"];
-			$member[3] = $result["org"];
+			if(isset($result["org"]) && $result["org"]!="") $member[3] = $result["org"];
+			else $member[3] = "Orgless";
 			$member[4] = true;
 			return $member;
 		}

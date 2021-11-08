@@ -72,7 +72,7 @@ $GLOBALS["msg_cat"] = array(
     501 => array(
         0xad0ae9b => array(
             'AOEM_ORG_LEAVE',
-            "{NAME} has left the organization because of alignment change.",
+            "{NAME} kicked from organization (alignment changed).",
             "s{NAME}"
         ),
     ),
@@ -139,11 +139,26 @@ $GLOBALS["msg_cat"] = array(
             "Voting notice: {SUBJECT}\nCandidates: {CHOICES}\nDuration: {DURATION} minutes",
             "s{SUBJECT}/u{MINUTES}/s{CHOICES}"
         ),
+        0x9f2cb84 => array(
+            'AOEM_ORG_ENDVOTE',
+            "Organization leader has stopped the voting with message : \"{MSG}\"",
+            "s{MSG}"
+        ),		
         0xa8241d4 => array(
             'AOEM_ORG_STRIKE',
             "Blammo! {NAME} has launched an orbital attack!",
             "s{NAME}"
         ),
+        0x5517b44 => array(
+            'AOEM_ORG_TAX',
+            "Your leader, {NAME}, just changed the organizational tax. The new tax is {NEW} credits (the old value was {OLD}).",
+            "s{NAME}/u{NEW}/u{OLD}"
+        ),	
+        0xe5e16f8 => array(
+            'AOEM_ORG_LEAD',
+            "Leadership has been given to {NAME}.",
+            "s{NAME}"
+        ),			
     ),
     1001 => array(
         0x01 => array(

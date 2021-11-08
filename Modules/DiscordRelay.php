@@ -107,7 +107,22 @@ class DiscordRelay extends BaseActiveModule
         $this->bot->core("settings")
             ->create("discord", "BotToken", "", "Bot Token obtain from https://discord.com/developers/applications ?");
         $this->bot->core("settings")
-            ->create("discord", "WhatChat", "both", "Which channel(s) should be relayed into Discord and vice versa ?", "gc;pgroup;both");			
+            ->create("discord", "WhatChat", "both", "Which channel(s) should be relayed into Discord and vice versa ?", "gc;pgroup;both");
+        $this->bot->core("settings")
+            ->create(
+                "discord",
+                "Announce",
+                true,
+                "Should we announce logons and logoffs as controlled by the Logon module to Discord?"
+            );	
+        $this->bot->core("settings")
+            ->create(
+                "discord",
+                "ItemRef",
+                "AOItems",
+                "Should AOItems or AUNO be used for links in item refs?",
+                "AOItems;AUNO"
+            );			
 	}
 	
     /*
@@ -130,7 +145,7 @@ class DiscordRelay extends BaseActiveModule
                         break;										
 				}
 			case 'discordonline':
-				return $this->discord_online($name);
+				return $this->discord_online($name, "output");
 				break;					
 		}
 	}
@@ -149,7 +164,7 @@ class DiscordRelay extends BaseActiveModule
     /*
     Discord online check
     */	
-    function discord_online($name = "")
+    function discord_online($name = "", $output= "output")
     {
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			$guild = $this->bot->core("settings")->get("discord", "ServerId");
@@ -181,18 +196,22 @@ class DiscordRelay extends BaseActiveModule
 				}
 			}	
 			if (($name != "") && ($name != "c")) {
-				$this->bot->send_tell($name,$sent);
+				if($output=="output") $this->bot->send_tell($name,$sent);
+				else return $sent;
 			} else {
 				if ($name == "") {
-					$this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
+					if($output=="output") $this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
+					else return $sent;
 				}
 			}	
 		} else {
 			if (($name != "") && ($name != "c")) {
-				$this->bot->send_tell($name,"Discord relay isn't activated");
+				if($output=="output") $this->bot->send_tell($name,"Discord relay isn't activated");
+				else return "Discord relay isn't activated";
 			} else {
 				if ($name == "") {
-					$this->bot->send_output("", "Discord relay isn't activated",$this->bot->core("settings")->get("discord", "WhatChat"));
+					if($output=="output") $this->bot->send_output("", "Discord relay ain't activated",$this->bot->core("settings")->get("discord", "WhatChat"));
+					else return "Discord relay ain't activated";
 				}
 			}			
 		}
@@ -310,13 +329,73 @@ class DiscordRelay extends BaseActiveModule
 				$token = $this->bot->core("settings")->get("discord", "BotToken");
 				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
-					$sent = "[Guildchat] ".ucfirst($name).": ".$this->cleanString($msg);
+					$form = $this->strip_formatting($msg);			
+					$sent = "[Guildchat] ".ucfirst($name).": ".$this->cleanString($form);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
 					if(isset($result['message'])&& isset($result['code'])) {
 						$this->bot->log("DISCORD", "ERROR", "Erroneous configuration : do !settings discord to fix");
 					}					
 				}
+			}
+		}
+	}
+
+    /*
+    This gets called just below to clean text of msg
+    */	
+    function strip_formatting($msg)
+    {
+        if (strtolower(
+                $this->bot->core("settings")
+                    ->get("discord", "Itemref")
+            ) == "auno"
+        ) {
+            $rep = "http://auno.org/ao/db.php?id=\\1&id2=\\2&ql=\\3";
+        } else {
+            $rep = "http://aoitems.com/item/\\1/\\2/\\3";
+        }
+        $msg = preg_replace(
+            "/<a href=\"itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\">(.*)<\/a>/iU",
+            "\\4" . " " . "(" . $rep . ")",
+            $msg
+        );
+        $msg = preg_replace(
+            "/<a style=\"text-decoration:none\" href=\"itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\">(.*)<\/a>/iU",
+            "\\4" . " " . "(" . $rep . ")",
+            $msg
+        );
+		$msg = preg_replace("/<a href='user:\/\/(.+)\'>/isU", "", $msg);
+		$msg = preg_replace("/<a href=\"user:\/\/(.+)\">/isU", "", $msg);
+        $msg = preg_replace("/<a href=\"(.+)\">/isU", "\\1", $msg);
+        $msg = preg_replace("/<a style=\"text-decoration:none\" href=\"(.+)\">/isU", "\\1", $msg);
+        $msg = preg_replace("/<\/a>/iU", "", $msg);
+        $msg = preg_replace("/<font(.+)>/iU", "", $msg);
+        $msg = preg_replace("/<\/font>/iU", "", $msg);
+        return $msg;
+    }	
+	
+    /*
+    This gets called by all various modules to send alerts
+    */
+    function disc_alert($msg, $chan="")
+    {
+		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
+			if($chan!=""&&$chan!=" ") {
+				$channel = $chan;
+			} else {
+				$channel = $this->bot->core("settings")->get("discord", "ChannelId");				
+			}
+			$token = $this->bot->core("settings")->get("discord", "BotToken");
+			if ($channel>0 && $token!="") {
+				$route = "/channels/{$channel}/messages";
+				$form = $this->strip_formatting($msg);
+				$sent = $this->cleanString($form);
+				$data = array("content" => $sent);
+				$result = discord_post($route, $token, $data);
+				if(isset($result['message'])&& isset($result['code'])) {
+					$this->bot->log("DISCORD", "ERROR", "Missed configuration : do !settings discord to fix");
+				}				
 			}
 		}
 	}
@@ -332,7 +411,8 @@ class DiscordRelay extends BaseActiveModule
 				$token = $this->bot->core("settings")->get("discord", "BotToken");
 				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
-					$sent = "[Privchat] ".ucfirst($name).": ".$this->cleanString($msg);
+					$form = $this->strip_formatting($msg);
+					$sent = "[Privchat] ".ucfirst($name).": ".$this->cleanString($form);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
 					if(isset($result['message'])&& isset($result['code'])) {

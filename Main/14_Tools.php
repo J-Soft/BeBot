@@ -315,12 +315,13 @@ class tools extends BasePassiveModule
                     false,
                     true
                 ) . "     ";
+			if ($title != 'MassMsg') {
             $inside .= $this->chatcmd(
                     'help',
                     ' ##blob_text##Help##end## ',
                     false,
                     true
-                ) . "     ";
+			) . "     ";}
 			if (strtolower($this->bot->game) == 'ao') {
             $inside .= $this->chatcmd(
                 'close InfoView',

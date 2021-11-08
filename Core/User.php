@@ -292,7 +292,7 @@ class User_Core extends BasePassiveModule
                         );
                         $this->bot->core("chat")->buddy_remove($id);
                     }
-                    if (isset($rerolled) && $rerolled != 1 && isset($silent) && $silent == 0) {
+                    if (isset($reroll) && $reroll != 1 && isset($silent) && $silent == 0) {
                         $this->bot->send_tell(
                             $name,
                             "##highlight##" . $source . "##end## has removed you from the bot."
@@ -365,7 +365,7 @@ class User_Core extends BasePassiveModule
                     $this->bot->db->query("DELETE FROM #___users WHERE char_id = " . $id);
                     $this->bot->core("chat")->buddy_remove($id);
                 }
-                if ($deleted != 1 && $rerolled != 1 && $silent == 0) {
+                if ($deleted != 1 && $reroll != 1 && $silent == 0) {
                     $this->bot->send_tell($name, "##highlight##" . $source . "##end## has removed you from the bot.");
                 }
                 // Make sure the security cache is up-to-date:

@@ -1,18 +1,25 @@
---------------
-Version 0.7.19
---------------
+-------------------------
+Release 0.7.20 - Nov 2021
+-------------------------
+- For both: gcr/c relay for chats+online (AO: Nad/Tyr also patched & compatible) ; wider Discord/Irc options ; multiple alts add ; ban improvements ; UserAdmin interface
+- For AO: corrected autoinvite at guest level ; added damage meter supports (AODM+Tiny) into Raid ; added new OrgHistory module ; enforced Tower API support
+- For AoC: nothing specific in this patch
+
+-------------------------
+Release 0.7.19 - Sep 2021
+-------------------------
 - Both : color/preference/warning/roster/raid/stat improvements, custom multiple relays, Twitch chat compatibilized/improved, PHP 8+ runnability
 - AO : !gsp inspired by Nadyita's code, new !hot + !lc enriched informations for Notum War fields with Tyrence's API courtesy of Unk & Draex
 - AoC : new specific !attribute module (thanks to Ruskebusk & Meathooks) + few more improvements over various generic modules (!raffle & more)
 
---------------
-Version 0.7.18
---------------
+-------------------------
+Release 0.7.18 - Jul 2021
+-------------------------
 - Various fixes, addition of raidhistory, full archive of changelog
 
---------------
-Version 0.7.17
---------------
+-------------------------
+Release 0.7.17 - May 2021
+-------------------------
 - Many modules improved/added for both AO & AoC (& few more bot fixes in various core/modules)
 27 For AO
  from bebot archive : Aggdef Cluster Ding Onlineorg Orgs Procs Rcalc Skills Twink Aiarmor (A)XP Announcer Aigen
@@ -22,49 +29,58 @@ Version 0.7.17
 3 For AoC
  Timeraa Bound Rweapon
 
---------------
-Version 0.7.16
---------------
+-------------------------
+Release 0.7.16 - Feb 2021
+-------------------------
 - Discord relay added + IRC improved ; several features added or improved for both games ; AO icons enriched
 
---------------
-Version 0.7.15
---------------
+-------------------------
+Release 0.7.15 - Feb 2021
+-------------------------
 - AO : addition of AoChatProxy compatibility to extend the bot friendlist over the 1000 limit
 - AoC : new slave system linked to module AutoUserAdd to extend bot friendlist over 1K limit
 
---------------
-Version 0.7.14
---------------
+-------------------------
+Release 0.7.14 - Feb 2021
+-------------------------
 - AoC : correction related to the newly added !items functionnalities
 - AO : ignoring system packets (AI 30 & SL 220) to reduce errors
 
---------------
-Version 0.7.13
---------------
+-------------------------
+Release 0.7.13 - Feb 2021
+-------------------------
 - AO/AoC : more tech patch for MySQL 8.x compatibility + addition of updated !items functionnalities for AOC
 
---------------
-Version 0.7.12
---------------
+-------------------------
+Release 0.7.12 - Feb 2021
+-------------------------
 - AO/AoC : technical patch allowing to use recent MySQL 8.x (with 5.x compatible auth) along with PHP 7.3 or 7.4
 
---------------
-Version 0.7.11
---------------
+-------------------------
+Release 0.7.11 - Sep 2020
+-------------------------
 - AO only : minor raid improvements patch + addition of the very latest high level "Subway" raid loots
 
--------------
-Version 0.7.1
--------------
+------------------------
+Release 0.7.1 - May 2020
+------------------------
 - AO/AoC: 2020 servers update, Mysqli full support for very latest SQL/Maria + PHP from v. 5.3 upto 7.2 successfull tested runnability
 - AO: updated !raidloot interface v. 1.1 offering most usual upto endgame remains, including latest high level "Temple of 3 Winds" raid
       new !mloot command supporting external 3rd party (e.g. M. Fjeldstad AOIA) for quick loot add/roll, suggested by player Relo (RK5)
 - AoC: major corrections for connection system in PHP 7+ and also various secondary warnings solved with help of tester Ruskebusk (Crom)
 
--------------
-Version 0.7.0
--------------
+-------------------------
+Beta 0.7.x - 2011 to 2015
+-------------------------
+In this period of its history, Bebot has been in relative pause with unfrequent patches over the years :
+- various bug/crash fixes, mainly made after several users feedback on official forum
+- typos fix with renaming towards newer conventions we won't list extensively here
+- AoC login / authentication patches and refactor from Chaoz over at conanchat.com plus updated AoC serverlist
+From 2015 upto 2020, there was no more visible activity nor patches ...
+
+---------------------
+Beta 0.7.0 - Aug 2010
+---------------------
 - Made Bot.php, AOChat.php and MySQL.php conform to the singleton design pattern
 - Moved ConfigMagik out of main and into Source and converted it to use the singleton design pattern.
 - Moved the configuration reading from Main.php and into Bot.php
@@ -125,9 +141,9 @@ Removed Modules:
 +- Moving uid/uname cache from AOChat to core/PlayerList.php. Calls to core("chat")->get_u* are now deprecated and PlayerList does return BotError on failures.
 +- rosterupdate seems to output alot of errors todo with failed to get whois (confirmed by luyu)
 
--------------
-Version 0.6.9
--------------
+------------------------
+Release 0.6.9 - May 2010
+------------------------
 - Removed the now defunct !items module for Age of Conan.
   An alternative third party items database is available at http://bebot.shadow-realm.org/aoc-0-6-x-customunofficial-modules/alternative-central-itemdb-%28!item!items!itemreg%28auto%29%29/
 - Fixed a bug in !massmsg/!massinvite reported by bitnykk @ Forum
@@ -138,9 +154,9 @@ Version 0.6.9
 - Updated serverlist for AOC
 - Removed AO module Server as it no longer serves any purpose.
 
--------------
-Version 0.6.8
--------------
+------------------------
+Release 0.6.8 - Jun 2010
+------------------------
 - Changed order of the all link so 1st added is last on 1st, giving it priority
 - Privgroup command Help no longer shows for AoC
 - Fixed Several Bugs in the bid info blob
@@ -151,9 +167,9 @@ Version 0.6.8
 - Added support for Rise of the godslayer expansion for AoC, courtesy of Chaoz.
 - !help now only displays help for the channel it is called from unless another channel is specifically requested.
 
--------------
-Version 0.6.7
--------------
+------------------------
+Release 0.6.7 - Feb 2010
+------------------------
 - Improved the cURL get_site function to support POST and Login.
 - Added a Link for turning LFT on in click to join blob, can be disabled under settings.
 - Autoinvites users who apear to have LD during a Raid.
@@ -176,9 +192,9 @@ socket timeout which is 60 seconds for most installs.
 New Modules:
 - Added AdminsUI Module to allow members to easily see the admin list, which also shows alts and status
 
--------------
-Version 0.6.6
--------------
+------------------------
+Release 0.6.6 - Nov 2009
+------------------------
 - Add detection of missing config file and try to detect if config file was not read properly.
 - Added setting for what raid types to show in raid control start raid links
 - Added a best match function to tools module
@@ -186,9 +202,9 @@ Version 0.6.6
 - Added a General queue module Changed chatqueue buddy_queue and masmsg (invites) to use
 - Fixed login in AoC after patch 1.05.6
 
--------------
-Version 0.6.5
--------------
+------------------------
+Release 0.6.5 - Aug 2009
+------------------------
 - Fixed date format for !whois -> last online (aoc only)
 - Added missing version info in !about (not currently used for stable release versions)
 - Backported some more fixes for various PHP notices when running with higher error reporting levels enabled.
@@ -199,9 +215,9 @@ Version 0.6.5
 API Changes:
 - make_item again accepts the optional fifth argument for alternative quoting.
 
--------------
-Version 0.6.4
--------------
+------------------------
+Release 0.6.4 - Jul 2009
+------------------------
 - Modified the network protocol to work with AoC 1.05
 Please note that PrivGroup relays are no longer an option for AoC due to chatserver changes.
 - Reversing stripping of control characters on text from IRC for now.
@@ -230,11 +246,12 @@ punish raiders, move countdown, min level and also fixed alot of problems with o
 - !version check can now be used by superadmins and above (hardcoded in 0.6 branch) to force a version check.
 
 API Changes:
-make_item no longer accepts the optional fifth argument. It will now properly deal with item names containing ' automatically.
+- make_item no longer accepts the optional fifth argument. It will now properly deal with item names containing ' automatically.
+- Added this->bot->core("tools")->my_rand($min=false, $max=false) wrapper to call random number generator.
 
--------------
-Version 0.6.3
--------------
+------------------------
+Release 0.6.3 - May 2009
+------------------------
 - Fixed stripping of control characters on text from IRC (logon/logoff)
 - Fixed a bug where the quotes module would crash if there where no quotes in the database
 - Added option to relay to suffix relayed text with a characters main. Controlled using !set relay showmain on/off
@@ -246,9 +263,7 @@ Version 0.6.3
 - Updated AO server information due to changed ports.
 - Fixed bug #380461 causing the AOC Autouseradd module to never add silently.
 
--------------
-Version 0.6.2
--------------
+Possibly added in same patch :
 - Fixed double removal on !is calls for people not on the notify list
 - Fixed Tyranny Port
 - Fixed Update to whois table
@@ -271,9 +286,9 @@ Version 0.6.2
 - Improved working and added some check to help prevent points being on wrong char
 - Fixed Issue with Default preference not being cached when changed
 
--------------
-Version 0.6.1
--------------
+------------------------
+Release 0.6.2 - Jan 2009
+------------------------
 - Fixed a bug in buddy list handling of the Roster core.
 - setcraft now has the option to set it as None, Update by gerborg
 - Moved ServerList into conf folder and Checked US server List, 9 Updated, 6 Added
@@ -287,15 +302,25 @@ Version 0.6.1
 - Added sending of shutdown/restart reason
 - Now allows password to be entered on loading of StartBot.php
 
--------------
-Version 0.6.0
--------------
+------------------------
+Release 0.6.1 - Dec 2008
+------------------------
 - Fixed bug in OnlineDisplay, correctly displaying otherbots and memberlist again.
 - Fixed AOChat to work with modifications done by FC to AoC chatserver.
 
--------------
-Version 0.5.6
--------------
+------------------------
+Release 0.6.0 - Nov 2008
+------------------------
+- Full support for AO and AoC. EDIT: Most of the AoC support was done by Noer and Vrykolas.
+- Almost full rewrite of the base structure for modules.
+- Unified way to register commands and events.
+- Automatically adding access rights for all commands, optionally for subcommands too.
+- Several internal reworks and optimizations to existing code.
+- Several new functions, both for AO and AoC.
+
+---------------------
+Beta 0.5.6 - Nov 2008
+---------------------
 - Fixed Search Issues with PB Module.
 - Added Option of useing cURL for getting site data changable in !set tools.
 - Online now shows Guests and None members seperatly.
@@ -311,9 +336,9 @@ Version 0.5.6
 - massmsg now Colors before Sending to make it easier on bot and massmsg now sends msg to PG and doesnt send to Users in PG (can be changed back in settings)
 - Added UI for timer class settings, allowing the change of them during runtime.
 
--------------
-Version 0.5.5
--------------
+------------------------
+Release 0.5.5 - Nov 2008
+------------------------
 - Moved Relay.php into /modules/ as there is no reason why AoC cant use it.
 - Loading settings from table right after connect now.
 - Checked and Updated Connection Details for All None US Servers.
@@ -334,9 +359,9 @@ Version 0.5.5
 - Fixed a Few minor Output Spaceing Errors, deluser now removes users from notify also
 - PG is now disabled by Default for AoC.
 
--------------
-Version 0.5.4
--------------
+------------------------
+Release 0.5.4 - Oct 2008
+------------------------
 - Fixed Prob with incorect chatcmd being used.
 - Added Comalias sub command.
 - Logon and AFK now use Alias Module.
@@ -356,9 +381,9 @@ Version 0.5.4
 New Modules:
 - Added Alias Module to set Alias's (names ur commanly called)
 
--------------
-Version 0.5.3
--------------
+------------------------
+Release 0.5.3 - Sep 2008
+------------------------
 - Fixed wrong links in !count org blob.
 - Merged the 2 Raid Modules and Improved.
 - Fixed some issues in Points Module.
@@ -391,9 +416,9 @@ New Modules:
 - Added a Gem Cutting Module for AoC.
 - Added Craft Classes Module for AoC.
 
--------------
-Version 0.5.2
--------------
+------------------------
+Release 0.5.2 - May 2008
+------------------------
 - Moved auto-invites to preferences
 - Moved recieving mass-announcements and mass-invites to preferences and these settings are now honored.
 - Added repeat interval to !timers output.
@@ -410,18 +435,18 @@ Version 0.5.2
 - Botname is ucfirst(strtolower())'ed before passing it to MySQL class.
 - modules/Is.php has been re-written to add support for alts look-up
 
--------------
-Version 0.5.1
--------------
+------------------------
+Release 0.5.1 - May 2008
+------------------------
 - Deleted Blacklist Modules, Added Notes Entry for Bans, Changes Whois to show if Banned.
 - Fixed <botname> and <pre> inside blobs.
 - Trying to reuse existing MySQL links now instead of creating new ones for every query.
 - Making sure no cron-jobs are executed before cron-delay is over.
 - Fixed all chatcmd calls.
 
--------------
-Version 0.5.0
--------------
+------------------------
+Release 0.5.0 - May 2008
+------------------------
 - Trunk is now 0.5.0 while stable developent continues in 0.4 branch.
 - Announce on IRC whenever someone joins/leaves or is kicked from the org. Patch by Temar.
 - send_irc() function added to Bot core. This function checks if IRC is enabled and connected before trying to send anything to IRC.
@@ -630,9 +655,110 @@ New Modules:
 - Added core/Error.php which is an attempt to make error-handling uniform
 - Added trickle which calculates trickle-down to skill that comes from increasing base stats
 
--------------
-Version 0.4.0
--------------
+------------------------
+Release 0.4.3 - Nov 2007
+------------------------
+- Fixed crash in whois module.
+- Fixed wrong SQL call in Settings->update().
+- !timer command accepts optional first parameter for timer class now.
+- Added !count org command to OnlineCount module.
+- Linked tower attack module to land control database.
+- Added several settings defining the output of the towers module. The way any attack or result is displayed is controlled by settings.
+- Optimized tower tables a bit, added zone to tower results.
+- Relay doesn't add 0 as user for extended notifications in org chat anymore. The relayed message looks like the chat in org chat now.
+- cron() functions now get called with the cron time as string parameter, so multiple cronjobs in one module are supported.
+- Timer core no longer uses a cronjob to check it's timer, it's hooked directly into the cron() function of Bot.php now.
+- Extended timer core by timed events, this way you can get a delayed callback in a module. Read the comment at the top of Timer_Core.php for more information.
+- Fixed whois details.
+- IRC now only shows one line of output on !online calls, and it lists members of linked bots too, using the online settings.
+- Added #!br!# as tag for linebreaks for tower module.
+
+New modules:
+- Added database for land control zones. Allows listings by level and by zone.
+
+------------------------
+Release 0.4.2 - Oct 2007
+------------------------
+- get_site() calls for org roster and character infos now use the new people.anarchy-online.com addresses.
+- Added work-around for missing full defender_rank names in XML files.
+- Only using botname as default table prefix if $table_prefix isn't set at all in MySQL.conf. This allows using no prefix if wished.
+- Updating alts cache once per hour from table to grab possible alts changes in the shared database.
+- IRC reconnect on connection lost implemented.
+- whois cache no longer uses the defender_rank field - no updating, the bot uses an internal array to get the correct names.
+- !is and !online now respond to queries in IRC.
+- Added !whois command to IRC channel.
+- Catching one more possible empty select return in AlienAttack_GUILD.
+- Disconnecting from IRC on a clean shutdown of the bot.
+- sm command in OnlineDisplay, lists all characters online sorted alphabetically.
+- Some internal recoding for the online modules.
+- Enforcing ucfirst(strtolower()) on all config defined superadmins and the defined owner.
+- Creating AND-combined flexible group extension for guest group defined by settings on calls of !minlevel or !faction.
+- Added delay proposed by Temar to Shutdown so notifies always get displayed.
+- Added fix by Temar to MassMsg, when spamming both guild and guest channel at once no longer offline characters get spammed.
+- Resetting org info of not updated org members in whois-update.php. The updated timestamp is reduced to increase the chance of them getting updated on next whois lookup.
+- Fixed wrong case of ID index in whois module.
+- Added support for gc and pgmsg channels. Replies are always sendt in tells as the output is dependant of the access level of the person issuing the command.
+- Renamed Bio.php to Identify.php.  Added in the Alappaa Galactic gems.  Module can now parse multiple items posted to it, and new items can be easily added.
+- Fixed some optical errors in flexible security output. Thanks to Temar for noticing them.
+- !invite name now requires at least LEADER access.
+- Added index to some columns in the users and blacklist tables.
+- Added functions to create timer classes to timer core.
+- Added a LowSpam timer class with less spam then the Default one.
+- !whois check for mains is no longer case-sensitive.
+- Alien city module now sets timer to inform about the time till the cloak can be cycled again.
+- Cron jobs can no longer happen in bursts.
+- The cron time is now the minimal time between two calls of the same job, though it may take longer if something else keeps the bot busy.
+- Catching payment warnings for the city now.
+- Removed IRC.Announce setting, it's no longer needed.
+- Added setting to toggle where IRC joins and parts should be announced too (if at all).
+
+New modules:
+- Count module, listing numbers of characters of each profession online.
+- Added module to track orbital bombardements, it sets timers notifying when an attack is ready again.
+
+------------------------
+Release 0.4.1 - Aug 2007
+------------------------
+- Announce on IRC whenever someone joins/leaves or is kicked from the org. Patch by Temar.
+- send_irc() function added to Bot core. This function checks if IRC is enabled and connected before trying to send anything to IRC.
+- StartBot.bat and StartDebugBot.bat now accept one command line argument to support multiple bots.
+- Fix security changelevel command for Board Member rank in the Faction style of org government.
+- Moved strip_formatting function into ->send_irc(), on too long msg irc->send_irc returns false instead of true now.
+- Updated all file headers.
+- Ensured that all files use long opening tags.
+- Fix call to wrong core module when dealing with rerolled characters in Users module.
+- Fixed $this -> bot -> time -> get_DHMS()
+- !invite name now returns an error if you try to invite a character already in chat.
+- LEADER can now kick characters with the same access level from the chatgroup, not only those with lower access levels.
+- Updated settings descriptions in the Whois cache module with more explanations.
+- Added setting to define time till an entry in the whois table is considered stale and should be refreshed by the bot.
+- Ported Ebag333's modification to select the query order of FC site and AUNO site to 0.4 branch.
+- irc->send_irc() checks for valid connection now, if none exists it returns false without trying to send anything.
+- Security now returns ANONYNOUS access without any further checks for character names that don't have a valid user ID.
+- Admins of the apropriate access level can now correctly delete news items.
+- Disabled lookup for non-orged characters and removal of outdated entries per default in whois-cache update script.
+- Added new config variables to enable those options again.
+- Fixed a bug where Department and Republic organization governments were not being detected properly.
+- Handling ID = 0 in whois table correctly now (getting UID and updating table and whois return correctly).
+- Extended functionality of relay->relay_to_bot(): boolean 2nd parameter $chat allows to toggle if <pre>gcr should be added to $msg or not.
+- Added caching of security level for mains (or same character if UseAlts is disabled) to security module.
+- Modified FlexibleSecurity and Alts to update the cache security levels for mains when any change happens.
+- Fixed spelling error in OE module.
+- Moved Logon_Notifies core module to pure array based working. No table is needed here, thanks Temar for pointing this out.
+- Changed chat server names to the new ones published by FC.
+- Moved CREATE TABLE for online module before the call to the constructor doing stuff on the online table. Now the online table should always be global.
+- Adapted Roster module to use the renamed "Org Msg" channel (was "Org. Msg." before).
+
+New Modules:
+- Added Nebhyper's Tokens calculator module. Rewritten slightly and adapted for BeBot 0.4/0.5
+- Added Timer framework:
+  * Timer_Core class for internal handling of timers, offering timer functionality to all modules
+  * TimerGUI class offering a user-interface to manage public and private timers
+  * TimerRelay class offering support to share timers among a relaying network
+
+------------------------
+Release 0.4.0 - Jul 2007
+------------------------
 - Numerous internal optimizations.
 - Added option for disabling error on bad input for is command. Turning this setting to off is reccomended when you are not using a command prefix.
 - Using call-by-reference instead of call-by-value in tablename callback, this way updates in get_tablename() are remembered.
@@ -654,9 +780,9 @@ Version 0.4.0
 - Renamed irc->send_over_irc() function to ird->send_irc() to keep in pattern set by other send_* functions.
 - Caching general help pages (the ones called on "!help") to speed up displaying of them.
 
--------------
-Version 0.3.5
--------------
+------------------------
+Release 0.3.5 - Jul 2007
+------------------------
 - added missing default access rights
 - added ban manager module to handle bans outside of blacklisting
 - added banned_for and banned_until fields to user table (table gets updated automatically) for more flexible bans
@@ -706,9 +832,9 @@ Version 0.3.5
 - Added option to disable logon spam entirely.
 - Caching all queries for alts and mains.
 
--------------
-Version 0.3.4
--------------
+------------------------
+Release 0.3.4 - Jun 2007
+------------------------
 Important:
 ===============================================================================
 - Important note for module developers
@@ -797,9 +923,9 @@ Updated Modules:
 New Modules:
 - Added settings managment and interface: http://bebot.shadow-realm.org/wiki/doku.php?id=settings
 
--------------
-Version 0.3.3
--------------
+---------------------
+Beta 0.3.3 - May 2006
+---------------------
 - Fixed a MySQL error in Admins.php.
 - Fixed directory traversal security issue in the HELP module.
   Thanx to Somebotty @ irc.funcom.com for discovery and notification.
@@ -810,9 +936,9 @@ Version 0.3.3
 New modules:
 - Replaced old Items.php with new module by Vhab.
 
--------------
-Version 0.3.2
--------------
+---------------------
+Beta 0.3.2 - Mar 2006
+---------------------
 - Really, really fix the "bot doesnt listen to org chat" bug.
 - "Admin" should no longer erronously send error message when no parameter is given and admin list is displayed.
 - Added Akarah's "Online" fancy format. Can be toggeled using the command: admin mode fancy/basic
@@ -843,9 +969,9 @@ New modules:
 Database changes:
 - "Admin" module now adds the description coloumn if missing.
 
--------------
-Version 0.3.1
--------------
+---------------------
+Beta 0.3.1 - Dec 2005
+---------------------
 - Fixed a bug in Tier2 module. NT's should now qualify for the correct Wills.
 - Raidleader is now a hardcoded access level with id 3.
   NB: If you had custom access levels added, you may need to correct the list as
@@ -860,9 +986,9 @@ Version 0.3.1
 - Fixed a bug in cut_size in Bot.php - Wolfbiter
 - Bot no longer enables guild relay on startup if guild relay is disabled.
 
--------------
-Version 0.3.0
--------------
+---------------------
+Beta 0.3.0 - Sep 2005
+---------------------
 - New version number convention. Major.Minor.Patchlevel, where even
   Minor numbers denote stable releases and odd numbers denote development releases.
 - Added setting in Bot.conf to allow guild relay to activate upon login.
@@ -900,16 +1026,119 @@ Database changes:
 - news have a new field named: time INT NOT NULL
   Value of id needs to be moved to time, and a new id assigned.
 
----------------
-Version 0.2.1.1
----------------
+-------------------------
+Release 0.2.11 - Feb 2007
+-------------------------
+- Backported php.ini settings from 0.3.
+- Backport the smarter StartBot.php from 0.3 to start.php.
+- Fix an issue with !calc throwing errors if $result == 0.
+- Updated Items module.
+- Updated AOChat to workaround the key generation issues causing "Not expecting login" errors. BCMath is now the only supported method and is bundled with all php versions since 4.0.4.
+
+-------------------------
+Release 0.2.10 - Nov 2006
+-------------------------
+===============================================================================
+- Important note for module developers
+  Due to character id's now being 2^31 in size and how the bot deals with this, you must remember to use the int_to_string and string_to_int whenever   you want to work with the "real" character id's. Internally the bot will happily churn on using overflowed integers that goes negative.
+  Remember also to convert any "real" character id's back to an overflowed integer before passing something back to the bot to handle internally.
+  Database entries will be stored with the overflowed integer value, NOT the "real" character id's.
+===============================================================================
+- Backported buddylist caching from 0.3 to eliminate logoff spam during first roster update
+  aswell as when chatserver is having issues.
+  The bot will still spam logons when this happens however.
+- Added missing IRC module help.
+- Replaced start.bat with StartBot.bat and StartDebugBot.bat to make it easier for people running on Windows.
+- Fix a long standing typo bug in RaidSingle.
+- Fix from Gridfan to allow the bot to handle overflowed integer value userid as a result of userid's now being 2^31 in size and php does not have unsigned integers to deal with it gracefully.
+- Added the bot functions int_to_string and string_to_int to convert between int and string and converting overflowed integers to unsigned integer string values and vice versa.
+
+------------------------
+Release 0.2.9 - Sep 2006
+------------------------
+- Fix a bug in server module due to carelessness when backporting a fix from trunk.
+- Added some debug code to AOChat.php to output which key generation method is used to aid in debugging.
+- Fix a typo in Admin module causing a query to always fail on adding new admins.
+- Backport get_site from trunk to prevent the bot from hanging up for several seconds if Funcom XML is unresponsive
+  and in worst case loose connection with MySQL if the server timeout is agressive enough.
+- Fixed an issue in Items module which could lead to the bot "hanging" with 100% CPU usage if
+  the central items database server was unreachable.
+- Synched Level information with Helpbot. Graciously provided by Vhab :)
+- Apply a cut_size fix that somehow got lost somewhere along the way.
+
+------------------------
+Release 0.2.8 - Sep 2006
+------------------------
+- Fix a bug in the Bid module causing bot to crash if someone with no raid_points entry tries to bid.
+- Fix a bug in the Rooster_RAID module causing crash if someone joins pgroup that is not in the members table.
+- Increase default max_blobsize to 12000.
+- Rooster_GUILD.php and Rooster_RAID.php has been renamed to Roster_GUILD.php and Roster_RAID.php.
+  Make sure you delete the old modules if upgrading.
+- Roster_GUILD.php now also adds the guild and updated coloumn to the members table to avoid problems for people
+  switching between a guildbot and raidbot setup.
+
+------------------------
+Release 0.2.7 - Aug 2006
+------------------------
+- The server load module will now work correctly on Testserver (RK0) and Die Neue Welt (RK3)
+- Fix a bug in the TowerAttack module leading to a MySQL error if the bot fails to lookup a player.
+- Updated About module.
+- Added a workaround for BotHelp overflowing the max blob character count on bots with large number of commands enabled.
+
+------------------------
+Release 0.2.6 - Aug 2006
+------------------------
+- Bot will now correctly connect to Die Neue Welt (RK3) without the need to alter the source.
+- We now take steps to ensure that we do not keep the username and password in memory after we have connected.
+- We no longer check for guests if we are a raidbot. Raidbots don't have guests.
+- Make sure admins and superadmins are treated as members regardless if they are added or not. (This is really a kludge, but it should work)
+- Backport Points module fixes from 0.3 branch.
+
+------------------------
+Release 0.2.5 - Jun 2006
+------------------------
+- Fixed a crash in AlienAttack_GUILD module triggered if the bot had not witnessed any city events.
+  Reported by Dabaron @ BeBot Forum
+- Fix a bug causing the wrong faction to be written to the database for tower war outcomes.
+  Reported by Dabaron @ BeBot Forum.
+- Upgraded SmartIRC to a modified version 1.0.0. This fixes php5 compatibility issues.
+- Added Angels AOChat hack to fix the "not expecting login" issues without the need for aokex.
+
+------------------------
+Release 0.2.4 - Mar 2006
+------------------------
+- Fixed directory traversal security issue in the HELP module.
+  Thanx to Somebotty @ irc.funcom.com for discovery and notification.
+- PHP split into a separate branch to conserve bandwith and make download sizes more manageable.
+- The log function have been changed so that if the second parameter is "Security" the event is logged
+  to security.txt in the log directory and an alert is sendt to guildchat or private group.
+
+New modules:
+- Replaced old Items.php with new module by Vhab.
+
+------------------------
+Release 0.2.3 - Mar 2006
+------------------------
+- Bot should now work "out of the box" on windows provided you have MySQL setup. (r60:62 from trunk)
+- Added IRC module from 0.3 branch.
+
+------------------------
+Release 0.2.2 - Dec 2005
+------------------------
+- New version number convention. Major.Minor.Patchlevel, where even minor numbers denote stable releases and odd numbers denote development releases.
+- Updated AOChat.php and city cloak/tower alert message handling.
+- Fixed a bug which would cause the bot to not listen to guildchat in some cases.
+
+--------------------------
+Release 0.2.1.1 - Dec 2005
+--------------------------
 - Fixed a bug that could crash the bot
 - Fixed a bug in the admin module
 - Fixed guildchat relay
 
----------------
-Version 0.2.1.0
----------------
+------------------------
+Release 0.2.1 - Feb 2005
+------------------------
 - Cronjobs will no longer execute before completed login.
 - !kick now works as intended.
 - Raid module now also possible working in guildbot mode.
@@ -922,3 +1151,9 @@ Version 0.2.1.0
 - It is now possible to have the points all saved on the main character's accout. !points tomain (on|off)
 - Bot can now be set to auto invite members on logon. !autoinv (on|off)
 - Special characters (ιδρω etc) should now work properly.
+
+------------------------
+Release 0.2.0 - Dec 2004
+------------------------
+- first public version of BeBot released by Blondy
+- a PHP guild and raidbot. Modular OOP buildup.

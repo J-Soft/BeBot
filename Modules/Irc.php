@@ -114,8 +114,8 @@ class IRC extends BaseActiveModule
             ->create("Irc", "GuildPrefix", "[IRC]", "Which prefix should IRC chat relayed to ingame chat get?");
         $this->bot->core("settings")
             ->create("Irc", "Reconnect", true, "Should the bot automatically reconnect to IRC?");
-        $this->bot->core("settings")
-            ->create("Irc", "RelayGuildName", "", "What is the name for GC guildrelay?");
+        /*$this->bot->core("settings")
+            ->create("Irc", "RelayGuildName", "", "What is the name for GC guildrelay?");*/
         $this->bot->core("settings")
             ->create(
                 "Irc",
@@ -141,13 +141,13 @@ class IRC extends BaseActiveModule
                 false,
                 "Should the chat be notified if something isn't relayed because it's too large?"
             );
-        $this->bot->core("settings")
+        /*$this->bot->core("settings")
             ->create(
                 "Irc",
                 "UseGuildRelay",
                 true,
                 "Should chat coming from IRC also be relayed over the guild relay if it's set up?"
-            );
+            );*/
         $this->bot->core("settings")
             ->create(
                 "Irc",
@@ -212,9 +212,9 @@ class IRC extends BaseActiveModule
                             return $this->reconnect($com['args']);
                         }
                         break;
-                    case 'relayguildname':
+                    /*case 'relayguildname':
                         return $this->change_relayguildname($com['args']);
-                        break;
+                        break;*/
                     case 'itemref':
                         if (($com['args'] == 'auno') || ($com['args'] == 'aodb')) {
                             return $this->change_itemref($com['args']);
@@ -255,14 +255,46 @@ class IRC extends BaseActiveModule
             chr(3) . chr(3) . "\\4" . chr(3) . " " . chr(3) . "(" . $rep . ")" . chr(3) . chr(3),
             $msg
         );
-        $msg = preg_replace("/<a href=\"(.+)\">/isU", "[link]", $msg);
-        $msg = preg_replace("/<a style=\"text-decoration:none\" href=\"(.+)\">/isU", "[link]", $msg);
-        $msg = preg_replace("/<\/a>/iU", "[/link]", $msg);
+		$msg = preg_replace("/<a href='user:\/\/(.+)\'>/isU", "", $msg);
+		$msg = preg_replace("/<a href=\"user:\/\/(.+)\">/isU", "", $msg);
+        $msg = preg_replace("/<a href=\"(.+)\">/isU", "\\1", $msg);
+        $msg = preg_replace("/<a style=\"text-decoration:none\" href=\"(.+)\">/isU", "\\1", $msg);
+        $msg = preg_replace("/<\/a>/iU", "", $msg);
         $msg = preg_replace("/<font(.+)>/iU", "", $msg);
         $msg = preg_replace("/<\/font>/iU", "", $msg);
+		$msg = $this->cleanString($msg);
         return $msg;
     }
 
+	function cleanString($msg) {
+		$patterns[0] = '/%(E1|E2|E0|E5|E4|E3|C0|C1|C2|C3|C4|C5|C6)/'; // áâàåäãÀÁÂÃÄÅÆ
+		$patterns[1] = '/%(F0|E9|EA|E8|EB|C8|C9|CA|CB)/'; // ðéêèëÈÉÊË
+		$patterns[2] = '/%(ED|EE|EC|EF|CC|CD|CE|CF)/'; // íîìïÌÍÎÏ
+		$patterns[3] = '/%(F3|F4|F2|F8|F0|F5|F6|D2|D3|D4|D5|D6|D8)/'; // óôòøðõöÒÓÔÕÖØ
+		$patterns[4] = '/%(FA|FB|F9|FC|D9|DA|DB|DC)/'; // úûùüÙÚÛÜ
+		$patterns[5] = '/%E6/'; // æ
+		$patterns[6] = '/%(E7|C7)/'; // çÇ
+		$patterns[7] = '/%DF/'; // ß
+		$patterns[8] = '/%(FD|FF|DD)/'; // ýÿÝ
+		$patterns[9] = '/%(F1|D1)/';// ñÑ
+		$patterns[10] = '/%(DE|FE)/';// Þþ
+		$replacements[0] = 'a';
+		$replacements[1] = 'e';
+		$replacements[2] = 'i';
+		$replacements[3] = 'o';
+		$replacements[4] = 'u';
+		$replacements[5] = 'ae';
+		$replacements[6] = 'c';
+		$replacements[7] = 'ss';
+		$replacements[8] = 'y';		
+		$replacements[9] = 'n';		
+		$replacements[10] = 'b';						
+		//return urldecode(preg_replace($patterns, $replacements, urlencode(strip_tags($msg)))); // replaced by utf8_encode()
+		$msg = str_replace("&gt;", ">", strip_tags(utf8_encode($msg)));
+		$msg = str_replace("&lt;", "<", $msg);
+		$msg = str_replace("&amp;", "&", $msg);		
+		return $msg;
+	}		
 
     function send_irc($prefix, $name, $msg)
     {
@@ -613,11 +645,11 @@ class IRC extends BaseActiveModule
     /*
     * Change guildprefix
     */
-    function change_relayguildname($new)
+    /*function change_relayguildname($new)
     {
         $this->bot->core("settings")->save("Irc", "Relayguildname", $new);
         return "Guildname for GC-Relay has been changed.";
-    }
+    }*/
 
 
     /*
@@ -934,13 +966,13 @@ class IRC extends BaseActiveModule
                 $this->bot->core("settings")
                     ->get("Irc", "Chat")
             );
-            if ($this->bot->core("settings")
-                    ->get("Irc", "Useguildrelay")
+            /*if ($this->bot->core("settings")
+                    ->get("Irc", "UseGuildRelay")
                 && $this->bot
                     ->core("settings")->get("Relay", "Relay")
             ) {
                 $this->bot->core("relay")->relay_to_bot($txt);
-            }
+            }*/
             if (!empty($this->ircmsg)) {
                 foreach ($this->ircmsg as $send) {
                     $send->irc($data->nick, $msg, "msg");
@@ -978,13 +1010,13 @@ class IRC extends BaseActiveModule
                 "INSERT INTO #___online (nickname, botname, status_gc) VALUES ('" . $data->nick . "', '" . $this->bot->botname . " - IRC', 1) ON DUPLICATE KEY UPDATE status_gc = 1"
             );
         }
-        if ($this->bot->core("settings")
-                ->get("Irc", "Useguildrelay")
+        /*if ($this->bot->core("settings")
+                ->get("Irc", "UseGuildRelay")
             && $this->bot->core("settings")
                 ->get("Relay", "Relay")
         ) {
             $this->bot->core("relay")->relay_to_bot($msg);
-        }
+        }*/
         if (!empty($this->ircmsg)) {
             foreach ($this->ircmsg as $send) {
                 $send->irc($data->nick, "", "join");
@@ -1021,13 +1053,13 @@ class IRC extends BaseActiveModule
         $this->bot->db->query(
             "UPDATE #___online SET status_gc = 0 WHERE botname = '" . $this->bot->botname . " - IRC' AND nickname = '" . $data->nick . "'"
         );
-        if ($this->bot->core("settings")
-                ->get("Irc", "Useguildrelay")
+        /*if ($this->bot->core("settings")
+                ->get("Irc", "UseGuildRelay")
             && $this->bot->core("settings")
                 ->get("Relay", "Relay")
         ) {
             $this->bot->core("relay")->relay_to_bot($msg);
-        }
+        }*/
         if (!empty($this->ircmsg)) {
             foreach ($this->ircmsg as $send) {
                 $send->irc($data->nick, "", "part");
@@ -1256,13 +1288,13 @@ class IRC extends BaseActiveModule
                     ->get("Irc", "Chat")
             );
         }
-        if ($this->bot->core("settings")
-                ->get("Irc", "Useguildrelay")
+        /*if ($this->bot->core("settings")
+                ->get("Irc", "UseGuildRelay")
             && $this->bot->core("settings")
                 ->get("Relay", "Relay")
         ) {
             $this->bot->core("relay")->relay_to_bot($txt);
-        }
+        }*/
         $this->bot->db->query(
             "UPDATE #___online SET nickname = '" . $data->message . "' WHERE botname = '" . $this->bot->botname . " - IRC' AND nickname = '" . $data->nick . "'"
         );

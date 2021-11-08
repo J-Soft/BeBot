@@ -158,6 +158,8 @@ class OnlineDisplay extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Online", "irc", false, "Should IRC be included in the Online List");
         $this->bot->core("settings")
+            ->create("Online", "discord", false, "Should Discord be included in the Online List");			
+        $this->bot->core("settings")
             ->create(
                 "Online",
                 "whois_alts_cmd",
@@ -333,6 +335,17 @@ class OnlineDisplay extends BaseActiveModule
                     ->colorize("highlight", $irclist[0]) . " " . $this->bot
                     ->core("settings")->get("Online", "IRCText");
         }
+        if ($this->bot->exists_module("discord") && $this->bot->core("settings")->get("Online", "discord")) {
+            $dclist = $this->bot->core("discord")->discord_online($this->bot->botname,"return");
+            $online .= "\n" . $this->bot->core("colors")
+                    ->colorize("lightbeige", "--------------------------------------------------------------\n\n");
+            $online .= $dclist;
+			$check = explode(" ",$dclist);
+			if(is_numeric($check[0])) $dc = $check[0];
+			else $dc = 0;
+            $msg .= ". " . $this->bot->core("colors")->colorize("highlight", $dc) . " Users in Discord";
+        }		
+		
         $msg .= ":: " . $this->bot->core("tools")
                 ->make_blob("click to view", $online);
         return $msg;

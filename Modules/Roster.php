@@ -170,23 +170,28 @@ class Roster_Handler extends BaseActiveModule
         $inside = "##blob_title##:::: <botname>'s Guest List ::::##end##\n\n";
         $count = 0;
         $result = $this->bot->db->select(
-            "SELECT id, nickname, added_at, added_by FROM #___users WHERE user_level = " . GUEST . " ORDER BY nickname ASC"
+            "SELECT id, nickname, added_at, added_by, last_seen FROM #___users WHERE user_level = " . GUEST . " ORDER BY nickname ASC"
         );
         if (!empty($result)) {
             foreach ($result as $val) {
                 if (!empty($val[1])) {
                     $count++;
+					$month = time()-2592000;
+					$year = time()-31536000;
+					if($val[4]>$month) $color = "green";
+					elseif($val[4]>$year) $color = "orange";
+					else $color = "red";
                     $inside .= "##blob_text##&#8226; " . $val[1] . "##end## " . $this->bot
                             ->core("tools")
                             ->chatcmd("whois " . $val[1], "[Whois]") . " " . $this->bot
                             ->core("tools")
-                            ->chatcmd("guest del " . $val[1], "[Remove]") . "\n";
+                            ->chatcmd("guest del " . $val[1], "[Remove]") . " - ##blob_text##last seen##end##: ##" . $color . "##" . gmdate("Y-m-d",$val[4]) . "##end##\n";
                     $inside .= "##blob_title##Added:##end## ##blob_text##" . gmdate(
                             $this->bot
                                 ->core("settings")
                                 ->get("Time", "FormatString"),
                             $val[2]
-                        ) . " GMT##end## :: ##blob_title##By:##end####blob_text## " . stripslashes(
+                        ) . " ##end## :: ##blob_title##By:##end####blob_text## " . stripslashes(
                             $val[3]
                         ) . "##end##\n\n";
                 }

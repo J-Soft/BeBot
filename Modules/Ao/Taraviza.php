@@ -69,6 +69,14 @@ class Taraviza extends BaseActiveModule
 		$this->bot->core("settings")->create('Taraviza', 'TaraAlert', 'None', 'Towards which channel(s) should Tarasque pop alert be sent to (None = disable) ?', 'Both;Guildchat;Private;None');
 		$this->bot->core("settings")->create('Taraviza', 'VizaAlert', 'None', 'Towards which channel(s) should Gauntlet start alert be sent to(None = disable) ?', 'Both;Guildchat;Private;None');
 		$this->bot->core("settings")->create('Taraviza', 'PopAlertTime', 59, 'How long in minutes before pop/start should alerts be sent to selected channel(s)?', '14;23;32;41;50;59');
+        $this->bot->core("settings")
+            ->create("Taraviza", "AlertDisc", false, "Do we alert Discord of worldbosses spawns ?");
+        $this->bot->core("settings")
+            ->create("Taraviza", "DiscChanId", "", "What Discord ChannelId in case we separate worldbosses spawns from main Discord channel (leave empty for all in main channel) ?");
+        $this->bot->core("settings")
+            ->create("Taraviza", "DiscTag", "", "Should we add a Discord Tag (e.g. @here or @everyone) to worldbosses spams for notifying Discord users (leave empty for no notification) ?");			
+        $this->bot->core("settings")
+            ->create("Taraviza", "AlertIrc", false, "Do we alert Irc of worldbosses spawns ?");		
 		$this->register_event("cron", "1min");
 	}
 
@@ -106,6 +114,14 @@ class Taraviza extends BaseActiveModule
 				if($ta=='Both'||$ta=='Private') {
 					$this->bot->send_pgroup($text);
 				}
+				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Taraviza", "AlertDisc")) {
+					if($this->bot->core("settings")->get("Taraviza", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Taraviza", "DiscChanId"); } else { $chan = ""; }
+					if($this->bot->core("settings")->get("Taraviza", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Taraviza", "DiscTag")." "; } else { $dctag = ""; }
+					$this->bot->core("discord")->disc_alert($dctag.$text, $chan);
+				}
+				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Taraviza", "AlertIrc")) {
+					$this->bot->core("irc")->send_irc("", "", $text);
+				}				
 			}
 		}
 		$va = $this->bot->core("settings")->get("Taraviza", "VizaAlert");
@@ -120,6 +136,14 @@ class Taraviza extends BaseActiveModule
 				if($va=='Both'||$va=='Private') {
 					$this->bot->send_pgroup($text);
 				}
+				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Taraviza", "AlertDisc")) {
+					if($this->bot->core("settings")->get("Taraviza", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Taraviza", "DiscChanId"); } else { $chan = ""; }
+					if($this->bot->core("settings")->get("Taraviza", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Taraviza", "DiscTag")." "; } else { $dctag = ""; }
+					$this->bot->core("discord")->disc_alert($dctag.$text, $chan);
+				}
+				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Taraviza", "AlertIrc")) {
+					$this->bot->core("irc")->send_irc("", "", $text);
+				}				
 			}
 		}					
 	}

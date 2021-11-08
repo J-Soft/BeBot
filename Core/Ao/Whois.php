@@ -361,7 +361,7 @@ class Whois_Core extends BasePassiveModule
             if (empty($lookup)) {
                 // No old data exists, return error:
                 $this->error->set(
-                    "No chached character data was found for $name, but no web lookup mode was requested!"
+                    "No cached character data was found for $name, but no web lookup mode was requested!"
                 );
                 return $this->error;
             } else {

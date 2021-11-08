@@ -52,6 +52,7 @@ class Raid extends BaseActiveModule
 	var $showcallers = false;
 	var $type;
 	var $note;
+	var $ddin = false;
 
 
     function __construct(&$bot)
@@ -74,6 +75,8 @@ class Raid extends BaseActiveModule
             $this->register_event("pgleave");
             $this->register_event("pgjoin");
             $this->register_event("buddy");
+            $this->register_event("privgroup");
+            $this->register_event("gmsg", "org");			
         }
         //$this -> register_event("connect");
         $this->register_event("logon_notify");
@@ -154,7 +157,18 @@ class Raid extends BaseActiveModule
                 "After how many hours a running raid is assumed forgotten and ended automatically?",
                 '4;8;12'
             );			
-
+        $this->bot->core("settings")
+            ->create("Raid", "AlertDisc", false, "Do we alert Discord of raid activity ?");
+        $this->bot->core("settings")
+            ->create("Raid", "DiscChanId", "", "What Discord ChannelId in case we separate raid alerts from main Discord channel (leave empty for all in main channel) ?");
+        $this->bot->core("settings")
+            ->create("Raid", "DiscTag", "", "Should we add a Discord Tag (e.g. @here or @everyone) to raid starts for notifying Discord users (leave empty for no notification) ?");
+        $this->bot->core("settings")
+            ->create("Raid", "AlertIrc", false, "Do we alert Irc of raid activity ?");	
+        $this->bot->core("settings")->create("Raid", "TopMonth", false, "Do we show monthly Top 5 ?");			
+        $this->bot->core("settings")->create("Raid", "TopYear", false, "Do we show yearly Top 5 ?");			
+        $this->bot->core("settings")->create("Raid", "TopAll", true, "Do we show all times Top 5 ?");			
+			
         $this->help['description'] = 'Module to manage and announce raids.';
         $this->help['command']['raidhistory [x]'] = "Shows 10 archived raids ; option to skip x records from bottom links.";
         $this->help['command']['raidstats <timestamp>'] = "Shows participants of give raid by timestamp of start.";
@@ -199,7 +213,15 @@ class Raid extends BaseActiveModule
 				time INT default '0',
 				end INT default '0',
 				UNIQUE (name, time))"
-        );		
+        );
+        $this->bot->db->query(
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("raid_damage", "true") . "
+				(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				name VARCHAR(50),
+				time INT default '0',
+				rank INT default '32',
+				UNIQUE (name, time))"
+        );			
         $this->restart_raid();
     }
 
@@ -362,7 +384,91 @@ class Raid extends BaseActiveModule
         }
     }
 
+    /*
+    This gets called on a msg in the private group.
+    */
+    function privgroup($name, $msg)
+    {
+        $this->dd_check($name, $msg);
+    }
 
+
+    /*
+    This gets called on a msg in the group.
+    */
+    function gmsg($name, $group, $msg)
+    {
+        $this->dd_check($name, $msg);
+    }
+	
+    /*
+    This gets called upper for priv or org msg
+    */
+    function dd_check($name, $msg)
+    {
+		if($this->ddin) {
+			if($this->bot->core("security")->get_access_level($name)>=128) {
+				if(preg_match('/<a href="text:\/\/([^"]+)">(?:.*)Damage(?:.*)<\/a>/i', $msg, $info)) {
+					$added = array();
+					$last = $this->bot->db->select("SELECT time FROM #___raid_log WHERE end > time ORDER BY id DESC LIMIT 1");
+					$time = $last[0][0];
+					for($i=1;$i<37;$i++) {
+						$trigger = false;
+						if(preg_match('/'.$i.'. ([^ ]+) \((?:[^\)]+)\) ([a-zA-Z0-9]+)<br>/i', $info[1], $toon)) { // AODM
+							if(!is_numeric($toon[2])&&$toon[1]!='') {
+								$char = ucfirst($toon[2]);
+								$dmgd = $toon[1];
+								$unit = substr($dmgd, -1);
+								if($unit=='K') {
+									$num = floatval(str_replace(',', '.', str_replace('.', '', substr($toon[1], 0, -1))));
+									$dmgd = round($num*1000);
+								} elseif($unit=='M') {
+									$num = floatval(str_replace(',', '.', str_replace('.', '', substr($toon[1], 0, -1))));
+									$dmgd = round($num*1000000);
+								} elseif($unit=='B') {
+									$num = floatval(str_replace(',', '.', str_replace('.', '', substr($toon[1], 0, -1))));
+									$dmgd = round($num*1000000000);
+								} else {
+									$dmgd = round($dmgd);
+								}
+								$trigger = true;
+							}
+						} elseif(preg_match('/'.$i.'. ([a-zA-Z0-9]+) \( ([^ ]+) \/ (?:[^ ]+) \/ (?:[^ ]+) \/ (?:[^ ]+) \)/i', $info[1], $toon)) { // Tiny
+							if(!is_numeric($toon[1])&&$toon[2]!='') {
+								$char = ucfirst($toon[1]);
+								$dmgd = round(floatval(str_replace(',', '.', str_replace('.', '', $toon[2]))));
+								$trigger = true;
+							}
+						}
+						if($trigger) {
+							$id = $this->bot->core("player")->id($char);
+							if ($id && !($id instanceof BotError)) {								
+								$verif = $this->bot->db->select("SELECT COUNT(*) FROM #___raid_log WHERE name = '".$char."' AND time =".$time);
+								if($verif[0][0]==1) {
+									if(!array_key_exists($char, $added)) {
+										$added[$char] = $dmgd;
+									} else {
+										$added[$char] = $added[$char]+$dmgd;
+									}																	
+									$this->ddin = false;
+								}
+							}
+							$trigger = false;
+						}
+					}
+					if(!$this->ddin) {
+						foreach($added as $char => $dmgd) {
+							$this->bot->db->query("INSERT INTO #___raid_damage (name, time, rank) VALUES ('" . $char . "', $time, " . $dmgd . ") ON DUPLICATE KEY UPDATE time = $time");
+						}
+						$this->bot->send_tell($name,"Your damage stats have been submitted to the bot.");
+					} else {
+						$this->bot->send_tell($name,"There was errors in your damage stats, nothing recorded.");
+					}
+				}
+			}
+		}
+	}
+	
     /*
     This gets called on cron
     */
@@ -383,53 +489,111 @@ class Raid extends BaseActiveModule
 		}
 		$bots[] = $this->bot->botname;
 		$inside = "";
-		$limit = time()-2592000;
+		$leaders = array();
 		$loads = array();
-		$loads[] = array("type"=>"Raiders","lapse"=>"of the month","table"=>"raid_log","where"=>" WHERE end > time AND time >=".$limit);
-		$loads[] = array("type"=>"Raiders","lapse"=>"of all times","table"=>"raid_log","where"=>" WHERE end > time");
-		$loads[] = array("type"=>"Leaders","lapse"=>"of the month","table"=>"raid_details","where"=>" WHERE time >=".$limit);
-		$loads[] = array("type"=>"Leaders","lapse"=>"of all times","table"=>"raid_details","where"=>"");
+		if($this->bot->core("settings")->get("Raid", "TopMonth")) {
+			$month = time()-2592000;
+			$loads[] = array("type"=>"Leaders","lapse"=>"of the month","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$month);
+			$loads[] = array("type"=>"Raiders","lapse"=>"of the month","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$month);
+			$loads[] = array("type"=>"Damagers","lapse"=>"of the month","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$month);
+		}
+		if($this->bot->core("settings")->get("Raid", "TopYear")) {
+			$year = time()-31536000;
+			$loads[] = array("type"=>"Leaders","lapse"=>"of the year","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$year);	
+			$loads[] = array("type"=>"Raiders","lapse"=>"of the year","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$year);
+			$loads[] = array("type"=>"Damagers","lapse"=>"of the year","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$year);
+		}
+		if($this->bot->core("settings")->get("Raid", "TopAll")) {
+			$loads[] = array("type"=>"Leaders","lapse"=>"of all times","table"=>"raid_details","other"=>"","where"=>"");
+			$loads[] = array("type"=>"Raiders","lapse"=>"of all times","table"=>"raid_log","other"=>"","where"=>" WHERE end > time");
+			$loads[] = array("type"=>"Damagers","lapse"=>"of all times","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>"");		
+		}
 		foreach($loads as $load) {
 			$mains = array();
+			if($load['type']=='Leaders') $leaders = array();
 			foreach($bots as $bot) {
-				$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt FROM ".strtolower($bot)."_".$load['table']."".$load['where']." GROUP BY name ORDER BY cnt DESC");
-				if (!empty($players)) {
-					foreach($players as $player) {
-						$name = $player[0];
-						$cnt = $player[1];
-						$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
-						if(isset($checka[0][0])&&count($checka)==1) {
-							$main = $checka[0][0];
-							if(!array_key_exists($main, $mains)) {
-								$mains[$main] = $cnt;
-							} else {
-								$mains[$main] = $mains[$main]+$cnt;
-							}
-						} else {
-							if(!array_key_exists($name, $mains)) {
-								$mains[$name] = $cnt;
-							} else {
-								$mains[$name] = $mains[$name]+$cnt;
+				if($load['type']=='Raiders') {
+					$raids = $this->bot->db->select("SELECT DISTINCT(time)".$load['other']." FROM ".strtolower($bot)."_".$load['table']."".$load['where']." ORDER BY time DESC");
+					if (!empty($raids)) {
+						foreach($raids as $raid) {
+							$done = array();
+							$players = $this->bot->db->select("SELECT name".$load['other']." FROM ".strtolower($bot)."_".$load['table']." WHERE time = ".$raid[0]);
+							foreach($players as $player) {
+								$name = $player[0];
+								$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
+								if(isset($checka[0][0])&&count($checka)==1) {
+									$main = $checka[0][0];
+									if(!array_key_exists($main, $done)) {
+										if(!array_key_exists($main, $mains)) {
+											$mains[$main] = 1;
+										} else {
+											$mains[$main] = $mains[$main]+1;
+										}
+										$done[$main] = true;
+									}
+								} else {
+									if(!array_key_exists($name, $done)) {
+										if(!array_key_exists($name, $mains)) {
+											$mains[$name] = 1;
+										} else {
+											$mains[$name] = $mains[$name]+1;
+										}
+										$done[$name] = true;
+									}					
+								}
 							}
 						}
-					}			
+					}					
+				} else {
+					$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt".$load['other']." FROM ".strtolower($bot)."_".$load['table']."".$load['where']." GROUP BY name ORDER BY cnt DESC");
+					if (!empty($players)) {
+						foreach($players as $player) {
+							$name = $player[0];
+							$cnt = $player[1];
+							if($load['table']=='raid_damage') $rnk = round(floatval($player[2]/1000000000),4);
+							$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
+							if(isset($checka[0][0])&&count($checka)==1) {
+								$main = $checka[0][0];
+								if(!array_key_exists($main, $mains)) {
+									if($load['table']=='raid_damage') $mains[$main] = $rnk;
+									else $mains[$main] = $cnt;
+								} else {
+									if($load['table']=='raid_damage') $mains[$main] = $mains[$main]+$rnk;
+									else $mains[$main] = $mains[$main]+$cnt;
+								}
+							} else {
+								if(!array_key_exists($name, $mains)) {
+									if($load['table']=='raid_damage') $mains[$name] = $rnk;
+									else $mains[$name] = $cnt;
+								} else {
+									if($load['table']=='raid_damage') $mains[$name] = $mains[$name]+$rnk;
+									else $mains[$name] = $mains[$name]+$cnt;
+								}
+							}
+						}			
+					}
 				}
 			}
 			if(count($mains)>0) {
-				natcasesort($mains);
+				natcasesort($mains);			
 				$mains = array_reverse($mains, true);
 				$shown = 0;
-				$inside .= "\n\nTOP #5 ##highlight##".$load['type']."##end## ".$load['lapse']." \n";
+				$inside .= "\n##highlight##".$load['type']."##end## ".$load['lapse']." \n";
 				foreach ($mains as $main => $tot)
 				{
-					$shown++;
-					if($shown<6) {
-						$inside .= " #".$shown." : ".$main." (".$tot.") \n";
+					if(!in_array($main,$leaders)||$load['type']=='Leaders') {
+						$shown++;
+						if($shown<6) {
+							if($load['type']=='Leaders') array_push($leaders,$main);
+							if($load['table']=='raid_damage') $tot = round($tot,2);
+							$inside .= " #".$shown." ".$main." (".$tot.") \n";
+						}
 					}
 				}			
 			}
 		}
-		$output = "Top #5 Leaders and Raiders :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
+		$inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded (top 5 Leaders are expelled of following Raiders & Damagers).";
+		$output = "Top 5 in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 		if ($source == "tell") {
 			$this->bot->send_tell($asker,$output);
 		} else {
@@ -448,21 +612,22 @@ class Raid extends BaseActiveModule
 		if($range>$total[0][0]) { $range = $total[0][0]; }
 		$history = $this->bot->db->select("SELECT DISTINCT(time) FROM #___raid_log WHERE end > time ORDER BY time DESC LIMIT ".$skip.", ".$pager);
 		$inside = "";
+		$cur = 0;
 		foreach($history as $entry) {
+			$id = $total[0][0]-($skip+$cur);
+			$cur++;
 			$date = date('Y M D d H:i', $entry[0]);
 			$details = $this->bot->db->select("SELECT * FROM #___raid_details WHERE time =".$entry[0]);
 			if (count($details)==1) {
-				$id = "#".$details[0][0];
 				$rl = $details[0][1];
 				$desc = $details[0][2];
 				$note = $details[0][3];
 			} else {
-				$id = "#?";
 				$rl = "?";
 				$desc = "?";
 				$note = "?";
 			}
-			$inside .= $id." ".$date." => ".$desc." by ".$rl." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats")."\n\n";
+			$inside .= "#".$id." ".$date." : ".$desc." by ".$rl." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats")."\n\n";
 		}
 		$back = $skip-$pager;
 		if($back>=0) {
@@ -518,6 +683,7 @@ class Raid extends BaseActiveModule
             $this->paused = true;
             $this->start = $info[1];
 			$this->limit = $info[6];
+			$this->ddin = false;
             $this->register_event("cron", "1min");
             echo "Raid Restarted for " . $info[0] . "\n";
             foreach ($raiding as $raider) {
@@ -645,7 +811,17 @@ class Raid extends BaseActiveModule
                 $this->pause(true);
                 $this->save();
                 $this->register_event("cron", "1min");			
-                return "Raid started. :: " . $this->control();
+				$this->join_raid($name);
+				$this->ddin = false;
+				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
+					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
+					if($this->bot->core("settings")->get("Raid", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Raid", "DiscTag")." "; } else { $dctag = ""; }
+					$this->bot->core("discord")->disc_alert($dctag.$name." started raid : " .$this->description, $chan);
+				}
+				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
+					$this->bot->core("irc")->send_irc("", "", $name." started raid : " .$this->description);
+				}				
+                return "Raid started. :: " . $this->control();	
             } else {
                 return "Raid already running.";
             }
@@ -681,10 +857,18 @@ class Raid extends BaseActiveModule
                 $this->announce = false;
                 $this->user2 = array();
                 $this->locked = false;
+				$this->ddin = true;
                 $this->unregister_event("cron", "1min");
                 $this->bot->send_output($name, "##highlight##$name##end## has stopped the raid.", "both");
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
-				$this->top_raid($name,'auto');				
+				$this->top_raid($name,'auto');		
+				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
+					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
+					$this->bot->core("discord")->disc_alert("Raid stopped", $chan);
+				}				
+				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
+					$this->bot->core("irc")->send_irc("", "", "Raid stopped ");
+				}				
                 Return "Raid stopped. :: " . $this->control();
             } else {
                 return "No raid running.";
@@ -720,10 +904,18 @@ class Raid extends BaseActiveModule
                 $this->announce = false;
                 $this->user2 = array();
                 $this->locked = false;
+				$this->ddin = false;
                 $this->unregister_event("cron", "1min");
                 $this->bot->send_output($name, "##highlight##$name##end## has cancelled the raid.", "both");
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
 				$this->top_raid($name,'auto');				
+				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
+					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
+					$this->bot->core("discord")->disc_alert("Raid cancelled", $chan);
+				}				
+				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
+					$this->bot->core("irc")->send_irc("", "", "Raid cancelled");
+				}				
                 Return "Raid cancelled. :: " . $this->control();
             } else {
                 return "No raid running.";

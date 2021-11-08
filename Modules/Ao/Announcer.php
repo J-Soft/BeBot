@@ -1,8 +1,6 @@
 <?php
 /* Announcer.php
 * From work by Doctorhyde@RK5, Alreadythere@RK2
-* To use this module : edit few parameters below in 2 EDITABLE zones, according to your needs
-* Then start bot, setup parameters & do !register to join the target Botnet + start relaying
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -46,96 +44,173 @@ class Announcer extends BaseActiveModule
 		
 		$this->register_event("tells");
 		$this->register_command('all', 'register', 'SUPERADMIN');
+		$this->register_command('all', 'subscribe', 'SUPERADMIN');
 		$this->register_command('all', 'unregister', 'SUPERADMIN');
+		$this->register_command('all', 'unsubscribe', 'SUPERADMIN');
 		
 		$this -> bot -> core("colors") -> define_scheme("Announcer", "botname", "bluesilver");
 		$this -> bot -> core("colors") -> define_scheme("Announcer", "sender", "bluegray");
 		$this -> bot -> core("colors") -> define_scheme("Announcer", "type", "brightgreen");
 		$this -> bot -> core("colors") -> define_scheme("Announcer", "text", "lightyellow");
 		
-		$this -> help['description'] = 'Allows to register/unregister from configured BotNet.';
-		$this -> help['command']['register']="Registers your bot into configured BotNet.";
-		$this -> help['command']['unregister']="Unregisters your bot from configured BotNet.";
+		$this -> help['description'] = 'Allows to register/unregister to one or more BotNet(s) and then subscribe/unsubscribe to specific channel(s).';
+		$this -> help['command']['register <botname>']="Registers your bot into given BotNet.";
+		$this -> help['command']['subscribe <botname> <channel>']="Subscribes your bot from given BotNet's channel.";
+		$this -> help['command']['unregister <botname>']="Unregisters your bot from given BotNet.";
+		$this -> help['command']['unsubscribe <botname> <channel>']="Unsubscribes your bot from given BotNet's channel.";
+		$this->help['notes'] = "Depending on Botnet(s) specificities, you may have to log into your bot character to make certain commands/subscriptions directly yourself.";
 		
-		$this->bot->core("settings")->create("Announcer", "OrgOn", false, "Should the bot be relaying from Botnet to guild channel ?", "On;Off");
-		$this->bot->core("settings")->create("Announcer", "PrivOn", false, "Should the bot be relaying from Botnet to private channel ?", "On;Off");
-		$this->bot->core("settings")->create("Announcer", "BotName", "Darknet", "What's the Botnet main BotName (Darknet by default) ?", "Darknet");
+		$this->bot->core("settings")->create("Announcer", "OrgOn", false, "Should the bot be relaying from Botnet(s) to guild channel ?", "On;Off");
+		$this->bot->core("settings")->create("Announcer", "ProfanState", false, "Should the bot filter profanity word(s) based on its filter ?", "On;Off");
+		$this->bot->core("settings")->create("Announcer", "ProfanFilter", "", "What profanity word(s) should the bot filter (comma separated list of words) ?");
+		$this->bot->core("settings")->create("Announcer", "IgnoreList", "", "What sender name(s) should the bot ignore (comma separated list of names) ?");
+		$this->bot->core("settings")->create("Announcer", "PrivOn", false, "Should the bot be relaying from Botnet(s) to private channel ?", "On;Off");
+		$this->bot->core("settings")->create("Announcer", "BotName", "", "What is/are Botnet(s) main BotName(s) (please better edit through register/unregister commands) ?");
+        $this->bot->core("settings")
+            ->create("Announcer", "AlertDisc", false, "Do we alert Discord of Botnet(s) spam ?");
+        $this->bot->core("settings")
+            ->create("Announcer", "DiscChanId", "", "What Discord ChannelId in case we separate Botnet(s) spam from main Discord channel (leave empty for all in main channel) ?");
+        $this->bot->core("settings")
+            ->create("Announcer", "AlertIrc", false, "Do we alert Irc of Botnet(s) spam ?");		
 		
 	}
 
 	function command_handler($name, $msg, $origin) {
-		if (preg_match("/^register$/i", $msg))
-			return $this->register($name, $origin);
-		elseif (preg_match("/^unregister$/i", $msg))
-			return $this->unregister($name, $origin);
+		if (preg_match("/^register (.+)$/i", $msg, $info))
+			return $this->register(ucfirst(strtolower($info[1])));
+		elseif (preg_match("/^subscribe (.+) (.+)$/i", $msg, $info))
+			return $this->subscribe(ucfirst(strtolower($info[1])), strtolower($info[2]));		
+		elseif (preg_match("/^unregister (.+)$/i", $msg, $info))
+			return $this->unregister(ucfirst(strtolower($info[1])));
+		elseif (preg_match("/^unsubscribe (.+) (.+)$/i", $msg, $info))
+			return $this->unsubscribe(ucfirst(strtolower($info[1])), strtolower($info[2]));			
+		else return false;
 	}
 
-	function register($name, $origin) {
-		$main = $this->bot->core("settings")->get("Announcer", "BotName");
-        if (!$this->bot->core('player')->id($main) instanceof BotError) {
-			$this->bot->send_tell($main, "register", 1, false);
-            return "Register command sent to ##highlight##$main##end##";
-        } else {
-			return "##error##Character ##highlight##$main##end## does not exist.##end##";
-		}
+	function register($botnet) {		
+		if (!$this->bot->core('player')->id($botnet) instanceof BotError) {
+			$mains = explode(",",$this->bot->core("settings")->get("Announcer", "BotName"));
+			$found = false;
+			foreach($mains as $main) {
+				if($main==$botnet) $found = true;
+			}
+			if(!$found) {
+				$this->bot->core("settings")->save("Announcer", "BotName", $this->bot->core("settings")->get("Announcer", "BotName").",".$botnet);
+			}			
+			$this->bot->send_tell($botnet, "register", 1, false);
+			return "Register command sent to ##highlight##$botnet##end##";
+		} else {
+			return "##error##Character ##highlight##$botnet##end## does not exist.##end##";
+		}		
 	}
-
-	function unregister($name, $origin) {
-		$main = $this->bot->core("settings")->get("Announcer", "BotName");
-        if (!$this->bot->core('player')->id($main) instanceof BotError) {
-			$this->bot->send_tell($main, "unregister", 1, false);
-            return "Unregister command sent to ##highlight##$main##end##";
-        } else {
-			return "##error##Character ##highlight##$main##end## does not exist.##end##";
-		}
-	}	
 	
-        function tells($name, $relay_message) {
+	function subscribe($botnet, $channel) {	
+		if (!$this->bot->core('player')->id($botnet) instanceof BotError) {
+			$mains = explode(",",$this->bot->core("settings")->get("Announcer", "BotName"));
+			$found = false;
+			foreach($mains as $main) {
+				if($main==$botnet) $found = true;
+			}
+			if($found) {
+				if($botnet=="Darknet") $this->bot->send_tell($botnet, "channels add ".$channel, 1, false);
+				else $this->bot->send_tell($botnet, "subscribe ".$channel, 1, false);
+				return "Subscribe command sent to ##highlight##$botnet##end##";
+			} else {
+				return "##error##We are not registered to ##highlight##$botnet##end## yet.##end##";
+			}
+		} else {
+			return "##error##Character ##highlight##$botnet##end## does not exist.##end##";
+		}
+	}
+
+	function unregister($botnet) {
+		if (!$this->bot->core('player')->id($botnet) instanceof BotError) {
+			$mains = explode(",",$this->bot->core("settings")->get("Announcer", "BotName"));
+			$found = false;
+			foreach($mains as $main) {
+				if($main==$botnet) $found = true;
+			}				
+			if($found) {
+				$new = str_replace($botnet.",", "", $this->bot->core("settings")->get("Announcer", "BotName"));
+				$new = str_replace(",".$botnet, "", $new);
+				$this->bot->core("settings")->save("Announcer", "BotName", str_replace($botnet, "", $new));
+			}						
+			$this->bot->send_tell($botnet, "unregister", 1, false);
+			return "Unregister command sent to ##highlight##$main##end##";
+		} else {
+			return "##error##Character ##highlight##$botnet##end## does not exist.##end##";
+		}
+	}
+	
+	function unsubscribe($botnet, $channel) {		
+		if (!$this->bot->core('player')->id($botnet) instanceof BotError) {
+			$mains = explode(",",$this->bot->core("settings")->get("Announcer", "BotName"));
+			$found = false;
+			foreach($mains as $main) {
+				if($main==$botnet) $found = true;
+			}
+			if($found) {
+				if($botnet=="Darknet") $this->bot->send_tell($botnet, "channels rem ".$channel, 1, false);
+				else $this->bot->send_tell($botnet, "unsubscribe ".$channel, 1, false);
+				return "Subscribe command sent to ##highlight##$botnet##end##";
+			} else {
+				return "##error##We are not registered to ##highlight##$botnet##end## yet.##end##";
+			}
+		} else {
+			return "##error##Character ##highlight##$botnet##end## does not exist.##end##";
+		}
+	}
+	
+    function tells($name, $relay_message) {
 		
 		if (!$this->bot->core("settings")->get("Announcer", "OrgOn") && !$this->bot->core("settings")->get("Announcer", "PrivOn")) {
 			return false;
 		}
-		$main = $this->bot->core("settings")->get("Announcer", "BotName");
-		$announcers = array(
-			$main,
-				$main."1",$main."2",$main."3",$main."4",$main."5",$main."6",$main."7",$main."8",$main."9",
-				$main."10",$main."11",$main."12",$main."13",$main."14",$main."15",$main."16",$main."17",$main."18",$main."19",
-				$main."20",$main."21",$main."22",$main."23",$main."24",$main."25",$main."26",$main."27",$main."28",$main."29",
-				$main."30",$main."31",$main."32",$main."33",$main."34",$main."35",$main."36",$main."37",$main."38",$main."39",
-				$main."40",$main."41",$main."42",$main."43",$main."44",$main."45",$main."46",$main."47",$main."48",$main."49",
-		);
-/* EDITABLE: Do you want to filter profanity out? FALSE here = strip profanity, TRUE here = don't bother */
-		$profanity = TRUE;
-		$profanityfilter = array("fuck","fcuk","shit"); // etc ...
-/* EDITABLE: customize quoted "" words comma , separated (except last one) into the array just upper */	
-
-		if (in_array($name,$announcers))
+		$profanity = $this->bot->core("settings")->get("Announcer", "ProfanState");
+		$profanityfilter = explode(",",$this->bot->core("settings")->get("Announcer", "ProfanFilter"));
+		$mains = explode(",",$this->bot->core("settings")->get("Announcer", "BotName"));
+		$found = false;
+		foreach($mains as $main) {
+			if($main==substr($name,0,strlen($main))) $found = true;
+		}
+		if ($found)
         {
 			$relay_Sender = "";
-			$font_pattern = '/\<([\/]*)font([^\>]*)\>/';
-			$relay_message = preg_replace($font_pattern,'',$relay_message);
 
-	                if (preg_match("/^\[([^\]]*)\]\ (.*) \[([^\]]*)\] \[([^\]]*)\]$/", $relay_message, $matches)) {
-				$relay_Type		= $matches[1];
-				$relay_Text		= $matches[2];
-				$relay_Sender		= $matches[3];
-				$relay_Append		= "";
-
-	                } elseif (preg_match("/^\[([^\]]*)\]\ (.*)\[([^\]]*)\]$/", $relay_message, $matches)) {
-				$relay_Type		= $matches[1];
-				$relay_Text		= $matches[2];
-				$relay_Sender		= $matches[3];
-				$relay_Append		= "";
-                        }
-
+			if (preg_match("/^<font color=#(?:[a-z0-9]+)><font color=#(?:[a-z0-9]+)>(?:[^<]+)<\/font> <font color=#(?:[a-z0-9]+)>([^<]+)<\/font>: <font color=#(?:[a-z0-9]+)>([^<]+)<\/font>/i", $relay_message, $matches)) {
+					$relay_Type		= "Message";
+					$relay_Text		= $matches[2];
+					$relay_Sender	= $matches[1];
+					$relay_Append	= "";
+            } else {
+				$font_pattern = '/\<([\/]*)font([^\>]*)\>/';
+				$relay_message = preg_replace($font_pattern,'',$relay_message);
+				if (preg_match("/^\[([^\]]*)\]\ (.*) \[([^\]]*)\] \[([^\]]*)\]$/", $relay_message, $matches)) {
+					$relay_Type		= $matches[1];
+					$relay_Text		= $matches[2];
+					$relay_Sender	= $matches[3];
+					$relay_Append	= "";
+				} elseif (preg_match("/^\[([^\]]*)\]\ (.*)\[([^\]]*)\]$/", $relay_message, $matches)) {
+					$relay_Type		= $matches[1];
+					$relay_Text		= $matches[2];
+					$relay_Sender	= $matches[3];
+					$relay_Append	= "";
+				} else {
+					$relay_Type		= "Announce";
+					$relay_Text		= $relay_message;
+					$relay_Sender	= $name;
+					$relay_Append	= "";						
+				}
+			}
+				
 			if ($relay_Sender && $relay_Text) {
 				if (preg_match("/^<a href=.*\>([^\<]*)\<\/a\>[\s]*$/",$relay_Sender,$relaySenderLink)) {
 					$relay_Sender = $relaySenderLink[1];
 				}
 				$relay_SenderLinked = "<a href=\"user:" . "/" . "/" . $relay_Sender . "\">" . $relay_Sender . "</a>";
 
-                                if ($relay_Type) {
-                                        if (preg_match("/wts/i",$relay_Type)) {
+                if ($relay_Type) {
+                    if (preg_match("/wts/i",$relay_Type)) {
 						$relay_TypeCaps = "Selling";
 					} elseif (preg_match("/wtb/i",$relay_Type)) {
 						$relay_TypeCaps = "Buying";
@@ -159,14 +234,15 @@ class Announcer extends BaseActiveModule
 				if ($relay_Append) { $relay_message .= $relay_Append; }
 			} 
 
-			if (! $profanity) {
+			if ($profanity) {						
 		                foreach ($profanityfilter as $curse_word) {
 		                        if (stristr(trim($relay_message)," ".$curse_word)) {
+										$stars = "";
 		                                $length = strlen($curse_word);
 		                                for ($i = 1; $i <= $length; $i++) {
 		                                        $stars .= "*";
 		                                }
-		                                $relay_message = eregi_replace($curse_word,$stars,trim($relay_message));
+		                                $relay_message = preg_replace("/".$curse_word."/i",$stars,trim($relay_message));
 		                                $stars = "";
 		                        }
 		                }
@@ -176,21 +252,28 @@ class Announcer extends BaseActiveModule
 			if (preg_match("/^([A-Za-z]{1,})([0-9]{1,})$/",$name,$botnames_matches)) { $botname_short = $botnames_matches[1]; } else { $botname_short = $name; }
 			$relay_message = "##Announcer_botname##" . $botname_short . " relay:##end## ##Announcer_text##" . $relay_message . "##end##";
 
-/* EDITABLE: Do you want to filter some specific name(s) that ain't wanted technically or caused problems ? */
-			$ignoredSender = array(
-					"",
-					""
-				);
-/* EDITABLE: each name is in quotes "" and separated by comma , (except final one) */
-
-			if (!in_array($relay_Sender,$ignoredSender)) {
+			$ignoredSender = explode(",",$this->bot->core("settings")->get("Announcer", "IgnoreList"));
+			$found = false;
+			foreach($ignoredSender as $ignored) {
+				if(strtolower($relay_Sender)==strtolower($ignored)) $found = true;
+			}
+			if (!$found) {
 				if ($this->bot->core("settings")->get("Announcer", "OrgOn")) $this -> bot -> send_gc($relay_message); 
 				if ($this->bot->core("settings")->get("Announcer", "PrivOn")) $this -> bot -> send_pgroup($relay_message);
+				$msg = preg_replace("/##end##/U", "", $relay_message);
+				$msg = preg_replace("/##([^#]+)##/U", "", $msg);
+				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Announcer", "AlertDisc")) {
+					if($this->bot->core("settings")->get("Announcer", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Announcer", "DiscChanId"); } else { $chan = ""; }
+					$this->bot->core("discord")->disc_alert($msg, $chan);
+				}
+				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Announcer", "AlertIrc")) {
+					$this->bot->core("irc")->send_irc("", "", $msg);
+				}				
 			}
 
-                        return true;
+            return true;
 		}
 		return false;
-        }
+    }
 }
 ?>
