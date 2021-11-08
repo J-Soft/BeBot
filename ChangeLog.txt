@@ -1,5 +1,5 @@
 -------------------------
-Release 0.7.20 - Oct 2021
+Release 0.7.20 - Nov 2021
 -------------------------
 - For both: gcr/c relay for chats+online (AO: Nad/Tyr also patched & compatible) ; wider Discord/Irc options ; multiple alts add ; ban improvements ; UserAdmin interface
 - For AO: corrected autoinvite at guest level ; added damage meter supports (AODM+Tiny) into Raid ; added new OrgHistory module ; enforced Tower API support
