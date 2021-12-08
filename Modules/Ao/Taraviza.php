@@ -1,7 +1,7 @@
 <?php
 /*
 * Tara.php - Handle Tara timer/alert.
-*
+* With linkage to Boss/Buff Timers API courtesy of The Nadybot Team
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
 * Copyright (C) 2005-2010 Thomas Juberg, ShadowRealm Creations and the BeBot development team.
@@ -47,22 +47,27 @@ class Taraviza extends BaseActiveModule
 		parent::__construct($bot, get_class($this));
 		$this->register_module("taraviza");
 		$this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS tara (time int NOT NULL default '0')");
-		$this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS viza (time int NOT NULL default '0')");
+		$this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS viza (time int NOT NULL default '0')");		
 		$this -> register_command("all", "tara", "GUEST");
 		$this -> register_command("all", "gauntlet", "GUEST");
 		$this -> register_command("all", "settara", "GUEST");
 		$this -> register_command("all", "setviza", "GUEST");
-		$this -> register_alias('tara', 'timers');
+		$this -> register_command("all", "gauntbuff", "GUEST");
+		$this -> register_alias("gauntbuff", "gaunbuff");
+		$this -> register_alias("gauntbuff", "gaubuff");
+		$this -> register_alias("gauntbuff", "gbuff");		
 		$this -> register_alias("gauntlet", "gaunt");
 		$this -> register_alias("gauntlet", "vizaresh");
 		$this -> register_alias("gauntlet", "viza");
+		$this -> register_alias('tara', 'timers');		
 		$this -> register_alias("tara", "spawntime");
 		$this -> register_alias("tara", "spawn");
 		$this -> register_alias("tara", "pop");
 		$this -> register_alias("tara", "poptime");
-		$this -> help['description'] = 'Allows to have a specific Tarasque/Gauntlet timer.';
+		$this -> help['description'] = 'Allows to have a specific Tarasque/Gauntlet timer. Both auto-update by API every 6 hours but is still manually overwritable.';
 		$this -> help['command']['tara']="Shows time left to next Tarasque.";
 		$this -> help['command']['viza']="Shows time left to next Gauntlet.";
+		$this -> help['command']['gbuff']="Shows current state for Gauntlet's Buff.";
 		$this -> help['command']['settara'] = "Sets the timer from now. Add -/+ number for minute adjusting.";
 		$this -> help['command']['setviza'] = "Sets the timer from now. Add -/+ number for minute adjusting.";
 		
@@ -74,10 +79,16 @@ class Taraviza extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Taraviza", "DiscChanId", "", "What Discord ChannelId in case we separate worldbosses spawns from main Discord channel (leave empty for all in main channel) ?");
         $this->bot->core("settings")
-            ->create("Taraviza", "DiscTag", "", "Should we add a Discord Tag (e.g. @here or @everyone) to worldbosses spams for notifying Discord users (leave empty for no notification) ?");			
+            ->create("Taraviza", "DiscTag", "", "Should we add a Discord Tag (e.g. @here or @everyone) to worldbosses spams for notifying Discord users (leave empty for no notification) ?");
         $this->bot->core("settings")
             ->create("Taraviza", "AlertIrc", false, "Do we alert Irc of worldbosses spawns ?");		
+        $this->bot->core("settings")
+            ->create("Taraviza", "ApiUrl", "https://timers.aobots.org/api/", "What's the Boss/Buff API URL we should use to auto-update (Nadybot's by default, leave empty to disable automation) ?");			
 		$this->register_event("cron", "1min");
+		$this->register_event("cron", "6hour");
+		$this->tcycle=34200; // 9H30 cycle
+		$this->vcycle=61620;  // 17H07 cycle
+		$this->apiver='v1.0';
 	}
 
 	function command_handler($name, $msg, $channel)
@@ -86,6 +97,8 @@ class Taraviza extends BaseActiveModule
 			return $this -> show_tara("user");
 		else if (preg_match("/^gauntlet$/i", $msg))
 			return $this -> show_viza("user");
+		else if (preg_match("/^gauntbuff$/i", $msg))
+			return $this -> show_buff();		
 		else if (preg_match("/^settara$/i", $msg))
 			return $this -> set_now($name, $channel);
 		else if (preg_match("/^settara [+]([0-9]+)$/i", $msg, $info))
@@ -102,51 +115,126 @@ class Taraviza extends BaseActiveModule
 
     function cron($cron)
     {
-		$ta = $this->bot->core("settings")->get("Taraviza", "TaraAlert");
-		if($ta!="None") {
-			$pot = $this->bot->core("settings")->get("Taraviza", "PopAlertTime");
-			$tt = $this->show_tara("cron");
-			if($pot==$tt) {
-				$text = "Alert : Tarasque should pop in ".$tt." minutes !";
-				if($ta=='Both'||$ta=='Guildchat') {
-					$this->bot->send_gc($text);
+		if ($cron == 60) {
+			$ta = $this->bot->core("settings")->get("Taraviza", "TaraAlert");
+			if($ta!="None") {
+				$pot = $this->bot->core("settings")->get("Taraviza", "PopAlertTime");
+				$tt = $this->show_tara("cron");
+				if($pot==$tt) {
+					$text = "Alert : Tarasque should pop in ".$tt." minutes !";
+					if($ta=='Both'||$ta=='Guildchat') {
+						$this->bot->send_gc($text);
+					}
+					if($ta=='Both'||$ta=='Private') {
+						$this->bot->send_pgroup($text);
+					}
+					if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Taraviza", "AlertDisc")) {
+						if($this->bot->core("settings")->get("Taraviza", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Taraviza", "DiscChanId"); } else { $chan = ""; }
+						if($this->bot->core("settings")->get("Taraviza", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Taraviza", "DiscTag")." "; } else { $dctag = ""; }
+						$this->bot->core("discord")->disc_alert($dctag.$text, $chan);
+					}
+					if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Taraviza", "AlertIrc")) {
+						$this->bot->core("irc")->send_irc("", "", $text);
+					}				
 				}
-				if($ta=='Both'||$ta=='Private') {
-					$this->bot->send_pgroup($text);
+			}
+			$va = $this->bot->core("settings")->get("Taraviza", "VizaAlert");
+			if($va!="None") {
+				$pot = $this->bot->core("settings")->get("Taraviza", "PopAlertTime");
+				$vt = $this->show_viza("cron");
+				if($pot==$vt) {
+					$text = "Alert : Gauntlet should start in ".$vt." minutes !";
+					if($va=='Both'||$va=='Guildchat') {
+						$this->bot->send_gc($text);
+					}
+					if($va=='Both'||$va=='Private') {
+						$this->bot->send_pgroup($text);
+					}
+					if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Taraviza", "AlertDisc")) {
+						if($this->bot->core("settings")->get("Taraviza", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Taraviza", "DiscChanId"); } else { $chan = ""; }
+						if($this->bot->core("settings")->get("Taraviza", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Taraviza", "DiscTag")." "; } else { $dctag = ""; }
+						$this->bot->core("discord")->disc_alert($dctag.$text, $chan);
+					}
+					if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Taraviza", "AlertIrc")) {
+						$this->bot->core("irc")->send_irc("", "", $text);
+					}				
 				}
-				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Taraviza", "AlertDisc")) {
-					if($this->bot->core("settings")->get("Taraviza", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Taraviza", "DiscChanId"); } else { $chan = ""; }
-					if($this->bot->core("settings")->get("Taraviza", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Taraviza", "DiscTag")." "; } else { $dctag = ""; }
-					$this->bot->core("discord")->disc_alert($dctag.$text, $chan);
+			}		
+		} elseif ($cron == 21600) {
+			if($this->bot->core("settings")->get("Taraviza", "ApiUrl")!='') {
+				$now = time(); $t = false; $v = false;
+				
+				$this -> verif_tara();
+				$take = $this -> bot -> db -> select("SELECT * FROM tara");
+				foreach ($take as $line){ $timer = $line[0]; }
+				if($now>$timer&&$now-$timer>$this->tcycle) $t = true;
+				
+				$this -> verif_viza();
+				$take = $this -> bot -> db -> select("SELECT * FROM viza");
+				foreach ($take as $line){ $timer = $line[0]; }
+				if($now>$timer&&$now-$timer>$this->vcycle) $v = true;
+				
+				if($v||$t) {
+					$url = $this->bot->core("settings")->get("Taraviza", "ApiUrl")."/".$this->apiver."/"."bosses";
+					$content = $this->bot->core("tools")->get_site($url);	
+					if (!($content instanceof BotError)) {
+						if (strpos($content, '{"name":') !== false) {
+							$timers = json_decode($content);													
+							foreach($timers as $timer) {
+								if($t&&$timer->name=='tara'&&$timer->last_spawn>0) {							
+									$this -> bot -> db -> query("TRUNCATE TABLE tara");
+									$this -> bot -> db -> query("INSERT INTO tara (time) VALUES ('".$timer->last_spawn."')");
+								}
+								if($v&&$timer->name=='vizaresh'&&$timer->last_spawn>0) {
+									$this -> bot -> db -> query("TRUNCATE TABLE viza");
+									$this -> bot -> db -> query("INSERT INTO viza (time) VALUES ('".$timer->last_spawn."')");
+								}							
+							}												
+						}
+					}
 				}
-				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Taraviza", "AlertIrc")) {
-					$this->bot->core("irc")->send_irc("", "", $text);
-				}				
 			}
 		}
-		$va = $this->bot->core("settings")->get("Taraviza", "VizaAlert");
-		if($va!="None") {
-			$pot = $this->bot->core("settings")->get("Taraviza", "PopAlertTime");
-			$vt = $this->show_viza("cron");
-			if($pot==$vt) {
-				$text = "Alert : Gauntlet should start in ".$vt." minutes !";
-				if($va=='Both'||$va=='Guildchat') {
-					$this->bot->send_gc($text);
-				}
-				if($va=='Both'||$va=='Private') {
-					$this->bot->send_pgroup($text);
-				}
-				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Taraviza", "AlertDisc")) {
-					if($this->bot->core("settings")->get("Taraviza", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Taraviza", "DiscChanId"); } else { $chan = ""; }
-					if($this->bot->core("settings")->get("Taraviza", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Taraviza", "DiscTag")." "; } else { $dctag = ""; }
-					$this->bot->core("discord")->disc_alert($dctag.$text, $chan);
-				}
-				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Taraviza", "AlertIrc")) {
-					$this->bot->core("irc")->send_irc("", "", $text);
-				}				
-			}
-		}					
 	}
+
+	function show_buff()
+	{
+		$return = "";
+		if($this->bot->core("settings")->get("Taraviza", "ApiUrl")!='') {
+			$url = $this->bot->core("settings")->get("Taraviza", "ApiUrl")."/".$this->apiver."/"."gaubuffs";
+			$content = $this->bot->core("tools")->get_site($url);	
+			if (!($content instanceof BotError)) {
+				if (strpos($content, '{"faction":') !== false) {
+					$buffs = json_decode($content);
+					$now = time(); $faction = ""; $expires = 0;
+					foreach($buffs as $buff) {
+						if(($buff->faction=='clan'||$buff->faction=='omni')&&$buff->expires>$now) {
+							$faction = $buff->faction;
+							$expires = $buff->expires;
+						} else {
+							$return = "No active sided buff detected for now.";
+						}
+					}
+					if($faction!=''&&$expires>$now) {
+						$left = $expires - $now;
+						$hour = floor($left/3600);
+						$left = $left - ($hour*3600);
+						$min = floor($left/60);
+						$sec = $left - ($min*60);
+						if ($sec < 10) { $sec = "0".$sec; }
+						if ($hour < 10) { $hour = "0".$hour; }
+						if ($min < 10) { $min = "0".$min; }
+						$return = "Current buff is ".$faction." & should expire in about ".$hour."h".$min."m";						
+					}
+				} else {
+					$return = "No buff info for now, may retry later on.";
+				}
+			} else {
+				$return = "API couldn't be reached, so no data obtained.";
+			}
+		}
+		return $return;
+    }	
 	
 	function verif_tara()
 	{
@@ -169,7 +257,7 @@ class Taraviza extends BaseActiveModule
         $take = $this -> bot -> db -> select("SELECT * FROM tara");
         foreach ($take as $line){ $timer = $line[0]; }
         $now = time();
-        while ($timer <= $now) { $timer = $timer + 34200; } // 9H30 cycle
+        while ($timer <= $now) { $timer = $timer + $this->tcycle; }
         $left = $timer - $now;
         $hour = floor($left/3600);
         $left = $left - ($hour*3600);
@@ -187,11 +275,11 @@ class Taraviza extends BaseActiveModule
 	function show_viza($from)
 	{
 		$timer = 0;
-        $this -> verif_tara();
+        $this -> verif_viza();
         $take = $this -> bot -> db -> select("SELECT * FROM viza");
         foreach ($take as $line){ $timer = $line[0]; }
         $now = time();
-        while ($timer <= $now) { $timer = $timer + 61620; } // 17H07 cycle
+        while ($timer <= $now) { $timer = $timer + $this->vcycle; }
         $left = $timer - $now;
         $hour = floor($left/3600);
         $left = $left - ($hour*3600);
