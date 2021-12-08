@@ -95,7 +95,7 @@ class Notify_Core extends BasePassiveModule
     {
         $id = $this->bot->core('player')->id($user);
         $user = ucfirst(strtolower($user));
-        if ($id == 0) {
+        if (!is_numeric($id) || $id == 0) {
             $this->error->set($user . " is no valid character name!");
             return $this->error;
         }

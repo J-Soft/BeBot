@@ -195,24 +195,20 @@ class DiscordRelay extends BaseActiveModule
 					}
 				}
 			}	
-			if (($name != "") && ($name != "c")) {
+			if ($name != "") {
 				if($output=="output") $this->bot->send_tell($name,$sent);
 				else return $sent;
 			} else {
-				if ($name == "") {
-					if($output=="output") $this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
-					else return $sent;
-				}
+				if($output=="output") $this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
+				else return $sent;
 			}	
 		} else {
-			if (($name != "") && ($name != "c")) {
+			if ($name != "") {
 				if($output=="output") $this->bot->send_tell($name,"Discord relay isn't activated");
 				else return "Discord relay isn't activated";
 			} else {
-				if ($name == "") {
-					if($output=="output") $this->bot->send_output("", "Discord relay ain't activated",$this->bot->core("settings")->get("discord", "WhatChat"));
-					else return "Discord relay ain't activated";
-				}
+				if($output=="output") $this->bot->send_output("", "Discord relay ain't activated",$this->bot->core("settings")->get("discord", "WhatChat"));
+				else return "Discord relay ain't activated";
 			}			
 		}
 	}
@@ -241,20 +237,16 @@ class DiscordRelay extends BaseActiveModule
 			$this->discord_ping();
 			$this->bot->core('settings')->save('discord', 'DiscordRelay', TRUE);
 			$this->register_event("cron", $this->crondelay);
-			if (($name != "") && ($name != "c")) {
+			if ($name != "") {
 				$this->bot->send_tell($name,"Relaying from/to Discord channel");
 			} else {
-				if ($name == "") {
-					$this->bot->send_output("", "Relaying from/to Discord channel",$this->bot->core("settings")->get("discord", "WhatChat"));
-				}
+				$this->bot->send_output("", "Relaying from/to Discord channel",$this->bot->core("settings")->get("discord", "WhatChat"));
 			}
 		} else {
-			if (($name != "") && ($name != "c")) {
+			if ($name != "") {
 				$this->bot->send_tell($name,"Discord relay is already activated");
 			} else {
-				if ($name == "") {
-					$this->bot->send_output("", "Discord relay is already activated",$this->bot->core("settings")->get("discord", "WhatChat"));
-				}
+				$this->bot->send_output("", "Discord relay is already activated",$this->bot->core("settings")->get("discord", "WhatChat"));
 			}			
 		}
 	}
@@ -267,20 +259,16 @@ class DiscordRelay extends BaseActiveModule
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			$this->unregister_event("cron", $this->crondelay);
 			$this->bot->core('settings')->save('discord', 'DiscordRelay', FALSE);
-			if (($name != "") && ($name != "c")) {
+			if ($name != "") {
 				$this->bot->send_tell($name,"Discord relay has been stopped");
 			} else {
-				if ($name == "") {
-					$this->bot->send_output("", "Discord relay has been stopped",$this->bot->core("settings")->get("discord", "WhatChat"));
-				}
+				$this->bot->send_output("", "Discord relay has been stopped",$this->bot->core("settings")->get("discord", "WhatChat"));
 			}
 		} else {
-			if (($name != "") && ($name != "c")) {
+			if ($name != "") {
 				$this->bot->send_tell($name,"Discord relay was already stopped");
 			} else {
-				if ($name == "") {
-					$this->bot->send_output("", "Discord relay was already stopped",$this->bot->core("settings")->get("discord", "WhatChat"));
-				}
+				$this->bot->send_output("", "Discord relay was already stopped",$this->bot->core("settings")->get("discord", "WhatChat"));
 			}			
 		}
 	}	
@@ -348,7 +336,7 @@ class DiscordRelay extends BaseActiveModule
     {
         if (strtolower(
                 $this->bot->core("settings")
-                    ->get("discord", "Itemref")
+                    ->get("discord", "ItemRef")
             ) == "auno"
         ) {
             $rep = "http://auno.org/ao/db.php?id=\\1&id2=\\2&ql=\\3";

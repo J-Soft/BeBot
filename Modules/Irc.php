@@ -238,7 +238,7 @@ class IRC extends BaseActiveModule
     {
         if (strtolower(
                 $this->bot->core("settings")
-                    ->get("Irc", "Itemref")
+                    ->get("Irc", "ItemRef")
             ) == "auno"
         ) {
             $rep = "http://auno.org/ao/db.php?id=\\1&id2=\\2&ql=\\3";
@@ -661,8 +661,8 @@ class IRC extends BaseActiveModule
         if (strtolower($new) == "auno") {
             $tmp = "AUNO";
         }
-        $this->bot->core("settings")->save("Irc", "Itemref", $tmp);
-        return "Itemref has been switched to " . $new . ".";
+        $this->bot->core("settings")->save("Irc", "ItemRef", $tmp);
+        return "ItemRef has been switched to " . $new . ".";
     }
 
 
