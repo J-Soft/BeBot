@@ -285,7 +285,7 @@ class DiscordRelay extends BaseActiveModule
 				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
 					$form = $this->strip_formatting($msg);			
-					$sent = "[Guildchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form);
+					$sent = "[Guildchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,0);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
 					if(isset($result['message'])&& isset($result['code'])) {
@@ -345,7 +345,7 @@ class DiscordRelay extends BaseActiveModule
 			if ($channel>0 && $token!="") {
 				$route = "/channels/{$channel}/messages";
 				$form = $this->strip_formatting($msg);
-				$sent = $this->bot->core("tools")->cleanString($form);
+				$sent = $this->bot->core("tools")->cleanString($form,0);
 				$data = array("content" => $sent);
 				$result = discord_post($route, $token, $data);
 				if(isset($result['message'])&& isset($result['code'])) {
@@ -367,7 +367,7 @@ class DiscordRelay extends BaseActiveModule
 				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
 					$form = $this->strip_formatting($msg);
-					$sent = "[Privchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form);
+					$sent = "[Privchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,0);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
 					if(isset($result['message'])&& isset($result['code'])) {
@@ -432,7 +432,7 @@ class DiscordRelay extends BaseActiveModule
 									}
 									if($sent!="") {
 										$route = "/channels/{$channel}/messages";
-										$sent = "[Gamebot] ".$this->bot->botname.": ".$this->bot->core("tools")->cleanString($sent);
+										$sent = "[Gamebot] ".$this->bot->botname.": ".$this->bot->core("tools")->cleanString($sent,0);
 										$data = array("content" => $sent);
 										$result = discord_post($route, $token, $data);
 										if(isset($result['message'])&& isset($result['code'])) {
@@ -502,7 +502,7 @@ class DiscordRelay extends BaseActiveModule
 				$channel = $this->bot->core("settings")->get("discord", "ChannelId");
 				$token = $this->bot->core("settings")->get("discord", "BotToken");				
 				$route = "/channels/{$channel}/messages";
-				$sent = "[Gamebot] ".$this->bot->botname.": ".$this->bot->core("tools")->cleanString($sent);
+				$sent = "[Gamebot] ".$this->bot->botname.": ".$this->bot->core("tools")->cleanString($sent,0);
 				$data = array("content" => $sent);
 				$result = discord_post($route, $token, $data);
 				if(isset($result['message'])&& isset($result['code'])) {
