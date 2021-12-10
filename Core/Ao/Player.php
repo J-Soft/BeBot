@@ -143,9 +143,11 @@ class Player
                 $this->get_uname($this->uid);
             }
             $data = $this->bot->core('whois')->lookup($this->uname);
-            foreach ($data as $key => $value) {
-                $this->$key = $value;
-            }
+			if(!($data instanceof BotError)) {
+				foreach ($data as $key => $value) {
+					$this->$key = $value;
+				}
+			}
         }
         return ($this->$attribute);
     }

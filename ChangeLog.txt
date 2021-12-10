@@ -1,8 +1,8 @@
 -------------------------
 Release 0.7.21 - ??? ???? 
 -------------------------
-- For both: more flexible multiloot ; ...
-- For AO: updated History ;
+- For both: more flexible multiloot ; added WebSocket relay (working with both Tyr/Nad) ; fixed rare Whois crash
+- For AO: updated History ; improved TaraViza courtesy of Nadybot Team API
 - For AoC: ...
 
 -------------------------

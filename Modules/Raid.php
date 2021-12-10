@@ -737,6 +737,7 @@ class Raid extends BaseActiveModule
 
     function notify($name, $startup = false)
     {
+		$move = "";
         if (!$startup && $this->raid && !$this->locked) {
             if ($this->move > time()) {
                 $move = $this->move - time();
@@ -744,7 +745,7 @@ class Raid extends BaseActiveModule
                         ->format_seconds($move) . " ##end##";
             }
             $who = $this->bot->core("whois")->lookup($name);
-            if ($who['level'] < $this->minlevel) {
+            if ($who instanceof BotError || $who['level'] < $this->minlevel) {
                 Return;
             }
             $this->bot->send_tell(
@@ -1157,7 +1158,9 @@ class Raid extends BaseActiveModule
         }
         $minlevel = $this->minlevel;
         $who = $this->bot->core("whois")->lookup($name, true);
-        if (isset($this->user[$name])) {
+		if($who instanceof BotError) {
+			return "Error looking up your character infos.";
+		} elseif (isset($this->user[$name])) {
             return "You are already in the raid";
         } elseif ($who["level"] < $minlevel) {
             return "This raid is ##highlight##$minlevel+##end##";
@@ -1364,23 +1367,25 @@ class Raid extends BaseActiveModule
                                 $player,
                                 true
                             ); //All info about raiders are expected to be correct as already beeing member and all.
+						
+						if(!($who instanceof BotError)) {
+							if ($who['faction'] == "Omni") {
+								$info = " [##omni##Omni</font>/";
+							} elseif ($who['faction'] == "Clan") {
+								$info = " [##clan##Clan</font>/";
+							} elseif ($who['faction'] == "Neutral") {
+								$info = " [##neut##Neut</font>/";
+							} else //Should never happend but who knows shit happens.
+							{
+								$info = " [<font color=#D7FFBC>" . $who['faction'] . "</font>/";
+							}
 
-                        if ($who['faction'] == "Omni") {
-                            $info = " [##omni##Omni</font>/";
-                        } elseif ($who['faction'] == "Clan") {
-                            $info = " [##clan##Clan</font>/";
-                        } elseif ($who['faction'] == "Neutral") {
-                            $info = " [##neut##Neut</font>/";
-                        } else //Should never happend but who knows shit happens.
-                        {
-                            $info = " [<font color=#D7FFBC>" . $who['faction'] . "</font>/";
-                        }
+							$info .= "<font color=#A2FF4C>" . $who['level'] . "</font>/";
+							$info .= "<font color=#FFFB9E>" . $who['profession'] . "</font>]";
 
-                        $info .= "<font color=#A2FF4C>" . $who['level'] . "</font>/";
-                        $info .= "<font color=#FFFB9E>" . $who['profession'] . "</font>]";
-
-                        $inside .= $player . " [" . $this->bot->core("tools")
-                                ->chatcmd("raid kick " . $player, "Kick") . "]\n";
+							$inside .= $player . " [" . $this->bot->core("tools")
+									->chatcmd("raid kick " . $player, "Kick") . "]\n";
+						}
                     }
                 } else {
                     $inside .= "There are no members of this raid.";
