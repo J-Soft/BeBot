@@ -523,7 +523,7 @@ class Raid extends BaseActiveModule
 						foreach($raids as $raid) {
 							$done = array();
 							if($user=="") $players = $this->bot->db->select("SELECT name".$load['other']." FROM ".strtolower($bot)."_".$load['table']." WHERE time = ".$raid[0]);
-							else $players[] = $user;
+							else $players[0] = $user;
 							foreach($players as $player) {
 								$name = $player[0];
 								$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
