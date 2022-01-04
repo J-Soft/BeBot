@@ -59,6 +59,7 @@ class IRC extends BaseActiveModule
         $this->register_module("irc");
         $this->register_command("all", "irc", "SUPERADMIN");
         $this->register_command("all", "irconline", "GUEST");
+		$this -> register_alias("irconline", "irco");
         $this->register_event("buddy");
         $this->register_event("connect");
         $this->register_event("disconnect");

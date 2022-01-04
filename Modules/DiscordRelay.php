@@ -89,7 +89,9 @@ class DiscordRelay extends BaseActiveModule
         parent::__construct($bot, get_class($this));
 		$this->register_module("discord");
 		$this->register_command("all", "discord", "SUPERADMIN");
+		$this -> register_alias("discord", "dc");
 		$this->register_command("all", "discordonline", "GUEST");
+		$this -> register_alias("discordonline", "dco");
 		$this->register_event("connect");
 		$this->register_event("privgroup");
         $this->register_event("gmsg", "org");

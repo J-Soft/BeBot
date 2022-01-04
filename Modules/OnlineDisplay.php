@@ -46,6 +46,7 @@ class OnlineDisplay extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "online", "GUEST");
+		$this -> register_alias("online", "o");
         $this->register_command("all", "sm", "GUEST");
 		$this->register_command("all", "recent", "GUEST");
 		$this -> register_alias("recent", "recents");

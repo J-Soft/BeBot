@@ -135,7 +135,7 @@ class Relay extends BaseActiveModule
         /*$this->bot->core("settings")
             ->create("Relay", "Encrypt", false, "Should messages be Encrypted?");
         $this->bot->core("settings")
-            ->create("Relay", "Key", "", "Encription Key for Sending and Recieving Messages?");*/
+            ->create("Relay", "Key", "", "Encription Key for Sending and Receiving Messages?");*/
         $this->bot->core("settings")
             ->create(
                 'Relay',
