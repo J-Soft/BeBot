@@ -842,7 +842,7 @@ class Raid extends BaseActiveModule
                     "##highlight##$name##end## has started the raid :: " . $this->clickjoin(),
                     "both"
                 );
-				$this->top_raid($name,'auto');
+				$this->top_raid($name,'auto','');
                 $this->pause(true);
                 $this->save();
                 $this->register_event("cron", "1min");			
@@ -896,7 +896,7 @@ class Raid extends BaseActiveModule
                 $this->unregister_event("cron", "1min");
                 $this->bot->send_output($name, "##highlight##$name##end## has stopped the raid.", "both");
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
-				$this->top_raid($name,'auto');		
+				$this->top_raid($name,'auto','');		
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
 					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
 					$this->bot->core("discord")->disc_alert("Raid stopped", $chan);
@@ -943,7 +943,7 @@ class Raid extends BaseActiveModule
                 $this->unregister_event("cron", "1min");
                 $this->bot->send_output($name, "##highlight##$name##end## has cancelled the raid.", "both");
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
-				$this->top_raid($name,'auto');				
+				$this->top_raid($name,'auto','');				
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
 					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
 					$this->bot->core("discord")->disc_alert("Raid cancelled", $chan);
