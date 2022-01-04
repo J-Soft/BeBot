@@ -522,8 +522,7 @@ class Raid extends BaseActiveModule
 					if (!empty($raids)) {
 						foreach($raids as $raid) {
 							$done = array();
-							if($user=="") $players = $this->bot->db->select("SELECT name".$load['other']." FROM ".strtolower($bot)."_".$load['table']." WHERE time = ".$raid[0]);
-							else $players[0] = $user;
+							$players = $this->bot->db->select("SELECT name".$load['other']." FROM ".strtolower($bot)."_".$load['table']." WHERE time = ".$raid[0]);
 							foreach($players as $player) {
 								$name = $player[0];
 								$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
@@ -531,18 +530,18 @@ class Raid extends BaseActiveModule
 									$main = $checka[0][0];
 									if(!array_key_exists($main, $done)) {
 										if(!array_key_exists($main, $mains)) {
-											$mains[$main] = 1;
+											if($user==""||$user==$main) $mains[$main] = 1;
 										} else {
-											$mains[$main] = $mains[$main]+1;
+											if($user==""||$user==$main) $mains[$main] = $mains[$main]+1;										
 										}
 										$done[$main] = true;
 									}
 								} else {
 									if(!array_key_exists($name, $done)) {
 										if(!array_key_exists($name, $mains)) {
-											$mains[$name] = 1;
+											if($user==""||$user==$name) $mains[$name] = 1;											
 										} else {
-											$mains[$name] = $mains[$name]+1;
+											if($user==""||$user==$name) $mains[$name] = $mains[$name]+1;											
 										}
 										$done[$name] = true;
 									}					
@@ -551,10 +550,6 @@ class Raid extends BaseActiveModule
 						}
 					}					
 				} else {
-					if($user!="") {
-						if($load['where']=="") $load['where'] = " WHERE name = '".$user."'";
-						else $load['where'] .= " AND name = '".$user."'";
-					}
 					$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt".$load['other']." FROM ".strtolower($bot)."_".$load['table']."".$load['where']." GROUP BY name ORDER BY cnt DESC");
 					if (!empty($players)) {
 						foreach($players as $player) {
@@ -565,19 +560,19 @@ class Raid extends BaseActiveModule
 							if(isset($checka[0][0])&&count($checka)==1) {
 								$main = $checka[0][0];
 								if(!array_key_exists($main, $mains)) {
-									if($load['table']=='raid_damage') $mains[$main] = $rnk;
-									else $mains[$main] = $cnt;
+									if($load['table']=='raid_damage'&&($user==""||$user==$main)) $mains[$main] = $rnk;
+									elseif($user==""||$user==$main) $mains[$main] = $cnt;
 								} else {
-									if($load['table']=='raid_damage') $mains[$main] = $mains[$main]+$rnk;
-									else $mains[$main] = $mains[$main]+$cnt;
+									if($load['table']=='raid_damage'&&($user==""||$user==$main)) $mains[$main] = $mains[$main]+$rnk;
+									elseif($user==""||$user==$main) $mains[$main] = $mains[$main]+$cnt;
 								}
 							} else {
 								if(!array_key_exists($name, $mains)) {
-									if($load['table']=='raid_damage') $mains[$name] = $rnk;
-									else $mains[$name] = $cnt;
+									if($load['table']=='raid_damage'&&($user==""||$user==$name)) $mains[$name] = $rnk;
+									elseif($user==""||$user==$name) $mains[$name] = $cnt;
 								} else {
-									if($load['table']=='raid_damage') $mains[$name] = $mains[$name]+$rnk;
-									else $mains[$name] = $mains[$name]+$cnt;
+									if($load['table']=='raid_damage'&&($user==""||$user==$name)) $mains[$name] = $mains[$name]+$rnk;
+									elseif($user==""||$user==$name) $mains[$name] = $mains[$name]+$cnt;
 								}
 							}
 						}			
@@ -631,7 +626,11 @@ class Raid extends BaseActiveModule
 		$uid = $this->bot->core('player')->id($player);
         if ($uid instanceof BotError) {
 			return "Player ##highlight##$player##end## does not exist!";
-        } else {
+        } else {			
+			$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$player."'");
+			if(isset($checka[0][0])&&count($checka)==1) {
+				$player = $checka[0][0];
+			}
 			return $this->top_raid($name, $source, $player);
 		}
 	}
