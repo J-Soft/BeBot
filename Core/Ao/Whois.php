@@ -287,7 +287,7 @@ class Whois_Core extends BasePassiveModule
      * @return The WHO array, or false, or BotError
      */
     function lookup($name, $noupdate = false, $nowait = false)
-    {
+    {	
         if ($this->bot->core("settings")->get("Statistics", "Enabled")) {
             $this->bot->core("statistics")
                 ->capture_statistic("Whois", "Lookup");
@@ -362,7 +362,7 @@ class Whois_Core extends BasePassiveModule
                 // No old data exists, return error:
                 $this->error->set(
                     "No cached character data was found for $name, but no web lookup mode was requested!"
-                );
+                );		
                 return $this->error;
             } else {
                 // only cache valid entries

@@ -511,6 +511,63 @@ class tools extends BasePassiveModule
             Return ($a == $b);
         }
     }
+	
+	// generic message cleanup called by various relays
+	// mode : 0 cleans all, 1 cleans only specifics
+	function cleanString($msg,$mode=0) {
+		if($mode==0) {
+			$msg = strip_tags(utf8_encode($msg));
+			$msg = str_replace("&gt;", ">", $msg);
+			$msg = str_replace("&lt;", "<", $msg);
+			$msg = str_replace("&amp;", "&", $msg);
+		} else {	
+			$patterns[0] = '/%(E1|E2|E0|E5|E4|E3)/'; // áâàåäã
+			$patterns[1] = '/%(C0|C1|C2|C3|C4|C5)/'; // ÀÁÂÃÄÅ
+			$patterns[2] = '/%(E9|EA|E8|EB)/'; // éêèë
+			$patterns[3] = '/%(C8|C9|CA|CB)/'; // ÈÉÊË
+			$patterns[4] = '/%(ED|EE|EC|EF)/'; // íîìï
+			$patterns[5] = '/%(CC|CD|CE|CF)/'; // ÌÍÎÏ
+			$patterns[6] = '/%(F3|F4|F2|F8|F0|F5|F6)/'; // óôòøðõö
+			$patterns[7] = '/%(D2|D3|D4|D5|D6|D8)/'; // ÒÓÔÕÖØ
+			$patterns[8] = '/%(FA|FB|F9|FC)/'; // úûùü
+			$patterns[9] = '/%(D9|DA|DB|DC)/'; // ÙÚÛÜ
+			$patterns[10] = '/%E6/'; // æ
+			$patterns[11] = '/%C6/'; // Æ
+			$patterns[12] = '/%E7/'; // ç
+			$patterns[13] = '/%C7/'; // Ç
+			$patterns[14] = '/%DF/'; // ß
+			$patterns[15] = '/%(FD|FF)/'; // ýÿ
+			$patterns[16] = '/%DD/'; // Ý
+			$patterns[17] = '/%F1/';// ñ
+			$patterns[18] = '/%D1/';// Ñ
+			$patterns[19] = '/%DE/';// Þ
+			$patterns[20] = '/%FE/';// þ
+			$replacements[0] = 'a';
+			$replacements[1] = 'A';
+			$replacements[2] = 'e';
+			$replacements[3] = 'E';
+			$replacements[4] = 'i';
+			$replacements[5] = 'I';
+			$replacements[6] = 'o';
+			$replacements[7] = 'O';
+			$replacements[8] = 'u';
+			$replacements[9] = 'U';
+			$replacements[10] = 'ae';
+			$replacements[11] = 'AE';
+			$replacements[12] = 'c';
+			$replacements[13] = 'C';
+			$replacements[14] = 'ss';
+			$replacements[15] = 'y';		
+			$replacements[16] = 'Y';		
+			$replacements[17] = 'n';		
+			$replacements[18] = 'N';		
+			$replacements[19] = 'b';				
+			$replacements[20] = 'B';				
+			return urldecode(preg_replace($patterns, $replacements, urlencode($msg)));
+		}
+		return $msg;
+	}	
+	
 }
 
 ?>

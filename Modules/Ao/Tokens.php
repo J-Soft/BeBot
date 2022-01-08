@@ -59,6 +59,7 @@ class tokens extends BaseActiveModule
     {
         $return = false;
         $clan = false;
+		$level = 1;
         /*
         This should really be moved to the bot core.. but until i get the time to modify every single module... :\
         */

@@ -562,7 +562,7 @@ class Roster_Core extends BasePassiveModule
                             Catch characters who are no longer in the org.
                             */
                             else {
-                                if ($whois["org_id"] != $this->bot->guildid && $member[2] >= 1
+                                if (!($whois instanceof BotError) && $whois["org_id"] != $this->bot->guildid && $member[2] >= 1
                                     && ($member[5] == "Roster-XML" || $member[5] == "Roster-XML-Reroll" || $member[5] == "Org Message")
                                 ) {
                                     /*

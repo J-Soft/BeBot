@@ -85,8 +85,8 @@ class History extends BaseActiveModule
 				if(file_exists($this->path."/".$file)) {
 					$content = file_get_contents($this->path."/".$file);
 					$distant = false;
-				} else {
-					$content = $this->bot->core("tools")->get_site("http://pork.budabot.jkbff.com/pork/history.php?server=".$dim."&name=".$name);
+				} else {				
+					$content = $this->bot->core("tools")->get_site("https://pork.jkbff.com/pork/history.php?server=".$dim."&name=".$name);
 					$distant = true;
 				}
 				if (!($content instanceof BotError)) {
@@ -217,10 +217,10 @@ class History extends BaseActiveModule
 				if($filename!="."&&$filename!=".."&&$filename!="history.txt") {
 					if($filename==$file) {
 						unlink($this->path."/".$filename);
-					}
-					file_put_contents($this->path."/".$file, $content);
+					}					
 				}
 			}
+			file_put_contents($this->path."/".$file, $content);
 		}
 	}
 	

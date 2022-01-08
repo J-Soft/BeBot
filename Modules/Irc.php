@@ -59,6 +59,7 @@ class IRC extends BaseActiveModule
         $this->register_module("irc");
         $this->register_command("all", "irc", "SUPERADMIN");
         $this->register_command("all", "irconline", "GUEST");
+		$this -> register_alias("irconline", "irco");
         $this->register_event("buddy");
         $this->register_event("connect");
         $this->register_event("disconnect");
@@ -238,7 +239,7 @@ class IRC extends BaseActiveModule
     {
         if (strtolower(
                 $this->bot->core("settings")
-                    ->get("Irc", "Itemref")
+                    ->get("Irc", "ItemRef")
             ) == "auno"
         ) {
             $rep = "http://auno.org/ao/db.php?id=\\1&id2=\\2&ql=\\3";
@@ -262,39 +263,9 @@ class IRC extends BaseActiveModule
         $msg = preg_replace("/<\/a>/iU", "", $msg);
         $msg = preg_replace("/<font(.+)>/iU", "", $msg);
         $msg = preg_replace("/<\/font>/iU", "", $msg);
-		$msg = $this->cleanString($msg);
+		$msg = $this->bot->core("tools")->cleanString($msg,0);
         return $msg;
-    }
-
-	function cleanString($msg) {
-		$patterns[0] = '/%(E1|E2|E0|E5|E4|E3|C0|C1|C2|C3|C4|C5|C6)/'; // áâàåäãÀÁÂÃÄÅÆ
-		$patterns[1] = '/%(F0|E9|EA|E8|EB|C8|C9|CA|CB)/'; // ðéêèëÈÉÊË
-		$patterns[2] = '/%(ED|EE|EC|EF|CC|CD|CE|CF)/'; // íîìïÌÍÎÏ
-		$patterns[3] = '/%(F3|F4|F2|F8|F0|F5|F6|D2|D3|D4|D5|D6|D8)/'; // óôòøðõöÒÓÔÕÖØ
-		$patterns[4] = '/%(FA|FB|F9|FC|D9|DA|DB|DC)/'; // úûùüÙÚÛÜ
-		$patterns[5] = '/%E6/'; // æ
-		$patterns[6] = '/%(E7|C7)/'; // çÇ
-		$patterns[7] = '/%DF/'; // ß
-		$patterns[8] = '/%(FD|FF|DD)/'; // ýÿÝ
-		$patterns[9] = '/%(F1|D1)/';// ñÑ
-		$patterns[10] = '/%(DE|FE)/';// Þþ
-		$replacements[0] = 'a';
-		$replacements[1] = 'e';
-		$replacements[2] = 'i';
-		$replacements[3] = 'o';
-		$replacements[4] = 'u';
-		$replacements[5] = 'ae';
-		$replacements[6] = 'c';
-		$replacements[7] = 'ss';
-		$replacements[8] = 'y';		
-		$replacements[9] = 'n';		
-		$replacements[10] = 'b';						
-		//return urldecode(preg_replace($patterns, $replacements, urlencode(strip_tags($msg)))); // replaced by utf8_encode()
-		$msg = str_replace("&gt;", ">", strip_tags(utf8_encode($msg)));
-		$msg = str_replace("&lt;", "<", $msg);
-		$msg = str_replace("&amp;", "&", $msg);		
-		return $msg;
-	}		
+    }	
 
     function send_irc($prefix, $name, $msg)
     {
@@ -661,8 +632,8 @@ class IRC extends BaseActiveModule
         if (strtolower($new) == "auno") {
             $tmp = "AUNO";
         }
-        $this->bot->core("settings")->save("Irc", "Itemref", $tmp);
-        return "Itemref has been switched to " . $new . ".";
+        $this->bot->core("settings")->save("Irc", "ItemRef", $tmp);
+        return "ItemRef has been switched to " . $new . ".";
     }
 
 

@@ -211,9 +211,9 @@ class Rolls extends BaseActiveModule
 		}
         if ($this->bot->core("settings")->get('Loot','Raidlock')=="On" && $this->bot->core("raid")->raid && !isset($this->bot->core("raid")->user[$name])) {
 			return $this->bot->send_tell($name, "You must first !raid join before being allowed to join any further Roll.");
-		}		
+		}
 		$who = $this->bot->core("whois")->lookup($name, true);
-		if(isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }
+		if(!($who instanceof BotError) && isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }
         if ($slot == 0) {
             $slots = array_keys($this->loot);
             foreach ($slots as $key => $sslot) {
@@ -261,7 +261,7 @@ class Rolls extends BaseActiveModule
 	function mloot($blob, $name)
 	{ 
 			$multiloots = html_entity_decode($blob);
-			if(preg_match_all("/<a href='itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)'>([^<]+)<\/a>/i", $multiloots, $matches)||preg_match_all('/<a href="itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)">([^<]+)<\/a>/i', $multiloots, $matches)) {
+			if(preg_match_all("/<a href='itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)'>([^<]+)<\/a>/i", $multiloots, $matches)||preg_match_all('/<a href="itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)">([^<]+)<\/a>/i', $multiloots, $matches)||preg_match_all('/([^ ]+)/i', $multiloots, $matches)) {
 				foreach($matches[0] as $match) {
 				$this->loot($match,$name);
 				usleep(600);
@@ -337,7 +337,7 @@ class Rolls extends BaseActiveModule
                     $this->leftovers[$lcount] = $item;
                 } else {
 					$who = $this->bot->core("whois")->lookup($winner, true);
-					if(isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }	
+					if(!($who instanceof BotError) && isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }	
                     unset($slot[$winner]);
 					$this->bot->log("LOOT", "NOTICE", $winner." (".$level.") won ".$item." from slot ".$num);
                 }			
@@ -442,14 +442,14 @@ class Rolls extends BaseActiveModule
                 foreach ($list as $key => $player) {
                     if (($player != "item") && ($player != "num") && ($slot[$player] == 2)) {
 						$who = $this->bot->core("whois")->lookup($player, true);
-						if(isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }	
+						if(!($who instanceof BotError) && isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }	
                         $msg .= " [##loot_highlight##$player##end##(".$level.")]";
                     }
                 }
                 foreach ($list as $key => $player) {
                     if (($player != "item") && ($player != "num") && ($slot[$player] == 1)) {
 						$who = $this->bot->core("whois")->lookup($player, true);
-						if(isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }	
+						if(!($who instanceof BotError) && isset($who["level"]) && $who["level"]>0) { $level = $who["level"]; } else { $level = 0; }	
 						$msg .= " [##loot_highlight##$player##end##(".$level.")]";
                     }
                 }

@@ -71,6 +71,7 @@ class Raid extends BaseActiveModule
         $this->register_command("all", "raid", "GUEST");
         $this->register_command("all", "raidhistory", "LEADER");
         $this->register_command("all", "raidstats", "LEADER");
+        $this->register_command("all", "raidstat", "GUEST");
         if (strtolower($this->bot->game) == 'ao') {
             $this->register_event("pgleave");
             $this->register_event("pgjoin");
@@ -171,7 +172,7 @@ class Raid extends BaseActiveModule
 			
         $this->help['description'] = 'Module to manage and announce raids.';
         $this->help['command']['raidhistory [x]'] = "Shows 10 archived raids ; option to skip x records from bottom links.";
-        $this->help['command']['raidstats <timestamp>'] = "Shows participants of give raid by timestamp of start.";
+        $this->help['command']['raidstats <timestamp>'] = "Shows participants of given raid by timestamp of start.";
         $this->help['command']['raid start <description>'] = "Starts a raid with optional description.";
         $this->help['command']['raid note <details>'] = "Adds optional note to current raid.";
         $this->help['command']['raid end'] = "Ends a raid.";
@@ -190,6 +191,7 @@ class Raid extends BaseActiveModule
         $this->help['command']['raid notinkick'] = "Kicks all user in privgroup who arnt in raid.";
         $this->help['command']['raid list'] = "List all user who are or where in the raid and there status.";
         $this->help['command']['raid top'] = "List top 5 leaders and readers per raid (declared alts included).";
+		$this->help['command']['raidstat <player>'] = "Shows given player various raid stat.";
         $this->help['command']['s <message>'] = "Raid command. Display <message> in a highly visiable manner.";
         $this->help['command']['c'] = "Raid command. Display cocoon warning in a highly visiable manner.";
         $this->help['command']['f'] = "Raid command. Display fence alert in a highly visiable manner.";
@@ -245,7 +247,10 @@ class Raid extends BaseActiveModule
                 Break;
             case 'raidstats':
                 Return $this->raid_stats($name, $var[1]);
-                Break;				
+                Break;			
+            case 'raidstat':
+                Return $this->raid_stat($name, $type, $var[1]);
+                Break;					
             case 'raid':
                 $var = explode(" ", $msg, 4);
 				if(!isset($var[1])) { $var[1]=""; }
@@ -269,7 +274,7 @@ class Raid extends BaseActiveModule
                     case 'abort':
                         Return $this->cancel_raid($name);						
                     case 'top':
-                        Return $this->top_raid($name, $type);						
+                        Return $this->top_raid($name, $type, '');						
                     case 'join':
                         return $this->join_raid($name);
                     case 'leave':
@@ -480,7 +485,7 @@ class Raid extends BaseActiveModule
     /*
     This gets called for top
     */
-    function top_raid($asker, $source)
+    function top_raid($asker, $source, $user)
     {
 		if($this->bot->core("settings")->get("Raid", "Morebots")!="") {
 			$bots = explode(",", $this->bot->core("settings")->get("Raid", "Morebots"));
@@ -525,18 +530,18 @@ class Raid extends BaseActiveModule
 									$main = $checka[0][0];
 									if(!array_key_exists($main, $done)) {
 										if(!array_key_exists($main, $mains)) {
-											$mains[$main] = 1;
+											if($user==""||$user==$main) $mains[$main] = 1;
 										} else {
-											$mains[$main] = $mains[$main]+1;
+											if($user==""||$user==$main) $mains[$main] = $mains[$main]+1;										
 										}
 										$done[$main] = true;
 									}
 								} else {
 									if(!array_key_exists($name, $done)) {
 										if(!array_key_exists($name, $mains)) {
-											$mains[$name] = 1;
+											if($user==""||$user==$name) $mains[$name] = 1;											
 										} else {
-											$mains[$name] = $mains[$name]+1;
+											if($user==""||$user==$name) $mains[$name] = $mains[$name]+1;											
 										}
 										$done[$name] = true;
 									}					
@@ -555,19 +560,19 @@ class Raid extends BaseActiveModule
 							if(isset($checka[0][0])&&count($checka)==1) {
 								$main = $checka[0][0];
 								if(!array_key_exists($main, $mains)) {
-									if($load['table']=='raid_damage') $mains[$main] = $rnk;
-									else $mains[$main] = $cnt;
+									if($load['table']=='raid_damage'&&($user==""||$user==$main)) $mains[$main] = $rnk;
+									elseif($user==""||$user==$main) $mains[$main] = $cnt;
 								} else {
-									if($load['table']=='raid_damage') $mains[$main] = $mains[$main]+$rnk;
-									else $mains[$main] = $mains[$main]+$cnt;
+									if($load['table']=='raid_damage'&&($user==""||$user==$main)) $mains[$main] = $mains[$main]+$rnk;
+									elseif($user==""||$user==$main) $mains[$main] = $mains[$main]+$cnt;
 								}
 							} else {
 								if(!array_key_exists($name, $mains)) {
-									if($load['table']=='raid_damage') $mains[$name] = $rnk;
-									else $mains[$name] = $cnt;
+									if($load['table']=='raid_damage'&&($user==""||$user==$name)) $mains[$name] = $rnk;
+									elseif($user==""||$user==$name) $mains[$name] = $cnt;
 								} else {
-									if($load['table']=='raid_damage') $mains[$name] = $mains[$name]+$rnk;
-									else $mains[$name] = $mains[$name]+$cnt;
+									if($load['table']=='raid_damage'&&($user==""||$user==$name)) $mains[$name] = $mains[$name]+$rnk;
+									elseif($user==""||$user==$name) $mains[$name] = $mains[$name]+$cnt;
 								}
 							}
 						}			
@@ -577,27 +582,56 @@ class Raid extends BaseActiveModule
 			if(count($mains)>0) {
 				natcasesort($mains);			
 				$mains = array_reverse($mains, true);
-				$shown = 0;
-				$inside .= "\n##highlight##".$load['type']."##end## ".$load['lapse']." \n";
+				if($user=="") $shown = 0;
+				else $shown = 4;
+				if($user=="") $inside .= "\n##highlight##".$load['type']."##end## ".$load['lapse']." \n";
+				else {
+					if($load['type']=="Leaders") $short = "Lead";
+					elseif($load['type']=="Raiders") $short = "Raid";
+					elseif($load['type']=="Damagers") $short = "Damage";
+					$inside .= "\n##highlight##".$short."##end## ".$load['lapse']." \n";
+				}
 				foreach ($mains as $main => $tot)
 				{
 					if(!in_array($main,$leaders)||$load['type']=='Leaders') {
 						$shown++;
 						if($shown<6) {
-							if($load['type']=='Leaders') array_push($leaders,$main);
+							if($user==""&&$load['type']=='Leaders') array_push($leaders,$main);
 							if($load['table']=='raid_damage') $tot = round($tot,2);
-							$inside .= " #".$shown." ".$main." (".$tot.") \n";
+							if($user=="") $inside .= " #".$shown." ".$main." (".$tot.") \n";
+							else $inside .= $tot." \n";
 						}
 					}
 				}			
 			}
 		}
-		$inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded (top 5 Leaders are expelled of following Raiders & Damagers).";
-		$output = "Top 5 in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
+		if($user=="") $inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded (top 5 Leaders are expelled of following Raiders & Damagers).";
+		else $inside .= "\n\nNote: Raid in number of raids joined (alts joined in same raid are ignored), Damage in billions of points recorded (alts joined in same raid are included), Lead in number of raids leaded.";
+		if($user=="") $output = "Top 5 in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
+		else $output = $user." raid stat :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 		if ($source == "tell") {
 			$this->bot->send_tell($asker,$output);
 		} else {
 			$this->bot->send_output($asker,$output,"both");
+		}
+	}
+	
+    /*
+    This gets called for a given player stat
+    */
+    function raid_stat($name, $source, $player)
+    {		
+		$output = "";
+		$player = ucfirst(strtolower($player));
+		$uid = $this->bot->core('player')->id($player);
+        if ($uid instanceof BotError) {
+			return "Player ##highlight##$player##end## does not exist!";
+        } else {			
+			$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$player."'");
+			if(isset($checka[0][0])&&count($checka)==1) {
+				$player = $checka[0][0];
+			}
+			return $this->top_raid($name, $source, $player);
 		}
 	}
 	
@@ -642,7 +676,7 @@ class Raid extends BaseActiveModule
     }
 
     /*
-    This gets called for stats
+    This gets called for a given raid stats
     */
     function raid_stats($name, $ts)
     {
@@ -737,6 +771,7 @@ class Raid extends BaseActiveModule
 
     function notify($name, $startup = false)
     {
+		$move = "";
         if (!$startup && $this->raid && !$this->locked) {
             if ($this->move > time()) {
                 $move = $this->move - time();
@@ -744,7 +779,7 @@ class Raid extends BaseActiveModule
                         ->format_seconds($move) . " ##end##";
             }
             $who = $this->bot->core("whois")->lookup($name);
-            if ($who['level'] < $this->minlevel) {
+            if ($who instanceof BotError || $who['level'] < $this->minlevel) {
                 Return;
             }
             $this->bot->send_tell(
@@ -807,7 +842,7 @@ class Raid extends BaseActiveModule
                     "##highlight##$name##end## has started the raid :: " . $this->clickjoin(),
                     "both"
                 );
-				$this->top_raid($name,'auto');
+				$this->top_raid($name,'auto','');
                 $this->pause(true);
                 $this->save();
                 $this->register_event("cron", "1min");			
@@ -861,7 +896,7 @@ class Raid extends BaseActiveModule
                 $this->unregister_event("cron", "1min");
                 $this->bot->send_output($name, "##highlight##$name##end## has stopped the raid.", "both");
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
-				$this->top_raid($name,'auto');		
+				$this->top_raid($name,'auto','');		
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
 					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
 					$this->bot->core("discord")->disc_alert("Raid stopped", $chan);
@@ -908,7 +943,7 @@ class Raid extends BaseActiveModule
                 $this->unregister_event("cron", "1min");
                 $this->bot->send_output($name, "##highlight##$name##end## has cancelled the raid.", "both");
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
-				$this->top_raid($name,'auto');				
+				$this->top_raid($name,'auto','');				
 				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
 					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
 					$this->bot->core("discord")->disc_alert("Raid cancelled", $chan);
@@ -1157,7 +1192,9 @@ class Raid extends BaseActiveModule
         }
         $minlevel = $this->minlevel;
         $who = $this->bot->core("whois")->lookup($name, true);
-        if (isset($this->user[$name])) {
+		if($who instanceof BotError) {
+			return "Error looking up your character infos.";
+		} elseif (isset($this->user[$name])) {
             return "You are already in the raid";
         } elseif ($who["level"] < $minlevel) {
             return "This raid is ##highlight##$minlevel+##end##";
@@ -1364,23 +1401,25 @@ class Raid extends BaseActiveModule
                                 $player,
                                 true
                             ); //All info about raiders are expected to be correct as already beeing member and all.
+						
+						if(!($who instanceof BotError)) {
+							if ($who['faction'] == "Omni") {
+								$info = " [##omni##Omni</font>/";
+							} elseif ($who['faction'] == "Clan") {
+								$info = " [##clan##Clan</font>/";
+							} elseif ($who['faction'] == "Neutral") {
+								$info = " [##neut##Neut</font>/";
+							} else //Should never happend but who knows shit happens.
+							{
+								$info = " [<font color=#D7FFBC>" . $who['faction'] . "</font>/";
+							}
 
-                        if ($who['faction'] == "Omni") {
-                            $info = " [##omni##Omni</font>/";
-                        } elseif ($who['faction'] == "Clan") {
-                            $info = " [##clan##Clan</font>/";
-                        } elseif ($who['faction'] == "Neutral") {
-                            $info = " [##neut##Neut</font>/";
-                        } else //Should never happend but who knows shit happens.
-                        {
-                            $info = " [<font color=#D7FFBC>" . $who['faction'] . "</font>/";
-                        }
+							$info .= "<font color=#A2FF4C>" . $who['level'] . "</font>/";
+							$info .= "<font color=#FFFB9E>" . $who['profession'] . "</font>]";
 
-                        $info .= "<font color=#A2FF4C>" . $who['level'] . "</font>/";
-                        $info .= "<font color=#FFFB9E>" . $who['profession'] . "</font>]";
-
-                        $inside .= $player . " [" . $this->bot->core("tools")
-                                ->chatcmd("raid kick " . $player, "Kick") . "]\n";
+							$inside .= $player . " [" . $this->bot->core("tools")
+									->chatcmd("raid kick " . $player, "Kick") . "]\n";
+						}
                     }
                 } else {
                     $inside .= "There are no members of this raid.";

@@ -1,4 +1,11 @@
 -------------------------
+Release 0.7.21 - Jan 2022 
+-------------------------
+- For both: more flexible multiloot ; added WebSocket relay (working with both Tyr/Nad) ; fixed rare Whois crash ; completed user raidstat
+- For AO: updated History ; improved TaraViza courtesy of Nadybot's Team API
+- For AoC: nothing specific in this patch
+
+-------------------------
 Release 0.7.20 - Nov 2021
 -------------------------
 - For both: gcr/c relay for chats+online (AO: Nad/Tyr also patched & compatible) ; wider Discord/Irc options ; multiple alts add ; ban improvements ; UserAdmin interface
