@@ -1,9 +1,9 @@
 -------------------------
-Release 0.7.21 - ??? ???? 
+Release 0.7.21 - Jan 2022 
 -------------------------
-- For both: more flexible multiloot ; added WebSocket relay (working with both Tyr/Nad) ; fixed rare Whois crash
-- For AO: updated History ; improved TaraViza courtesy of Nadybot Team API
-- For AoC: ...
+- For both: more flexible multiloot ; added WebSocket relay (working with both Tyr/Nad) ; fixed rare Whois crash ; completed user raidstat
+- For AO: updated History ; improved TaraViza courtesy of Nadybot's Team API
+- For AoC: nothing specific in this patch
 
 -------------------------
 Release 0.7.20 - Nov 2021
