@@ -99,7 +99,7 @@ class DiscordRelay extends BaseActiveModule
         $this->help['description'] = "Handles the Discord relay of the bot.";
         $this->help['command']['discord connect'] = "Tries relaying from/to the Discord channel.";
         $this->help['command']['discord disconnect'] = "Stops relaying from/to the Discord channel.";
-        $this->help['notes'] = "The Discord relay is configured via settings, for all options check /tell <botname> <pre>settings discord. Discord side commands available are : is, online/sm, whois, level/lvl/pvp";
+        $this->help['notes'] = "The Discord relay is configured via settings, for all options check /tell <botname> <pre>settings discord. Discord side commands available are : is, online/sm, whois, alts, level/lvl/pvp";
         $this->bot->core("settings")
             ->create("discord", "DiscordRelay", false, "Should the bot be relaying from/to Discord server ?", "On;Off", true);	
         $this->bot->core("settings")
@@ -410,6 +410,9 @@ class DiscordRelay extends BaseActiveModule
 										case $this->bot->commpre . 'is':
 											$sent = $this->discord_is($msg['content']);
 											Break;
+										case $this->bot->commpre . 'alts':
+											$sent = $this->discord_alts($msg['content']);
+											Break;											
 										case $this->bot->commpre . 'tara':
 											$sent = $this->discord_tara($msg['content']);
 											Break;
@@ -458,7 +461,7 @@ class DiscordRelay extends BaseActiveModule
 		$sent = "";
 		if (preg_match("/^" . $this->bot->commpre . "is ([a-zA-Z0-9]{4,25})$/i", $msg, $info)) {
 			$info[1] = ucfirst(strtolower($info[1]));
-            if (!$this->bot->core('player')->id($info[1])) {
+            if ($this->bot->core('player')->id($info[1]) instanceof BotError) {
                 $sent = "Player " . $info[1] . " does not exist.";
             } else {
                 if ($info[1] == ucfirst(strtolower($this->bot->botname))) {
@@ -476,9 +479,33 @@ class DiscordRelay extends BaseActiveModule
 					}
                 }
             }
+		} else {
+			$sent = "Please enter a valid name.";
 		}
 		return $sent;
 	}
+	
+    /*
+    * Gets called when someone does !alts
+    */
+    function discord_alts($msg)
+    {
+		$sent = "";
+		if (preg_match("/^" . $this->bot->commpre . "alts ([a-zA-Z0-9]{4,25})$/i", $msg, $info)) {
+			$info[1] = ucfirst(strtolower($info[1]));
+            if ($this->bot->core('player')->id($info[1]) instanceof BotError) {
+                $sent = "Player " . $info[1] . " does not exist.";
+            } else {
+				$main = $this->bot->core("alts")->main($info[1]);
+				$list = $this->bot->core("alts")->get_alts($main);
+				if(count($list)>0) $sent = $main."'s alts : ".implode(" ", $list);
+				else $sent = $main." has no alts defined!";
+            }
+		} else {
+			$sent = "Please enter a valid name.";
+		}
+		return $sent;
+	}	
 	
     /*
     This gets called if a buddy logs on/off
@@ -522,11 +549,13 @@ class DiscordRelay extends BaseActiveModule
 		$sent = "";
 		if (preg_match("/^" . $this->bot->commpre . "whois (.+)$/i", $msg, $info)) {
             $info[1] = ucfirst(strtolower($info[1]));
-			if (!$this->bot->core('player')->id($info[1])) {
+			if ($this->bot->core('player')->id($info[1]) instanceof BotError) {
 				$sent = "Player " . $info[1] . " does not exist.";
 			} else {
 				$sent = $this->whois_player($info[1]);
 			}		
+		} else {
+			$sent = "Please enter a valid name.";
 		}
 		return $sent;		
 	}	

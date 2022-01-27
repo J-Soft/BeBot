@@ -69,7 +69,7 @@ class IRC extends BaseActiveModule
         $this->help['command']['irconline'] = "Shows users in the IRC Channel.";
         $this->help['command']['irc connect'] = "Tries to connect to the IRC channel.";
         $this->help['command']['irc disconnect'] = "Disconnects from the IRC server.";
-        $this->help['notes'] = "The IRC relay is configured via settings, for all options check /tell <botname> <pre>settings IRC. Irc side commands available are : tara, viza, is, online/sm, whois, level/lvl/pvp";
+        $this->help['notes'] = "The IRC relay is configured via settings, for all options check /tell <botname> <pre>settings IRC. Irc side commands available are : tara, viza, is, online/sm, whois, alts, level/lvl/pvp";
         // Create default settings:
         if ($this->bot->guildbot) {
             $guildprefix = "[" . $this->bot->guildname . "]";
@@ -728,6 +728,12 @@ class IRC extends BaseActiveModule
         );
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_CHANNEL,
+            $this->bot->commpre . 'alts (.*)',
+            $this->bot->commands["tell"]["irc"],
+            'alts_is'
+        );		
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_CHANNEL,
             $this->bot->commpre . 'level (.*)',
             $this->bot->commands["tell"]["irc"],
             'irc_level'
@@ -769,6 +775,12 @@ class IRC extends BaseActiveModule
             $this->bot->commands["tell"]["irc"],
             'irc_is'
         );
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_QUERY,
+            $this->bot->commpre . 'alts (.*)',
+            $this->bot->commands["tell"]["irc"],
+            'alts_is'
+        );		
         //$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'tell (.*)', $this -> bot -> commands["tell"]["irc"], 'ao_msg');
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_QUERY,
@@ -1077,6 +1089,36 @@ class IRC extends BaseActiveModule
             $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
         }
     }
+	
+	
+    /*
+    * Gets called when someone does !alts
+    */
+    function alts_is(&$irc, &$data)
+    {
+        $msg = "";		
+        if ($data->type == SMARTIRC_TYPE_QUERY) {
+            $target = $data->nick;
+        } else {
+            $target = $this->bot->core("settings")->get("Irc", "Channel");
+        }
+        if (!preg_match("/^" . $this->bot->commpre . "alts ([a-zA-Z0-9]{4,25})$/i", $data->message, $info)) {
+            $msg = "Please enter a valid name.";
+        } else {
+            $info[1] = ucfirst(strtolower($info[1]));
+            if ($this->bot->core('player')->id($info[1]) instanceof BotError) {
+                $msg = "Player " . $info[1] . " does not exist.";
+            } else {
+				$main = $this->bot->core("alts")->main($info[1]);
+				$list = $this->bot->core("alts")->get_alts($main);
+				if(count($list)>0) $msg = $main."'s alts : ".implode(" ", $list);
+				else $msg = $main." has no alts defined!";
+            }
+        }
+        if (!empty($msg)) {
+            $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
+        }
+    }	
 
 
     /*
@@ -1396,6 +1438,10 @@ class IRC extends BaseActiveModule
                 $data->message = $this->bot->commpre . $data->message;
                 $this->irc_is($irc, $data);
                 Break;
+            case 'alts':
+                $data->message = $this->bot->commpre . $data->message;
+                $this->alts_is($irc, $data);
+                Break;				
             case 'online':
 			case 'sm':
                 $data->message = $this->bot->commpre . $data->message;
