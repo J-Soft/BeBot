@@ -639,21 +639,30 @@ class DiscordRelay extends BaseActiveModule
             ) == "pgroup"
         ) {
             $channels = "status_pg = 1";
-        }
+        }	
         $online = $this->bot->db->select(
-            "SELECT DISTINCT(nickname) FROM #___online WHERE " . $this->bot
+            "SELECT DISTINCT(nickname), botname FROM #___online WHERE " . $this->bot
                 ->core("online")
                 ->otherbots() . " AND " . $channels . " ORDER BY nickname ASC"
-        );
+        );				
         if (empty($online)) {
             $sent = "Nobody online on notify!";
         } else {
-            $sent = count($online) . " online in game ... ";
-            $list = array();
+            $orglist = array();
+			$othlist = array();
             foreach ($online as $name) {
-                $list[] = $name[0];
+				if($name[1] == $this->bot->botname) {
+					$orglist[] = $name[0];
+				}
             }
-            $sent .= implode(" ", $list);
+			foreach ($online as $name) {
+				if($name[1] != $this->bot->botname && !in_array($name[0], $orglist) ) {
+					$othlist[] = $name[0];
+				}				
+			}		
+            $sent = count($orglist) . " online in org + ". count($othlist) . " others : ";
+			if(count($orglist)>0&&count($othlist)>0) { $spacer = " + "; } else { $spacer = " "; }
+            $sent .= implode(" ", $orglist). $spacer . implode(" ", $othlist);
         }
 		return $sent;		
     }	
