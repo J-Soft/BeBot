@@ -2,7 +2,7 @@
 require "discord_curl.php";
 
 if (!defined("DISCORD_API"))
-    define("DISCORD_API", "https://discordapp.com/api/v6");
+    define("DISCORD_API", "https://discordapp.com/api/v9");
 
 
 /**
