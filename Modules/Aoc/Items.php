@@ -152,6 +152,7 @@ class Items extends BaseActiveModule
         $items = $this -> bot -> core('items') -> parse_items($msg);
 
         $passkey = $this -> bot -> core("settings") -> get("Items", "Passkey");
+		if($passkey=='none') $passkey = '';
 
         if ($origin == "org") { $origin = "gc"; }
 
