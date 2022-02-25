@@ -309,7 +309,7 @@ class Roster_Core extends BasePassiveModule
             "Starting roster update for guild id: " . $this->bot->guildid . " on RK" . $this->bot->dimension
         );
         if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
-            $this->bot->send_gc("##normal##Roster update starting ::: System busy##end##");
+            $this->bot->send_gc("##normal##Roster Org update starting ::: System busy##end##");
         }
         // Get the guild roster
         if (strtolower($this->bot->game) == 'ao') {
@@ -519,7 +519,7 @@ class Roster_Core extends BasePassiveModule
                         /*
                         If we still have no updates for this member after 2 days, remove.
                         */
-                        if (!$id) {
+                        if ($id instanceof BotError) {
                             if ((($member[4] + 172800) <= time()) && ($member[4] != 0)) {
                                 $this->erase(
                                     "Roster",
@@ -670,7 +670,7 @@ class Roster_Core extends BasePassiveModule
         } else {
             $this->bot->log("ROSTER", "UPDATE", "Starting raid roster update");
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
-                $this->bot->send_pgroup("##normal##" . $msg . "Roster update starting ::: System busy##end##");
+                $this->bot->send_pgroup("##normal##" . $msg . "Roster Raid update starting ::: System busy##end##");
             }
             $buddies = $this->bot->aoc->buddies;
             $num = 0;
@@ -685,7 +685,7 @@ class Roster_Core extends BasePassiveModule
                     /*
                     Catch deleted characters.
                     */
-                    if (!$id) {
+                    if ($id instanceof BotError) {
                         if ((($member[4] + 172800) <= time()) && ($member[4] != 0)) {
                             $this->erase(
                                 "Roster",
@@ -698,7 +698,7 @@ class Roster_Core extends BasePassiveModule
                             $this->bot->log(
                                 "ROSTER",
                                 "INFO",
-                                $member[1] . " is in members table but Apears to have been Deleted, skipping removal for now"
+                                $member[1] . " is in members table but Appears to have been Deleted, skipping removal for now"
                             );
 							$upid[$member[0]] = true;
                         }
