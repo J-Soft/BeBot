@@ -63,7 +63,7 @@ class BanManager extends BaseActiveModule
         $this->help['command']['ban search'] = "Searches among currently + previously banned toons.";
         $this->help['command']['ban add <name> <reason>'] = "Bans <name> for <reason> from the bot forever - or until manually unbanned.";
         $this->help['command']['ban add <name> <time> <reason>']
-            = "Bans <name> for <reason> from the bot for <time>. <time> has a base unit of days. Using 'm' for minutes, 'h' for hours and 'd' for days directly behind the number you can change the time unit. '6h' as time would ban the character for 6h, after which the ban will be automatically deleted. The bot checks every minute for bans that have run out.";
+            = "Bans <name> for <reason> from the bot for <time>. <time> has a base unit of days. Use 'h' for hours, 'd' for days, 'w' for weeks, 'm' for monthes, 'y' for years directly behind the number you can change the time unit. '6h' as time would ban the character for 6h, after which the ban will be automatically deleted. The bot checks every minute for bans that have run out.";
         $this->help['command']['ban del <name>'] = "Unbans <name>.";
         $this->help['command']['ban rem <name>'] = "Unbans <name>.";
         $this->bot->core("command_alias")->register("ban list", "banlist");
@@ -105,11 +105,11 @@ class BanManager extends BaseActiveModule
             return $this->ban_search($info[1], $info[2]);
         } elseif (preg_match("/^ban search (.+)$/i", $msg, $info)) {
             return $this->ban_search(0, $info[1]);
-        } elseif (preg_match("/^ban add ([a-z0-9-]+) ([0-9]+[mhd]?)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban add ([a-z0-9-]+) ([0-9]+[hdwmy]?)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], $info[2], "");
         } elseif (preg_match("/^ban add ([a-z0-9-]+)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], "0", "");
-        } elseif (preg_match("/^ban add ([a-z0-9-]+) ([0-9]+[mhd]?) (.+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^ban add ([a-z0-9-]+) ([0-9]+[hdwmy]?) (.+)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], $info[2], $info[3]);
         } elseif (preg_match("/^ban add ([a-z0-9-]+) (.+)$/i", $msg, $info)) {
             return $this->add_ban($name, $info[1], "0", $info[2]);
@@ -322,13 +322,18 @@ class BanManager extends BaseActiveModule
             $endtime = 0;
         } else {
             $timesize = 60 * 60 * 24;
-            if (stristr($duration, 'm')) {
-                $timesize = 60;
-            } elseif (stristr($duration, 'h')) {
+			if (stristr($duration, 'h')) {
                 $timesize = 60 * 60;
             } elseif (stristr($duration, 'd')) {
                 $timesize = 60 * 60 * 24;
+            } elseif (stristr($duration, 'w')) {
+                $timesize = 60 * 60 * 24 * 7;
+            } elseif (stristr($duration, 'm')) {
+                $timesize = 60 * 60 * 24 * 30;
+            } elseif (stristr($duration, 'y')) {
+                $timesize = 60 * 60 * 24 * 365;
             }
+			
             settype($duration, "integer");
             $endtime = time() + $duration * $timesize;
         }

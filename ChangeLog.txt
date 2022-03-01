@@ -1,4 +1,10 @@
 -------------------------
+Release 0.7.22 - Mar 2022 
+-------------------------
+- For both: reviewing ban duration ; improved irc/discord relays ; various fixes
+- For AoC: small Item changes
+
+-------------------------
 Release 0.7.21 - Jan 2022 
 -------------------------
 - For both: more flexible multiloot ; added WebSocket relay (working with both Tyr/Nad) ; fixed rare Whois crash ; completed user raidstat

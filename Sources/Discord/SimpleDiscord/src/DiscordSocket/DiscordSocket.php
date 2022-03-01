@@ -14,7 +14,7 @@ class DiscordSocket {
 
 	private $lastFrame=null;
 
-	private const CURRENT_GATEWAY_VERSION = "6";
+	private const CURRENT_GATEWAY_VERSION = "9";
 
 	public function __construct(\SimpleDiscord\SimpleDiscord $discord) {
 		$this->discord = $discord;
@@ -234,7 +234,7 @@ class DiscordSocket {
 					$this->identify();
 					break;
 				case 10: // Hello
-					$this->discord->log("Recieved hello", 3);
+					$this->discord->log("Received hello", 3);
 					$this->heartbeatInterval = $response->d->heartbeat_interval;
 					$this->sendHeartbeat();
 					break;
