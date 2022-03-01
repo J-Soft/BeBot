@@ -1,9 +1,8 @@
 -------------------------
-Release 0.7.22 - ??? 2022 
+Release 0.7.22 - Mar 2022 
 -------------------------
-- For both: reviewing ban duration ; improved irc/discord relays ; various fixes ;
-- For AO: ...
-- For AoC: small Item changes ;
+- For both: reviewing ban duration ; improved irc/discord relays ; various fixes
+- For AoC: small Item changes
 
 -------------------------
 Release 0.7.21 - Jan 2022 
