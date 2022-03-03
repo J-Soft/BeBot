@@ -87,7 +87,7 @@ class Roster_Core extends BasePassiveModule
             ->create(
                 "Roster",
                 "AllowedTime",
-                23,
+                24,
                 "Is there an exclusive hour (in server local time, from 0 to 23) you'd prefer for the bot autoupdate (use 24 otherwise to disable and allow any hour)?",
                 "0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24"
             );		
