@@ -502,7 +502,8 @@ class OnlineOrg extends BaseActiveModule
 			foreach ($sortedorg as $sorted)
 			{
 				foreach($sorted as $player) {
-					if($player["state"]=="on") { $color = "##green##"; $oncount++; } elseif($player["state"]=="off") { $color = "##red##"; } else { $color = "##orange##"; }
+					$separ = '?';
+					if($player["state"]=="on") { $color = "##green##"; $oncount++; $separ = '#'; } elseif($player["state"]=="off") { $color = "##red##"; $separ = 'X'; } else { $color = "##orange##"; }
 					if($player["profession"]=="Adventurer") { $prof="Advy"; }
 					elseif($player["profession"]=="Agent") { $prof="Agt"; }
 					elseif($player["profession"]=="Bureaucrat") { $prof="Bur"; }
@@ -525,7 +526,7 @@ class OnlineOrg extends BaseActiveModule
 								$current = $player["level"];
 								$blob .= "\n\n".$player["level"].":\n";
 							}
-							$blob .= $color.$player["nickname"]."##end## (".$this->bot->core("shortcuts")->get_short($player["rank"])." ".$prof.") | ";
+							$blob .= $color.$player["nickname"]."##end## (".$this->bot->core("shortcuts")->get_short($player["rank"])." ".$prof.") ".$separ;
 							break;
 						case "Profession":
 							if($current != $player["profession"])
@@ -533,10 +534,10 @@ class OnlineOrg extends BaseActiveModule
 								$current = $player["profession"];
 								$blob .= "\n\n".$player["profession"].":\n";
 							}
-							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$this->bot->core("shortcuts")->get_short($player["rank"]).") | ";
+							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$this->bot->core("shortcuts")->get_short($player["rank"]).") ".$separ;
 							break;
 						case "Name":
-							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$this->bot->core("shortcuts")->get_short($player["rank"])." ".$prof.") | ";
+							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$this->bot->core("shortcuts")->get_short($player["rank"])." ".$prof.") ".$separ;
 							break;				
 						default:
 							if($current != $player["rank"])
@@ -544,7 +545,7 @@ class OnlineOrg extends BaseActiveModule
 								$current = $player["rank"];
 								$blob .= "\n\n".$player["rank"].":\n";
 							}
-							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$prof.") | ";
+							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$prof.") ".$separ;
 							break;
 					}				
 				}
