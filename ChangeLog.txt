@@ -1,4 +1,11 @@
 -------------------------
+Release 0.7.23 - ... 2022 
+-------------------------
+- For both: Roster time control ;
+- For AO: ...
+- For AoC: ...
+
+-------------------------
 Release 0.7.22 - Mar 2022 
 -------------------------
 - For both: reviewing ban duration ; improved irc/discord relays ; various fixes

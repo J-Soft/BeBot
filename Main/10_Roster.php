@@ -66,7 +66,7 @@ class Roster_Core extends BasePassiveModule
         if ($bot->guildbot) {
             $this->register_event("gmsg", "Org Msg");
         }
-        $this->register_event("cron", "24hour");
+        $this->register_event("cron", "1hour");
         $this->update_table();
         $this->bot->core("settings")
             ->create("Members", "LastRosterUpdate", 1, "Last time we completed a Roster update", null, true, 2);
@@ -83,6 +83,14 @@ class Roster_Core extends BasePassiveModule
         $this->bot->core("settings")
             ->create("Members", "QuietUpdate", false, "Do roster update quietly without spamming the guild channel?");
 		$this->bot->core("settings")->create("Members", "MembersUrl", "http://people.anarchy-online.com", "What is HTTP(s) Members interface  URL (FC official by default, or your prefered mirror) ?");
+        $this->bot->core("settings")
+            ->create(
+                "Roster",
+                "AllowedTime",
+                23,
+                "Is there an exclusive hour (in server local time, from 0 to 23) you'd prefer for the bot autoupdate (use 24 otherwise to disable and allow any hour)?",
+                "0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24"
+            );		
         $this->startup = true;
         $this->running = false;
     }
@@ -302,6 +310,13 @@ class Roster_Core extends BasePassiveModule
             }
             return;
         }
+		$allowedt = $this->bot->core("settings")->get("Roster", "AllowedTime");
+		if (isset($allowedt)&&$allowedt!=''&&is_numeric($allowedt)&&$allowedt>=0&&$allowedt<=23) {
+			if($allowedt!=date('G')) {
+				$this->bot->log("ROSTER", "UPDATE", "Roster org update cancelled as now (".date('G').") is not allowed time (".$allowedt.")!");
+				return;
+			}
+		}
         $this->running = true;
         $this->bot->log(
             "ROSTER",
@@ -656,6 +671,13 @@ class Roster_Core extends BasePassiveModule
     function update_raid($force = false)
     {
 		$msg = ""; $upid = array();
+		$allowedt = $this->bot->core("settings")->get("Roster", "AllowedTime");
+		if (isset($allowedt)&&$allowedt!=''&&is_numeric($allowedt)&&$allowedt>=0&&$allowedt<=23) {
+			if($allowedt!=date('G')) {
+				$this->bot->log("ROSTER", "UPDATE", "Roster raid update cancelled as now (".date('G').") is not allowed time (".$allowedt.")!");
+				return;
+			}
+		}		
         if ($this->running) {
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_pgroup("Roster update is already running");
