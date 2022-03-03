@@ -526,7 +526,7 @@ class OnlineOrg extends BaseActiveModule
 								$current = $player["level"];
 								$blob .= "\n\n".$player["level"].":\n";
 							}
-							$blob .= $color.$player["nickname"]."##end## (".$this->bot->core("shortcuts")->get_short($player["rank"])." ".$prof.") ".$separ;
+							$blob .= $color.$player["nickname"]."##end## (".$this->bot->core("shortcuts")->get_short($player["rank"])." ".$prof.") ".$separ." ";
 							break;
 						case "Profession":
 							if($current != $player["profession"])
@@ -534,10 +534,10 @@ class OnlineOrg extends BaseActiveModule
 								$current = $player["profession"];
 								$blob .= "\n\n".$player["profession"].":\n";
 							}
-							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$this->bot->core("shortcuts")->get_short($player["rank"]).") ".$separ;
+							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$this->bot->core("shortcuts")->get_short($player["rank"]).") ".$separ." ";
 							break;
 						case "Name":
-							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$this->bot->core("shortcuts")->get_short($player["rank"])." ".$prof.") ".$separ;
+							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$this->bot->core("shortcuts")->get_short($player["rank"])." ".$prof.") ".$separ." ";
 							break;				
 						default:
 							if($current != $player["rank"])
@@ -545,7 +545,7 @@ class OnlineOrg extends BaseActiveModule
 								$current = $player["rank"];
 								$blob .= "\n\n".$player["rank"].":\n";
 							}
-							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$prof.") ".$separ;
+							$blob .= $color.$player["nickname"]."##end## (".$player["level"]." ".$prof.") ".$separ." ";
 							break;
 					}				
 				}
