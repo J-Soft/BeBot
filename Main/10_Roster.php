@@ -312,7 +312,7 @@ class Roster_Core extends BasePassiveModule
         }
 		$allowedt = $this->bot->core("settings")->get("Roster", "AllowedTime");
 		if (isset($allowedt)&&$allowedt!=''&&is_numeric($allowedt)&&$allowedt>=0&&$allowedt<=23) {
-			if($allowedt!=date('G')) {
+			if(!$force&&$allowedt!=date('G')) {
 				$this->bot->log("ROSTER", "UPDATE", "Roster org update cancelled as now (".date('G').") is not allowed time (".$allowedt.")!");
 				return;
 			}
@@ -673,7 +673,7 @@ class Roster_Core extends BasePassiveModule
 		$msg = ""; $upid = array();
 		$allowedt = $this->bot->core("settings")->get("Roster", "AllowedTime");
 		if (isset($allowedt)&&$allowedt!=''&&is_numeric($allowedt)&&$allowedt>=0&&$allowedt<=23) {
-			if($allowedt!=date('G')) {
+			if(!$force&&$allowedt!=date('G')) {
 				$this->bot->log("ROSTER", "UPDATE", "Roster raid update cancelled as now (".date('G').") is not allowed time (".$allowedt.")!");
 				return;
 			}
