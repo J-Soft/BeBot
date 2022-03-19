@@ -298,371 +298,368 @@ class Roster_Core extends BasePassiveModule
     {
 		$upid = array(); $denot = array();
 		$members = array(); $db_member = array();
-		$this->lastrun = $this->bot->core("settings")
-            ->get("members", "LastRosterUpdate");
-        if (($this->lastrun + 21600) >= time() && $force == false) {
-            $this->bot->log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
-            return;
-        }
-        if ($this->running) {
+		$this->lastrun = $this->bot->core("settings")->get("members", "LastRosterUpdate");
+		$allowedt = $this->bot->core("settings")->get("Roster", "AllowedTime");		
+		if (isset($allowedt)&&$allowedt!=''&&is_numeric($allowedt)&&$allowedt>=0&&$allowedt<=23&&!$force&&$allowedt!=date('G')) {
+			$this->bot->log("ROSTER", "UPDATE", "Roster org update cancelled as now (".date('G').") is not allowed time (".$allowedt.")!");
+			Return;
+		} elseif ($this->running) {
+			$this->bot->log("ROSTER", "UPDATE", "Roster org was already running, cancelled!");
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
-                $this->bot->send_gc("Roster update is already running");
+                $this->bot->send_gc("Roster org update was already running, cancelled.");
             }
-            return;
-        }
-		$allowedt = $this->bot->core("settings")->get("Roster", "AllowedTime");
-		if (isset($allowedt)&&$allowedt!=''&&is_numeric($allowedt)&&$allowedt>=0&&$allowedt<=23) {
-			if(!$force&&$allowedt!=date('G')) {
-				$this->bot->log("ROSTER", "UPDATE", "Roster org update cancelled as now (".date('G').") is not allowed time (".$allowedt.")!");
-				return;
+			Return;
+        } elseif (($this->lastrun + 21600) >= time() && $force == false) {
+            $this->bot->log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
+			Return;	
+        } else {
+			$this->running = true;
+			$this->bot->log(
+				"ROSTER",
+				"UPDATE",
+				"Starting roster update for guild id: " . $this->bot->guildid . " on RK" . $this->bot->dimension
+			);
+			if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
+				$this->bot->send_gc("##normal##Roster Org update starting ::: System busy##end##");
 			}
-		}
-        $this->running = true;
-        $this->bot->log(
-            "ROSTER",
-            "UPDATE",
-            "Starting roster update for guild id: " . $this->bot->guildid . " on RK" . $this->bot->dimension
-        );
-        if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
-            $this->bot->send_gc("##normal##Roster Org update starting ::: System busy##end##");
-        }
-        // Get the guild roster
-        if (strtolower($this->bot->game) == 'ao') {
-            $dimension = $this->bot->dimension;
-            switch (strtolower($dimension)) {
-				case "testlive":
-				case "aotestproxy":
-					$dimension = "0";
-					break;
-				case "rubi-ka";
-				case "aoliveproxy":
-					$dimension = "5";
-					break;
-				case "rubi-ka-2019":
-				case "aork19proxy":
-					$dimension = "6";
-					break;
-            }
-            $members = $this->parse_org($dimension, $this->bot->guildid);
-        }
-		
-		if(!is_array($members)) {
-			$this->bot->log("ROSTER", "ERROR", "XML obtained is broken ... stopping update.");
-			return;
-		}
-		
-        /*
-        Only run the update if the XML returns more than one member, otherwise we skip the update.
-        */
-        if (count($members) > 1 || strtolower($this->bot->game) == 'aoc') {
-            $buddies = $this->bot->aoc->buddies;
-            $this->added = 0;
-            $this->removed = 0;
-            $this->rerolled = 0;
-			$db_members = array();
-            $db_members_sql = $this->bot->db->select("SELECT char_id, nickname, user_level, updated_at FROM #___users");
-            if (!empty($db_members_sql)) {
-                foreach ($db_members_sql as $db_member) {
-                    $db_members[$db_member[1]] = $db_member;
-                }
-            }
-            unset($db_members_sql);
-            if (strtolower($this->bot->game) == 'ao') { // wrong for new bots : && count($db_members) > 0
-                /*
-                Go through all members and make sure we are up to date.
-                */
-                foreach ($members as $member) {
-					if(isset($member["nickname"]) && isset($db_members[$member["nickname"]])) $db_member = $db_members[$member["nickname"]];
-					else $db_member = array();
-					/*
-					If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
-					its a new member we havent picked up for some reason.
-					*/
-					if (empty($db_member))
-					{
-						$this -> add("Roster-XML", $member["id"], $member["nickname"], "from XML");
-						$this -> added++;
+			// Get the guild roster
+			if (strtolower($this->bot->game) == 'ao') {
+				$dimension = $this->bot->dimension;
+				switch (strtolower($dimension)) {
+					case "testlive":
+					case "aotestproxy":
+						$dimension = "0";
+						break;
+					case "rubi-ka";
+					case "aoliveproxy":
+						$dimension = "5";
+						break;
+					case "rubi-ka-2019":
+					case "aork19proxy":
+						$dimension = "6";
+						break;
+				}
+				$members = $this->parse_org($dimension, $this->bot->guildid);
+			}
+			
+			if(!is_array($members)) {
+				$this->bot->log("ROSTER", "ERROR", "XML obtained is broken ... stopping update.");
+				Return;
+			}
+			
+			/*
+			Only run the update if the XML returns more than one member, otherwise we skip the update.
+			*/
+			if (count($members) > 1 || strtolower($this->bot->game) == 'aoc') {
+				$buddies = $this->bot->aoc->buddies;
+				$this->added = 0;
+				$this->removed = 0;
+				$this->rerolled = 0;
+				$db_members = array();
+				$db_members_sql = $this->bot->db->select("SELECT char_id, nickname, user_level, updated_at FROM #___users");
+				if (!empty($db_members_sql)) {
+					foreach ($db_members_sql as $db_member) {
+						$db_members[$db_member[1]] = $db_member;
 					}
-
-					else if ($db_member[2] == 1 || ($db_member[2] == 0 && (($db_member[3] + 172800) <= time())))
-					{
-						$this -> add("Roster-XML", $member["id"], $member["nickname"], "from XML");
-						$this -> added++;
-					}
-
+				}
+				unset($db_members_sql);
+				if (strtolower($this->bot->game) == 'ao') { // wrong for new bots : && count($db_members) > 0
 					/*
-					We have an entry for the nickname, but the character id's have changed, rerolled character.
+					Go through all members and make sure we are up to date.
 					*/
-					else if ($db_member[0] != $member["id"])
-					{
-						if($member["id"] == "0" || $member["id"] == "-1" || $member["id"] == "" || $member["id"] == NULL || empty($member["id"]) || strlen($id) < 5)
+					foreach ($members as $member) {
+						if(isset($member["nickname"]) && isset($db_members[$member["nickname"]])) $db_member = $db_members[$member["nickname"]];
+						else $db_member = array();
+						/*
+						If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
+						its a new member we havent picked up for some reason.
+						*/
+						if (empty($db_member))
 						{
-							$this -> bot -> log("ROSTER", "ID", "Get ID Failed for $name (ID: ".$member["id"].")");
+							$this -> add("Roster-XML", $member["id"], $member["nickname"], "from XML");
+							$this -> added++;
 						}
-						else
+
+						else if ($db_member[2] == 1 || ($db_member[2] == 0 && (($db_member[3] + 172800) <= time())))
 						{
-							$this -> erase("Roster-XML", $db_member[0], $member["nickname"], "char_id mismatch (ID: " . $db_member[0] . ")");
-							$this -> removed++;
+							$this -> add("Roster-XML", $member["id"], $member["nickname"], "from XML");
+							$this -> added++;
+						}
 
-							if ($this -> bot -> guildid == $member["org_id"])
+						/*
+						We have an entry for the nickname, but the character id's have changed, rerolled character.
+						*/
+						else if ($db_member[0] != $member["id"])
+						{
+							if($member["id"] == "0" || $member["id"] == "-1" || $member["id"] == "" || $member["id"] == NULL || empty($member["id"]) || strlen($id) < 5)
 							{
-								$this -> add("Roster-XML-Reroll", $member["id"], $member["nickname"], "after reroll (ID: " . $member["id"] . ")");
-								$this -> added++;
+								$this -> bot -> log("ROSTER", "ID", "Get ID Failed for $name (ID: ".$member["id"].")");
+							}
+							else
+							{
+								$this -> erase("Roster-XML", $db_member[0], $member["nickname"], "char_id mismatch (ID: " . $db_member[0] . ")");
+								$this -> removed++;
 
-								$this -> rerolled++;
+								if ($this -> bot -> guildid == $member["org_id"])
+								{
+									$this -> add("Roster-XML-Reroll", $member["id"], $member["nickname"], "after reroll (ID: " . $member["id"] . ")");
+									$this -> added++;
+
+									$this -> rerolled++;
+								}
+							}
+						}
+						/*
+						Make sure we have an entry in the whois cache for the character.
+						*/
+						$this->bot->core("whois")->update($member);
+						/*
+						Make sure the user is on the buddylist.
+						*/
+						$this->bot->core("chat")->buddy_add($member["nickname"]);
+						/*
+						Update the timestamp, but only if its a member.
+						*/
+						if (!empty($db_member) && $db_member[2] <= 2) {
+							$upid[$member["id"]] = true;
+						}
+						/*
+						Make sure we don't delete the member in the final step
+						*/
+						if (isset($buddies[$member["id"]])) {
+							unset($buddies[$member["id"]]);
+						}
+						if (isset($db_members[$member["nickname"]])) {
+							unset($db_members[$member["nickname"]]);
+						}
+					}
+					//check  DB members not on Roster
+					if (!empty($db_members)) {
+						foreach ($db_members as $dbmember) {
+							if ($dbmember[2] < 2) {
+								continue;
+							}
+							/*
+							Catch newly added members and give them their first update timestamp
+							*/
+							if ($dbmember[3] == 0) {
+								$upid[$dbmember[0]] = true;
+							}
+							/*
+							If we still have no updates for this member after 2 days, remove.
+							*/
+							if ((($dbmember[3] + 172800) <= time()) && ($dbmember[3] != 0)) {
+								$this->del("Roster-XML", $dbmember[0], $dbmember[1], "removed");
+								$this->removed++;
+							} else {
+								$this->bot->log(
+									"ROSTER",
+									"INFO",
+									$dbmember[1] . " is in members table but appears to not to be in XML, skipping removal for now"
+								);
+							}
+							unset($buddies[$dbmember[0]]);
+						}
+					}
+				}
+				/*
+				Run through our notifylist to make sure they are on the buddylist - and stay there
+				*/
+				$guests = $this->bot->db->select("SELECT char_id, nickname FROM #___users WHERE notify = '1'");
+				if (!empty($guests)) {
+					foreach ($guests as $guest) {
+						/*
+						Make sure the user is on the buddylist.
+						*/
+						$this->bot->core("chat")->buddy_add($guest[0]);
+						/*
+						Make sure we don't delete the guest in the final step
+						*/
+						unset($buddies[$guest[0]]);
+					}
+				}
+				/*
+				Cycle through anything still on our buddylist
+				*/
+				if (!empty($buddies)) {
+					foreach ($buddies as $id => $value) {
+						$name = $this->bot->core("player")->name($id);
+						$member = $this->bot->db->select(
+							"SELECT char_id, user_level, updated_at FROM #___users WHERE char_id = '" . $id . "' AND user_level >= '2'"
+						);
+						if (!empty($member)) {
+							/*
+							Catch newly added members and give them their first update timestamp
+							*/
+							if ($member[0][2] == 0) {
+								$upid[$id] = true;
+							}
+							/*
+							If we still have no updates for this member after 2 days, remove.
+							*/
+							if ((($member[0][2] + 172800) <= time()) && ($member[0][2] != 0)) {
+								$this->del("Roster-XML", $id, $name, "removed");
+								$this->removed++;
+							} else {
+								$this->bot->log(
+									"ROSTER",
+									"INFO",
+									"$name is in members table but appears to not to be in XML, skipping removal for now"
+								);
+							}
+						} else {
+							$this->bot->core("chat")->buddy_remove($id);
+						}
+					}
+				}
+				$members = $this->bot->db->select(
+					"SELECT char_id, nickname, user_level, notify, updated_at, added_by FROM #___users ORDER BY nickname"
+				);
+				if (!empty($members)) {
+					foreach ($members as $member) {
+						$id = $this->bot->core("player")->id($member[1]);
+						/*
+						Make sure we have an entry in the whois cache for the character.
+						*/
+						$whois = $this->bot->core("whois")
+							->lookup($member[1], false, true);
+						if (strtolower($this->bot->game) == 'ao') {
+							/*
+							Catch deleted characters.
+							*/
+							/*
+							If we still have no updates for this member after 2 days, remove.
+							*/
+							if ($id instanceof BotError) {
+								if ((($member[4] + 172800) <= time()) && ($member[4] != 0)) {
+									$this->erase(
+										"Roster",
+										$member[0],
+										$member[1],
+										"as the character appears to have been deleted."
+									);
+									$this->removed++;
+									continue;
+								} else {
+									$this->bot->log(
+										"ROSTER",
+										"INFO",
+										$member[1] . " is in members table but appears to not to be in XML, skipping removal for now"
+									);
+								}
+							}
+							if ($whois instanceof BotError) {
+								Continue; // prob shouldnt skip this but it will stop the crashing
+							} /*
+							Catch rerolled characters.
+							*/
+							else {
+								if ($id != $member[0] && $member[2] >= 1) {
+									if ($id == "0" || $id == "-1" || $id == "" || $id == null || empty($id) || strlen(
+											$id
+										) < 5
+									) {
+										$this->bot->log("ROSTER", "ID", "Get ID Failed for $name (ID: " . $id . ")");
+									}
+									$this->erase(
+										"Roster",
+										$member[0],
+										$member[1],
+										"as the character appears to have been rerolled. Old: $member[0] New: $id"
+									);
+									$this->removed++;
+									continue;
+								} /*
+								Catch characters who are no longer in the org.
+								*/
+								else {
+									if (!($whois instanceof BotError) && $whois["org_id"] != $this->bot->guildid && $member[2] >= 1
+										&& ($member[5] == "Roster-XML" || $member[5] == "Roster-XML-Reroll" || $member[5] == "Org Message")
+									) {
+										/*
+										If we still have no updates for this member after 2 days, remove.
+										*/
+										if ((($member[4] + 172800) <= time()) && ($member[4] != 0)) {
+											$this->del("Roster-XML", $member[0], $member[1], "removed");
+											$this->removed++;
+											continue;
+										} else {
+											$this->bot->log(
+												"ROSTER",
+												"INFO",
+												$member[1] . " is in members table but appears to not to be in XML, skipping removal for now"
+											);
+										}
+									} /*
+									If not we just run through the paces and make sure everything is in order.
+									*/
+									else {
+										if ($member[3] == 1 && $member[2] >= 1) {
+											/*
+											Make sure all on characters on notify list are in buddy list
+											*/
+											$this->bot->core("chat")->buddy_add($id);
+										}
+									}
+								}
 							}
 						}
 					}
-                    /*
-                    Make sure we have an entry in the whois cache for the character.
-                    */
-                    $this->bot->core("whois")->update($member);
-                    /*
-                    Make sure the user is on the buddylist.
-                    */
-                    $this->bot->core("chat")->buddy_add($member["nickname"]);
-                    /*
-                    Update the timestamp, but only if its a member.
-                    */
-                    if (!empty($db_member) && $db_member[2] <= 2) {
-						$upid[$member["id"]] = true;
-                    }
-                    /*
-                    Make sure we don't delete the member in the final step
-                    */
-                    if (isset($buddies[$member["id"]])) {
-                        unset($buddies[$member["id"]]);
-                    }
-                    if (isset($db_members[$member["nickname"]])) {
-                        unset($db_members[$member["nickname"]]);
-                    }
-                }
-                //check  DB members not on Roster
-                if (!empty($db_members)) {
-                    foreach ($db_members as $dbmember) {
-                        if ($dbmember[2] < 2) {
-                            continue;
-                        }
-                        /*
-                        Catch newly added members and give them their first update timestamp
-                        */
-                        if ($dbmember[3] == 0) {
-							$upid[$dbmember[0]] = true;
-                        }
-                        /*
-                        If we still have no updates for this member after 2 days, remove.
-                        */
-                        if ((($dbmember[3] + 172800) <= time()) && ($dbmember[3] != 0)) {
-                            $this->del("Roster-XML", $dbmember[0], $dbmember[1], "removed");
-                            $this->removed++;
-                        } else {
-                            $this->bot->log(
-                                "ROSTER",
-                                "INFO",
-                                $dbmember[1] . " is in members table but appears to not to be in XML, skipping removal for now"
-                            );
-                        }
-                        unset($buddies[$dbmember[0]]);
-                    }
-                }
-            }
-            /*
-            Run through our notifylist to make sure they are on the buddylist - and stay there
-            */
-            $guests = $this->bot->db->select("SELECT char_id, nickname FROM #___users WHERE notify = '1'");
-            if (!empty($guests)) {
-                foreach ($guests as $guest) {
-                    /*
-                    Make sure the user is on the buddylist.
-                    */
-                    $this->bot->core("chat")->buddy_add($guest[0]);
-                    /*
-                    Make sure we don't delete the guest in the final step
-                    */
-                    unset($buddies[$guest[0]]);
-                }
-            }
-            /*
-            Cycle through anything still on our buddylist
-            */
-            if (!empty($buddies)) {
-                foreach ($buddies as $id => $value) {
-                    $name = $this->bot->core("player")->name($id);
-                    $member = $this->bot->db->select(
-                        "SELECT char_id, user_level, updated_at FROM #___users WHERE char_id = '" . $id . "' AND user_level >= '2'"
-                    );
-                    if (!empty($member)) {
-                        /*
-                        Catch newly added members and give them their first update timestamp
-                        */
-                        if ($member[0][2] == 0) {
-							$upid[$id] = true;
-                        }
-                        /*
-                        If we still have no updates for this member after 2 days, remove.
-                        */
-                        if ((($member[0][2] + 172800) <= time()) && ($member[0][2] != 0)) {
-                            $this->del("Roster-XML", $id, $name, "removed");
-                            $this->removed++;
-                        } else {
-                            $this->bot->log(
-                                "ROSTER",
-                                "INFO",
-                                "$name is in members table but appears to not to be in XML, skipping removal for now"
-                            );
-                        }
-                    } else {
-                        $this->bot->core("chat")->buddy_remove($id);
-                    }
-                }
-            }
-            $members = $this->bot->db->select(
-                "SELECT char_id, nickname, user_level, notify, updated_at, added_by FROM #___users ORDER BY nickname"
-            );
-            if (!empty($members)) {
-                foreach ($members as $member) {
-                    $id = $this->bot->core("player")->id($member[1]);
-                    /*
-                    Make sure we have an entry in the whois cache for the character.
-                    */
-                    $whois = $this->bot->core("whois")
-                        ->lookup($member[1], false, true);
-                    if (strtolower($this->bot->game) == 'ao') {
-                        /*
-                        Catch deleted characters.
-                        */
-                        /*
-                        If we still have no updates for this member after 2 days, remove.
-                        */
-                        if ($id instanceof BotError) {
-                            if ((($member[4] + 172800) <= time()) && ($member[4] != 0)) {
-                                $this->erase(
-                                    "Roster",
-                                    $member[0],
-                                    $member[1],
-                                    "as the character appears to have been deleted."
-                                );
-                                $this->removed++;
-                                continue;
-                            } else {
-                                $this->bot->log(
-                                    "ROSTER",
-                                    "INFO",
-                                    $member[1] . " is in members table but appears to not to be in XML, skipping removal for now"
-                                );
-                            }
-                        }
-                        if ($whois instanceof BotError) {
-                            Continue; // prob shouldnt skip this but it will stop the crashing
-                        } /*
-                        Catch rerolled characters.
-                        */
-                        else {
-                            if ($id != $member[0] && $member[2] >= 1) {
-                                if ($id == "0" || $id == "-1" || $id == "" || $id == null || empty($id) || strlen(
-                                        $id
-                                    ) < 5
-                                ) {
-                                    $this->bot->log("ROSTER", "ID", "Get ID Failed for $name (ID: " . $id . ")");
-                                }
-                                $this->erase(
-                                    "Roster",
-                                    $member[0],
-                                    $member[1],
-                                    "as the character appears to have been rerolled. Old: $member[0] New: $id"
-                                );
-                                $this->removed++;
-                                continue;
-                            } /*
-                            Catch characters who are no longer in the org.
-                            */
-                            else {
-                                if (!($whois instanceof BotError) && $whois["org_id"] != $this->bot->guildid && $member[2] >= 1
-                                    && ($member[5] == "Roster-XML" || $member[5] == "Roster-XML-Reroll" || $member[5] == "Org Message")
-                                ) {
-                                    /*
-                                    If we still have no updates for this member after 2 days, remove.
-                                    */
-                                    if ((($member[4] + 172800) <= time()) && ($member[4] != 0)) {
-                                        $this->del("Roster-XML", $member[0], $member[1], "removed");
-                                        $this->removed++;
-                                        continue;
-                                    } else {
-                                        $this->bot->log(
-                                            "ROSTER",
-                                            "INFO",
-                                            $member[1] . " is in members table but appears to not to be in XML, skipping removal for now"
-                                        );
-                                    }
-                                } /*
-                                If not we just run through the paces and make sure everything is in order.
-                                */
-                                else {
-                                    if ($member[3] == 1 && $member[2] >= 1) {
-                                        /*
-                                        Make sure all on characters on notify list are in buddy list
-                                        */
-                                        $this->bot->core("chat")->buddy_add($id);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            //make sure all users are on buddy list
-            $buddylist = $this->bot->db->select("SELECT nickname FROM #___users WHERE notify = 1");
-            if (!empty($buddylist)) {
-                foreach ($buddylist as $user) {
-                    // Do some sanity checking since funcom has broken chatserver
-                    $uid = $this->bot->core("player")->id($user[0]);
-                    if ($uid instanceof BotError) {
-						$denot[$user[0]] = true;
-                    } else if (!$this->bot->core("chat")->buddy_exists($user[0])) {
-                        $this->bot->core("chat")->buddy_add($user[0]);
-                    }
-                }
-            }
-            $msg = "";
-            if ($this->added > 0) {
-                $msg .= "::: Added " . $this->added . " members ";
-            }
-            if ($this->removed > 0) {
-                $msg .= "::: Removed " . $this->removed . " members ";
-            }
-            if ($this->rerolled > 0) {
-                $msg .= "::: " . $this->rerolled . " members was found to have rerolled ";
-            }
-			if (count($upid)>0) {
-				$ciin = "";
-				foreach ($upid AS $key => $val) {
-					$ciin .= $key.",";
-				}		
-				$ciin = substr($ciin, 0, -1);
-				$this->bot->db->query(
-					"UPDATE #___users SET updated_at = '" . time() . "' WHERE char_id IN (" . $ciin . ")"
-				);
+				}
+				//make sure all users are on buddy list
+				$buddylist = $this->bot->db->select("SELECT nickname FROM #___users WHERE notify = 1");
+				if (!empty($buddylist)) {
+					foreach ($buddylist as $user) {
+						// Do some sanity checking since funcom has broken chatserver
+						$uid = $this->bot->core("player")->id($user[0]);
+						if ($uid instanceof BotError) {
+							$denot[$user[0]] = true;
+						} else if (!$this->bot->core("chat")->buddy_exists($user[0])) {
+							$this->bot->core("chat")->buddy_add($user[0]);
+						}
+					}
+				}
+				$msg = "";
+				if ($this->added > 0) {
+					$msg .= "::: Added " . $this->added . " members ";
+				}
+				if ($this->removed > 0) {
+					$msg .= "::: Removed " . $this->removed . " members ";
+				}
+				if ($this->rerolled > 0) {
+					$msg .= "::: " . $this->rerolled . " members was found to have rerolled ";
+				}
+				if (count($upid)>0) {
+					$ciin = "";
+					foreach ($upid AS $key => $val) {
+						$ciin .= $key.",";
+					}		
+					$ciin = substr($ciin, 0, -1);
+					$this->bot->db->query(
+						"UPDATE #___users SET updated_at = '" . time() . "' WHERE char_id IN (" . $ciin . ")"
+					);
+				}
+				if (count($denot)>0) {
+					$nnin = "";
+					foreach ($denot AS $key => $val) {
+						$nnin .= "'".$key."',";
+					}				
+					$nnin = substr($nnin, 0, -1);				
+					$this->bot->db->query("UPDATE #___users SET notify = 0 WHERE nickname IN (" . $nnin . ")");
+				}
+				$this->bot->core("settings")
+					->save("members", "LastRosterUpdate", time());
+				$this->bot->log("ROSTER", "UPDATE", "Roster update complete. $msg", true);
+				if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
+					$this->bot->send_gc("##normal##Roster update completed. $msg ##end##");
+				}
+			} else {
+				$this->bot->log("ROSTER", "UPDATE", "Roster update failed. Funcom XML returned 0 members.", true);
+				if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
+					$this->bot->send_gc("##normal##Roster update failed! Funcom XML returned 0 members ##end##");
+				}
 			}
-			if (count($denot)>0) {
-				$nnin = "";
-				foreach ($denot AS $key => $val) {
-					$nnin .= "'".$key."',";
-				}				
-				$nnin = substr($nnin, 0, -1);				
-				$this->bot->db->query("UPDATE #___users SET notify = 0 WHERE nickname IN (" . $nnin . ")");
-			}
-            $this->bot->core("settings")
-                ->save("members", "LastRosterUpdate", time());
-            $this->bot->log("ROSTER", "UPDATE", "Roster update complete. $msg", true);
-            if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
-                $this->bot->send_gc("##normal##Roster update completed. $msg ##end##");
-            }
-        } else {
-            $this->bot->log("ROSTER", "UPDATE", "Roster update failed. Funcom XML returned 0 members.", true);
-            if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
-                $this->bot->send_gc("##normal##Roster update failed! Funcom XML returned 0 members ##end##");
-            }
-        }
+		}
         $this->bot->core("notify")->update_cache();
         $this->running = false;
     }
@@ -672,24 +669,21 @@ class Roster_Core extends BasePassiveModule
     {
 		$msg = ""; $upid = array();
 		$allowedt = $this->bot->core("settings")->get("Roster", "AllowedTime");
-		if (isset($allowedt)&&$allowedt!=''&&is_numeric($allowedt)&&$allowedt>=0&&$allowedt<=23) {
-			if(!$force&&$allowedt!=date('G')) {
-				$this->bot->log("ROSTER", "UPDATE", "Roster raid update cancelled as now (".date('G').") is not allowed time (".$allowedt.")!");
-				return;
-			}
-		}		
-        if ($this->running) {
+		$this->lastrun = $this->bot->core("settings")->get("members", "LastRosterUpdate");
+		if (isset($allowedt)&&$allowedt!=''&&is_numeric($allowedt)&&$allowedt>=0&&$allowedt<=23&&!$force&&$allowedt!=date('G')) {
+			$this->bot->log("ROSTER", "UPDATE", "Roster raid update cancelled as now (".date('G').") is not allowed time (".$allowedt.")!");
+			Return;
+		} elseif ($this->running) {
+			$this->bot->log("ROSTER", "UPDATE", "Roster raid update was already running, cancelling!");
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
-                $this->bot->send_pgroup("Roster update is already running");
+                $this->bot->send_pgroup("Roster raid update was already running, cancelling.");
             }
-            return;
-        }
-        $this->running = true;
-        $this->lastrun = $this->bot->core("settings")
-            ->get("members", "LastRosterUpdate");
-        if (($this->lastrun + (60 * 60 * 6)) >= time() && $force == false) {
+			Return;
+        } elseif (($this->lastrun + (60 * 60 * 6)) >= time() && $force == false) {
             $this->bot->log("ROSTER", "UPDATE", "Roster update ran less than 6 hours ago, skipping!");
+			Return;
         } else {
+			$this->running = true;			
             $this->bot->log("ROSTER", "UPDATE", "Starting raid roster update");
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_pgroup("##normal##" . $msg . "Roster Raid update starting ::: System busy##end##");
