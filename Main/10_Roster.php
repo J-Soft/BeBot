@@ -317,7 +317,7 @@ class Roster_Core extends BasePassiveModule
 			$this->bot->log(
 				"ROSTER",
 				"UPDATE",
-				"Starting roster update for guild id: " . $this->bot->guildid . " on RK" . $this->bot->dimension
+				"Starting roster update for guild id: " . $this->bot->guildid . " on dim: " . $this->bot->dimension
 			);
 			if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
 				$this->bot->send_gc("##normal##Roster Org update starting ::: System busy##end##");
@@ -341,16 +341,10 @@ class Roster_Core extends BasePassiveModule
 				}
 				$members = $this->parse_org($dimension, $this->bot->guildid);
 			}
-			
 			if(!is_array($members)) {
 				$this->bot->log("ROSTER", "ERROR", "XML obtained is broken ... stopping update.");
 				Return;
-			}
-			
-			/*
-			Only run the update if the XML returns more than one member, otherwise we skip the update.
-			*/
-			if (count($members) > 1 || strtolower($this->bot->game) == 'aoc') {
+			} elseif (count($members) > 1 || strtolower($this->bot->game) == 'aoc') {
 				$buddies = $this->bot->aoc->buddies;
 				$this->added = 0;
 				$this->removed = 0;
@@ -487,7 +481,7 @@ class Roster_Core extends BasePassiveModule
 						$member = $this->bot->db->select(
 							"SELECT char_id, user_level, updated_at FROM #___users WHERE char_id = '" . $id . "' AND user_level >= '2'"
 						);
-						if (!empty($member)) {
+						if (!empty($member)&&!($name instanceof BotError)) {
 							/*
 							Catch newly added members and give them their first update timestamp
 							*/
@@ -647,8 +641,7 @@ class Roster_Core extends BasePassiveModule
 					$nnin = substr($nnin, 0, -1);				
 					$this->bot->db->query("UPDATE #___users SET notify = 0 WHERE nickname IN (" . $nnin . ")");
 				}
-				$this->bot->core("settings")
-					->save("members", "LastRosterUpdate", time());
+				$this->bot->core("settings")->save("members", "LastRosterUpdate", time());
 				$this->bot->log("ROSTER", "UPDATE", "Roster update complete. $msg", true);
 				if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
 					$this->bot->send_gc("##normal##Roster update completed. $msg ##end##");
@@ -747,8 +740,7 @@ class Roster_Core extends BasePassiveModule
                             /*
                             Make sure we have an entry in the whois cache for the character.
                             */
-                            $this->bot->core("whois")
-                                ->lookup($member[1], false, true);
+                            $this->bot->core("whois")->lookup($member[1], false, true);
                             if ($member[3] == 1) {
                                 /*
                                 Make sure all on characters on notify list are in buddy list
@@ -787,8 +779,7 @@ class Roster_Core extends BasePassiveModule
                 $this->bot->core("chat")->buddy_remove($id);
                 $num++;
             }
-            $this->bot->core("settings")
-                ->save("members", "LastRosterUpdate", time());
+            $this->bot->core("settings")->save("members", "LastRosterUpdate", time());
             $this->bot->log("CRON", "ROSTER", "Cleaning buddylist done. $num buddies removed.");
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_pgroup("##normal##Roster update completed ##end##");
