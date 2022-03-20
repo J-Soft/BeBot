@@ -66,7 +66,8 @@ class Roster_Core extends BasePassiveModule
         if ($bot->guildbot) {
             $this->register_event("gmsg", "Org Msg");
         }
-        $this->register_event("cron", "1hour");
+        //$this->register_event("cron", "1hour");
+        $this->register_event("cron", "2min");
         $this->update_table();
         $this->bot->core("settings")
             ->create("Members", "LastRosterUpdate", 1, "Last time we completed a Roster update", null, true, 2);
@@ -298,6 +299,7 @@ class Roster_Core extends BasePassiveModule
     {
 		$upid = array(); $denot = array();
 		$members = array(); $db_member = array();
+		if($force) { $mode="forced"; } else { $mode="auto"; }
 		$this->lastrun = $this->bot->core("settings")->get("members", "LastRosterUpdate");
 		$allowedt = $this->bot->core("settings")->get("Roster", "AllowedTime");		
 		if (isset($allowedt)&&$allowedt!=''&&is_numeric($allowedt)&&$allowedt>=0&&$allowedt<=23&&!$force&&$allowedt!=date('G')) {
@@ -317,10 +319,10 @@ class Roster_Core extends BasePassiveModule
 			$this->bot->log(
 				"ROSTER",
 				"UPDATE",
-				"Starting roster update for guild id: " . $this->bot->guildid . " on dim: " . $this->bot->dimension
+				"Starting roster ".$mode." update for guild id: " . $this->bot->guildid . " on dim: " . $this->bot->dimension
 			);
 			if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
-				$this->bot->send_gc("##normal##Roster Org update starting ::: System busy##end##");
+				$this->bot->send_gc("##normal##Roster Org ".$mode." update starting ::: System busy##end##");
 			}
 			// Get the guild roster
 			if (strtolower($this->bot->game) == 'ao') {
@@ -663,6 +665,7 @@ class Roster_Core extends BasePassiveModule
 		$msg = ""; $upid = array();
 		$allowedt = $this->bot->core("settings")->get("Roster", "AllowedTime");
 		$this->lastrun = $this->bot->core("settings")->get("members", "LastRosterUpdate");
+		if($force) { $mode="forced"; } else { $mode="auto"; }
 		if (isset($allowedt)&&$allowedt!=''&&is_numeric($allowedt)&&$allowedt>=0&&$allowedt<=23&&!$force&&$allowedt!=date('G')) {
 			$this->bot->log("ROSTER", "UPDATE", "Roster raid update cancelled as now (".date('G').") is not allowed time (".$allowedt.")!");
 			Return;
@@ -677,9 +680,9 @@ class Roster_Core extends BasePassiveModule
 			Return;
         } else {
 			$this->running = true;			
-            $this->bot->log("ROSTER", "UPDATE", "Starting raid roster update");
+            $this->bot->log("ROSTER", "UPDATE", "Starting raid roster ".$mode." update");
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
-                $this->bot->send_pgroup("##normal##" . $msg . "Roster Raid update starting ::: System busy##end##");
+                $this->bot->send_pgroup("##normal##" . $msg . "Roster Raid ".$mode." update starting ::: System busy##end##");
             }
             $buddies = $this->bot->aoc->buddies;
             $num = 0;
