@@ -1,9 +1,9 @@
 -------------------------
 Release 0.7.23 - ... 2022 
 -------------------------
-- For both: Roster time control ;
-- For AO: OnlineOrg improved ;
-- For AoC: ...
+- For both: Roster improved
+- For AO: OnlineOrg improved
+- For AoC: TimerAA improved
 
 -------------------------
 Release 0.7.22 - Mar 2022 
