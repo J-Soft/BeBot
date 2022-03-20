@@ -66,8 +66,7 @@ class Roster_Core extends BasePassiveModule
         if ($bot->guildbot) {
             $this->register_event("gmsg", "Org Msg");
         }
-        //$this->register_event("cron", "1hour");
-        $this->register_event("cron", "2min");
+        $this->register_event("cron", "1hour");
         $this->update_table();
         $this->bot->core("settings")
             ->create("Members", "LastRosterUpdate", 1, "Last time we completed a Roster update", null, true, 2);
