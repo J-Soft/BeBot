@@ -377,12 +377,12 @@ class Roster_Core extends BasePassiveModule
 						If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
 						its a new member we havent picked up for some reason.
 						*/
+						$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
 						if (empty($db_member))
 						{
 							$this -> add("Roster-XML", $member["id"], $member["nickname"], "from XML");
 							$this -> added++;
 						}
-						$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
 						else if ($db_member[2] == 1 || ($db_member[2] == 0 && (($db_member[3] + $rdelay) <= time())))
 						{
 							$this -> add("Roster-XML", $member["id"], $member["nickname"], "from XML");
