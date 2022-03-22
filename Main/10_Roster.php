@@ -90,7 +90,15 @@ class Roster_Core extends BasePassiveModule
                 24,
                 "Is there an exclusive hour (in server local time, from 0 to 23) you'd prefer for the bot autoupdate (use 24 otherwise to disable and allow any hour)?",
                 "0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24"
-            );		
+            );
+        $this->bot->core("settings")
+            ->create(
+                "Roster",
+                "RemoveDelay",
+                7,
+                "After how many days should non-updatable & non-notified buddies be considered okay to delete?",
+                "2;7;15;30;90;180;365"
+            );				
         $this->startup = true;
         $this->running = false;
     }
@@ -374,8 +382,8 @@ class Roster_Core extends BasePassiveModule
 							$this -> add("Roster-XML", $member["id"], $member["nickname"], "from XML");
 							$this -> added++;
 						}
-
-						else if ($db_member[2] == 1 || ($db_member[2] == 0 && (($db_member[3] + 172800) <= time())))
+						$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
+						else if ($db_member[2] == 1 || ($db_member[2] == 0 && (($db_member[3] + $rdelay) <= time())))
 						{
 							$this -> add("Roster-XML", $member["id"], $member["nickname"], "from XML");
 							$this -> added++;
@@ -443,7 +451,8 @@ class Roster_Core extends BasePassiveModule
 							/*
 							If we still have no updates for this member after 2 days, remove.
 							*/
-							if ((($dbmember[3] + 172800) <= time()) && ($dbmember[3] != 0)) {
+							$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
+							if ((($dbmember[3] + $rdelay) <= time()) && ($dbmember[3] != 0)) {
 								$this->del("Roster-XML", $dbmember[0], $dbmember[1], "removed");
 								$this->removed++;
 							} else {
@@ -492,7 +501,8 @@ class Roster_Core extends BasePassiveModule
 							/*
 							If we still have no updates for this member after 2 days, remove.
 							*/
-							if ((($member[0][2] + 172800) <= time()) && ($member[0][2] != 0)) {
+							$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
+							if ((($member[0][2] + $rdelay) <= time()) && ($member[0][2] != 0)) {
 								$this->del("Roster-XML", $id, $name, "removed");
 								$this->removed++;
 							} else {
@@ -526,7 +536,8 @@ class Roster_Core extends BasePassiveModule
 							If we still have no updates for this member after 2 days, remove.
 							*/
 							if ($id instanceof BotError) {
-								if ((($member[4] + 172800) <= time()) && ($member[4] != 0)) {
+								$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
+								if ((($member[4] + $rdelay) <= time()) && ($member[4] != 0)) {
 									$this->erase(
 										"Roster",
 										$member[0],
@@ -574,7 +585,8 @@ class Roster_Core extends BasePassiveModule
 										/*
 										If we still have no updates for this member after 2 days, remove.
 										*/
-										if ((($member[4] + 172800) <= time()) && ($member[4] != 0)) {
+										$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
+										if ((($member[4] + $rdelay) <= time()) && ($member[4] != 0)) {
 											$this->del("Roster-XML", $member[0], $member[1], "removed");
 											$this->removed++;
 											continue;
@@ -697,7 +709,8 @@ class Roster_Core extends BasePassiveModule
                     Catch deleted characters.
                     */
                     if ($id instanceof BotError) {
-                        if ((($member[4] + 172800) <= time()) && ($member[4] != 0)) {
+						$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
+                        if ((($member[4] + $rdelay) <= time()) && ($member[4] != 0)) {
                             $this->erase(
                                 "Roster",
                                 $member[0],
