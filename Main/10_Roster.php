@@ -374,7 +374,7 @@ class Roster_Core extends BasePassiveModule
 						if(isset($member["nickname"]) && isset($db_members[$member["nickname"]])) $db_member = $db_members[$member["nickname"]];
 						else $db_member = array();
 						/*
-						If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over 2 days on,
+						If we dont have this user in the user table, or if its a guest, or if its a deleted character we have no updates for over few days on,
 						its a new member we havent picked up for some reason.
 						*/
 						$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
@@ -449,7 +449,7 @@ class Roster_Core extends BasePassiveModule
 								$upid[$dbmember[0]] = true;
 							}
 							/*
-							If we still have no updates for this member after 2 days, remove.
+							If we still have no updates for this member after few days, remove.
 							*/
 							$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
 							if ((($dbmember[3] + $rdelay) <= time()) && ($dbmember[3] != 0)) {
@@ -499,7 +499,7 @@ class Roster_Core extends BasePassiveModule
 								$upid[$id] = true;
 							}
 							/*
-							If we still have no updates for this member after 2 days, remove.
+							If we still have no updates for this member after few days, remove.
 							*/
 							$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
 							if ((($member[0][2] + $rdelay) <= time()) && ($member[0][2] != 0)) {
@@ -533,7 +533,7 @@ class Roster_Core extends BasePassiveModule
 							Catch deleted characters.
 							*/
 							/*
-							If we still have no updates for this member after 2 days, remove.
+							If we still have no updates for this member after few days, remove.
 							*/
 							if ($id instanceof BotError) {
 								$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
@@ -583,7 +583,7 @@ class Roster_Core extends BasePassiveModule
 										&& ($member[5] == "Roster-XML" || $member[5] == "Roster-XML-Reroll" || $member[5] == "Org Message")
 									) {
 										/*
-										If we still have no updates for this member after 2 days, remove.
+										If we still have no updates for this member after few days, remove.
 										*/
 										$rdelay = $this->bot->core("settings")->get("Roster", "RemoveDelay")*86400;
 										if ((($member[4] + $rdelay) <= time()) && ($member[4] != 0)) {
@@ -786,7 +786,7 @@ class Roster_Core extends BasePassiveModule
                 "Done updating roster. Removed " . $this->removed . " members of which " . $this->rerolled . " was rerolled characters.",
                 true
             );
-            $this->bot->log("CRON", "ROSTER", "Cleaning buddylist.");
+            $this->bot->log("CRON", "ROSTER", "Cleaning buddylist...");
             /*
             cycle through anything still on our buddylist
             */
@@ -795,7 +795,7 @@ class Roster_Core extends BasePassiveModule
                 $num++;
             }
             $this->bot->core("settings")->save("members", "LastRosterUpdate", time());
-            $this->bot->log("CRON", "ROSTER", "Cleaning buddylist done. $num buddies removed.");
+            $this->bot->log("CRON", "ROSTER", "Cleaning buddylist done. $num invalid buddies removed.");
             if (!$this->bot->core("settings")->get("Members", "QuietUpdate")) {
                 $this->bot->send_pgroup("##normal##Roster update completed ##end##");
             }
