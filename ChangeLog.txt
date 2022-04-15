@@ -1,7 +1,7 @@
 -------------------------
 Release 0.7.23 - ... 2022 
 -------------------------
-- For both: Roster improved ; Scripts added
+- For both: Roster improved ; Scripts added ; Ban modified
 - For AO: OnlineOrg improved
 - For AoC: TimerAA improved
 

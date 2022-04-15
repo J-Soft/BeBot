@@ -63,7 +63,7 @@ class BanManager extends BaseActiveModule
         $this->help['command']['ban search'] = "Searches among currently + previously banned toons.";
         $this->help['command']['ban add <name> <reason>'] = "Bans <name> for <reason> from the bot forever - or until manually unbanned.";
         $this->help['command']['ban add <name> <time> <reason>']
-            = "Bans <name> for <reason> from the bot for <time>. <time> has a base unit of days. Use 'h' for hours, 'd' for days, 'w' for weeks, 'm' for monthes, 'y' for years directly behind the number you can change the time unit. '6h' as time would ban the character for 6h, after which the ban will be automatically deleted. The bot checks every minute for bans that have run out.";
+            = "Bans <name> for <reason> from the bot for <time>. <time> has a base unit of minutes. Add 'h' for hours, 'd' for days, 'w' for weeks, 'm' for monthes, 'y' for years directly behind the number to change the time unit. '6h' as time would ban the character for 6h, after which the ban will be automatically deleted. The bot checks every 5 minutes for bans that have run out.";
         $this->help['command']['ban del <name>'] = "Unbans <name>.";
         $this->help['command']['ban rem <name>'] = "Unbans <name>.";
         $this->bot->core("command_alias")->register("ban list", "banlist");
@@ -321,7 +321,7 @@ class BanManager extends BaseActiveModule
         if ($duration == "0") {
             $endtime = 0;
         } else {
-            $timesize = 60 * 60 * 24;
+            $timesize = 60;
 			if (stristr($duration, 'h')) {
                 $timesize = 60 * 60;
             } elseif (stristr($duration, 'd')) {
