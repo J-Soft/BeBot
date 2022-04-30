@@ -72,6 +72,8 @@ class NewRis extends BaseActiveModule
 	$this -> register_alias('risend', 'sendri');		
         $this -> register_command("all", "ritake", "GUEST");
 		$this -> register_command("all", "riauto", "LEADER");
+		$this -> register_command("all", "rialts", "LEADER");
+	$this -> register_alias('rialts', 'rialt');		
         $this -> register_command("all", "ritest", "OWNER");
 
         $this -> bot -> core("settings") -> create("Ris", "sendrate", 100000, "Microsecond (usleep) pause between each member manipulation (kick/invite)");
@@ -134,6 +136,10 @@ class NewRis extends BaseActiveModule
 		{
 			$this->AutoRi($name);
 		}
+		else if($msg[0] == "rialts")
+		{
+			$this->RiAlts($msg[1],$name);
+		}		
 		else if($msg[0] == "ritest")
 		{
 			echo " (1-DEBUG-1) "; print_r($this->ris); echo " (0-DEBUG-0) ";
@@ -174,6 +180,116 @@ class NewRis extends BaseActiveModule
 		}
 	}
 
+	function RiAlts($prof, $name)
+	{
+		$return = ""; $inside = ""; $checklist = array(); $prof = strtolower(substr($prof,0,3));
+		$profs = array("enf","doc","cra","bur","age","fix","eng","sol","kee","met","mp","nan","nt","tra","adv","mar","ma","sha");
+		if(!in_array($prof,$profs)) {
+			$return = "Wrong profession given.";
+		} else {
+			switch ($prof) {
+				case "enf":
+					$prof = "Enforcer";
+					break;				
+				case "doc":
+					$prof = "Doctor";
+					break;			
+				case "cra":
+				case "bur":
+					$prof = "Bureaucrat";
+					break;				
+				case "age":
+					$prof = "Agent";
+					break;			
+				case "fix":
+					$prof = "Fixer";
+					break;			
+				case "eng":
+					$prof = "Engineer";
+					break;			
+				case "sol":
+					$prof = "Soldier";
+					break;			
+				case "kee":
+					$prof = "Keeper";
+					break;			
+				case "met":
+				case "mp":
+					$prof = "Meta-Physicist";
+					break;					
+				case "nan":
+				case "nt":
+					$prof = "Nano-Technician";
+					break;					
+				case "tra":
+					$prof = "Trader";
+					break;			
+				case "adv":
+					$prof = "Adventurer";
+					break;				
+				case "mar":
+				case "ma":
+					$prof = "Martial Artist";
+					break;					
+				case "sha":
+					$prof = "Shade";
+					break;					
+			}
+			if(count($this->pgroup)>1) {
+				foreach($this->pgroup as $index=>$array) {
+					if(count($array)>0) {
+						$toon = $array[0];
+						$result = $this -> bot -> core("whois") -> lookup($toon);
+						if($prof!=$result["profession"]) $checklist[$toon] = array();
+					}
+				}
+				foreach($checklist as $toon=>$state) {
+					$found = false;
+					$main = $this->bot->core("alts")->main($toon);
+					if($main!=$toon) {
+						$result = $this -> bot -> core("whois") -> lookup($main);
+						if($prof==$result["profession"]) {
+							$checklist[$toon][] = array($main=>$result["level"]);
+							$found = true;
+						}
+					}
+					$alts = $this->bot->core("alts")->get_alts($main);
+					foreach ($alts as $alt) {	 
+						if($alt!=$toon) {
+							$result = $this -> bot -> core("whois") -> lookup($alt);
+							if($prof==$result["profession"]) {
+								$checklist[$toon][] = array($alt=>$result["level"]);
+								$found = true;
+							}
+						}
+					}
+					if(!$found) unset($checklist[$toon]);
+				}
+				if(count($checklist)>0) {
+					$all = "";
+					foreach($checklist as $player=>$alts) {
+						$all .= $player." ";
+						$inside .= "\n".$player." has ".count($alts)." ".$prof."(s)"; $list = "";
+						foreach($alts as $id=>$values) {				
+							foreach($values as $thealt=>$lvl) { 
+								$list .= " ".$lvl;
+							}
+						}
+						$inside .= " [lvl".$list."] ";
+						$inside .= "<a href='chatcmd:///tell ".$player." could you log a ".$prof." please ?'>Tell this player</a>";
+					}
+					if(count($checklist)>1) $inside .= "\n\n<a href='chatcmd:///tell ".$this->bot->botname." !s ".$all." => could any of you log a ".$prof." please ?'>Warn all players</a>";
+					$return = count($checklist)." player(s) have some alt(s) of given profession ".$this->bot->core("tools")->make_blob("click to view", $inside);
+				} else {
+					$return = "No alt of given profession found.";
+				}
+			} else {
+				$return = "Nobody in raid channel yet.";
+			}
+		}		
+		$this -> bot -> send_tell($name,$return);
+	}
+	
 	function AutoRi($name)
 	{
 		if(count($this->ris)==0) { 
@@ -713,6 +829,22 @@ class NewRis extends BaseActiveModule
 		$msg .= "##highlight##Commands:##end##\n";
 		$msg .= $this -> bot -> core("tools") -> chatcmd("riadmin", "Refresh this admin.")."\n";
 		$msg .= $this -> bot -> core("tools") -> chatcmd("riauto", "Auto distrib profs among RIs.")."\n";
+		$msg .= "Seek alt: "
+			.$this -> bot -> core("tools") -> chatcmd("rialts enf", "Enf")." "
+			.$this -> bot -> core("tools") -> chatcmd("rialts doc", "Doc")." "
+			.$this -> bot -> core("tools") -> chatcmd("rialts bur", "Bu")." "
+			.$this -> bot -> core("tools") -> chatcmd("rialts age", "Ag")." "			
+			.$this -> bot -> core("tools") -> chatcmd("rialts fix", "Fx")." "
+			.$this -> bot -> core("tools") -> chatcmd("rialts eng", "Eng")." "
+			.$this -> bot -> core("tools") -> chatcmd("rialts sol", "So")." "
+			.$this -> bot -> core("tools") -> chatcmd("rialts kee", "Ke")." "
+			.$this -> bot -> core("tools") -> chatcmd("rialts met", "Mp")." "
+			.$this -> bot -> core("tools") -> chatcmd("rialts nan", "Nt")." "
+			.$this -> bot -> core("tools") -> chatcmd("rialts tra", "Tr")." "			
+			.$this -> bot -> core("tools") -> chatcmd("rialts adv", "Ad")." "
+			.$this -> bot -> core("tools") -> chatcmd("rialts mar", "Ma")." "
+			.$this -> bot -> core("tools") -> chatcmd("rialts sha", "Sh")." "
+		."\n";
 		$msg .= $this -> bot -> core("tools") -> chatcmd("showris", "Show RIs on channel.")."\n";
 		$msg .= $this -> bot -> core("tools") -> chatcmd("clearris", "Reset all RIs !")."\n";
 		$msg .= $this -> bot -> core("tools") -> chatcmd("risend", "Howto export RI ?")."\n\n";
