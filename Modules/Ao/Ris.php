@@ -248,7 +248,7 @@ class NewRis extends BaseActiveModule
 					$main = $this->bot->core("alts")->main($toon);
 					if($main!=$toon) {
 						$result = $this -> bot -> core("whois") -> lookup($main);
-						if($prof==$result["profession"]) {
+						if(!($result instanceof BotError)&&$prof==$result["profession"]) {
 							$checklist[$toon][] = array($main=>$result["level"]);
 							$found = true;
 						}
@@ -257,7 +257,7 @@ class NewRis extends BaseActiveModule
 					foreach ($alts as $alt) {	 
 						if($alt!=$toon) {
 							$result = $this -> bot -> core("whois") -> lookup($alt);
-							if($prof==$result["profession"]) {
+							if(!($result instanceof BotError)&&$prof==$result["profession"]) {
 								$checklist[$toon][] = array($alt=>$result["level"]);
 								$found = true;
 							}
