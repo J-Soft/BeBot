@@ -276,9 +276,9 @@ class NewRis extends BaseActiveModule
 							}
 						}
 						$inside .= " [lvl".$list."] ";
-						$inside .= "<a href='chatcmd:///tell ".$player." could you log a ".$prof." please ?'>Tell this player</a>";
+						$inside .= "<a href='chatcmd:///tell ".$player." could you log ".$prof." please ?'>Tell this player</a>";
 					}
-					if(count($checklist)>1) $inside .= "\n\n<a href='chatcmd:///tell ".$this->bot->botname." !s ".$all." => could any of you log a ".$prof." please ?'>Warn all players</a>";
+					if(count($checklist)>1) $inside .= "\n\n<a href='chatcmd:///tell ".$this->bot->botname." !s ".$all." => could any of you log ".$prof." please ?'>Warn all players</a>";
 					$return = count($checklist)." player(s) have some alt(s) of given profession ".$this->bot->core("tools")->make_blob("click to view", $inside);
 				} else {
 					$return = "No alt of given profession found.";
