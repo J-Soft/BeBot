@@ -16,7 +16,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -50,6 +50,7 @@ class Say extends BaseActiveModule
         $this->register_command("all", "say", "ADMIN");
         $this->register_command("all", "whosaidthat", "MEMBER");
 		$this->register_command("all", "sendtell", "ADMIN");
+		$this->register_command("all", "sendhelp", "ADMIN");
         $this->bot->core("settings")
             ->create(
                 "Say",
@@ -60,7 +61,8 @@ class Say extends BaseActiveModule
             );
         $this->help['description'] = 'Makes the bot say things.';
         $this->help['command']['say something'] = "Makes that bot say 'something' in org/private channel.";
-		$this->help['command']['sendtell someone something'] = "Makes that bot send 'something' in /tell to someone.";
+		$this->help['command']['sendtell someone message'] = "Makes the bot send 'message' in /tell to someone.";
+		$this->help['command']['sendtell someone command'] = "Makes the bot send command's help in /tell to someone.";
         $this->help['command']['whosaidthat'] = "Find out who made the bot say that.";
     }
 
@@ -93,6 +95,8 @@ class Say extends BaseActiveModule
                 return false;
 			case "sendtell":
 				return $this->sendtell($name, $args['args']);
+			case "sendhelp":
+				return $this->sendhelp($name, $args['args']);				
             case "whosaidthat":
                 return $this->whosaidthat();
         }
@@ -100,6 +104,7 @@ class Say extends BaseActiveModule
         return false;
     } // End function handler()
 
+	
     function saythis($name, $message)
     {
         $this->whosaidthat['time'] = time();
@@ -107,6 +112,31 @@ class Say extends BaseActiveModule
         $this->whosaidthat['what'] = $message;
         return $message;
     }
+	
+	
+    function sendhelp($name, $message)
+    {
+        if(isset($message) && $message!="") {
+			$args = explode(' ',$message);
+			if($this->bot->core("whois")->lookup($args[0]) instanceof BotError) {
+				return "Player ".$args[0]." doesn't exist";
+			} elseif(strtolower($name)==strtolower($args[0])) {
+				return "No use to send help to yourself";
+			} elseif(count($args)==2 && isset($args[1]) && $args[1]!="") {
+				$this->whosaidthat['time'] = time();
+				$this->whosaidthat['name'] = $name;
+				$this->whosaidthat['what'] = $message;	
+				$this->bot->send_help($args[0],$args[1]);
+				return "Help sent to ".$args[0];							
+			} else {
+				return "Can't send wrong command";
+			}
+		} else {
+			return "Please provide player & command";
+		}
+        return $message;
+    }		
+	
 	
     function sendtell($name, $message)
     {
@@ -131,6 +161,7 @@ class Say extends BaseActiveModule
         return $message;
     }	
 
+	
     function whosaidthat()
     {
         if (empty($this->whosaidthat)) {
