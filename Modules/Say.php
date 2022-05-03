@@ -62,7 +62,7 @@ class Say extends BaseActiveModule
         $this->help['description'] = 'Makes the bot say things.';
         $this->help['command']['say something'] = "Makes that bot say 'something' in org/private channel.";
 		$this->help['command']['sendtell someone message'] = "Makes the bot send 'message' in /tell to someone.";
-		$this->help['command']['sendtell someone command'] = "Makes the bot send command's help in /tell to someone.";
+		$this->help['command']['sendhelp someone command'] = "Makes the bot send command's help in /tell to someone.";
         $this->help['command']['whosaidthat'] = "Find out who made the bot say that.";
     }
 
