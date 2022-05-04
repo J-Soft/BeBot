@@ -580,7 +580,7 @@ class Raid extends BaseActiveModule
 				}
 			}
 			if(count($mains)>0) {
-				natcasesort($mains);			
+				asort($mains, SORT_NUMERIC);
 				$mains = array_reverse($mains, true);
 				if($user=="") $shown = 0;
 				else $shown = 4;
