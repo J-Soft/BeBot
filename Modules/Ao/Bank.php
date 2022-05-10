@@ -47,7 +47,7 @@ class Bank extends BaseActiveModule
 		$this->register_command('all', 'bankrem', 'ADMIN');
         $this->help['description'] = 'Manages bank sharing so the people in org know who owns an item they could ask for.';
         $this->help['command']['banksearch [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql].";
-        $this->help['command']['bankadd <url>'] = "Adds a webhosted .csv file to the bot's Extras/Bank folder.";
+        $this->help['command']['bankadd <url>'] = "Adds a webhosted .csv file to the bot's Extras/Bank folder (existing file is updated, overwrite NOT UNDOABLE).";
         $this->help['command']['banklook [file]'] = "Browses bank and its files (with deletion links for Admins)";		
         $this->help['command']['bankrem <file>'] = "Removes a .csv file from the bot's Extras/Bank folder (NOT UNDOABLE).";
         $this->help['notes'] = "This module uses Dream's AOIA(+) .csv file format, so make sure to use this tool specifically.";
