@@ -49,9 +49,10 @@ class Bank extends BaseActiveModule
         $this->help['command']['banksearch [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql].";
         $this->help['command']['bankadd <url>'] = "Adds a webhosted .csv file to the bot's Extras/Bank folder (existing file is updated, overwrite NOT UNDOABLE).";
         $this->help['command']['banklook [file]'] = "Browses bank and its files (with deletion links for Admins)";		
-        $this->help['command']['bankrem <file>'] = "Removes a .csv file from the bot's Extras/Bank folder (NOT UNDOABLE).";
-        $this->help['notes'] = "This module uses Dream's AOIA(+) .csv file format, so make sure to use this tool specifically.";
+        $this->help['command']['bankrem [line] <file>'] = "Removes a .csv file (or just optionnal line) from the bot's Extras/Bank folder (NOT UNDOABLE).";
+        $this->help['notes'] = "This module uses Dream's AOIA(+) .csv file format. Equipped items are ignored by default.";
 		$this->path = "./Extras/Bank";
+		$this->bot->core("settings")->create("Bank", "IncludeEquipped", false, "Should we include currently equipped items?");					
     }
 
     function command_handler($name, $msg, $origin)
@@ -76,7 +77,7 @@ class Bank extends BaseActiveModule
 		if (!empty($words)) {
 			$total = 0;
 			$parts = explode(' ', $words);
-			if (count($parts) > 1 && is_numeric($parts[0])) {
+			if (count($parts) > 1 && is_numeric($parts[0]) && $parts[0] > 0) {
 				$ql = $parts[0];
 				unset($parts[0]);
 				$search = implode(' ', $parts);
@@ -94,14 +95,21 @@ class Bank extends BaseActiveModule
 							$line = preg_split('#\r?\n#', $content, 0);
 							for($i=0;$i<count($line);$i++) {
 								if($i>0) {
-									if(preg_match("/^\"?([a-z: ,.\']+)\"?,([0-9]+),([0-9a-z-]+),([^,]+),([^,]+),([0-9]+),([0-9]+),([0-9]+),([^,]?)/i",$line[$i],$value)) {
-										if (stripos($value[1], $search) !== false) {
+									if(preg_match("/^\"?([0-9a-z: ,.\'-]+)\"?,([0-9]+),([0-9a-z-]+),([^,]*),([^,]+),([0-9]+),([0-9]+),([0-9]+),([^,]?)/i",$line[$i],$value)) {
+										$match = true;
+										foreach($parts as $part) {
+											if(stripos($value[1],$part)===false) $match = false;
+										}
+										if ($match && ( $this->bot->core("settings")->get("Bank", "IncludeEquipped")==true || ($this->bot->core("settings")->get("Bank", "IncludeEquipped")==false&&strpos($value[5],"Equipped")===false) ) ) {
 											if($ql==0||$ql==$value[2]) {
 												$total++;
 												$inside .= "<a href='itemref://".$value[6]."/".$value[7]."/".$value[2]."'>".str_replace('\'','`',$value[1])."</a>";
-												if ($value[4]!="") $bag = " in bag ".str_replace('\'','`',$value[4]); else $bag = "";
+												if ($value[4]!="") $bag = " in bag ".str_replace('\'','`',$value[4]); else $bag = " in inventory";
 												if($name!=$value[3]) $inside .= " <a href='chatcmd:///tell ".$value[3]." Hi, I would please need: ".str_replace('\'','`',$value[1])." (QL ".$value[2].") you share".$bag."'>[ASK]</a>";
 												else $inside .= " [YOURS]";
+												if ($this->bot->core("security")->check_access($name, "ADMIN")) {
+													$inside .= " <a href='chatcmd:///tell ".$this->bot->botname." bankrem ".$i." ".$file.".".$ext."'>[REM]</a>";
+												}												
 												$inside .= "\n";
 											}
 										}
@@ -182,13 +190,18 @@ class Bank extends BaseActiveModule
 				$line = preg_split('#\r?\n#', $content, 0);
 				for($i=0;$i<count($line);$i++) {
 					if($i>0) {
-						if(preg_match("/^\"?([a-z: ,.\']+)\"?,([0-9]+),([0-9a-z-]+),([^,]+),([^,]+),([0-9]+),([0-9]+),([0-9]+),([^,]?)/i",$line[$i],$value)) {
-							if($i==1) $inside .= $value[3]."'s shared bank :\n\n";							
-							$inside .= "<a href='itemref://".$value[6]."/".$value[7]."/".$value[2]."'>".str_replace('\'','`',$value[1])."</a>";
-							if ($value[4]!="") $bag = " in bag ".str_replace('\'','`',$value[4]); else $bag = "";
-							if($name!=$value[3]) $inside .= " <a href='chatcmd:///tell ".$value[3]." Hi, I would please need: ".str_replace('\'','`',$value[1])." (QL ".$value[2].") you share".$bag."'>[ASK]</a>";
-							else $inside .= " [YOURS]";
-							$inside .= "\n";
+						if(preg_match("/^\"?([0-9a-z: ,.\'-]+)\"?,([0-9]+),([0-9a-z-]+),([^,]*),([^,]+),([0-9]+),([0-9]+),([0-9]+),([^,]?)/i",$line[$i],$value)) {
+							if ( $this->bot->core("settings")->get("Bank", "IncludeEquipped")==true || ($this->bot->core("settings")->get("Bank", "IncludeEquipped")==false&&strpos($value[5],"Equipped")===false) ) {
+								if($i==1) $inside .= $value[3]."'s shared bank :\n\n";							
+								$inside .= "<a href='itemref://".$value[6]."/".$value[7]."/".$value[2]."'>".str_replace('\'','`',$value[1])."</a>";
+								if ($value[4]!="") $bag = " in bag ".str_replace('\'','`',$value[4]); else $bag = " in inventory";
+								if($name!=$value[3]) $inside .= " <a href='chatcmd:///tell ".$value[3]." Hi, I would please need: ".str_replace('\'','`',$value[1])." (QL ".$value[2].") you share".$bag."'>[ASK]</a>";
+								else $inside .= " [YOURS]";
+								if ($this->bot->core("security")->check_access($name, "ADMIN")) {
+									$inside .= " <a href='chatcmd:///tell ".$this->bot->botname." bankrem ".$i." ".$file.".csv'>[REM]</a>";
+								}
+								$inside .= "\n";
+							}
 						}
 					}
 				}
@@ -200,17 +213,40 @@ class Bank extends BaseActiveModule
 	}
 	
 	function bankrem($msg)
-	{
-	   $file = trim(substr($msg, strlen('bankrem')));
+	{		
+		$file = trim(substr($msg, strlen('bankrem')));			   
+		$num = 0;
 		if (!empty($file)) {
-			if(file_exists($this->path."/".$file)) {
-				unlink($this->path."/".$file);
-				return "Target file has been removed.";
-			} else {
-				return "No such file into Bank folder.";
-			}
+			$parts = explode(' ', $file);			
+			if (count($parts) > 1 && is_numeric($parts[0]) && $parts[0] > 0) {
+				$num = $parts[0];
+				unset($parts[0]);
+				$file = implode(' ', $parts);
+				if(file_exists($this->path."/".$file)) {
+					$content = file_get_contents($this->path."/".$file);
+					$line = preg_split('#\r?\n#', $content, 0);
+					$edited = "";
+					for($i=0;$i<count($line);$i++) {
+						if($i!=$num) {
+							$edited .= $line[$i]."\n";
+						}
+					}
+					unlink($this->path."/".$file);
+					file_put_contents($this->path."/".$file, $edited);
+					return "File edited, line removed (refresh for more).";
+				} else {
+					return "No such entry into Bank folder.";
+				}								
+			} else {				
+				if(file_exists($this->path."/".$file)) {
+					unlink($this->path."/".$file);
+					return "Target file has been removed.";
+				} else {
+					return "No such file into Bank folder.";
+				}				
+			}							
 		} else {
-			return "Usage: bankrem <filename>";
+			return "Usage: bankrem [line] <filename>";
 		}
 	}	
 	
