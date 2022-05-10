@@ -1,6 +1,7 @@
 <?php
 /**
  * Bank module by Bitnykk based on Dream's AOIA(+) .csv file format
+ * Read explanations at http://wiki.bebot.link/index.php/Bank
  *
  * BeBot - An Anarchy Online & Age of Conan Chat Automaton
  * Copyright (C) 2004 Jonas Jax
