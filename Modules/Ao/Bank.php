@@ -104,7 +104,7 @@ class Bank extends BaseActiveModule
 											if($ql==0||$ql==$value[2]) {
 												$total++;
 												$inside .= "<a href='itemref://".$value[6]."/".$value[7]."/".$value[2]."'>".str_replace('\'','`',$value[1])."</a>";
-												if ($value[4]!="") $bag = " in bag ".str_replace('\'','`',$value[4]); else $bag = " in inventory";
+												if ($value[4]!="") $bag = " in bag ".str_replace('\'','`',$value[4]); else $bag = " in ".explode(' ', $value[5])[0];
 												if($name!=$value[3]) $inside .= " <a href='chatcmd:///tell ".$value[3]." Hi, I would please need: ".str_replace('\'','`',$value[1])." (QL ".$value[2].") you share".$bag."'>[ASK]</a>";
 												else $inside .= " [YOURS]";
 												if ($this->bot->core("security")->check_access($name, "ADMIN")) {
@@ -194,7 +194,7 @@ class Bank extends BaseActiveModule
 							if ( $this->bot->core("settings")->get("Bank", "IncludeEquipped")==true || ($this->bot->core("settings")->get("Bank", "IncludeEquipped")==false&&strpos($value[5],"Equipped")===false) ) {
 								if($i==1) $inside .= $value[3]."'s shared bank :\n\n";							
 								$inside .= "<a href='itemref://".$value[6]."/".$value[7]."/".$value[2]."'>".str_replace('\'','`',$value[1])."</a>";
-								if ($value[4]!="") $bag = " in bag ".str_replace('\'','`',$value[4]); else $bag = " in inventory";
+								if ($value[4]!="") $bag = " in bag ".str_replace('\'','`',$value[4]); else $bag = " in ".explode(' ', $value[5])[0];
 								if($name!=$value[3]) $inside .= " <a href='chatcmd:///tell ".$value[3]." Hi, I would please need: ".str_replace('\'','`',$value[1])." (QL ".$value[2].") you share".$bag."'>[ASK]</a>";
 								else $inside .= " [YOURS]";
 								if ($this->bot->core("security")->check_access($name, "ADMIN")) {
