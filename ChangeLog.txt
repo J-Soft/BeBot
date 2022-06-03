@@ -1,4 +1,11 @@
 -------------------------
+Release 0.7.24 - ??? 2022 
+-------------------------
+- For both: 
+- For AO: 
+- For AoC: 
+
+-------------------------
 Release 0.7.23 - jun 2022 
 -------------------------
 - For both: Roster improved ; Scripts added ; Ban modified ; php 8.1 runnability ; sendhelp added
