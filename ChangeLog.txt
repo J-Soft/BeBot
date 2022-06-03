@@ -1,5 +1,5 @@
 -------------------------
-Release 0.7.23 - may 2022 
+Release 0.7.23 - jun 2022 
 -------------------------
 - For both: Roster improved ; Scripts added ; Ban modified ; php 8.1 runnability ; sendhelp added
 - For AO: OnlineOrg improved ; Riadmin alt seek added ; Bank sharing added
