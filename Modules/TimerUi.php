@@ -64,11 +64,11 @@ class TimerGUI extends BaseActiveModule
         $this->help['command']['timer'] = "Lists all current timer for the bot and offers support to delete them.";
         $this->help['command']['timer [class] #[mshd] title']
             = "Adds a timer for # minutes (m), seconds (s), hours (h) or days (d). If no time unit is added it's # seconds. [class] is an optional parameter defining which timer class to use.";
-        $this->help['command']['timer [class] #[:##[:##[:##]]] title']
+        $this->help['command']['timer [class] 0:0:0:0 title']
             = "Adds a timer using the format days:hours:minutes:seconds, with the lowest time unit always being seconds (so 1:20 means 1min 20secs, 1:03:05 means 1hour 3mins 5secs). On every : there have to follow exactly two numbers. You don't have to enter all numbers. [class] is an optional parameter defining which timer class to use.";
         $this->help['command']['rtimer [class] <dur>[mshd] <repeat>[mshd] title']
             = "Adds a repeating timer for <dur> minutes (m), seconds (s), hours (h) or days (d). If no time unit is added it's <dur> seconds. <rep> is the time between repetitions of the timer, the same rules as for <dur> apply. [class] is an optional parameter defining which timer class to use.";
-        $this->help['command']['rtimer [class] <dur>[:##[:##[:##]]] <repeat>[:##[:##[:##]]] title']
+        $this->help['command']['rtimer [class] <dur>0:0:0:0 <repeat>0:0:0:0 title']
             = "Adds a timer using the format days:hours:minutes:seconds, with the lowest time unit always being seconds (so 1:20 means 1min 20secs, 1:03:05 means 1hour 3mins 5secs). On every : there have to follow exactly two numbers. You don't have to enter all numbers. <rep> is the time between repetitions of the timer, the same rules as for <dur> apply. [class] is an optional parameter defining which timer class to use.";
         $this->help['command']['ptimer']
             = "Lists and creates timers in the org chat, disregarding the originating channel. Syntax otherwise exactly as the syntax of the timer command, read there for more information.";

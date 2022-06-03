@@ -292,7 +292,7 @@ class TimerAA extends BaseActiveModule
 		if ($this->bot->core("settings")->get("TimerAA", "Remind")) {
 			if ($time > $timeraa_end && $timeraa_finished != 1) {
 				if ($result["level"] > 20) {
-					$msg = "##red##TimerAA##end##: You have no timer set! You can disable this message by replying: !timeraa set done";
+					$msg = "##red##TimerAA##end##: You have no timer set! You can set new timer or disable this message by replying: !timeraa set done";
 					$output = $this->bot->send_tell($user, $msg);
 				}
 			}

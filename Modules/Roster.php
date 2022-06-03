@@ -43,7 +43,7 @@ class Roster_Handler extends BaseActiveModule
         $this->register_command("all", "rosterupdate", "ADMIN");
         $this->register_command("all", "buddylist", "ADMIN");
         if (strtolower($this->bot->game) == 'ao') {
-            $this->register_event("cron", "1hour");
+            $this->register_event("cron", "6hour");
         }
         $this->help['description'] = 'Handles member roster commands.';
         $this->help['command']['member'] = "Shows the members count.";
@@ -61,9 +61,11 @@ class Roster_Handler extends BaseActiveModule
                 "Roster",
                 "Buddylistupdate",
                 10,
-                "What difference is allowed between the bots buddylist and the number of members who should be on it before a roster update is forced?",
-                "10;20;30;40;50"
+                "What difference is allowed between the bots buddylist and the number of members who should be on it before a roster update is eventually forced?",
+                "10;25;50;100;200;500;1000"
             );
+        $this->bot->core("settings")
+            ->create("Roster", "Forcedupdate", true, "Should the roster be forced updated if the buddylist difference exceeds the threshold?");			
         // 		$infos = $this -> bot -> db -> select("SELECT * FROM #___professions ORDER BY profession ASC");
         // 		foreach ($infos as $info)
         // 		{
@@ -139,11 +141,11 @@ class Roster_Handler extends BaseActiveModule
                 }
             case 'rosterupdate':
                 if ($this->bot->guildbot) {
-                    $this->output_destination($source, "Starting guild roster update.");
+                    $this->output_destination($source, "Attempting guild roster update...");
                     $this->bot->core("roster_core")->update_guild(true);
                     return false;
                 } else {
-                    $this->output_destination($source, "Starting raid roster update.");
+                    $this->output_destination($source, "Attempting raid roster update...");
                     $this->bot->core("roster_core")->update_raid(true);
                     return false;
                 }
@@ -324,12 +326,11 @@ class Roster_Handler extends BaseActiveModule
         $buddy_count = count($buddies);
         $notify_db = $this->bot->db->select("SELECT count(notify) FROM #___users WHERE notify = 1");
         $notify_count = $notify_db[0][0];
-        if ($notify_count - $buddy_count >= $this->bot->core("settings")
-                ->get("Roster", "Buddylistupdate")
-            || $buddy_count - $notify_count >= $this->bot
-                ->core("settings")->get("Roster", "Buddylistupdate")
+        if ($notify_count - $buddy_count >= $this->bot->core("settings")->get("Roster", "Buddylistupdate")
+            ||
+			$buddy_count - $notify_count >= $this->bot->core("settings")->get("Roster", "Buddylistupdate")
         ) {
-            $force = true;
+            $force = $this->bot->core("settings")->get("Roster", "Forcedupdate");
             if ($this->bot->guildbot) {
                 $this->bot->core("roster_core")->update_guild($force);
             } else {

@@ -680,6 +680,8 @@ class Relay extends BaseActiveModule
 
     function connect()
     {
+		$sql = "UPDATE #___online SET status_gc = '0', status_pg = '0' WHERE botname <> '" . $this->bot->botname . "'";
+		$this->bot->db->query($sql);		
         if ($this->bot->core("settings")->get('Relay', 'Autoinvite')) {
             $security_group = $this->bot->core("settings")
                 ->get('Relay', 'AutoinviteRelayGroup');

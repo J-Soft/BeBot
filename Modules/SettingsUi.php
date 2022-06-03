@@ -180,7 +180,7 @@ class SetConf extends BaseActiveModule
                 } elseif ($value == "off") {
                     $value = false;
                 } else {
-                    return "Unrecgonized value for setting " . $setting . " for module " . $module . ". No change made.";
+                    return "Unrecognized value for setting " . $setting . " for module " . $module . ". No change made.";
                 }
                 break;
             case "null":

@@ -1,4 +1,11 @@
 -------------------------
+Release 0.7.23 - jun 2022 
+-------------------------
+- For both: Roster improved ; Scripts added ; Ban modified ; php 8.1 runnability ; sendhelp added
+- For AO: OnlineOrg improved ; Riadmin alt seek added ; Bank sharing added
+- For AoC: TimerAA improved
+
+-------------------------
 Release 0.7.22 - Mar 2022 
 -------------------------
 - For both: reviewing ban duration ; improved irc/discord relays ; various fixes
@@ -21,7 +28,7 @@ Release 0.7.20 - Nov 2021
 -------------------------
 Release 0.7.19 - Sep 2021
 -------------------------
-- Both : color/preference/warning/roster/raid/stat improvements, custom multiple relays, Twitch chat compatibilized/improved, PHP 8+ runnability
+- Both : color/preference/warning/roster/raid/stat improvements, custom multiple relays, Twitch chat compatibilized/improved, PHP 8.0 runnability
 - AO : !gsp inspired by Nadyita's code, new !hot + !lc enriched informations for Notum War fields with Tyrence's API courtesy of Unk & Draex
 - AoC : new specific !attribute module (thanks to Ruskebusk & Meathooks) + few more improvements over various generic modules (!raffle & more)
 

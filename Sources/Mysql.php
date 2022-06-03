@@ -169,7 +169,7 @@ class MySQL
 
     function real_escape_string($string)
     {
-        return mysqli_real_escape_string($this->CONN, $string);
+        return mysqli_real_escape_string($this->CONN, (string)$string);
     }
 
     function error($text, $fatal = false, $connected = true)
