@@ -298,6 +298,8 @@ class Taraviza extends BaseActiveModule
         foreach ($take as $line){ $timer = $line[0]; }
         $now = time();
         while ($timer <= $now) { $timer = $timer + $this->tcycle; }
+		if ($now<($timer-$this->tcycle+1800)) $still = "should be up since ".floor(($now-($timer-$this->tcycle))/60)."m and then would";
+		else $still = "should";
         $left = $timer - $now;
         $hour = floor($left/3600);
         $left = $left - ($hour*3600);
@@ -307,7 +309,7 @@ class Taraviza extends BaseActiveModule
         if ($hour < 10) { $hour = "0".$hour; }
         if ($min < 10) { $min = "0".$min; }
 		$msg = "";
-        if($from=="user") $msg = "Tarasque should pop in about ".$hour."h".$min."m";
+        if($from=="user") $msg = "Tarasque ".$still." pop in about ".$hour."h".$min."m";
 		elseif($hour=="00") $msg = $min;
 		return $msg;
     }
