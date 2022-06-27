@@ -173,19 +173,7 @@ class Taraviza extends BaseActiveModule
 				}
 			}		
 		} elseif ($cron == 3600) {
-			if($this->bot->core("settings")->get("Taraviza", "ApiUrl")!='') {
-				$now = time(); $t = false; $v = false;
-				
-				$this -> verif_tara();
-				$take = $this -> bot -> db -> select("SELECT * FROM tara");
-				foreach ($take as $line){ $timer = $line[0]; }
-				if($now>$timer&&$now-$timer>$this->tcycle) $t = true;
-				
-				$this -> verif_viza();
-				$take = $this -> bot -> db -> select("SELECT * FROM viza");
-				foreach ($take as $line){ $timer = $line[0]; }
-				if($now>$timer&&$now-$timer>$this->vcycle) $v = true;
-				
+			if($this->bot->core("settings")->get("Taraviza", "ApiUrl")!='') {				
 				$url = $this->bot->core("settings")->get("Taraviza", "ApiUrl")."/".$this->apiver."/"."bosses";
 				$content = $this->bot->core("tools")->get_site($url);	
 				if (!($content instanceof BotError)) {
@@ -193,11 +181,11 @@ class Taraviza extends BaseActiveModule
 						$timers = json_decode($content);		
 						$this->wlist= ''; $this->wcount= 0;							
 						foreach($timers as $timer) {
-							if($t&&$timer->name=='tara'&&$this->bot->dimension==$timer->dimension&&$timer->last_spawn>0) {							
+							if($timer->name=='tara'&&$this->bot->dimension==$timer->dimension&&$timer->last_spawn>0) {							
 								$this -> bot -> db -> query("TRUNCATE TABLE tara");
 								$this -> bot -> db -> query("INSERT INTO tara (time) VALUES ('".$timer->last_spawn."')");
 							}
-							if($v&&$timer->name=='vizaresh'&&$this->bot->dimension==$timer->dimension&&$timer->last_spawn>0) {
+							if($timer->name=='vizaresh'&&$this->bot->dimension==$timer->dimension&&$timer->last_spawn>0) {
 								$this -> bot -> db -> query("TRUNCATE TABLE viza");
 								$this -> bot -> db -> query("INSERT INTO viza (time) VALUES ('".$timer->last_spawn."')");
 							}
@@ -209,18 +197,18 @@ class Taraviza extends BaseActiveModule
 									break;										
 								case 'cerubin':
 									$cycle = 32400; // 9h cycle
-									break;
-									case 'tara':
-									$cycle = $this->tcycle;
-									break;
-									case 'vizaresh':
-									$cycle = $this->vcycle;
-									break;										
-								case 'loren':
+									break;									
 								case 'father':
+								case 'loren':
 								case 'reaper':
 									$cycle = 33300; // 9H15 cycle (15=immortality)
-									break;																											
+									break;
+								case 'tara':
+									$cycle = $this->tcycle;
+									break;
+								case 'vizaresh':
+									$cycle = $this->vcycle;
+									break;									
 								default:
 									$cycle = 21600; // 6H default cycle, assumed for abmouth/tam/zaal & any other
 									break;
