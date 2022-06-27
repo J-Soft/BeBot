@@ -92,12 +92,11 @@ class Taraviza extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Taraviza", "ApiUrl", "https://timers.aobots.org/api/", "What's the Boss/Buff API URL we should use to auto-update (Nadybot's by default, leave empty to disable automation) ?");			
 		$this->register_event("cron", "1min");
-		$this->register_event("cron", "1hour");
+		$this->register_event("cron", "3hour");
 		$this->tcycle=34200; // 9H30 tara cycle (30=immortality)
-		$this->vcycle=61620;  // 17H07 viza cycle (7=immortality)
+		$this->vcycle=61620; // 17H07 viza cycle (7=immortality)
 		$this->apiver='v1.1';
-		$this->wlist= '';
-		$this->wcount= 0;
+		$this->wlist= array();
 	}
 
 	function command_handler($name, $msg, $channel)
@@ -121,7 +120,7 @@ class Taraviza extends BaseActiveModule
 		else if (preg_match("/^setviza [-]([0-9]+)$/i", $msg, $info))
 			return $this -> set_viza($name, "rem", $info, $channel);
 		else if (preg_match("/^world$/i", $msg)) {
-			return $this->wcount." world boss(es) currently found : ".$this->bot->core("tools")->make_blob("click to view", $this->wlist);
+			return $this -> show_world();
 		}
 	}
 
@@ -172,14 +171,14 @@ class Taraviza extends BaseActiveModule
 					}				
 				}
 			}		
-		} elseif ($cron == 3600) {
+		} elseif ($cron == 10800) {
 			if($this->bot->core("settings")->get("Taraviza", "ApiUrl")!='') {				
 				$url = $this->bot->core("settings")->get("Taraviza", "ApiUrl")."/".$this->apiver."/"."bosses";
 				$content = $this->bot->core("tools")->get_site($url);	
 				if (!($content instanceof BotError)) {
 					if (strpos($content, '{"name":') !== false) {							
 						$timers = json_decode($content);		
-						$this->wlist= ''; $this->wcount= 0;							
+						$this->wlist= array();							
 						foreach($timers as $timer) {
 							if($timer->name=='tara'&&$this->bot->dimension==$timer->dimension&&$timer->last_spawn>0) {							
 								$this -> bot -> db -> query("TRUNCATE TABLE tara");
@@ -189,36 +188,70 @@ class Taraviza extends BaseActiveModule
 								$this -> bot -> db -> query("TRUNCATE TABLE viza");
 								$this -> bot -> db -> query("INSERT INTO viza (time) VALUES ('".$timer->last_spawn."')");
 							}
-							$this -> wcount++;
-							$boss = $timer->name;
-							switch($boss) {
-								case 'atma':
-									$cycle = 10800; // 3H cycle
-									break;										
-								case 'cerubin':
-									$cycle = 32400; // 9h cycle
-									break;									
-								case 'father':
-								case 'loren':
-								case 'reaper':
-									$cycle = 33300; // 9H15 cycle (15=immortality)
-									break;
-								case 'tara':
-									$cycle = $this->tcycle;
-									break;
-								case 'vizaresh':
-									$cycle = $this->vcycle;
-									break;									
-								default:
-									$cycle = 21600; // 6H default cycle, assumed for abmouth/tam/zaal & any other
-									break;
-							}
-							$this -> wlist .= '<br>'.ucfirst($boss).' (RK'.$timer->dimension.') : may pop in '.$this->nextpop($timer->last_spawn,$cycle);
+							$this -> wlist [$timer->dimension] [$timer->name] = $timer->last_spawn;
 						}											
 					}
 				}
 			}
 		}
+	}
+	
+	function show_world()
+	{
+		$inside = ''; $total = 0;
+		foreach ($this -> wlist AS $dim => $bosses) {
+			foreach ($bosses AS $boss => $last) {
+				$total++;
+				switch($boss) {
+					case 'abmouth':
+						$cycle = 21600; // 6H cycle randomized
+						$title = '<a href="chatcmd:///waypoint 3150 1550 556">'.ucfirst($boss).'</a>';
+						break;										
+					case 'atma':
+						$cycle = 10800; // 3H cycle randomized
+						$title = '<a href="chatcmd:///waypoint 1900 3000 650">'.ucfirst($boss).'</a>';
+						break;										
+					case 'cerubin':
+						$cycle = 32400; // 9h cycle randomized
+						$title = '<a href="chatcmd:///waypoint 2100 280 505">'.ucfirst($boss).'</a>';
+						break;									
+					case 'father':
+						$cycle = 33300; // 9H15 cycle (15=immortality)
+						$title = '<a href="chatcmd:///waypoint 2900 300 615">'.ucfirst($boss).'</a>';
+						break;					
+					case 'loren':
+						$cycle = 33300; // 9H15 cycle (15=immortality)
+						$title = '<a href="chatcmd:///waypoint 350 500 567">'.ucfirst($boss).'</a>';
+						break;					
+					case 'reaper':
+						$cycle = 33300; // 9H15 cycle (15=immortality)
+						$title = '<a href="chatcmd:///waypoint 1760 2840 595">'.ucfirst($boss).'</a>';
+						break;
+					case 'tam':
+						$cycle = 21600; // 6H cycle randomized
+						$title = '<a href="chatcmd:///waypoint 1130 1530 795">'.ucfirst($boss).'</a>';
+						break;										
+					case 'tara':
+						$cycle = $this->tcycle;  // 9H30 tara cycle (30=immortality)
+						$title = '<a href="chatcmd:///waypoint 2092 3797 505">'.ucfirst($boss).'</a>';
+						break;
+					case 'vizaresh':
+						$cycle = $this->vcycle; // 17H07 viza cycle (7=immortality)
+						$title = '<a href="chatcmd:///waypoint 310 25 4328">'.ucfirst($boss).'</a>';
+						break;			
+					case 'zaal':
+						$cycle = 21600; // 6H cycle randomized
+						$title = '<a href="chatcmd:///waypoint 1730 1200 610">'.ucfirst($boss).'</a>';
+						break;																
+					default:
+						$cycle = 21600; // 6H default common cycle, assumed for any other
+						$title = ucfirst($boss); // unknown coordinates by default
+						break;
+				}				
+				$inside .= '<br>'.$title.' (RK'.$dim.') : may pop in '.$this->nextpop($last,$cycle);
+			}
+		}
+		return $total." world boss(es) currently found : ".$this->bot->core("tools")->make_blob("click to view", $inside);	
 	}
 	
 	function nextpop($timer,$cycle)
