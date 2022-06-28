@@ -204,51 +204,62 @@ class Taraviza extends BaseActiveModule
 				$total++;
 				switch($boss) {
 					case 'abmouth':
-						$cycle = 21600; // 6H cycle randomized
-						$title = '<a href="chatcmd:///waypoint 3150 1550 556">'.ucfirst($boss).'</a>';
+						$cycle = 21600; // 6H cycle randomized (15=immortality)
+						$title = 'Mutated <a href="chatcmd:///waypoint 3150 1550 556">'.ucfirst($boss).'</a>';
+						$perce = " [5% chance]";
 						break;										
 					case 'atma':
-						$cycle = 10800; // 3H cycle randomized
-						$title = '<a href="chatcmd:///waypoint 1900 3000 650">'.ucfirst($boss).'</a>';
+						$cycle = 10800; // 3H cycle randomized (15=immortality)
+						$title = 'Winged <a href="chatcmd:///waypoint 1900 3000 650">'.ucfirst($boss).'</a>';
+						$perce = " [30% chance]";
 						break;										
 					case 'cerubin':
-						$cycle = 32400; // 9h cycle randomized
-						$title = '<a href="chatcmd:///waypoint 2100 280 505">'.ucfirst($boss).'</a>';
+						$cycle = 32400; // 9h cycle randomized (15=immortality)
+						$title = 'Rejected <a href="chatcmd:///waypoint 2100 280 505">'.ucfirst($boss).'</a>';
+						$perce = " [85% chance]";
 						break;									
 					case 'father':
 						$cycle = 33300; // 9H15 cycle (15=immortality)
-						$title = '<a href="chatcmd:///waypoint 2900 300 615">'.ucfirst($boss).'</a>';
+						$title = 'Time <a href="chatcmd:///waypoint 2900 300 615">'.ucfirst($boss).'</a>';
+						$perce = " [100% sure]";
 						break;					
 					case 'loren':
 						$cycle = 33300; // 9H15 cycle (15=immortality)
-						$title = '<a href="chatcmd:///waypoint 350 500 567">'.ucfirst($boss).'</a>';
+						$title = 'Mercenary <a href="chatcmd:///waypoint 350 500 567">'.ucfirst($boss).'</a>';
+						$perce = " [100% sure]";
 						break;					
 					case 'reaper':
 						$cycle = 33300; // 9H15 cycle (15=immortality)
-						$title = '<a href="chatcmd:///waypoint 1760 2840 595">'.ucfirst($boss).'</a>';
+						$title = 'Dark <a href="chatcmd:///waypoint 1760 2840 595">'.ucfirst($boss).'</a>';
+						$perce = " [100% sure]";
 						break;
 					case 'tam':
-						$cycle = 21600; // 6H cycle randomized
-						$title = '<a href="chatcmd:///waypoint 1130 1530 795">'.ucfirst($boss).'</a>';
+						$cycle = 21600; // 6H cycle randomized (15=immortality)
+						$title = 'Automaton <a href="chatcmd:///waypoint 1130 1530 795">'.ucfirst($boss).'</a>';
+						$perce = " [60% chance]";
 						break;										
 					case 'tara':
 						$cycle = $this->tcycle;  // 9H30 tara cycle (30=immortality)
-						$title = '<a href="chatcmd:///waypoint 2092 3797 505">'.ucfirst($boss).'</a>';
+						$title = 'Camelot <a href="chatcmd:///waypoint 2092 3797 505">'.ucfirst($boss).'</a>';
+						$perce = " [100% sure]";
 						break;
 					case 'vizaresh':
 						$cycle = $this->vcycle; // 17H07 viza cycle (7=immortality)
-						$title = '<a href="chatcmd:///waypoint 310 25 4328">'.ucfirst($boss).'</a>';
+						$title = 'Gauntlet <a href="chatcmd:///waypoint 310 25 4328">'.ucfirst($boss).'</a>';
+						$perce = " [100% sure]";
 						break;			
 					case 'zaal':
-						$cycle = 21600; // 6H cycle randomized
-						$title = '<a href="chatcmd:///waypoint 1730 1200 610">'.ucfirst($boss).'</a>';
+						$cycle = 21600; // 6H cycle randomized (15=immortality)
+						$title = 'Deity <a href="chatcmd:///waypoint 1730 1200 610">'.ucfirst($boss).'</a>';
+						$perce = " [75% chance]";
 						break;																
 					default:
 						$cycle = 21600; // 6H default common cycle, assumed for any other
-						$title = ucfirst($boss); // unknown coordinates by default
+						$title = "Unknown ".ucfirst($boss); // no coordinates by default
+						$perce = " [no details]"; // unpredictable chance
 						break;
 				}				
-				$inside .= '<br>'.$title.' (RK'.$dim.') : may pop in '.$this->nextpop($last,$cycle);
+				$inside .= '<br>'.$title.' (RK'.$dim.') : may pop in '.$this->nextpop($last,$cycle).$perce;
 			}
 		}
 		return $total." world boss(es) currently found : ".$this->bot->core("tools")->make_blob("click to view", $inside);	
