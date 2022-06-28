@@ -92,7 +92,7 @@ class Taraviza extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Taraviza", "ApiUrl", "https://timers.aobots.org/api/", "What's the Boss/Buff API URL we should use to auto-update (Nadybot's by default, leave empty to disable automation) ?");			
 		$this->register_event("cron", "1min");
-		$this->register_event("cron", "3hour");
+		$this->register_event("cron", "30min");
 		$this->tcycle=34200; // 9H30 tara cycle (30=immortality)
 		$this->vcycle=61620; // 17H07 viza cycle (7=immortality)
 		$this->apiver='v1.1';
@@ -171,7 +171,7 @@ class Taraviza extends BaseActiveModule
 					}				
 				}
 			}		
-		} elseif ($cron == 10800) {
+		} elseif ($cron == 1800) {
 			if($this->bot->core("settings")->get("Taraviza", "ApiUrl")!='') {				
 				$url = $this->bot->core("settings")->get("Taraviza", "ApiUrl")."/".$this->apiver."/"."bosses";
 				$content = $this->bot->core("tools")->get_site($url);	
@@ -221,17 +221,17 @@ class Taraviza extends BaseActiveModule
 					case 'father':
 						$cycle = 33300; // 9H15 cycle (15=immortality)
 						$title = 'Time <a href="chatcmd:///waypoint 2900 300 615">'.ucfirst($boss).'</a>';
-						$perce = " [100% sure]";
+						$perce = " [99% sure]";
 						break;					
 					case 'loren':
 						$cycle = 33300; // 9H15 cycle (15=immortality)
 						$title = 'Mercenary <a href="chatcmd:///waypoint 350 500 567">'.ucfirst($boss).'</a>';
-						$perce = " [100% sure]";
+						$perce = " [99% sure]";
 						break;					
 					case 'reaper':
 						$cycle = 33300; // 9H15 cycle (15=immortality)
 						$title = 'Dark <a href="chatcmd:///waypoint 1760 2840 595">'.ucfirst($boss).'</a>';
-						$perce = " [100% sure]";
+						$perce = " [99% sure]";
 						break;
 					case 'tam':
 						$cycle = 21600; // 6H cycle randomized (15=immortality)
@@ -241,12 +241,12 @@ class Taraviza extends BaseActiveModule
 					case 'tara':
 						$cycle = $this->tcycle;  // 9H30 tara cycle (30=immortality)
 						$title = 'Camelot <a href="chatcmd:///waypoint 2092 3797 505">'.ucfirst($boss).'</a>';
-						$perce = " [100% sure]";
+						$perce = " [99% sure]";
 						break;
 					case 'vizaresh':
 						$cycle = $this->vcycle; // 17H07 viza cycle (7=immortality)
 						$title = 'Gauntlet <a href="chatcmd:///waypoint 310 25 4328">'.ucfirst($boss).'</a>';
-						$perce = " [100% sure]";
+						$perce = " [99% sure]";
 						break;			
 					case 'zaal':
 						$cycle = 21600; // 6H cycle randomized (15=immortality)
