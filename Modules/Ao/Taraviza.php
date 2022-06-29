@@ -222,10 +222,10 @@ class Taraviza extends BaseActiveModule
 						$immor = 15*60;
 						break;
 						case 'desert-rider':
-						$cycle = 21600; // 6h cycle randomized (15=immortality)
+						$cycle = 21600; // 6h cycle randomized (5=immortality)
 						$title = 'Nomad <a href="chatcmd:///waypoint 2232 1586 565">'.ucfirst($boss).'</a>';
 						$perce = " [unpredictable]";
-						$immor = 15*60;
+						$immor = 5*60;
 						break;									
 					case 'father':
 						$cycle = 33300; // 9H15 cycle (15=immortality)
