@@ -207,59 +207,78 @@ class Taraviza extends BaseActiveModule
 						$cycle = 21600; // 6H cycle randomized (15=immortality)
 						$title = 'Mutated <a href="chatcmd:///waypoint 3150 1550 556">'.ucfirst($boss).'</a>';
 						$perce = " [5% chance]";
+						$immor = 15*60;
 						break;										
 					case 'atma':
 						$cycle = 10800; // 3H cycle randomized (15=immortality)
 						$title = 'Winged <a href="chatcmd:///waypoint 1900 3000 650">'.ucfirst($boss).'</a>';
 						$perce = " [30% chance]";
+						$immor = 15*60;
 						break;										
 					case 'cerubin':
 						$cycle = 32400; // 9h cycle randomized (15=immortality)
 						$title = 'Rejected <a href="chatcmd:///waypoint 2100 280 505">'.ucfirst($boss).'</a>';
 						$perce = " [85% chance]";
+						$immor = 15*60;
+						break;
+						case 'desert-rider':
+						$cycle = 21600; // 6h cycle randomized (15=immortality)
+						$title = 'Nomad <a href="chatcmd:///waypoint 2232 1586 565">'.ucfirst($boss).'</a>';
+						$perce = " [unpredictable]";
+						$immor = 15*60;
 						break;									
 					case 'father':
 						$cycle = 33300; // 9H15 cycle (15=immortality)
 						$title = 'Time <a href="chatcmd:///waypoint 2900 300 615">'.ucfirst($boss).'</a>';
 						$perce = " [99% sure]";
+						$immor = 15*60;
 						break;					
 					case 'loren':
 						$cycle = 33300; // 9H15 cycle (15=immortality)
 						$title = 'Mercenary <a href="chatcmd:///waypoint 350 500 567">'.ucfirst($boss).'</a>';
 						$perce = " [99% sure]";
+						$immor = 15*60;
 						break;					
 					case 'reaper':
 						$cycle = 33300; // 9H15 cycle (15=immortality)
 						$title = 'Dark <a href="chatcmd:///waypoint 1760 2840 595">'.ucfirst($boss).'</a>';
 						$perce = " [99% sure]";
+						$immor = 15*60;
 						break;
 					case 'tam':
 						$cycle = 21600; // 6H cycle randomized (15=immortality)
 						$title = 'Automaton <a href="chatcmd:///waypoint 1130 1530 795">'.ucfirst($boss).'</a>';
 						$perce = " [60% chance]";
+						$immor = 15*60;
 						break;										
 					case 'tara':
 						$cycle = $this->tcycle;  // 9H30 tara cycle (30=immortality)
 						$title = 'Camelot <a href="chatcmd:///waypoint 2092 3797 505">'.ucfirst($boss).'</a>';
 						$perce = " [99% sure]";
+						$immor = 30*60;
 						break;
 					case 'vizaresh':
 						$cycle = $this->vcycle; // 17H07 viza cycle (7=immortality)
 						$title = 'Gauntlet <a href="chatcmd:///waypoint 310 25 4328">'.ucfirst($boss).'</a>';
 						$perce = " [99% sure]";
+						$immor = 7*60;
 						break;			
 					case 'zaal':
 						$cycle = 21600; // 6H cycle randomized (15=immortality)
 						$title = 'Deity <a href="chatcmd:///waypoint 1730 1200 610">'.ucfirst($boss).'</a>';
 						$perce = " [75% chance]";
+						$immor = 15*60;
 						break;																
 					default:
 						$cycle = 21600; // 6H default common cycle, assumed for any other
 						$title = "Unknown ".ucfirst($boss); // no coordinates by default
 						$perce = " [no details]"; // unpredictable chance
+						$immor = 15*60; // default 15 min immortality
 						break;
-				}				
-				$inside .= '<br>'.$title.' (RK'.$dim.') : may pop in '.$this->nextpop($last,$cycle).$perce;
+				}
+				if (time()<$last+$immor+30) $updown = "could be ##green##up##end##"; //
+				else $updown = "prolly ##red##down##end##";
+				$inside .= '<br>'.$title.' (RK'.$dim.') : '.$updown.' / may pop in '.$this->nextpop($last,$cycle).$perce;
 			}
 		}
 		return $total." world boss(es) currently found : ".$this->bot->core("tools")->make_blob("click to view", $inside);	
