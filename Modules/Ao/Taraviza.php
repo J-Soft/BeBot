@@ -92,7 +92,7 @@ class Taraviza extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Taraviza", "ApiUrl", "https://timers.aobots.org/api/", "What's the Boss/Buff API URL we should use to auto-update (Nadybot's by default, leave empty to disable automation) ?");			
 		$this->register_event("cron", "1min");
-		$this->register_event("cron", "30min");
+		$this->register_event("cron", "5min");
 		$this->tcycle=34200; // 9H30 tara cycle (30=immortality)
 		$this->vcycle=61620; // 17H07 viza cycle (7=immortality)
 		$this->apiver='v1.1';
@@ -171,7 +171,7 @@ class Taraviza extends BaseActiveModule
 					}				
 				}
 			}		
-		} elseif ($cron == 1800) {
+		} elseif ($cron == 300) {
 			if($this->bot->core("settings")->get("Taraviza", "ApiUrl")!='') {				
 				$url = $this->bot->core("settings")->get("Taraviza", "ApiUrl")."/".$this->apiver."/"."bosses";
 				$content = $this->bot->core("tools")->get_site($url);	
