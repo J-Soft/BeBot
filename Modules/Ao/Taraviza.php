@@ -278,7 +278,7 @@ class Taraviza extends BaseActiveModule
 				}
 				if (time()<$last+$immor+30) $updown = "could be ##green##up##end##"; //
 				else $updown = "prolly ##red##down##end##";
-				$inside .= '<br>'.$title.' (RK'.$dim.') : '.$updown.' / may pop in '.$this->nextpop($last,$cycle).$perce;
+				$inside .= '<br>'.$title.' (RK'.$dim.') : '.$updown.' / last seen '.$this->nextpop($last,0).' ago, may repop in '.$this->nextpop($last,$cycle).$perce;
 			}
 		}
 		return $total." world boss(es) currently found : ".$this->bot->core("tools")->make_blob("click to view", $inside);	
@@ -287,8 +287,9 @@ class Taraviza extends BaseActiveModule
 	function nextpop($timer,$cycle)
 	{
         $now = time();
-        while ($timer <= $now) { $timer = $timer + $cycle; }
-        $left = $timer - $now;
+        if($cycle>0) { while ($timer <= $now) { $timer = $timer + $cycle; }}
+        if($cycle>0) $left = $timer - $now;
+		else $left = $now-$timer;
         $hour = floor($left/3600);
         $left = $left - ($hour*3600);
         $min = floor($left/60);
