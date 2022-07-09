@@ -204,7 +204,7 @@ class Taraviza extends BaseActiveModule
 				$total++;
 				switch($boss) {
 					case 'abmouth':
-						$cycle = 21600; // 6H cycle randomized (15=immortality)
+						$cycle = 10800; // 3H cycle randomized (15=immortality)
 						$title = 'Mutated <a href="chatcmd:///waypoint 3150 1550 556">'.ucfirst($boss).'</a>';
 						$perce = " [5% chance]";
 						$immor = 15*60;
