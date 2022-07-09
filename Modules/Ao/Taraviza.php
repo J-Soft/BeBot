@@ -200,7 +200,7 @@ class Taraviza extends BaseActiveModule
 	{
 		$inside = ''; $total = 0;
 		foreach ($this -> wlist AS $dim => $bosses) {
-			foreach ($bosses AS $boss => $last) {
+			foreach (array_reverse($bosses) AS $boss => $last) {
 				$total++;
 				switch($boss) {
 					case 'abmouth':
@@ -280,6 +280,7 @@ class Taraviza extends BaseActiveModule
 				else $updown = "prolly ##red##down##end##";
 				$inside .= '<br>'.$title.' (RK'.$dim.') : '.$updown.' / last seen '.$this->nextpop($last,0).' ago, may repop in '.$this->nextpop($last,$cycle).$perce;
 			}
+			$inside .= '<br>';
 		}
 		return $total." world boss(es) currently found : ".$this->bot->core("tools")->make_blob("click to view", $inside);	
 	}
