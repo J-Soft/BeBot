@@ -1495,6 +1495,10 @@ class Raid extends BaseActiveModule
             $inside .= "Description:\n     " . $this->description."\n\n";
         }
 
+        if ($this->note!='') {
+            $inside .= "Note:\n     ".$this->note."\n\n";
+        }
+		
         if ($join) {
             $inside .= $this->bot->core("tools")
                     ->chatcmd("join", "Join <botname>")." || ";
@@ -1587,10 +1591,13 @@ class Raid extends BaseActiveModule
                         ->format_seconds($move) . " ##end##";
             } else { $move = ""; }
 
+			$nl = false;
+			
             if ($this->tank && $this->showtank) {
                 $nl = true;
                 $tank = "\nTank is ##highlight##" . $this->tank . "##end##";
             } else { $tank = ""; }
+			
             if ($this->showcallers && isset($this->bot->commands['tell']['caller']) && !empty($this->bot->commands['tell']['caller']->callers)) {
                 if ($nl) {
                     $callers = ", ";
@@ -1599,6 +1606,7 @@ class Raid extends BaseActiveModule
                 }
                 $callers .= $this->bot->commands['tell']['caller']->show_callers();
             } else { $callers = ""; }
+			
             $this->bot->send_output(
                 "",
                 "Raid is running: ##highlight##" . $this->description . "##end##" . $tank . $callers . $move . " :: " . $this->clickjoin(
