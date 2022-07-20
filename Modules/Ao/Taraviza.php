@@ -201,7 +201,6 @@ class Taraviza extends BaseActiveModule
 		$inside = ''; $total = 0;
 		foreach ($this -> wlist AS $dim => $bosses) {
 			foreach (array_reverse($bosses) AS $boss => $last) {
-				$total++;
 				switch($boss) {
 					case 'abmouth':
 						$cycle = 10800; // 3H cycle randomized (15=immortality)
@@ -278,7 +277,10 @@ class Taraviza extends BaseActiveModule
 				}
 				if (time()<$last+$immor+30) $updown = "could be ##green##up##end##"; //
 				else $updown = "prolly ##red##down##end##";
-				$inside .= '<br>'.$title.' (RK'.$dim.') : '.$updown.' / last seen '.$this->nextpop($last,0).' ago, may repop in '.$this->nextpop($last,$cycle).$perce;
+				if (time()-$last<172800) { // after 48h without spawn, boss event is prolly over
+					$inside .= '<br>'.$title.' (RK'.$dim.') : '.$updown.' / last seen '.$this->nextpop($last,0).' ago, may repop in '.$this->nextpop($last,$cycle).$perce;
+					$total++;
+				}
 			}
 			$inside .= '<br>';
 		}
