@@ -2,8 +2,8 @@
 Release 0.7.24 - ??? 2022 
 -------------------------
 - For both: Raid note added in click join spam
-- For AO: World bosses added
-- For AoC: 
+- For AO: World bosses added ; small changes in c/cd/recent
+- For AoC: nothing specific this time
 
 -------------------------
 Release 0.7.23 - jun 2022 
