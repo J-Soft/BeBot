@@ -689,40 +689,69 @@ class OnlineDisplay extends BaseActiveModule
 		$count = 0;
 		$plays = 0;
 		$msg = "";
-		$mains = array();
-		$recent = $this->bot->db->select("SELECT DISTINCT(nickname) FROM #___online WHERE status_gc_changetime > ".$day);
+		$mains = array(); $mains2 = array();
+		$recent = $this->bot->db->select("SELECT DISTINCT(nickname), botname FROM #___online WHERE status_gc_changetime > ".$day);
         if (!empty($recent))
 		{
 				$count = count($recent);
                 foreach ($recent as $toon)
 				{
-					$name = $toon[0];						
-					$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");											
-					if(isset($checka[0][0])&&count($checka)==1) {
-						$main = $checka[0][0];
-						if(!array_key_exists($main, $mains)) {
-							$mains[$main] = 1;
+					if($toon[1] == $this->bot->botname) {
+						$name = $toon[0];						
+						$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");											
+						if(isset($checka[0][0])&&count($checka)==1) {
+							$main = $checka[0][0];
+							if(!array_key_exists($main, $mains)) {
+								$mains[$main] = 1;
+							} else {
+								$mains[$main] = $mains[$main]+1;
+							}
 						} else {
-							$mains[$main] = $mains[$main]+1;
-						}
-					} else {
-						if(!array_key_exists($name, $mains)) {
-							$mains[$name] = 1;
+							if(!array_key_exists($name, $mains)) {
+								$mains[$name] = 1;
+							} else {
+								$mains[$name] = $mains[$name]+1;
+							}
+						}				
+					}
+				}
+                foreach ($recent as $toon)
+				{
+					if($toon[1] != $this->bot->botname) {
+						$name = $toon[0];						
+						$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");											
+						if(isset($checka[0][0])&&count($checka)==1) {
+							$main = $checka[0][0];
+							if(!array_key_exists($main, $mains2)) {
+								$mains2[$main] = 1;
+							} else {
+								$mains2[$main] = $mains2[$main]+1;
+							}
 						} else {
-							$mains[$name] = $mains[$name]+1;
-						}
-					}				
+							if(!array_key_exists($name, $mains2)) {
+								$mains2[$name] = 1;
+							} else {
+								$mains2[$name] = $mains2[$name]+1;
+							}
+						}	
+					}
 				}
 				foreach ($mains as $main => $alts)
 				{
 					$msg .= " ".$main."(".$alts.") ";
 				}
-				$plays = count($mains);
+				if(count($mains)>0&&count($mains2)>0) { $spacer = " + "; } else { $spacer = " "; }
+				$msg .= $spacer;				
+				foreach ($mains2 as $main => $alts)
+				{
+					$msg .= " ".$main."(".$alts.") ";
+				}				
+				$plays = count($mains) + count($mains2);
         } else {
 			$msg = "No logon information found.";
 		}
 		$msg = str_replace("(1)", "", $msg);
-		return $count." toons logged today from ".$plays." players :: ".$this->bot->core("tools")->make_blob("click to view",$msg);
+		return $count." (org + guest/other) toon(s) logged today from ".$plays." players :: ".$this->bot->core("tools")->make_blob("click to view",$msg);
     }
 	
 }

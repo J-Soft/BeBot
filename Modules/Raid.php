@@ -66,7 +66,7 @@ class Raid extends BaseActiveModule
 		$this->limit = 0;
         $this->locked = false;
         $this->register_command("all", "s", "LEADER");
-        $this->register_command("all", "c", "LEADER");
+        $this->register_command("all", "c", "MEMBER");
         $this->register_command("all", "f", "LEADER");
         $this->register_command("all", "raid", "GUEST");
         $this->register_command("all", "raidhistory", "LEADER");
