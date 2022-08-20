@@ -52,7 +52,7 @@ class Recruit extends BaseActiveModule
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer1", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer2", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficerNo", 2, "Last Officer slot used");
-		$this -> bot -> core("settings") -> create("Recruit", "SpamPublic", false, "Should the bot be spamming a public channel every 20 minutes ?", "On;Off");	
+		$this -> bot -> core("settings") -> create("Recruit", "SpamPublic", false, "Should the bot be spamming a public channel every hour ?", "On;Off");	
 		$this -> bot -> core("settings") -> create("Recruit", "WhatChan", "Newbie", "Which channel should be spammed every hour ?", "Newbie;Neutral;Clan;Omni");
 	}
 
