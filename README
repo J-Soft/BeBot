@@ -105,7 +105,7 @@ need to copy a php.exe file right into bot's root folder (where StartBot.bat is)
 Unless windows PATH and/or php.ini are well set so the exe can locate required
 libraries alone, you may have to copy correct .dll files for this specific PHP.
 For 5.4/5.6 : libeay32, libmysql, php5ts and ssleay32, php_mysqli & php_sockets.
-For 7.x : libcrypt, libssl, libssh2, sockets, nghttp2, curl & php7(ts).
+For 7/8 : libcrypt, libssl, libssh2, sockets, nghttp2, curl & phpX(ts).
 
 Bot will tell you what misses to run during startup, so check all lines !
 You may need to install some modules (e.g. curl) and activate them in php.ini
@@ -120,8 +120,11 @@ recommended) you must specify the complete path to Main.php.
 CONF/BOT.CONF
 -------------
 
-Open the file Bot.conf, which is in the conf directory where you installed 
-the bot, in a text editor. Here you will have to enter the AO/AoC username, 
+This file will be partly filled during first startup within bot prompt,
+but you can also edit it manually if ever needed :
+
+Open the file Bot.conf, which is in the Conf directory where you installed 
+the bot, in a text editor. Here you can to enter the AO/AoC username, 
 password, and the name of the bot along with the dimension number (AO only) 
 or server name (AoC only) you would like to run it on. 
 
@@ -183,7 +186,7 @@ Raid bot
 
 To make a raid bot set "$guildbot" to false and leave "$guild_name" blank. 
 Set "$guild_id" to 0. For a raid bot you most likely want to set 
-$guild_relay_target = false; (note: false, not "false") 
+$guild_relay_target = False; (note: False, not "False" as explain upper) 
 
 CONF/MYSQL.CONF
 ---------------
@@ -290,7 +293,7 @@ PHASE 5: CONFIGURE BEBOT
   $server = "localhost";
 
 That's it, you should now be able to start the bot provided PHP is set up 
-correctly.
+correctly as cover upper already.
 
 Nevertheless, if bot can't locate the database, that's either because these infos
 ain't proper, or because the server isn't running, or may be because you have
@@ -365,8 +368,8 @@ PLAYING WHILE RUNNING THE BOT (AOC ONLY)
 You can run the bot and play AoC from the same account (with different 
 characters). However the bot must connect first and you have to wait at 
 least 5 minutes after logging the bot in, before you can connect with your 
-client. If the bot (re)connects while you are logged in, you get 
-disconnected. 
+client. If the bot (re)connects while you are logged in, you might get 
+disconnected most of times. 
 
 
 IN-GAME SETUP
