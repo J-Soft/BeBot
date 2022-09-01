@@ -1,4 +1,11 @@
 -------------------------
+Release 0.7.25 - ??? 2022 
+-------------------------
+- For both: ...
+- For AO: ...
+- For AoC: ...
+
+-------------------------
 Release 0.7.24 - Sep 2022 
 -------------------------
 - For both: Raid note added in click join spam + renaming announced to discord/Irc
