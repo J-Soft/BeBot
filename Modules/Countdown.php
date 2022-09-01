@@ -41,7 +41,7 @@ class Countdown extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'countdown', 'MEMBER');
+        $this->register_command('all', 'countdown', 'LEADER');
         $this->register_alias("countdown", "cd");
         $this->register_event("timer", "countdown");
         $classid = $this->bot->core("timer")

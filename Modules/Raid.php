@@ -66,7 +66,7 @@ class Raid extends BaseActiveModule
 		$this->limit = 0;
         $this->locked = false;
         $this->register_command("all", "s", "LEADER");
-        $this->register_command("all", "c", "LEADER");
+        $this->register_command("all", "c", "MEMBER");
         $this->register_command("all", "f", "LEADER");
         $this->register_command("all", "raid", "GUEST");
         $this->register_command("all", "raidhistory", "LEADER");
@@ -315,7 +315,8 @@ class Raid extends BaseActiveModule
                         Return $this->pause(false);
                     case 'announce':
                         Return $this->set_announce($name, $var[2]);
-                    case 'description':					
+                    case 'description':
+					case 'rename':
 						if($var[2]=="") {
 							Return "Please add 1 or 2 word(s) as raid name (e.g.: !raid description Sector 35)";
 						} else {
@@ -1495,6 +1496,10 @@ class Raid extends BaseActiveModule
             $inside .= "Description:\n     " . $this->description."\n\n";
         }
 
+        if ($this->note!='') {
+            $inside .= "Note:\n     ".$this->note."\n\n";
+        }
+		
         if ($join) {
             $inside .= $this->bot->core("tools")
                     ->chatcmd("join", "Join <botname>")." || ";
@@ -1587,10 +1592,13 @@ class Raid extends BaseActiveModule
                         ->format_seconds($move) . " ##end##";
             } else { $move = ""; }
 
+			$nl = false;
+			
             if ($this->tank && $this->showtank) {
                 $nl = true;
                 $tank = "\nTank is ##highlight##" . $this->tank . "##end##";
             } else { $tank = ""; }
+			
             if ($this->showcallers && isset($this->bot->commands['tell']['caller']) && !empty($this->bot->commands['tell']['caller']->callers)) {
                 if ($nl) {
                     $callers = ", ";
@@ -1599,6 +1607,7 @@ class Raid extends BaseActiveModule
                 }
                 $callers .= $this->bot->commands['tell']['caller']->show_callers();
             } else { $callers = ""; }
+			
             $this->bot->send_output(
                 "",
                 "Raid is running: ##highlight##" . $this->description . "##end##" . $tank . $callers . $move . " :: " . $this->clickjoin(
@@ -1934,6 +1943,14 @@ class Raid extends BaseActiveModule
             if ($this->raid) {
                 $this->description = $desc;
                 $this->save();
+				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
+					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
+					if($this->bot->core("settings")->get("Raid", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Raid", "DiscTag")." "; } else { $dctag = ""; }
+					$this->bot->core("discord")->disc_alert($dctag.$name." renamed raid : " .$this->description, $chan);
+				}
+				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
+					$this->bot->core("irc")->send_irc("", "", $name." renamed raid : " .$this->description);
+				}				
                 Return ("Description Change :: " . $this->control());
             } else {
                 Return ("Error There isnt a Raid Running.");

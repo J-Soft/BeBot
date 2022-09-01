@@ -69,7 +69,7 @@ class Callers extends BaseActiveModule
             if (preg_match("/^caller add (.+)/i", $msg, $info)) {
                 return $this->caller_add($info[1]);
             } else {
-                if (preg_match("/^caller del (.+)/i", $msg, $info)) {
+                if (preg_match("/^caller del (.+)/i", $msg, $info) || preg_match("/^caller delete (.+)/i", $msg, $info) || preg_match("/^caller rem (.+)/i", $msg, $info) || preg_match("/^caller remove (.+)/i", $msg, $info)) {
                     return $this->caller_del($info[1]);
                 } else {
                     if (preg_match("/^caller/i", $msg)) {
