@@ -31,7 +31,7 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-define('BOT_VERSION', "0.7.25");
+define('BOT_VERSION', "0.7.24");
 define('BOT_VERSION_INFO', ".git(official)");
 define('BOT_VERSION_NAME', "BeBot");
 
