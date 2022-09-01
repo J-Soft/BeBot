@@ -315,7 +315,8 @@ class Raid extends BaseActiveModule
                         Return $this->pause(false);
                     case 'announce':
                         Return $this->set_announce($name, $var[2]);
-                    case 'description':					
+                    case 'description':
+					case 'rename':
 						if($var[2]=="") {
 							Return "Please add 1 or 2 word(s) as raid name (e.g.: !raid description Sector 35)";
 						} else {
@@ -1942,6 +1943,14 @@ class Raid extends BaseActiveModule
             if ($this->raid) {
                 $this->description = $desc;
                 $this->save();
+				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Raid", "AlertDisc")) {
+					if($this->bot->core("settings")->get("Raid", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Raid", "DiscChanId"); } else { $chan = ""; }
+					if($this->bot->core("settings")->get("Raid", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Raid", "DiscTag")." "; } else { $dctag = ""; }
+					$this->bot->core("discord")->disc_alert($dctag.$name." renamed raid : " .$this->description, $chan);
+				}
+				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
+					$this->bot->core("irc")->send_irc("", "", $name." renamed raid : " .$this->description);
+				}				
                 Return ("Description Change :: " . $this->control());
             } else {
                 Return ("Error There isnt a Raid Running.");
