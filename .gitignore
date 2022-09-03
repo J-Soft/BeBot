@@ -3,6 +3,7 @@
 *.org
 Conf/*.conf
 Conf/*.ini
+Conf/*.dist
 *.dll
 php.*
 
