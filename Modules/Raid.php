@@ -785,7 +785,7 @@ class Raid extends BaseActiveModule
             }
             $this->bot->send_tell(
                 $name,
-                "Raid is running: ##highlight##" . $this->description . "##end##" . $move . " :: " . $this->clickjoin(
+                "Raid is running: ##highlight##" . $this->description . "##end## started by " . $this->name . $move . " :: " . $this->clickjoin(
                     true
                 )
             );
