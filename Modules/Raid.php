@@ -1493,12 +1493,46 @@ class Raid extends BaseActiveModule
 
         $inside = "##blob_title##:::: Join/Leave Raid ::::##end##\n\n";
         if ($this->description && !empty($this->description)) {
-            $inside .= "Description:\n     " . $this->description."\n\n";
+            $inside .= "Description:\n     " . $this->description."\n";
         }
-
+		
+		if (strtolower($this->bot->game) == 'ao' && $this->bot->exists_module("guide")) {
+			if (strpos($this->description, '13') !== false) {
+				$cmd = 'guide';
+				$guide = 'apf13';
+			} elseif (strpos($this->description, '28') !== false) {
+				$cmd = 'guide';
+				$guide = 'apf28';
+			} elseif (strpos($this->description, '35') !== false) {
+				$cmd = 'guide';
+				$guide = 'apf35';
+			} elseif (strpos($this->description, '42') !== false) {
+				$cmd = 'guide';
+				$guide = 'apf42';
+			} elseif (strpos($this->description, '12') !== false) {
+				$cmd = 'aou read';
+				$guide = '454';
+			} elseif (strpos($this->description, 'pande') !== false) {
+				$cmd = 'guide';
+				$guide = 'pande';
+			} elseif (strpos($this->description, 'tchu') !== false) {
+				$cmd = 'guide';
+				$guide = 'tchu';
+			} else {
+				$cmd = '';
+				$guide = '';
+			}
+			if ($cmd != '' && $guide != '') {
+				$inside .= "     ".$this->bot->core("tools")
+						->chatcmd($cmd." ".$guide, "Read guide")."\n";
+			}
+		}
+		
         if ($this->note!='') {
-            $inside .= "Note:\n     ".$this->note."\n\n";
+            $inside .= "\nNote:\n     ".$this->note."\n";
         }
+		
+		$inside .= "\n";
 		
         if ($join) {
             $inside .= $this->bot->core("tools")
@@ -1511,7 +1545,7 @@ class Raid extends BaseActiveModule
                     ->chatcmd("<botname>", "Go LFT", "lft")." || ";
         }
         $inside .= $this->bot->core("tools")
-                ->chatcmd("raid leave", "Leave the raid");		
+                ->chatcmd("raid leave", "Leave the raid");
 		
 		$onarr = $this->bot->core("onlinedisplay")->online_array();
 		$inside .= "\n\n:: ".count($this->user)." Joined User(s) ::\n";
