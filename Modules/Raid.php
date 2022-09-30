@@ -1506,7 +1506,7 @@ class Raid extends BaseActiveModule
 			} elseif (strpos($this->description, '35') !== false) {
 				$cmd = 'guide';
 				$guide = 'apf35';
-			} elseif (strpos($this->description, '42') !== false) {
+			} elseif (strpos($this->description, '42') !== false || strpos(strtolower($this->description), 'west') !== false || strpos(strtolower($this->description), 'north') !== false || strpos(strtolower($this->description), 'east') !== false) {
 				$cmd = 'guide';
 				$guide = 'apf42';
 			} elseif (strpos($this->description, '12') !== false) {
