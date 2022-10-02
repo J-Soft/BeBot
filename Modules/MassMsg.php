@@ -148,6 +148,7 @@ class MassMsg extends BaseActiveModule
             //Send to PG and ignore all in PG
             $this->bot->send_pgroup("\n" . $msg, null, true, false);
         }
+		$msg = $msg." <a href=\"text://To join the bot click: <a href='chatcmd:///tell ".$this->bot->botname." join'>Join</a><br><br>\">Join link</a>";
         if ($this->bot->core('settings')->get('MassMsg', 'IncludePrefLink')) {
             $msg = $msg . "\n##massmsg_disable##You can disable receipt of mass messages and invites in the ##end##";
             $msg = $this->bot->core("colors")->parse($msg);
@@ -187,7 +188,7 @@ class MassMsg extends BaseActiveModule
 				}
             } else {
                 $message = $msg;
-            }
+            }			
             //If they want messages they will get them regardless of type
             if ($massmsg) {
                 if (!$inchattell

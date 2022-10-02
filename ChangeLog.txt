@@ -1,7 +1,7 @@
 -------------------------
 Release 0.7.25 - ??? 2022 
 -------------------------
-- For both: raid leader autojoined/notified
+- For both: raid leader autojoined/notified ; announce join link added
 - For AO: rcalc improved ; raid guide added
 - For AoC: ...
 
