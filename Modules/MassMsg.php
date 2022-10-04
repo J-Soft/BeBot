@@ -148,7 +148,12 @@ class MassMsg extends BaseActiveModule
             //Send to PG and ignore all in PG
             $this->bot->send_pgroup("\n" . $msg, null, true, false);
         }
-		$msg = $msg." <a href=\"text://To join the bot click: <a href='chatcmd:///tell ".$this->bot->botname." join'>Join</a><br><br>\">Join link</a>";
+		$msg = $msg." <a href=\"text://To join the bot click: <a href='chatcmd:///tell ".$this->bot->botname." join'>Join</a>";
+		if ($this->bot->exists_module("raid")&&$this->bot->core("raid")->raid) {
+			$msg = $msg."<br>To join the raid click: <a href='chatcmd:///tell ".$this->bot->botname." raid join'>Raid</a>";
+			$msg = $msg."<br>To go lft click: <a href='chatcmd:///lft ".$this->bot->botname."'>LFT</a>";
+		}
+		$msg = $msg."\">Link(s)</a>";
         if ($this->bot->core('settings')->get('MassMsg', 'IncludePrefLink')) {
             $msg = $msg . "\n##massmsg_disable##You can disable receipt of mass messages and invites in the ##end##";
             $msg = $this->bot->core("colors")->parse($msg);
