@@ -881,9 +881,14 @@ class Raid extends BaseActiveModule
         ) {
             if ($this->raid) {
                 $this->bot->db->query("UPDATE #___raid_log SET end = " . time() . " WHERE time = " . $this->start);
+				if(strlen($this->note)>50) {
+					$note = substr($this->note,0,47)."...";
+				} else {
+					$note = $this->note;
+				}
 				$this->bot->db->query(
 					"UPDATE #___raid_details SET end = " . time(
-					) . ", description = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', note = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->note) . "' WHERE time = " . $this->start
+					) . ", description = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', note = '" . mysqli_real_escape_string($this->bot->db->CONN,$note) . "' WHERE time = " . $this->start
 				);				
                 $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
                 $this->raid = false;
