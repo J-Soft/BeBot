@@ -226,9 +226,9 @@ class Taraviza extends BaseActiveModule
 						$perce = " [unpredictable]";
 						$immor = 5*60;
 						break;									
-					case 'father':
+					case 'father-time':
 						$cycle = 33300; // 9H15 cycle (15=immortality)
-						$title = 'Time <a href="chatcmd:///waypoint 2900 300 615">'.ucfirst($boss).'</a>';
+						$title = 'Timed <a href="chatcmd:///waypoint 2900 300 615">'.ucfirst($boss).'</a>';
 						$perce = " [99% sure]";
 						$immor = 15*60;
 						break;					
