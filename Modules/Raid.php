@@ -168,7 +168,15 @@ class Raid extends BaseActiveModule
             ->create("Raid", "AlertIrc", false, "Do we alert Irc of raid activity ?");	
         $this->bot->core("settings")->create("Raid", "TopMonth", false, "Do we show monthly Top 5 ?");			
         $this->bot->core("settings")->create("Raid", "TopYear", false, "Do we show yearly Top 5 ?");			
-        $this->bot->core("settings")->create("Raid", "TopAll", true, "Do we show all times Top 5 ?");			
+        $this->bot->core("settings")->create("Raid", "TopAll", true, "Do we show all times Top 5 ?");
+        $this->bot->core("settings")
+            ->create(
+                "Raid",
+                "TopLimit",
+                5,
+                "Specify the shown winners for all top (limited to 5 by default).",
+                '3;5;10'
+            );		
 			
         $this->help['description'] = 'Module to manage and announce raids.';
         $this->help['command']['raidhistory [x]'] = "Shows 10 archived raids ; option to skip x records from bottom links.";
@@ -497,6 +505,7 @@ class Raid extends BaseActiveModule
 		$inside = "";
 		$leaders = array();
 		$loads = array();
+		$limit = $this->bot->core("settings")->get("Raid", "TopLimit");
 		if($this->bot->core("settings")->get("Raid", "TopMonth")) {
 			$month = time()-2592000;
 			$loads[] = array("type"=>"Leaders","lapse"=>"of the month","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$month);
@@ -584,7 +593,7 @@ class Raid extends BaseActiveModule
 				asort($mains, SORT_NUMERIC);
 				$mains = array_reverse($mains, true);
 				if($user=="") $shown = 0;
-				else $shown = 4;
+				else $shown = $limit-1;
 				if($user=="") $inside .= "\n##highlight##".$load['type']."##end## ".$load['lapse']." \n";
 				else {
 					if($load['type']=="Leaders") $short = "Lead";
@@ -594,21 +603,21 @@ class Raid extends BaseActiveModule
 				}
 				foreach ($mains as $main => $tot)
 				{
-					if(!in_array($main,$leaders)||$load['type']=='Leaders') {
+					//if(!in_array($main,$leaders)||$load['type']=='Leaders') { /* patch note few lines below */
 						$shown++;
-						if($shown<6) {
+						if($shown<$limit+1) {
 							if($user==""&&$load['type']=='Leaders') array_push($leaders,$main);
 							if($load['table']=='raid_damage') $tot = round($tot,2);
 							if($user=="") $inside .= " #".$shown." ".$main." (".$tot.") \n";
 							else $inside .= $tot." \n";
 						}
-					}
+					//} /* disables RL expelling of raid/damage lists */
 				}			
 			}
 		}
-		if($user=="") $inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded (top 5 Leaders are expelled of following Raiders & Damagers).";
+		if($user=="") $inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded."; // (top 5 Leaders are expelled of following Raiders & Damagers) /* not anymore */
 		else $inside .= "\n\nNote: Raid in number of raids joined (alts joined in same raid are ignored), Damage in billions of points recorded (alts joined in same raid are included), Lead in number of raids leaded.";
-		if($user=="") $output = "Top 5 in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
+		if($user=="") $output = "Top ".$limit." in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 		else $output = $user." raid stat :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 		if ($source == "tell") {
 			$this->bot->send_tell($asker,$output);
