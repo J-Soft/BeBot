@@ -226,11 +226,11 @@ class Raid extends BaseActiveModule
         );
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("raid_damage", "true") . "
-				(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-				name VARCHAR(50),
-				time INT default '0',
-				rank INT default '32',
-				UNIQUE (name, time))"
+				(`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				`name` VARCHAR(50),
+				`time` INT default '0',
+				`rank` INT default '32',
+				UNIQUE (`name`, `time`))"
         );			
         $this->restart_raid();
     }
