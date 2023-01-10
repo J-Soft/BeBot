@@ -1,7 +1,7 @@
 -------------------------
 Release 0.7.25 - ??? 2022 
 -------------------------
-- For both: raid leader autojoined/notified ; announce join link added ; note shortened ; raid fixed/improved
+- For both: raid leader autojoined/notified ; announce join link added ; note shortened ; raid fixed/improved ; mail improved
 - For AO: rcalc/aou/ffa/top improved ; raid guide added ; father & orgs fixed
 - For AoC: bound & blacklist fixed
 
