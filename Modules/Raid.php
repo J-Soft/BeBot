@@ -166,9 +166,10 @@ class Raid extends BaseActiveModule
             ->create("Raid", "DiscTag", "", "Should we add a Discord Tag (e.g. @here or @everyone) to raid starts for notifying Discord users (leave empty for no notification) ?");
         $this->bot->core("settings")
             ->create("Raid", "AlertIrc", false, "Do we alert Irc of raid activity ?");	
-        $this->bot->core("settings")->create("Raid", "TopMonth", false, "Do we show monthly Top 5 ?");			
-        $this->bot->core("settings")->create("Raid", "TopYear", false, "Do we show yearly Top 5 ?");			
-        $this->bot->core("settings")->create("Raid", "TopAll", true, "Do we show all times Top 5 ?");
+        $this->bot->core("settings")->create("Raid", "TopMonth", false, "Do we show monthly Top ?");			
+        $this->bot->core("settings")->create("Raid", "TopYear", false, "Do we show yearly Top ?");			
+        $this->bot->core("settings")->create("Raid", "TopAll", true, "Do we show all times Top ?");
+        $this->bot->core("settings")->create("Raid", "TopDD", false, "Do we show damage Top ?");		
         $this->bot->core("settings")
             ->create(
                 "Raid",
@@ -198,7 +199,7 @@ class Raid extends BaseActiveModule
         $this->help['command']['raid notin'] = "Sent tells to all user in privgroup saying they arnt in raid if they arnt.";
         $this->help['command']['raid notinkick'] = "Kicks all user in privgroup who arnt in raid.";
         $this->help['command']['raid list'] = "List all user who are or where in the raid and there status.";
-        $this->help['command']['raid top'] = "List top 5 leaders and readers per raid (declared alts included).";
+        $this->help['command']['raid top'] = "List top leaders and readers per raid (declared alts included).";
 		$this->help['command']['raidstat <player>'] = "Shows given player various raid stat.";
         $this->help['command']['s <message>'] = "Raid command. Display <message> in a highly visiable manner.";
         $this->help['command']['c'] = "Raid command. Display cocoon warning in a highly visiable manner.";
@@ -510,18 +511,24 @@ class Raid extends BaseActiveModule
 			$month = time()-2592000;
 			$loads[] = array("type"=>"Leaders","lapse"=>"of the month","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$month);
 			$loads[] = array("type"=>"Raiders","lapse"=>"of the month","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$month);
-			$loads[] = array("type"=>"Damagers","lapse"=>"of the month","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$month);
+			if($this->bot->core("settings")->get("Raid", "TopDD")) {
+				$loads[] = array("type"=>"Damagers","lapse"=>"of the month","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$month);
+			}
 		}
 		if($this->bot->core("settings")->get("Raid", "TopYear")) {
 			$year = time()-31536000;
 			$loads[] = array("type"=>"Leaders","lapse"=>"of the year","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$year);	
 			$loads[] = array("type"=>"Raiders","lapse"=>"of the year","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$year);
-			$loads[] = array("type"=>"Damagers","lapse"=>"of the year","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$year);
+			if($this->bot->core("settings")->get("Raid", "TopDD")) {
+				$loads[] = array("type"=>"Damagers","lapse"=>"of the year","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$year);
+			}
 		}
 		if($this->bot->core("settings")->get("Raid", "TopAll")) {
 			$loads[] = array("type"=>"Leaders","lapse"=>"of all times","table"=>"raid_details","other"=>"","where"=>"");
 			$loads[] = array("type"=>"Raiders","lapse"=>"of all times","table"=>"raid_log","other"=>"","where"=>" WHERE end > time");
-			$loads[] = array("type"=>"Damagers","lapse"=>"of all times","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>"");		
+			if($this->bot->core("settings")->get("Raid", "TopDD")) {
+				$loads[] = array("type"=>"Damagers","lapse"=>"of all times","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>"");		
+			}
 		}
 		foreach($loads as $load) {
 			$mains = array();
@@ -615,7 +622,7 @@ class Raid extends BaseActiveModule
 				}			
 			}
 		}
-		if($user=="") $inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded."; // (top 5 Leaders are expelled of following Raiders & Damagers) /* not anymore */
+		if($user=="") $inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded."; // (top Leaders are expelled of following Raiders & Damagers) /* not anymore */
 		else $inside .= "\n\nNote: Raid in number of raids joined (alts joined in same raid are ignored), Damage in billions of points recorded (alts joined in same raid are included), Lead in number of raids leaded.";
 		if($user=="") $output = "Top ".$limit." in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 		else $output = $user." raid stat :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
