@@ -788,20 +788,25 @@ class Raid extends BaseActiveModule
 
     function notify($name, $startup = false)
     {
-		$move = "";
+		$move = ""; $since = "";
         if (!$startup && $this->raid && !$this->locked) {
             if ($this->move > time()) {
                 $move = $this->move - time();
                 $move = ", Move in ##highlight##" . $this->bot->core("time")
                         ->format_seconds($move) . " ##end##";
             }
+            if ($this->start < time()) {
+                $since = time() - $this->start;
+                $since = " since ##highlight##" . $this->bot->core("time")
+                        ->format_seconds($since) . " ##end##";
+            }			
             $who = $this->bot->core("whois")->lookup($name);
             if ($who instanceof BotError || $who['level'] < $this->minlevel) {
                 Return;
             }
             $this->bot->send_tell(
                 $name,
-                "Raid is running: ##highlight##" . $this->description . "##end## started by " . $this->name . $move . " :: " . $this->clickjoin(
+                "Raid is running: ##highlight##" . $this->description . "##end## started by " . $this->name . $since . $move . " :: " . $this->clickjoin(
                     true
                 )
             );
