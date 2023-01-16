@@ -179,7 +179,16 @@ class Raid extends BaseActiveModule
                 5,
                 "Specify the shown winners for all top (limited to 5 by default).",
                 '3;5;10'
-            );		
+            );	
+        $this->bot->core("settings")
+            ->create(
+                "Raid",
+                "TopCache",
+                60,
+                "Specify the number of minutes before Top cache is refreshed (set to 60 by default).",
+                '15;30;60;120;240'
+            );			
+		$this->register_event("cron", "5min");			
 			
         $this->help['description'] = 'Module to manage and announce raids.';
         $this->help['command']['raidhistory [x]'] = "Shows 10 archived raids ; option to skip x records from bottom links.";
@@ -495,11 +504,12 @@ class Raid extends BaseActiveModule
     }
 	
     /*
-    This gets called for top (cache of 30 min = 1800 sec)
+    This gets called for top (croned cache with timeout parameter)
     */
     function top_raid($asker, $source, $user)
-    {	
-		if($this->topcache!="" && $this->toptime!="" && $this->toptime<time() && time()-$this->toptime<1800 ) {
+    {
+		$timeout = $this->bot->core("settings")->get("Raid", "TopCache");
+		if($this->topcache!="" && $this->toptime!="" && $this->toptime<time() && time()-$this->toptime<$timeout*60 ) {
 				$output = $this->topcache;
 		} else {
 			if($this->bot->core("settings")->get("Raid", "Morebots")!="") {
@@ -634,7 +644,10 @@ class Raid extends BaseActiveModule
 			$this->topcache = $output;
 			$this->toptime = time();
 		}
-		if ($source == "tell") {
+		if ($source == "cron") {
+			return;
+		}
+		elseif ($source == "tell") {
 			$this->bot->send_tell($asker,$output);
 		} else {
 			$this->bot->send_output($asker,$output,"both");
@@ -1616,81 +1629,90 @@ class Raid extends BaseActiveModule
     /*
     This gets called on cron
     */
-    function cron()
+    function cron($cron)
     {
-        if (!$this->paused) {
-            $points = $this->bot->core("settings")->get('Raid', 'Points');
-            if (!is_numeric($points)) {
-                $this->bot->send_output(
-                    "",
-                    "##error##Error: Invalid Amount set for Points in Settings (must be a number)",
-                    "both"
-                );
-                $this->pause(true);
-            } else {
-                $users = $this->bot->db->select(
-                    "SELECT raidingas FROM #___raid_points WHERE raiding = 1 ORDER BY raidingas"
-                );
-                if (!empty($users)) {
-                    //$inside = " :: $points Given to all Raiders ::\n\n";
-					$count = 0;
-                    foreach ($users as $user) {
-                        $count++;
-                        $user = $user[0];			
-						if(isset($this->points[$user])) $this->points[$user] += $points;
-						else $this->points[$user] = $points;					
-                        $userp = isset($this->points[$user]) ? $this->points[$user] : 0;
-                        $this->bot->db->query(
-                            "INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points + "
-                            . $points
-                        );
-                    }
-                }
-                $this->bot->db->query("UPDATE #___raid_points SET points = points + " . $points . " WHERE raiding = 1");
-            }
-        }
-
-        if ($this->announce
-            && $this->announcel <= (time() + $this->bot
-                    ->core("settings")->get('Raid', 'AnnounceDelay'))
-        ) {
-            if ($this->move > time()) {
-                $move = $this->move - time();
-                $move = ", Move in ##highlight##" . $this->bot->core("time")
-                        ->format_seconds($move) . " ##end##";
-            } else { $move = ""; }
-
-			$nl = false;
-			
-            if ($this->tank && $this->showtank) {
-                $nl = true;
-                $tank = "\nTank is ##highlight##" . $this->tank . "##end##";
-            } else { $tank = ""; }
-			
-            if ($this->showcallers && isset($this->bot->commands['tell']['caller']) && !empty($this->bot->commands['tell']['caller']->callers)) {
-                if ($nl) {
-                    $callers = ", ";
-                } else {
-                    $callers = "\n";
-                }
-                $callers .= $this->bot->commands['tell']['caller']->show_callers();
-            } else { $callers = ""; }
-			
-            $this->bot->send_output(
-                "",
-                "Raid is running: ##highlight##" . $this->description . "##end##" . $tank . $callers . $move . " :: " . $this->clickjoin(
-                ),
-                "both"
-            );
-            $this->announcel = time();
-        }
-		
-		if ($this->raid) {
-			$autoend = $this->bot->core("settings")->get("Raid", "AutoEnd")*3600;
-			if(time()>=$this->start+$autoend){
-				$this->end_raid($this->bot->botname);
+        if ($cron == 60) {
+			if (!$this->paused) {
+				$points = $this->bot->core("settings")->get('Raid', 'Points');
+				if (!is_numeric($points)) {
+					$this->bot->send_output(
+						"",
+						"##error##Error: Invalid Amount set for Points in Settings (must be a number)",
+						"both"
+					);
+					$this->pause(true);
+				} else {
+					$users = $this->bot->db->select(
+						"SELECT raidingas FROM #___raid_points WHERE raiding = 1 ORDER BY raidingas"
+					);
+					if (!empty($users)) {
+						//$inside = " :: $points Given to all Raiders ::\n\n";
+						$count = 0;
+						foreach ($users as $user) {
+							$count++;
+							$user = $user[0];			
+							if(isset($this->points[$user])) $this->points[$user] += $points;
+							else $this->points[$user] = $points;					
+							$userp = isset($this->points[$user]) ? $this->points[$user] : 0;
+							$this->bot->db->query(
+								"INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points + "
+								. $points
+							);
+						}
+					}
+					$this->bot->db->query("UPDATE #___raid_points SET points = points + " . $points . " WHERE raiding = 1");
+				}
 			}
-		}		
+
+			if ($this->announce
+				&& $this->announcel <= (time() + $this->bot
+						->core("settings")->get('Raid', 'AnnounceDelay'))
+			) {
+				if ($this->move > time()) {
+					$move = $this->move - time();
+					$move = ", Move in ##highlight##" . $this->bot->core("time")
+							->format_seconds($move) . " ##end##";
+				} else { $move = ""; }
+
+				$nl = false;
+				
+				if ($this->tank && $this->showtank) {
+					$nl = true;
+					$tank = "\nTank is ##highlight##" . $this->tank . "##end##";
+				} else { $tank = ""; }
+				
+				if ($this->showcallers && isset($this->bot->commands['tell']['caller']) && !empty($this->bot->commands['tell']['caller']->callers)) {
+					if ($nl) {
+						$callers = ", ";
+					} else {
+						$callers = "\n";
+					}
+					$callers .= $this->bot->commands['tell']['caller']->show_callers();
+				} else { $callers = ""; }
+				
+				$this->bot->send_output(
+					"",
+					"Raid is running: ##highlight##" . $this->description . "##end##" . $tank . $callers . $move . " :: " . $this->clickjoin(
+					),
+					"both"
+				);
+				$this->announcel = time();
+			}
+			
+			if ($this->raid) {
+				$autoend = $this->bot->core("settings")->get("Raid", "AutoEnd")*3600;
+				if(time()>=$this->start+$autoend){
+					$this->end_raid($this->bot->botname);
+				}
+			}			
+		} elseif ($cron == 300) {
+			if (!$this->raid) {
+				$timeout = $this->bot->core("settings")->get("Raid", "TopCache");
+				if($this->topcache=="" || $this->toptime=="" || $this->toptime>time() || time()-$this->toptime>$timeout*60 ) {	
+					$this->top_raid($this->bot->botname,'cron','');
+				}
+			}			
+		}
     }
 
 
