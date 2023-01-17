@@ -932,8 +932,7 @@ class Raid extends BaseActiveModule
 					"UPDATE #___raid_details SET end = " . time(
 					) . ", description = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', note = '" . mysqli_real_escape_string($this->bot->db->CONN,$note) . "' WHERE time = " . $this->start
 				);				
-                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
-                $this->raid = false;
+                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");                
 				$this->limit = 0;
                 $this->user = array();
                 $this->move = false;
@@ -952,6 +951,7 @@ class Raid extends BaseActiveModule
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
 					$this->bot->core("irc")->send_irc("", "", "Raid stopped ");
 				}				
+				$this->raid = false;
                 Return "Raid stopped. :: " . $this->control();
             } else {
                 return "No raid running.";
@@ -979,8 +979,7 @@ class Raid extends BaseActiveModule
 				$this->bot->db->query(
 					"DELETE FROM #___raid_details WHERE time = " . $this->start
 				);				
-                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
-                $this->raid = false;
+                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");                
 				$this->limit = 0;
                 $this->user = array();
                 $this->move = false;
@@ -999,6 +998,7 @@ class Raid extends BaseActiveModule
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
 					$this->bot->core("irc")->send_irc("", "", "Raid cancelled");
 				}				
+				$this->raid = false;
                 Return "Raid cancelled. :: " . $this->control();
             } else {
                 return "No raid running.";
