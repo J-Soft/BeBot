@@ -325,7 +325,7 @@ for ($i = $SL ; $i <= $FL ; $i++) {
     $XP1 += $level[$i]; }
 $ALL = $XP1+($XP2-$XP3);
 $S = (($XP2-$XP3)/$ALL)*100;
-return "From ".$SL." to ".$FL." = ".$XP1." XP ; research = ".$XP2." XP ; so optimal slider = ".ceil($S)."%";
+return "From ".$SL." to ".$FL." = ".$XP1." XP ; research left = ".($XP2-$XP3)." XP ; so optimal slider = ".ceil($S)."%";
         }
 
 }

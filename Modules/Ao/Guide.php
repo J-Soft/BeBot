@@ -137,11 +137,13 @@ class Guide extends BaseActiveModule
 			$topic = $this -> bot -> core("tools") -> xmlparse($section, "name");
 			$guides = explode("<guide>", $section);
 			foreach ($guides as $guide) {
-				if($current!=$topic) { $current = $topic; $blob .= "\n\n".$current.": "; }
-				$id = $this -> bot -> core("tools") -> xmlparse($guide, "id");
-				$title = $this -> bot -> core("tools") -> xmlparse($guide, "name");
-				$blob .= $this->bot->core("tools")->chatcmd("aou read ".$id, $title)." ";
-				$count++;
+				if(strpos($guide, '<folderlist>') === false) {
+					if($current!=$topic) { $current = $topic; $blob .= "\n\n".$current.": "; }
+					$id = $this -> bot -> core("tools") -> xmlparse($guide, "id");
+					$title = $this -> bot -> core("tools") -> xmlparse($guide, "name");
+					$blob .= $this->bot->core("tools")->chatcmd("aou read ".$id, $title)." ";
+					$count++;
+				}
 			}
 		}
 		$this->bot->send_output($name, $this->bot->core("tools")->make_blob($count." AOU guide(s) found", $blob), $origin);		

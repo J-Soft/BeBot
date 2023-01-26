@@ -129,6 +129,9 @@ class LeadEcho extends BaseActiveModule
 			if(isset($current[0][0])&&$current[0][0]>0) {
 				$update = $this->bot->db->query("UPDATE #___raid_details SET name='".$leadername."' WHERE id=".$current[0][0]);
 			}
+			if(!isset($this->bot->core("raid")->raid->user[$leadername])) {
+				$join = $this->bot->core("raid")->join_raid($leadername);
+			}
 		}
         return "##highlight##" . $leadername . " ##end##has lead now!" . $repeatstring;
     }

@@ -62,6 +62,7 @@ class Mail extends BaseActiveModule
         );
         //Register commands for this module
         $this->register_command('all', 'mail', 'GUEST');
+		$this->register_command('all', 'mailed', 'GUEST');
         //Register events for this module
         $this->register_event("logon_notify");
         $this->register_event('connect');
@@ -112,6 +113,7 @@ class Mail extends BaseActiveModule
             );
         $this->help['description'] = "Module to send mail messages to other members of the bot.";
         $this->help['command']['mail'] = "Shows a list of messages for you.";
+		$this->help['command']['mailed'] = "Shows a list of messages from you.";
         $this->help['command']['mail send <name> <message>'] = "Send the mail <message> to player <name>";
         $this->help['notes'] = "Mail is delivered to any registered alt of the player <name>";
     }
@@ -129,33 +131,37 @@ class Mail extends BaseActiveModule
                  'message'
             )
         );
-        switch (ucfirst($com['sub'])) {
-            case 'Delete':
-                if ((isset($com['target'])) && (is_int(intval($com['target'])))) {
-                    return ($this->mail_delete($name, $com['target']));
-                    unset($com['target']); //We don't want to trigger the first check below.
-                }
-            //No break here as we want the list to be sent after deleting a message
-            case '':
-            case 'Read':
-                if ((isset($com['target'])) && (is_int(intval($com['target'])))) {
-                    return ($this->make_item_blob(
-                        "Mail item {$com['target']}",
-                        $this->mail_read($name, $com['target'])
-                    ));
-                } else {
-                    return ($this->make_item_blob('Mail list', $this->mail_list($name)));
-                }
-                break;
-            case 'Send':
-                return ($this->mail_send($name, $com['target'], $com['message']));
-                break;
-            default:
-                //No matches. Sending usage information (Another useless comment)
-                $this->error->set("Unknown sub command '##highlight##{$com['sub']}##end##'. ");
-                return ($this->error->message());
-                break;
-        }
+		if(ucfirst($com['com'])=='Mailed') {
+			return ($this->make_item_blob('Mailed list', $this->mail_sent($name)));
+		} else {
+			switch (ucfirst($com['sub'])) {
+				case 'Delete':
+					if ((isset($com['target'])) && (is_int(intval($com['target'])))) {
+						return ($this->mail_delete($name, $com['target']));
+						unset($com['target']); //We don't want to trigger the first check below.
+					}
+				//No break here as we want the list to be sent after deleting a message
+				case '':
+				case 'Read':
+					if ((isset($com['target'])) && (is_int(intval($com['target'])))) {
+						return ($this->make_item_blob(
+							"Mail item {$com['target']}",
+							$this->mail_read($name, $com['target'])
+						));
+					} else {
+						return ($this->make_item_blob('Mail list', $this->mail_list($name)));
+					}
+					break;
+				case 'Send':
+					return ($this->mail_send($name, $com['target'], $com['message']));
+					break;
+				default:
+					//No matches. Sending usage information (Another useless comment)
+					$this->error->set("Unknown sub command '##highlight##{$com['sub']}##end##'. ");
+					return ($this->error->message());
+					break;
+			}
+		}
     }
 
 
@@ -257,6 +263,38 @@ class Mail extends BaseActiveModule
         }
         return ($window);
     }
+	
+    function mail_sent($user)
+    {
+        //Returns a window containing sent mail
+        $window = "##yellow##:::##end## Mail from ##highlight##$user##end## ##yellow##:::##end##<br><br>";
+        $query = "SELECT * FROM #___mail_message WHERE sender='$user' ORDER BY id DESC";
+        $messages = $this->bot->db->select($query, MYSQLI_ASSOC);
+        if (!empty($messages)) {
+            foreach ($messages as $message) {
+                $message['message'] = base64_decode($message['message']);
+                //for unread
+                if (($message['is_read'] == '0')) {
+                    $window .= "(Unread) ";
+                }
+                //for read
+                if (($message['is_read'] == '1')) {
+                    $window .= "(Read) ";
+                }
+                //Only show the 20-23 first characters of the message in the list.
+                if (strlen($message['message']) > 23) {
+                    $message['message'] = substr($message['message'], 0, 20) . '...';
+                }
+                $window .= "{$message['received']} ";
+                $window .= "To: ##highlight##{$message['recipient']}##end## ";
+                $window .= "From: ##highlight##{$message['sender']}##end##  ::: ";
+                $window .= $message['message'] . "<br>";
+            }
+        } else {
+            $window .= "No mail from you.";
+        }
+        return ($window);
+    }	
 
 
     function mail_read($user, $id)

@@ -53,6 +53,8 @@ class Raid extends BaseActiveModule
 	var $type;
 	var $note;
 	var $ddin = false;
+	var $topcache;
+	var $toptime;
 
 
     function __construct(&$bot)
@@ -166,9 +168,27 @@ class Raid extends BaseActiveModule
             ->create("Raid", "DiscTag", "", "Should we add a Discord Tag (e.g. @here or @everyone) to raid starts for notifying Discord users (leave empty for no notification) ?");
         $this->bot->core("settings")
             ->create("Raid", "AlertIrc", false, "Do we alert Irc of raid activity ?");	
-        $this->bot->core("settings")->create("Raid", "TopMonth", false, "Do we show monthly Top 5 ?");			
-        $this->bot->core("settings")->create("Raid", "TopYear", false, "Do we show yearly Top 5 ?");			
-        $this->bot->core("settings")->create("Raid", "TopAll", true, "Do we show all times Top 5 ?");			
+        $this->bot->core("settings")->create("Raid", "TopMonth", false, "Do we show monthly Top ?");			
+        $this->bot->core("settings")->create("Raid", "TopYear", false, "Do we show yearly Top ?");			
+        $this->bot->core("settings")->create("Raid", "TopAll", true, "Do we show all times Top ?");
+        $this->bot->core("settings")->create("Raid", "TopDD", false, "Do we show damage Top ?");		
+        $this->bot->core("settings")
+            ->create(
+                "Raid",
+                "TopLimit",
+                5,
+                "Specify the shown winners for all top (limited to 5 by default).",
+                '3;5;10'
+            );	
+        $this->bot->core("settings")
+            ->create(
+                "Raid",
+                "TopCache",
+                60,
+                "Specify the number of minutes before Top cache is refreshed (set to 60 by default).",
+                '15;30;60;120;240'
+            );			
+		$this->register_event("cron", "5min");			
 			
         $this->help['description'] = 'Module to manage and announce raids.';
         $this->help['command']['raidhistory [x]'] = "Shows 10 archived raids ; option to skip x records from bottom links.";
@@ -190,7 +210,7 @@ class Raid extends BaseActiveModule
         $this->help['command']['raid notin'] = "Sent tells to all user in privgroup saying they arnt in raid if they arnt.";
         $this->help['command']['raid notinkick'] = "Kicks all user in privgroup who arnt in raid.";
         $this->help['command']['raid list'] = "List all user who are or where in the raid and there status.";
-        $this->help['command']['raid top'] = "List top 5 leaders and readers per raid (declared alts included).";
+        $this->help['command']['raid top'] = "List top leaders and readers per raid (declared alts included) ; 30min cached.";
 		$this->help['command']['raidstat <player>'] = "Shows given player various raid stat.";
         $this->help['command']['s <message>'] = "Raid command. Display <message> in a highly visiable manner.";
         $this->help['command']['c'] = "Raid command. Display cocoon warning in a highly visiable manner.";
@@ -218,11 +238,11 @@ class Raid extends BaseActiveModule
         );
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("raid_damage", "true") . "
-				(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-				name VARCHAR(50),
-				time INT default '0',
-				rank INT default '32',
-				UNIQUE (name, time))"
+				(`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				`name` VARCHAR(50),
+				`time` INT default '0',
+				`rank` INT default '32',
+				UNIQUE (`name`, `time`))"
         );			
         $this->restart_raid();
     }
@@ -484,133 +504,150 @@ class Raid extends BaseActiveModule
     }
 	
     /*
-    This gets called for top
+    This gets called for top (croned cache with timeout parameter)
     */
     function top_raid($asker, $source, $user)
     {
-		if($this->bot->core("settings")->get("Raid", "Morebots")!="") {
-			$bots = explode(",", $this->bot->core("settings")->get("Raid", "Morebots"));
+		$timeout = $this->bot->core("settings")->get("Raid", "TopCache");
+		if($this->topcache!="" && $this->toptime!="" && $this->toptime<time() && time()-$this->toptime<$timeout*60 ) {
+				$output = $this->topcache;
 		} else {
-			$bots = array();
-		}
-		$bots[] = $this->bot->botname;
-		$inside = "";
-		$leaders = array();
-		$loads = array();
-		if($this->bot->core("settings")->get("Raid", "TopMonth")) {
-			$month = time()-2592000;
-			$loads[] = array("type"=>"Leaders","lapse"=>"of the month","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$month);
-			$loads[] = array("type"=>"Raiders","lapse"=>"of the month","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$month);
-			$loads[] = array("type"=>"Damagers","lapse"=>"of the month","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$month);
-		}
-		if($this->bot->core("settings")->get("Raid", "TopYear")) {
-			$year = time()-31536000;
-			$loads[] = array("type"=>"Leaders","lapse"=>"of the year","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$year);	
-			$loads[] = array("type"=>"Raiders","lapse"=>"of the year","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$year);
-			$loads[] = array("type"=>"Damagers","lapse"=>"of the year","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$year);
-		}
-		if($this->bot->core("settings")->get("Raid", "TopAll")) {
-			$loads[] = array("type"=>"Leaders","lapse"=>"of all times","table"=>"raid_details","other"=>"","where"=>"");
-			$loads[] = array("type"=>"Raiders","lapse"=>"of all times","table"=>"raid_log","other"=>"","where"=>" WHERE end > time");
-			$loads[] = array("type"=>"Damagers","lapse"=>"of all times","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>"");		
-		}
-		foreach($loads as $load) {
-			$mains = array();
-			if($load['type']=='Leaders') $leaders = array();
-			foreach($bots as $bot) {
-				if($load['type']=='Raiders') {
-					$raids = $this->bot->db->select("SELECT DISTINCT(time)".$load['other']." FROM ".strtolower($bot)."_".$load['table']."".$load['where']." ORDER BY time DESC");
-					if (!empty($raids)) {
-						foreach($raids as $raid) {
-							$done = array();
-							$players = $this->bot->db->select("SELECT name".$load['other']." FROM ".strtolower($bot)."_".$load['table']." WHERE time = ".$raid[0]);
+			if($this->bot->core("settings")->get("Raid", "Morebots")!="") {
+				$bots = explode(",", $this->bot->core("settings")->get("Raid", "Morebots"));
+			} else {
+				$bots = array();
+			}
+			$bots[] = $this->bot->botname;
+			$inside = "";
+			$leaders = array();
+			$loads = array();
+			$limit = $this->bot->core("settings")->get("Raid", "TopLimit");
+			if($this->bot->core("settings")->get("Raid", "TopMonth")) {
+				$month = time()-2592000;
+				$loads[] = array("type"=>"Leaders","lapse"=>"of the month","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$month);
+				$loads[] = array("type"=>"Raiders","lapse"=>"of the month","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$month);
+				if($this->bot->core("settings")->get("Raid", "TopDD")) {
+					$loads[] = array("type"=>"Damagers","lapse"=>"of the month","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$month);
+				}
+			}
+			if($this->bot->core("settings")->get("Raid", "TopYear")) {
+				$year = time()-31536000;
+				$loads[] = array("type"=>"Leaders","lapse"=>"of the year","table"=>"raid_details","other"=>"","where"=>" WHERE time >=".$year);	
+				$loads[] = array("type"=>"Raiders","lapse"=>"of the year","table"=>"raid_log","other"=>"","where"=>" WHERE end > time AND time >=".$year);
+				if($this->bot->core("settings")->get("Raid", "TopDD")) {
+					$loads[] = array("type"=>"Damagers","lapse"=>"of the year","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>" WHERE time >=".$year);
+				}
+			}
+			if($this->bot->core("settings")->get("Raid", "TopAll")) {
+				$loads[] = array("type"=>"Leaders","lapse"=>"of all times","table"=>"raid_details","other"=>"","where"=>"");
+				$loads[] = array("type"=>"Raiders","lapse"=>"of all times","table"=>"raid_log","other"=>"","where"=>" WHERE end > time");
+				if($this->bot->core("settings")->get("Raid", "TopDD")) {
+					$loads[] = array("type"=>"Damagers","lapse"=>"of all times","table"=>"raid_damage","other"=>", SUM(rank) as ranks","where"=>"");		
+				}
+			}
+			foreach($loads as $load) {
+				$mains = array();
+				if($load['type']=='Leaders') $leaders = array();
+				foreach($bots as $bot) {
+					if($load['type']=='Raiders') {
+						$raids = $this->bot->db->select("SELECT DISTINCT(time)".$load['other']." FROM ".strtolower($bot)."_".$load['table']."".$load['where']." ORDER BY time DESC");
+						if (!empty($raids)) {
+							foreach($raids as $raid) {
+								$done = array();
+								$players = $this->bot->db->select("SELECT name".$load['other']." FROM ".strtolower($bot)."_".$load['table']." WHERE time = ".$raid[0]);
+								foreach($players as $player) {
+									$name = $player[0];
+									$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
+									if(isset($checka[0][0])&&count($checka)==1) {
+										$main = $checka[0][0];
+										if(!array_key_exists($main, $done)) {
+											if(!array_key_exists($main, $mains)) {
+												if($user==""||$user==$main) $mains[$main] = 1;
+											} else {
+												if($user==""||$user==$main) $mains[$main] = $mains[$main]+1;										
+											}
+											$done[$main] = true;
+										}
+									} else {
+										if(!array_key_exists($name, $done)) {
+											if(!array_key_exists($name, $mains)) {
+												if($user==""||$user==$name) $mains[$name] = 1;											
+											} else {
+												if($user==""||$user==$name) $mains[$name] = $mains[$name]+1;											
+											}
+											$done[$name] = true;
+										}					
+									}
+								}
+							}
+						}					
+					} else {
+						$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt".$load['other']." FROM ".strtolower($bot)."_".$load['table']."".$load['where']." GROUP BY name ORDER BY cnt DESC");
+						if (!empty($players)) {
 							foreach($players as $player) {
 								$name = $player[0];
+								$cnt = $player[1];
+								if($load['table']=='raid_damage') $rnk = round(floatval($player[2]/1000000000),4);
 								$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
 								if(isset($checka[0][0])&&count($checka)==1) {
 									$main = $checka[0][0];
-									if(!array_key_exists($main, $done)) {
-										if(!array_key_exists($main, $mains)) {
-											if($user==""||$user==$main) $mains[$main] = 1;
-										} else {
-											if($user==""||$user==$main) $mains[$main] = $mains[$main]+1;										
-										}
-										$done[$main] = true;
+									if(!array_key_exists($main, $mains)) {
+										if($load['table']=='raid_damage'&&($user==""||$user==$main)) $mains[$main] = $rnk;
+										elseif($user==""||$user==$main) $mains[$main] = $cnt;
+									} else {
+										if($load['table']=='raid_damage'&&($user==""||$user==$main)) $mains[$main] = $mains[$main]+$rnk;
+										elseif($user==""||$user==$main) $mains[$main] = $mains[$main]+$cnt;
 									}
 								} else {
-									if(!array_key_exists($name, $done)) {
-										if(!array_key_exists($name, $mains)) {
-											if($user==""||$user==$name) $mains[$name] = 1;											
-										} else {
-											if($user==""||$user==$name) $mains[$name] = $mains[$name]+1;											
-										}
-										$done[$name] = true;
-									}					
+									if(!array_key_exists($name, $mains)) {
+										if($load['table']=='raid_damage'&&($user==""||$user==$name)) $mains[$name] = $rnk;
+										elseif($user==""||$user==$name) $mains[$name] = $cnt;
+									} else {
+										if($load['table']=='raid_damage'&&($user==""||$user==$name)) $mains[$name] = $mains[$name]+$rnk;
+										elseif($user==""||$user==$name) $mains[$name] = $mains[$name]+$cnt;
+									}
 								}
-							}
-						}
-					}					
-				} else {
-					$players = $this->bot->db->select("SELECT name, COUNT(*) as cnt".$load['other']." FROM ".strtolower($bot)."_".$load['table']."".$load['where']." GROUP BY name ORDER BY cnt DESC");
-					if (!empty($players)) {
-						foreach($players as $player) {
-							$name = $player[0];
-							$cnt = $player[1];
-							if($load['table']=='raid_damage') $rnk = round(floatval($player[2]/1000000000),4);
-							$checka = $this->bot->db->select("SELECT main FROM #___alts WHERE confirmed = 1 AND alt ='".$name."'");
-							if(isset($checka[0][0])&&count($checka)==1) {
-								$main = $checka[0][0];
-								if(!array_key_exists($main, $mains)) {
-									if($load['table']=='raid_damage'&&($user==""||$user==$main)) $mains[$main] = $rnk;
-									elseif($user==""||$user==$main) $mains[$main] = $cnt;
-								} else {
-									if($load['table']=='raid_damage'&&($user==""||$user==$main)) $mains[$main] = $mains[$main]+$rnk;
-									elseif($user==""||$user==$main) $mains[$main] = $mains[$main]+$cnt;
-								}
-							} else {
-								if(!array_key_exists($name, $mains)) {
-									if($load['table']=='raid_damage'&&($user==""||$user==$name)) $mains[$name] = $rnk;
-									elseif($user==""||$user==$name) $mains[$name] = $cnt;
-								} else {
-									if($load['table']=='raid_damage'&&($user==""||$user==$name)) $mains[$name] = $mains[$name]+$rnk;
-									elseif($user==""||$user==$name) $mains[$name] = $mains[$name]+$cnt;
-								}
-							}
-						}			
-					}
-				}
-			}
-			if(count($mains)>0) {
-				asort($mains, SORT_NUMERIC);
-				$mains = array_reverse($mains, true);
-				if($user=="") $shown = 0;
-				else $shown = 4;
-				if($user=="") $inside .= "\n##highlight##".$load['type']."##end## ".$load['lapse']." \n";
-				else {
-					if($load['type']=="Leaders") $short = "Lead";
-					elseif($load['type']=="Raiders") $short = "Raid";
-					elseif($load['type']=="Damagers") $short = "Damage";
-					$inside .= "\n##highlight##".$short."##end## ".$load['lapse']." \n";
-				}
-				foreach ($mains as $main => $tot)
-				{
-					if(!in_array($main,$leaders)||$load['type']=='Leaders') {
-						$shown++;
-						if($shown<6) {
-							if($user==""&&$load['type']=='Leaders') array_push($leaders,$main);
-							if($load['table']=='raid_damage') $tot = round($tot,2);
-							if($user=="") $inside .= " #".$shown." ".$main." (".$tot.") \n";
-							else $inside .= $tot." \n";
+							}			
 						}
 					}
-				}			
+				}
+				if(count($mains)>0) {
+					asort($mains, SORT_NUMERIC);
+					$mains = array_reverse($mains, true);
+					if($user=="") $shown = 0;
+					else $shown = $limit-1;
+					if($user=="") $inside .= "\n##highlight##".$load['type']."##end## ".$load['lapse']." \n";
+					else {
+						if($load['type']=="Leaders") $short = "Lead";
+						elseif($load['type']=="Raiders") $short = "Raid";
+						elseif($load['type']=="Damagers") $short = "Damage";
+						$inside .= "\n##highlight##".$short."##end## ".$load['lapse']." \n";
+					}
+					foreach ($mains as $main => $tot)
+					{
+						//if(!in_array($main,$leaders)||$load['type']=='Leaders') { /* patch note few lines below */
+							$shown++;
+							if($shown<$limit+1) {
+								if($user==""&&$load['type']=='Leaders') array_push($leaders,$main);
+								if($load['table']=='raid_damage') $tot = round($tot,2);
+								if($user=="") $inside .= " #".$shown." ".$main." (".$tot.") \n";
+								else $inside .= $tot." \n";
+							}
+						//} /* disables RL expelling of raid/damage lists */
+					}			
+				}
 			}
+			if($user=="") $inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded."; // (top Leaders are expelled of following Raiders & Damagers) /* not anymore */
+			else $inside .= "\n\nNote: Raid in number of raids joined (alts joined in same raid are ignored), Damage in billions of points recorded (alts joined in same raid are included), Lead in number of raids leaded.";
+			if($user=="") $output = "Top ".$limit." in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
+			else $output = $user." raid stat :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
+			$this->topcache = $output;
+			$this->toptime = time();
 		}
-		if($user=="") $inside .= "\n\nNote: Raiders in number of raids joined (alts joined in same raid are ignored), Damagers in billions of points recorded (alts joined in same raid are included), Leaders in number of raids leaded (top 5 Leaders are expelled of following Raiders & Damagers).";
-		else $inside .= "\n\nNote: Raid in number of raids joined (alts joined in same raid are ignored), Damage in billions of points recorded (alts joined in same raid are included), Lead in number of raids leaded.";
-		if($user=="") $output = "Top 5 in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
-		else $output = $user." raid stat :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
-		if ($source == "tell") {
+		if ($source == "cron") {
+			return;
+		}
+		elseif ($source == "tell") {
 			$this->bot->send_tell($asker,$output);
 		} else {
 			$this->bot->send_output($asker,$output,"both");
@@ -772,20 +809,25 @@ class Raid extends BaseActiveModule
 
     function notify($name, $startup = false)
     {
-		$move = "";
+		$move = ""; $since = "";
         if (!$startup && $this->raid && !$this->locked) {
             if ($this->move > time()) {
                 $move = $this->move - time();
                 $move = ", Move in ##highlight##" . $this->bot->core("time")
                         ->format_seconds($move) . " ##end##";
             }
+            if ($this->start < time()) {
+                $since = time() - $this->start;
+                $since = " since ##highlight##" . $this->bot->core("time")
+                        ->format_seconds($since) . " ##end##";
+            }			
             $who = $this->bot->core("whois")->lookup($name);
             if ($who instanceof BotError || $who['level'] < $this->minlevel) {
                 Return;
             }
             $this->bot->send_tell(
                 $name,
-                "Raid is running: ##highlight##" . $this->description . "##end##" . $move . " :: " . $this->clickjoin(
+                "Raid is running: ##highlight##" . $this->description . "##end## started by " . $this->name . $since . $move . " :: " . $this->clickjoin(
                     true
                 )
             );
@@ -881,12 +923,16 @@ class Raid extends BaseActiveModule
         ) {
             if ($this->raid) {
                 $this->bot->db->query("UPDATE #___raid_log SET end = " . time() . " WHERE time = " . $this->start);
+				if(strlen($this->note)>50) {
+					$note = substr($this->note,0,47)."...";
+				} else {
+					$note = $this->note;
+				}
 				$this->bot->db->query(
 					"UPDATE #___raid_details SET end = " . time(
-					) . ", description = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', note = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->note) . "' WHERE time = " . $this->start
+					) . ", description = '" . mysqli_real_escape_string($this->bot->db->CONN,$this->description) . "', note = '" . mysqli_real_escape_string($this->bot->db->CONN,$note) . "' WHERE time = " . $this->start
 				);				
-                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
-                $this->raid = false;
+                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");                
 				$this->limit = 0;
                 $this->user = array();
                 $this->move = false;
@@ -905,6 +951,7 @@ class Raid extends BaseActiveModule
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
 					$this->bot->core("irc")->send_irc("", "", "Raid stopped ");
 				}				
+				$this->raid = false;
                 Return "Raid stopped. :: " . $this->control();
             } else {
                 return "No raid running.";
@@ -932,8 +979,7 @@ class Raid extends BaseActiveModule
 				$this->bot->db->query(
 					"DELETE FROM #___raid_details WHERE time = " . $this->start
 				);				
-                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
-                $this->raid = false;
+                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");                
 				$this->limit = 0;
                 $this->user = array();
                 $this->move = false;
@@ -952,6 +998,7 @@ class Raid extends BaseActiveModule
 				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Raid", "AlertIrc")) {
 					$this->bot->core("irc")->send_irc("", "", "Raid cancelled");
 				}				
+				$this->raid = false;
                 Return "Raid cancelled. :: " . $this->control();
             } else {
                 return "No raid running.";
@@ -1493,12 +1540,46 @@ class Raid extends BaseActiveModule
 
         $inside = "##blob_title##:::: Join/Leave Raid ::::##end##\n\n";
         if ($this->description && !empty($this->description)) {
-            $inside .= "Description:\n     " . $this->description."\n\n";
+            $inside .= "Description:\n     " . $this->description."\n";
         }
-
+		
+		if (strtolower($this->bot->game) == 'ao' && $this->bot->exists_module("guide")) {
+			if (strpos($this->description, '13') !== false) {
+				$cmd = 'guide';
+				$guide = 'apf13';
+			} elseif (strpos($this->description, '28') !== false) {
+				$cmd = 'guide';
+				$guide = 'apf28';
+			} elseif (strpos($this->description, '35') !== false) {
+				$cmd = 'guide';
+				$guide = 'apf35';
+			} elseif (strpos($this->description, '42') !== false || strpos(strtolower($this->description), 'west') !== false || strpos(strtolower($this->description), 'north') !== false || strpos(strtolower($this->description), 'east') !== false) {
+				$cmd = 'guide';
+				$guide = 'apf42';
+			} elseif (strpos($this->description, '12') !== false) {
+				$cmd = 'aou read';
+				$guide = '454';
+			} elseif (strpos($this->description, 'pande') !== false) {
+				$cmd = 'guide';
+				$guide = 'pande';
+			} elseif (strpos($this->description, 'tchu') !== false) {
+				$cmd = 'guide';
+				$guide = 'tchu';
+			} else {
+				$cmd = '';
+				$guide = '';
+			}
+			if ($cmd != '' && $guide != '') {
+				$inside .= "     ".$this->bot->core("tools")
+						->chatcmd($cmd." ".$guide, "Read guide")."\n";
+			}
+		}
+		
         if ($this->note!='') {
-            $inside .= "Note:\n     ".$this->note."\n\n";
+            $inside .= "\nNote:\n     ".$this->note."\n";
         }
+		
+		$inside .= "\n";
 		
         if ($join) {
             $inside .= $this->bot->core("tools")
@@ -1511,7 +1592,7 @@ class Raid extends BaseActiveModule
                     ->chatcmd("<botname>", "Go LFT", "lft")." || ";
         }
         $inside .= $this->bot->core("tools")
-                ->chatcmd("raid leave", "Leave the raid");		
+                ->chatcmd("raid leave", "Leave the raid");
 		
 		$onarr = $this->bot->core("onlinedisplay")->online_array();
 		$inside .= "\n\n:: ".count($this->user)." Joined User(s) ::\n";
@@ -1548,81 +1629,90 @@ class Raid extends BaseActiveModule
     /*
     This gets called on cron
     */
-    function cron()
+    function cron($cron)
     {
-        if (!$this->paused) {
-            $points = $this->bot->core("settings")->get('Raid', 'Points');
-            if (!is_numeric($points)) {
-                $this->bot->send_output(
-                    "",
-                    "##error##Error: Invalid Amount set for Points in Settings (must be a number)",
-                    "both"
-                );
-                $this->pause(true);
-            } else {
-                $users = $this->bot->db->select(
-                    "SELECT raidingas FROM #___raid_points WHERE raiding = 1 ORDER BY raidingas"
-                );
-                if (!empty($users)) {
-                    //$inside = " :: $points Given to all Raiders ::\n\n";
-					$count = 0;
-                    foreach ($users as $user) {
-                        $count++;
-                        $user = $user[0];			
-						if(isset($this->points[$user])) $this->points[$user] += $points;
-						else $this->points[$user] = $points;					
-                        $userp = isset($this->points[$user]) ? $this->points[$user] : 0;
-                        $this->bot->db->query(
-                            "INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points + "
-                            . $points
-                        );
-                    }
-                }
-                $this->bot->db->query("UPDATE #___raid_points SET points = points + " . $points . " WHERE raiding = 1");
-            }
-        }
-
-        if ($this->announce
-            && $this->announcel <= (time() + $this->bot
-                    ->core("settings")->get('Raid', 'AnnounceDelay'))
-        ) {
-            if ($this->move > time()) {
-                $move = $this->move - time();
-                $move = ", Move in ##highlight##" . $this->bot->core("time")
-                        ->format_seconds($move) . " ##end##";
-            } else { $move = ""; }
-
-			$nl = false;
-			
-            if ($this->tank && $this->showtank) {
-                $nl = true;
-                $tank = "\nTank is ##highlight##" . $this->tank . "##end##";
-            } else { $tank = ""; }
-			
-            if ($this->showcallers && isset($this->bot->commands['tell']['caller']) && !empty($this->bot->commands['tell']['caller']->callers)) {
-                if ($nl) {
-                    $callers = ", ";
-                } else {
-                    $callers = "\n";
-                }
-                $callers .= $this->bot->commands['tell']['caller']->show_callers();
-            } else { $callers = ""; }
-			
-            $this->bot->send_output(
-                "",
-                "Raid is running: ##highlight##" . $this->description . "##end##" . $tank . $callers . $move . " :: " . $this->clickjoin(
-                ),
-                "both"
-            );
-            $this->announcel = time();
-        }
-		
-		if ($this->raid) {
-			$autoend = $this->bot->core("settings")->get("Raid", "AutoEnd")*3600;
-			if(time()>=$this->start+$autoend){
-				$this->end_raid($this->bot->botname);
+        if ($cron == 60) {
+			if (!$this->paused) {
+				$points = $this->bot->core("settings")->get('Raid', 'Points');
+				if (!is_numeric($points)) {
+					$this->bot->send_output(
+						"",
+						"##error##Error: Invalid Amount set for Points in Settings (must be a number)",
+						"both"
+					);
+					$this->pause(true);
+				} else {
+					$users = $this->bot->db->select(
+						"SELECT raidingas FROM #___raid_points WHERE raiding = 1 ORDER BY raidingas"
+					);
+					if (!empty($users)) {
+						//$inside = " :: $points Given to all Raiders ::\n\n";
+						$count = 0;
+						foreach ($users as $user) {
+							$count++;
+							$user = $user[0];			
+							if(isset($this->points[$user])) $this->points[$user] += $points;
+							else $this->points[$user] = $points;					
+							$userp = isset($this->points[$user]) ? $this->points[$user] : 0;
+							$this->bot->db->query(
+								"INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points + "
+								. $points
+							);
+						}
+					}
+					$this->bot->db->query("UPDATE #___raid_points SET points = points + " . $points . " WHERE raiding = 1");
+				}
 			}
-		}		
+
+			if ($this->announce
+				&& $this->announcel <= (time() + $this->bot
+						->core("settings")->get('Raid', 'AnnounceDelay'))
+			) {
+				if ($this->move > time()) {
+					$move = $this->move - time();
+					$move = ", Move in ##highlight##" . $this->bot->core("time")
+							->format_seconds($move) . " ##end##";
+				} else { $move = ""; }
+
+				$nl = false;
+				
+				if ($this->tank && $this->showtank) {
+					$nl = true;
+					$tank = "\nTank is ##highlight##" . $this->tank . "##end##";
+				} else { $tank = ""; }
+				
+				if ($this->showcallers && isset($this->bot->commands['tell']['caller']) && !empty($this->bot->commands['tell']['caller']->callers)) {
+					if ($nl) {
+						$callers = ", ";
+					} else {
+						$callers = "\n";
+					}
+					$callers .= $this->bot->commands['tell']['caller']->show_callers();
+				} else { $callers = ""; }
+				
+				$this->bot->send_output(
+					"",
+					"Raid is running: ##highlight##" . $this->description . "##end##" . $tank . $callers . $move . " :: " . $this->clickjoin(
+					),
+					"both"
+				);
+				$this->announcel = time();
+			}
+			
+			if ($this->raid) {
+				$autoend = $this->bot->core("settings")->get("Raid", "AutoEnd")*3600;
+				if(time()>=$this->start+$autoend){
+					$this->end_raid($this->bot->botname);
+				}
+			}			
+		} elseif ($cron == 300) {
+			if (!$this->raid) {
+				$timeout = $this->bot->core("settings")->get("Raid", "TopCache");
+				if($this->topcache=="" || $this->toptime=="" || $this->toptime>time() || time()-$this->toptime>$timeout*60 ) {	
+					$this->top_raid($this->bot->botname,'cron','');
+				}
+			}			
+		}
     }
 
 

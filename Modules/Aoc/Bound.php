@@ -64,7 +64,7 @@ class Bound extends BaseActiveModule
 
 		if($this->bot->db->get_version("bound_instance")<4)  $this->bot->db->query("DROP TABLE IF EXISTS #___bound_instance");
         $this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS " . $this -> bot -> db -> define_tablename("bound_instance", "true") . " (
-            `instance_id` int(10) unsigned DEFAULT NULL AUTO_INCREMENT,
+            `instance_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `instance_shortname` varchar(25) DEFAULT NULL,
             `instance_fullname` varchar(40) DEFAULT NULL,
             `instance_type` enum('Raid','RF','PvP','Solo','Group','WB') DEFAULT NULL,

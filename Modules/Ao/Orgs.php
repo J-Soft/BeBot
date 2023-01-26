@@ -80,7 +80,7 @@ class Orgs extends BaseActiveModule
 	
 		if ($this->bot->db->get_version("orgs") == 3)
 			return;
-			
+
 		switch ($this->bot->db->get_version("orgs"))
 		{
 			case 1:
@@ -89,10 +89,12 @@ class Orgs extends BaseActiveModule
 				$this->bot->db->update_table("orgs", "members", "add", "ALTER IGNORE TABLE #___orgs ADD `members` INT default '0' AFTER `org`");
 				$this->bot->db->update_table("orgs", "faction", "add", "ALTER IGNORE TABLE #___orgs ADD `faction` VARCHAR(7) AFTER `members`");
 			case 2:
-				$this->bot->db->update_table("orgs", "org_id", "alter", "alter table `#___orgs` DROP index org_id");
-				$this->bot->db->update_table("orgs", array("dim", "org_id"), "alter", "alter table `#___orgs` ADD UNIQUE index (dim, org_id)");
-		}
-		
+				$oldindex = $this->bot->db->select("SHOW INDEX FROM #___orgs WHERE KEY_NAME = 'org_id'");
+				if(count($oldindex)>0) {
+					$this->bot->db->query("ALTER IGNORE TABLE #___orgs DROP INDEX `org_id`");
+					$this->bot->db->query("ALTER IGNORE TABLE #___orgs ADD UNIQUE INDEX (`dim`, `org_id`)");
+				}
+		}		
 		$this->bot->db->set_version("orgs", 3);
 	}
 

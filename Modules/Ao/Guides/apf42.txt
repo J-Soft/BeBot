@@ -1,8 +1,6 @@
 <header>::::: Guide to Apf Sector 42 :::::<end>
 
-<font color=#4170e1>Quest: Sector 42 Key</font>
-
-<font color=#4170e1>Quest Part 1: Data Cores</font>
+<font color=#4170e1>Get the key</font>
 
 To access Sector 42, you need a Data Core from the boss of Sectors 13, 28, and 25. <font color=#ff0000>You only need one Data Core from each boss. Please do not loot another core if you already have your key part!</font>
 
@@ -10,12 +8,34 @@ To access Sector 42, you need a Data Core from the boss of Sectors 13, 28, and 2
 * <a href='itemref://258293/258293/1'>Kyr'Ozch Data Core</a> (Embalmer - Cha'Khaz, Sector 28 )
 * <a href='itemref://258292/258292/1'>Kyr'Ozch Data Core</a> (Field Marshal - Cha'Khaz, Sector 35)
 
-<font color=#4170e1>Quest Part 2: Encrypted Keys</font>
-Trade your data cores with the Unicorn Administrator and he will give you one of three Encrypted Kyr'Ozch Keys (you get a different key for each Data Core. Each key has a different label.
+Then trade your data cores with the Unicorn Access Supervisor outside Sector 42 gates. He will give you a Decrypted Kyr'Ozch Data Core.
 
-* <a href='itemref://257536/257536/1'>Encrypted Kyr'Ozch Key</a> (OS BURR)
-* <a href='itemref://257536/257535/1'>Encrypted Kyr'Ozch Key</a> (LUNG SEAL)
-* <a href='itemref://257536/257534/1'>Encrypted Kyr'Ozch Key</a> (SABLE)
+<font color=#4170e1>Raid preparation</font>
+When you join a 42 raid, you'll surely have to wait awhile before entering at the gates, during time your leadership is preparing 3 raidforces (1 per sector direction : west, north, east). At some point you'll be asked to go /lft for one of those sides.
 
-<font color=#4170e1>Quest Part 3: ???</font>
-The rest of this quest has not yet been added to the game. :)
+The damage dealing and also core professions are to be balanced per side : tank and doc with def (keep, e.g.) and reflect (sold or engi), indeed, but also crat (expected to have "Shackle of Obedience" nano) and possibly fixer (with AOE snare if crat doesn't have).
+
+Once all sides are ready to go, you'll be asked to enter, and only at that time you'll speak with NPC, trade him key from inventory, follow dialog until th end, make sure you have free ncu to receive buff, and hit goodbye. Then click the gate to enter.
+
+Make sure you know what side you must follow all along, and that you are in correct team/bot to easen further raid coordination.
+
+<font color=#4170e1>Raid execution</font>
+
+Each team will go its direction, snaring patrollers with Shackle (do NOT hit them), killing mobs with cocoons first to free trapped raiders.
+
+There will be a fence at some point, make sure you get free ncu and right click it or you will die here. Pet profession can use /pet wait then warp nano.
+
+In final room, each side will kill its first tower when prompted and will encounter a first boss, different per side : west is like s28, north s13 and east s35.
+
+After all sides killed first boss, they will have to prepare kill of second tower and stop at 1 blob, then synchronize finalization of kill. If done well, one AC final boss will pop per side.
+
+Final boss will frequently pop some exploding seekers. There is several ways to overcome, one being fix/crat snare (in this case do not hit any seeker and remove all AOE damage). Follow leader direction on how.
+
+<font color=#4170e1>Raid execution</font>
+Once killed the boss will drop various stuff : different kinds of viral bot among usual (supple, observant, strong, spiritual, arithmetic) but also 2 rare drops :
+
+* <a href='itemref://260422/260422/1'>Unlearning Device</a> (an item to get a free reset)
+* <a href='itemref://262656/262656/1'>Kyr'Ozch Invasion Plan</a> which will allow you to speak to NPC to get :
+* <a href='itemref://267528/267528/300'>Alien Combat Directive Controller</a>
+
+(Guide by Bitnykk)
