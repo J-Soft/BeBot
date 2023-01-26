@@ -1,4 +1,11 @@
 -------------------------
+Release 0.7.26 - ??? 2022 
+-------------------------
+- For both: ...
+- For AO: gmi added
+- For AoC: ...
+
+-------------------------
 Release 0.7.25 - Jan 2022 
 -------------------------
 - For both: raid leader autojoined/notified ; announce join link added ; note shortened ; raid fixed/improved ; mail improved
