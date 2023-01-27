@@ -52,18 +52,34 @@ class Gmi extends BaseActiveModule
 	
 	function command_handler($name, $msg, $channel)
 	{
-		if (preg_match("/^gmi ([0-9]+) (.+)$/i", $msg, $info))
-			return $this -> gmi_search($name, $info, $channel);
-		elseif (preg_match("/^gmi (.+)$/i", $msg, $info))
+		if (preg_match("/^gmi ([0-9]+) (.+)$/i", $msg, $info)) {	
+			if($info[1]>21600) {
+				return $this -> gmi_search($name, $info, $channel);
+			} else {
+				$group = array($info[0],$info[1]." ".$info[2]);
+				return $this -> gmi_check($name, $group, $channel);
+			}
+		} elseif (preg_match("/^gmi (.+)$/i", $msg, $info)) {
 			return $this -> gmi_check($name, $info, $channel);
-		else return "Wrong use of command, retry with existing item name e.g. : !gmi whatever item name";
+		} else {
+			return "Wrong use of command, retry with existing item name e.g. : !gmi whatever item name";
+		}
 	}	
 	
 	function gmi_check($name, $info, $channel)
 	{	
 		$return = ""; $inside = ""; $count = 0;
 		if($this->bot->db->get_version("aorefs")>1) {
-			$query = "SELECT id, name, ql FROM aorefs WHERE name LIKE '%".strtolower(addslashes($info[1]))."%' ORDER BY ql DESC";
+			$where = "";
+			$space = explode(' ', strtolower($info[1]));
+			$total = count($space);
+			for($i=0;$i<$total;$i++) {
+				if($i!=0) { 
+					$where .= " AND ";
+				}
+				$where .= "LOWER(name) LIKE '%".$space[$i]."%'";
+			}
+			$query = "SELECT id, name, ql FROM aorefs WHERE ".$where." ORDER BY ql DESC";
 			$refs = $this->bot->db->select($query);
 			if (!empty($refs)) {	
 				$count = count($refs);
@@ -79,7 +95,7 @@ class Gmi extends BaseActiveModule
 
 	function gmi_search($name, $info, $channel)
 	{
-		$return = "";
+		$return = ""; $count = 0;
 		if($this->bot->core("settings")->get("Gmi", "ApiUrl")!='') {
 			$url = $this->bot->core("settings")->get("Gmi", "ApiUrl")."/".$this->apiver."/"."aoid/".$info[1];
 			$content = $this->bot->core("tools")->get_site($url);	
@@ -92,23 +108,29 @@ class Gmi extends BaseActiveModule
 						$inside .= "__________SELL Orders_________\n";
 						$inside .= $this->tab("PRICE",15)." ".$this->tab("QL",5)." ".$this->tab("COUNT",5)." ".$this->tab("SELLER",18)." ".$this->tab("EXPIRATION",20)."\n";						
 						foreach($blocs->sell_orders AS $sell) {
+							$count ++;
 							$interval = new DateInterval("PT{$sell->expiration}S");
 							$expire = $now->diff($now->add($interval))->format('%a days %h h %i min');
 							$inside .= $this->tab($sell->price,15)." ".$this->tab($sell->ql,5)." ".$this->tab($sell->count,5)." ".$this->tab($sell->seller,18)." ".$this->tab($expire,20)."\n";
 						}
 						$inside .= "\n\n";
-					}					
+					} else {
+						$inside .= "No SELL Order(s) for now ...\n\n";
+					}
 					if(isset($blocs->buy_orders)&& count($blocs->buy_orders)>0) {
 						$inside .= "__________BUY Orders__________\n";
 						$inside .= $this->tab("PRICE",15)." ".$this->tab("MIN",5)." ".$this->tab("MAX",5)." ".$this->tab("CNT",5)." ".$this->tab("BUYER",18)." ".$this->tab("EXPIRATION",20)."\n";
 						foreach($blocs->buy_orders AS $buy) {
+							$count ++;
 							$interval = new DateInterval("PT{$buy->expiration}S");
 							$expire = $now->diff($now->add($interval))->format('%a days %h h %i min');				
 							$inside .= $this->tab($buy->price,15)." ".$this->tab($buy->min_ql,5)." ".$this->tab($buy->max_ql,5)." ".$this->tab($buy->count,5)." ".$this->tab($buy->buyer,18)." ".$this->tab($expire,20)."\n";
 						}
 						$inside .= "\n\n";
+					} else {
+						$inside .= "No BUY Order(s) for now ...\n\n";
 					}
-					$return = $info[2]." GMI search : ".$this->bot->core("tools")->make_blob("click to view", $inside);
+					$return = " :: ".$info[2]." :: GMI ".$count." result(s) : ".$this->bot->core("tools")->make_blob("click to view", $inside);
 				} else {
 					$return = "Uncorrect GMI data obtained, may retry later on.";
 				}
