@@ -433,8 +433,10 @@ class AOChat
 				$ao_account_pass = $this->bot->password;
 				$this->bot->log("LOGIN", "AUTH", "No proper AO account .ini file found, using default password");				
 			}
-			$tasks = array();
+			$tasks = array(); // Structure : socket target (+ optional port & session cookie) & list of task (each with url + optional data array)
 			$tasks["target"] = "https://register.funcom.com";
+			$tasks["port"] = 443;
+			$tasks["cookie"] = "__aca";
 			$tasks["task"][0]["url"] = "https://register.funcom.com/account";
 			$datas = array("__ac_name" => $ao_account_user, "__ac_password" => $ao_account_pass);
 			$tasks["task"][0]["data"] = $datas;
@@ -444,6 +446,7 @@ class AOChat
 			$tasks["task"][2]["url"] = "https://register.funcom.com/account/logOut";
 			$tasks["task"][2]["data"] = "";
 			$defreezer = $this->bot->core("tools")->multi_site($tasks,9);
+			//file_put_contents("defreezer.txt", $defreezer, FILE_APPEND | LOCK_EX); // uncomment for testing purpose only
 			die("AOChat restarting bot after attempting self defreezer\n");		
 		}
 		// If we receive anything but the character list, something's wrong.

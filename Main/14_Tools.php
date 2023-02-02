@@ -3,7 +3,7 @@
 * Tools.php - Module Containing Useful Functions to be used by other Modules
 *
 * Made by Temar (most code is Simply Taken from elsewhere)
-*
+* Added by Bitnykk : simple/multi tasks (check Sources/Aochat/authenticate)
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
 * Copyright (C) 2005-2020 J-Soft and the BeBot development team.
@@ -138,6 +138,7 @@ class tools extends BasePassiveModule
         }		
 		
 		if($url['scheme']=="https") $port = 443;
+		elseif(isset($tasks["port"])) $port = $tasks["port"];
 		else $port = 80;
 				
 		$cookie = array();
@@ -168,7 +169,7 @@ class tools extends BasePassiveModule
 				fputs($fp, "Content-length: ".strlen($request)."\r\n");	
 				foreach ($cookie as $v) {
 					$e = explode("=",$v);
-					if($e[0]=="__aca") {
+					if($e[0]==$tasks["cookie"]) {
 						$x = explode(";",$e[1]);
 						fputs($fp, "Cookie: ".$e[0]."=".substr($x[0],1,-1)."; path=/\r\n");
 					}
@@ -181,7 +182,7 @@ class tools extends BasePassiveModule
 				fputs($fp, "Host: ".$parse['host']."\r\n");
 				foreach ($cookie as $v) {
 					$e = explode("=",$v);
-					if($e[0]=="__aca") {
+					if($e[0]==$tasks["cookie"]) {
 						$x = explode(";",$e[1]);
 						fputs($fp, "Cookie: ".$e[0]."=".substr($x[0],1,-1)."; path=/\r\n");
 					}
@@ -384,6 +385,7 @@ class tools extends BasePassiveModule
     )
     {
         // Read lower function for more options available ...
+		$cookie = @tempnam('/log','cookie.tmp');
 		$ch = curl_init();        
         curl_setopt($ch, CURLOPT_USERAGENT, $this->useragent);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -395,7 +397,7 @@ class tools extends BasePassiveModule
         }
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 		curl_setopt($ch, CURLOPT_COOKIESESSION, true);
-		curl_setopt($ch, CURLOPT_COOKIEJAR, "/log/cookie-register");
+		curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie);
 		
 		$return = '';
 		foreach($tasks["task"] AS $exec) {
@@ -411,9 +413,10 @@ class tools extends BasePassiveModule
 			sleep(1);
 		}		
 		curl_close($ch);
+		@unlink($cookie);
 		
         Return $return;
-    }	
+    }
 
     function get_site_curl(
         $url,
