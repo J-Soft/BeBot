@@ -8,7 +8,7 @@
 * Copyright (C) 2006-2012 J-Soft and the BeBot development team.
 * Copyright (c) 2008 Allan Noer <allan@noer.biz>
 * Copyright (C) 2002-2005  Oskari Saarenmaa <auno@auno.org>.
-*
+* Edition 2023 From Bitnykk (RK5) for the self defreezer
 * This is an adapted version of Auno's original AOChat PHP class.
 * This version has been adapted for use with pre PHP 5 versions aswell as other bugfixes
 * by the community and BeBot development team.
@@ -416,8 +416,38 @@ class AOChat
                                                            ));
         $this->send_packet($pak);
         $packet = $this->get_packet();
-        // If we receive anything but the character list, something's wrong.
-        if ($packet->type != AOCP_LOGIN_CHARLIST) {
+        /* If the account was wrongly frozen we may attempt bot self defreezer below ...
+			But BEWARE : this can only work 5 times per 24 hours from same computer (must wait for more) */
+        if ($packet->type == AOCP_LOGIN_ERROR && substr($packet->args[0],-28) == "/Account system denies login") {
+            $this->bot->log("LOGIN", "AUTH", "AO account seems to be frozen, tryting self defreezer");
+			$ao_account_user = strtolower($this->bot->username);
+			if (file_exists("./Conf/".$ao_account_user.".ini")) {
+				require_once("./Conf/".$ao_account_user.".ini");
+				if ($ao_account_pass!="") {
+					$this->bot->log("LOGIN", "AUTH", "AO account .ini file loaded, using its specific password");
+				} else {				
+					$ao_account_pass = $this->bot->password;
+					$this->bot->log("LOGIN", "AUTH", "AO account .ini file found but not set, using default password");
+				}
+			} else {
+				$ao_account_pass = $this->bot->password;
+				$this->bot->log("LOGIN", "AUTH", "No proper AO account .ini file found, using default password");				
+			}
+			$tasks = array();
+			$tasks["target"] = "https://register.funcom.com";
+			$tasks["task"][0]["url"] = "https://register.funcom.com/account";
+			$datas = array("__ac_name" => $ao_account_user, "__ac_password" => $ao_account_pass);
+			$tasks["task"][0]["data"] = $datas;
+			$tasks["task"][1]["url"] = "https://register.funcom.com/account/subscription/ctrl/anarchy/".$ao_account_user."/reactivate";
+			$fields = array("process" => "submit");
+			$tasks["task"][1]["data"] = $fields;
+			$tasks["task"][2]["url"] = "https://register.funcom.com/account/logOut";
+			$tasks["task"][2]["data"] = "";
+			$defreezer = $this->bot->core("tools")->multi_site($tasks,9);
+			die("AOChat restarting bot after attempting self defreezer\n");		
+		}
+		// If we receive anything but the character list, something's wrong.
+        if ($packet->type != AOCP_LOGIN_CHARLIST) {			
             die("AOChat Expecting Character list, received: {$packet->args[0]}\n");
         }
         // Prepare an array of all characters returned

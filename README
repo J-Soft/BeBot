@@ -356,6 +356,22 @@ The console should now state that the bot is loading the modules,
 authenticating and connecting. Once this is done you can log onto a character
 in-game (see below) marked as "superadmin" to be able to control the bot. 
 
+DEFREEZING BOT ACCOUNT (AO ONLY)
+---------------------------------------
+
+Sometimes an AO account, even a froob, could turn frozen state ...
+You could manually defreeze it by logging at register.funcom.com with browser.
+
+Or another option is to setup the bot self defreezer triggered at logon !
+If account password is different than chat login password do this :
+- Go into you Conf/ folder and make a copy of Aoaccount.ini file
+- Rename this copy like your AO lowercase account (e.g. : myaccname.ini)
+- Edit it with text editor to set the $ao_account_pass value correctly
+
+From there, the bot will try to log, notice the frozen error, fix it and restart.
+If you don't change anything in the config, it will redo it everytime necessary.
+But BEWARE : this can only work 5 times per 24 hours from same computer (must wait for more)
+
 PLAYING WHILE RUNNING THE BOT (AO ONLY)
 ---------------------------------------
 

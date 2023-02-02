@@ -2,7 +2,7 @@
 Release 0.7.26 - ??? 2022 
 -------------------------
 - For both: ...
-- For AO: gmi added
+- For AO: gmi added ; self defreezer ;
 - For AoC: ...
 
 -------------------------
