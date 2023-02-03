@@ -509,7 +509,7 @@ class Raid extends BaseActiveModule
     function top_raid($asker, $source, $user)
     {
 		$timeout = $this->bot->core("settings")->get("Raid", "TopCache");
-		if($this->topcache!="" && $this->toptime!="" && $this->toptime<time() && time()-$this->toptime<$timeout*60 ) {
+		if($user=="" && $this->topcache!="" && $this->toptime!="" && $this->toptime<time() && time()-$this->toptime<$timeout*60 ) {
 				$output = $this->topcache;
 		} else {
 			if($this->bot->core("settings")->get("Raid", "Morebots")!="") {
