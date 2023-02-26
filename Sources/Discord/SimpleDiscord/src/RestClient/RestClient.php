@@ -12,7 +12,7 @@ class RestClient {
 	public $channel;
 	public $guild;
 
-	const BASE_URI = "https://discord.com/api/v10";
+	const BASE_URI = "https://discord.com/api/v10/";
 
 	public function __construct(array $headers, \SimpleDiscord\SimpleDiscord $discord) {
 		$this->headers = $headers;
