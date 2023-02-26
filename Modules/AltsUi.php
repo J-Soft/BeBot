@@ -308,6 +308,7 @@ class Alts extends BaseActiveModule
         }
         $this->bot->db->query("INSERT INTO #___alts (alt, main) VALUES ('$alt', '$main')");
         $this->bot->core("alts")->add_alt($main, $alt);
+		$this->bot->core("alts")->create_caches();
         if ($this->bot->exists_module("points")) {
             $this->bot->core("points")->check_alts($main);
         }
@@ -344,6 +345,7 @@ class Alts extends BaseActiveModule
         } else {
             $this->bot->db->query("DELETE FROM #___alts WHERE alt = '" . ucfirst(strtolower($alt)) . "'");
             $this->bot->core("alts")->del_alt($main, $alt);
+			$this->bot->core("alts")->create_caches();
             return "##highlight##$alt##end## has been removed from ##highlight##$main##end##s alt-list.";
         }
     }
