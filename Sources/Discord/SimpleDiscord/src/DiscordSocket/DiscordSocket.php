@@ -14,7 +14,7 @@ class DiscordSocket {
 
 	private $lastFrame=null;
 
-	private const CURRENT_GATEWAY_VERSION = "9";
+	private const CURRENT_GATEWAY_VERSION = "10";
 
 	public function __construct(\SimpleDiscord\SimpleDiscord $discord) {
 		$this->discord = $discord;
