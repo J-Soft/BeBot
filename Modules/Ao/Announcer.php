@@ -174,7 +174,7 @@ class Announcer extends BaseActiveModule
 			if($found) {
 				if($botnet=="Darknet") $this->bot->send_tell($botnet, "channels rem ".$channel, 1, false);
 				else $this->bot->send_tell($botnet, "unsubscribe ".$channel, 1, false);
-				return "Subscribe command sent to ##highlight##$botnet##end##";
+				return "Unsubscribe command sent to ##highlight##$botnet##end##";
 			} else {
 				return "##error##We are not registered to ##highlight##$botnet##end## yet.##end##";
 			}
