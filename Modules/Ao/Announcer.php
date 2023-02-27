@@ -47,6 +47,7 @@ class Announcer extends BaseActiveModule
 		$this->register_command('all', 'subscribe', 'SUPERADMIN');
 		$this->register_command('all', 'unregister', 'SUPERADMIN');
 		$this->register_command('all', 'unsubscribe', 'SUPERADMIN');
+		$this->register_command('all', 'sendcommand', 'SUPERADMIN');
 		
 		$this -> bot -> core("colors") -> define_scheme("Announcer", "botname", "bluesilver");
 		$this -> bot -> core("colors") -> define_scheme("Announcer", "sender", "bluegray");
@@ -58,6 +59,7 @@ class Announcer extends BaseActiveModule
 		$this -> help['command']['subscribe <botname> <channel>']="Subscribes your bot from given BotNet's channel.";
 		$this -> help['command']['unregister <botname>']="Unregisters your bot from given BotNet.";
 		$this -> help['command']['unsubscribe <botname> <channel>']="Unsubscribes your bot from given BotNet's channel.";
+		$this -> help['command']['sendcommand <botname> <command>']="Sends given BotNet manual command (e.g.: darknet ignore add player).";
 		$this->help['notes'] = "Depending on Botnet(s) specificities, you may have to log into your bot character to make certain commands/subscriptions directly yourself.";
 		
 		$this->bot->core("settings")->create("Announcer", "OrgOn", false, "Should the bot be relaying from Botnet(s) to guild channel ?", "On;Off");
@@ -83,7 +85,9 @@ class Announcer extends BaseActiveModule
 		elseif (preg_match("/^unregister (.+)$/i", $msg, $info))
 			return $this->unregister(ucfirst(strtolower($info[1])));
 		elseif (preg_match("/^unsubscribe (.+) (.+)$/i", $msg, $info))
-			return $this->unsubscribe(ucfirst(strtolower($info[1])), strtolower($info[2]));			
+			return $this->unsubscribe(ucfirst(strtolower($info[1])), strtolower($info[2]));	
+		elseif (preg_match("/^sendcommand ([^ ]+) (.+)$/i", $msg, $info))
+			return $this->sendcommand(ucfirst(strtolower($info[1])), strtolower($info[2]));				
 		else return false;
 	}
 
@@ -99,6 +103,24 @@ class Announcer extends BaseActiveModule
 			}			
 			$this->bot->send_tell($botnet, "register", 1, false);
 			return "Register command sent to ##highlight##$botnet##end##";
+		} else {
+			return "##error##Character ##highlight##$botnet##end## does not exist.##end##";
+		}		
+	}
+	
+	function sendcommand($botnet, $command) {
+		if (!$this->bot->core('player')->id($botnet) instanceof BotError) {
+			$mains = explode(",",$this->bot->core("settings")->get("Announcer", "BotName"));
+			$found = false;
+			foreach($mains as $main) {
+				if($main==$botnet) $found = true;
+			}
+			if($found) {
+				$this->bot->send_tell($botnet, $command, 1, false);
+				return "Given command ($command) sent to ##highlight##$botnet##end##";
+			} else {
+				return "##error##We are not registered to ##highlight##$botnet##end## yet.##end##";
+			}
 		} else {
 			return "##error##Character ##highlight##$botnet##end## does not exist.##end##";
 		}		
