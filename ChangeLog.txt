@@ -1,8 +1,8 @@
 -------------------------
 Release 0.7.26 - ??? 2022 
 -------------------------
-- For both: improving alts
-- For AO: gmi added ; self defreezer
+- For both: improving alts ; updating Discord to API v10
+- For AO: gmi added ; self defreezer to newest point ; announcer sendcommand
 - For AoC: ...
 
 -------------------------

@@ -148,7 +148,7 @@ class tools extends BasePassiveModule
 				Return "Socket error : $errstr ($errno)\n";
 			}
 			$request = '';
-			$parse = parse_url($exec["url"]);
+			$parse = parse_url($exec["url"]);		
 			if ($exec["data"]!="") {
 				foreach ($exec["data"] as $k => $v) {
 					if (is_array($v)) {
@@ -163,6 +163,7 @@ class tools extends BasePassiveModule
 				$request = substr($request,0,-1);
 			}				
 			if($request!="") {
+				if (!isset($parse['path'])) $parse['path'] = "/";
 				fputs($fp, "POST ".$parse['path'].((!empty($parse['query'])) ? '?'.$parse['query'] : '')." HTTP/1.1\r\n");
 				fputs($fp, "Host: ".$parse['host']."\r\n");
 				fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
@@ -178,6 +179,7 @@ class tools extends BasePassiveModule
 				fputs($fp, "Connection: close\r\n\r\n");
 				fputs($fp, $request . "\r\n\r\n");
 			} else {
+				if (!isset($parse['path'])) $parse['path'] = "/";
 				fputs($fp, "GET ".$parse['path'].((!empty($parse['query'])) ? '?'.$parse['query'] : '')." HTTP/1.0\r\n");
 				fputs($fp, "Host: ".$parse['host']."\r\n");
 				foreach ($cookie as $v) {

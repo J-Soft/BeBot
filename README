@@ -367,6 +367,7 @@ If account password is different than chat login password do this :
 - Go into you Conf/ folder and make a copy of Aoaccount.ini file
 - Rename this copy like your AO lowercase account (e.g. : myaccname.ini)
 - Edit it with text editor to set the $ao_account_pass value correctly
+In case of several accounts, as for bot proxy, repeat upper steps for whole network accounts.
 
 From there, the bot will try to log, notice the frozen error, fix it and restart.
 If you don't change anything in the config, it will redo it everytime necessary.
