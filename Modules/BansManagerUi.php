@@ -358,6 +358,7 @@ class BanManager extends BaseActiveModule
 					$bot = ucfirst(strtolower($bot));
 					if (!$idb instanceof BotError || $idb != 0) {
 						$this->bot->send_tell($bot, "ban add ".$user." ".$duration." ".$reason, 1, false);
+						usleep(500000);						
 					}					
 				}
 		}
@@ -381,6 +382,7 @@ class BanManager extends BaseActiveModule
 					$bot = ucfirst(strtolower($bot));
 					if (!$idb instanceof BotError || $idb != 0) {
 						$this->bot->send_tell($bot, "ban rem ".$user, 1, false);
+						usleep(500000);
 					}					
 				}
 		}		
