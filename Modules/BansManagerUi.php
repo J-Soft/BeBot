@@ -73,6 +73,13 @@ class BanManager extends BaseActiveModule
         $this->register_event("cron", "5min");
         $this->bot->core("settings")
             ->create("Ban", "ReqReason", false, "is a Reason Required?");
+        $this->bot->core("settings")
+            ->create(
+                "Ban",
+                "MoreBots",
+                "",
+                "Anymore bots (where main bot is ADMIN) that should reflect same ban table? This has to be a comma-separated list."
+            );			
     }
 
 
@@ -344,6 +351,16 @@ class BanManager extends BaseActiveModule
                 $this->bot->core("chat")->pgroup_kick($user);
             }
         }
+		if($this->bot->core("settings")->get("Ban", "Morebots")!="") {
+				$bots = explode(",", $this->bot->core("settings")->get("Ban", "Morebots"));
+				foreach($bots as $bot) {
+					$idb = $this->bot->core('player')->id($bot);
+					$bot = ucfirst(strtolower($bot));
+					if (!$idb instanceof BotError || $idb != 0) {
+						$this->bot->send_tell($bot, "ban add ".$user." ".$duration." ".$reason, 1, false);
+					}					
+				}
+		}
         return $ban;
     }
 
@@ -357,6 +374,16 @@ class BanManager extends BaseActiveModule
         }
         $ban = $this->bot->core("security")->rem_ban($source, $user, $source);
 		$this->auto_user_readd($user);
+		if($this->bot->core("settings")->get("Ban", "Morebots")!="") {
+				$bots = explode(",", $this->bot->core("settings")->get("Ban", "Morebots"));
+				foreach($bots as $bot) {
+					$idb = $this->bot->core('player')->id($bot);
+					$bot = ucfirst(strtolower($bot));
+					if (!$idb instanceof BotError || $idb != 0) {
+						$this->bot->send_tell($bot, "ban rem ".$user, 1, false);
+					}					
+				}
+		}		
         return $ban;
     }
 	
