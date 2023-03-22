@@ -419,7 +419,7 @@ class AOChat
         /* If the account was wrongly frozen we may attempt bot self defreezer below ...
 			But BEWARE : this can only work 5 times per 24 hours from same computer (must wait for more) */
         if ($packet->type == AOCP_LOGIN_ERROR && substr($packet->args[0],-28) == "/Account system denies login") {
-            $this->bot->log("LOGIN", "AUTH", "AO account seems to be frozen, tryting self defreezer");
+            $this->bot->log("LOGIN", "AUTH", "AO account seems to be frozen, trying self defreezer");
 			$counter = 0; $confpath = "./Conf";
 			if ($handle = opendir($confpath)) {
 				while (false !== ($filename = readdir($handle))) {
