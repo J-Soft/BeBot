@@ -3,7 +3,7 @@
 * Tools.php - Module Containing Useful Functions to be used by other Modules
 *
 * Made by Temar (most code is Simply Taken from elsewhere)
-*
+* Added by Bitnykk : simple/multi tasks (check Sources/Aochat/authenticate)
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
 * Copyright (C) 2005-2020 J-Soft and the BeBot development team.
@@ -16,7 +16,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -103,6 +103,154 @@ class tools extends BasePassiveModule
         Return ('<a ' . $msgstrip . 'href=\'chatcmd:///' . $chatcmd . $link . '\'>' . $title . '</a>');
     }
 
+    function multi_site($tasks, $timeout = false)
+    {
+        if (!function_exists('curl_init')
+            || ($this->bot->core("settings")
+                    ->get("tools", "force_sockets") == true)
+        ) {
+            Return $this->multi_site_sock($tasks, $timeout);
+        } else {
+			Return $this->multi_site_curl($tasks, $timeout);
+        }
+    }	
+	
+    function post_site($url, $datas = "", $timeout = false)
+    {
+        if (!function_exists('curl_init')
+            || ($this->bot->core("settings")
+                    ->get("tools", "force_sockets") == true)
+        ) {
+            Return $this->post_site_sock($url, $datas, $timeout);
+        } else {
+			Return $this->get_site_curl($url, false, $timeout, $datas);
+        }
+    }	
+
+    function multi_site_sock($tasks, $read_timeout = false)
+    {
+		$result = '';
+		$url = parse_url($tasks["target"]);
+		
+        if (!$read_timeout) {
+            $read_timeout = $this->bot->core("settings")
+                ->get("tools", "connect_timeout");
+        }		
+		
+		if($url['scheme']=="https") $port = 443;
+		elseif(isset($tasks["port"])) $port = $tasks["port"];
+		else $port = 80;
+				
+		$cookie = array();
+		foreach($tasks["task"] AS $exec) {
+			$fp = fsockopen("ssl://".$url['host'], $port, $errno, $errstr, $read_timeout);
+			if(!$fp) {
+				Return "Socket error : $errstr ($errno)\n";
+			}
+			$request = '';
+			$parse = parse_url($exec["url"]);		
+			if ($exec["data"]!="") {
+				foreach ($exec["data"] as $k => $v) {
+					if (is_array($v)) {
+						foreach($v as $v2) {
+							$request .= urlencode($k).'[]='.urlencode($v2).'&';
+						}
+					}
+					else {
+						$request .= urlencode($k).'='.urlencode($v).'&';
+					}
+				}
+				$request = substr($request,0,-1);
+			}				
+			if($request!="") {
+				if (!isset($parse['path'])) $parse['path'] = "/";
+				fputs($fp, "POST ".$parse['path'].((!empty($parse['query'])) ? '?'.$parse['query'] : '')." HTTP/1.1\r\n");
+				fputs($fp, "Host: ".$parse['host']."\r\n");
+				fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
+				fputs($fp, "Content-length: ".strlen($request)."\r\n");	
+				foreach ($cookie as $v) {
+					$e = explode("=",$v);
+					if($e[0]==$tasks["cookie"]) {
+						$x = explode(";",$e[1]);
+						fputs($fp, "Cookie: ".$e[0]."=".substr($x[0],1,-1)."; path=/\r\n");
+					}
+				}
+				$cookie = array();
+				fputs($fp, "Connection: close\r\n\r\n");
+				fputs($fp, $request . "\r\n\r\n");
+			} else {
+				if (!isset($parse['path'])) $parse['path'] = "/";
+				fputs($fp, "GET ".$parse['path'].((!empty($parse['query'])) ? '?'.$parse['query'] : '')." HTTP/1.0\r\n");
+				fputs($fp, "Host: ".$parse['host']."\r\n");
+				foreach ($cookie as $v) {
+					$e = explode("=",$v);
+					if($e[0]==$tasks["cookie"]) {
+						$x = explode(";",$e[1]);
+						fputs($fp, "Cookie: ".$e[0]."=".substr($x[0],1,-1)."; path=/\r\n");
+					}
+				}
+				$cookie = array();
+				fputs($fp, "\r\n\r\n");					
+			}
+			while(!feof($fp)) {
+				$tmp = fgets($fp, 4096);
+				preg_match_all('/Set-Cookie:\s*(.*)\b/', $tmp, $cookie_v);
+				foreach($cookie_v[1] as &$v){
+					if(strpos($v,"deleted") === false) $cookie[] = $v;
+				}
+				$result .= $tmp;
+			}					
+			fclose($fp);
+			sleep(1);
+		}
+		Return $result;		
+	}
+	
+    function post_site_sock($url, $datas = "", $read_timeout = false)
+    {
+		$result = '';
+		$url = parse_url($url);
+		
+        if (!$read_timeout) {
+            $read_timeout = $this->bot->core("settings")
+                ->get("tools", "connect_timeout");
+        }		
+		
+		if($url['scheme']=="https") $port = 443;
+		else $port = 80;
+		
+		$fp = fsockopen("ssl://".$url['host'], $port, $errno, $errstr, $read_timeout);
+		if(!$fp) {
+			Return "Socket error : $errstr ($errno)\n";
+		} else {
+			$request = '';
+			if (!empty($datas)) {
+				foreach ($datas as $k => $v) {
+					if (is_array($v)) {
+						foreach($v as $v2) {
+							$request .= urlencode($k).'[]='.urlencode($v2).'&';
+						}
+					}
+					else {
+						$request .= urlencode($k).'='.urlencode($v).'&';
+					}
+				}
+				$request = substr($request,0,-1);
+			}			
+			fputs($fp, "POST ".$url['path'].((!empty($url['query'])) ? '?'.$url['query'] : '')." HTTP/1.1\r\n");
+			fputs($fp, "Host: ".$url['host']."\r\n");
+			fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
+			fputs($fp, "Content-length: ".strlen($request)."\r\n");
+			fputs($fp, "Connection: close\r\n\r\n");
+			fputs($fp, $request . "\r\n\r\n");		
+			while(!feof($fp)) {
+				$result .= fgets($fp, 4096);
+			}
+			fclose($fp);
+		}
+		
+		Return $result;		
+	}
 
     function get_site($url, $strip_headers = false, $read_timeout = false)
     {
@@ -115,7 +263,6 @@ class tools extends BasePassiveModule
             Return $this->get_site_curl($url, $strip_headers, $read_timeout);
         }
     }
-
 
     function get_site_sock($url, $strip_headers = false, $read_timeout = false)
     {
@@ -234,6 +381,44 @@ class tools extends BasePassiveModule
         return $return;
     }
 
+	function multi_site_curl(
+        $tasks,
+        $timeout = false
+    )
+    {
+        // Read lower function for more options available ...
+		$cookie = @tempnam('/log','cookie.tmp');
+		$ch = curl_init();        
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->useragent);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        if (!$timeout) {
+            $timeout = $this->bot->core("settings")
+                ->get("tools", "connect_timeout");
+        }
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+		curl_setopt($ch, CURLOPT_COOKIESESSION, true);
+		curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie);
+		
+		$return = '';
+		foreach($tasks["task"] AS $exec) {
+			curl_setopt($ch, CURLOPT_URL, $exec["url"]);
+			if($exec["data"]!="") {
+				curl_setopt($ch, CURLOPT_POST, true);
+				curl_setopt($ch,CURLOPT_POSTFIELDS, $exec["data"]);
+			} else {
+				curl_setopt($ch, CURLOPT_POST, false);
+				curl_setopt($ch,CURLOPT_POSTFIELDS, "");
+			}
+			$return .= curl_exec($ch);
+			sleep(1);
+		}		
+		curl_close($ch);
+		@unlink($cookie);
+		
+        Return $return;
+    }
 
     function get_site_curl(
         $url,
@@ -246,6 +431,7 @@ class tools extends BasePassiveModule
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->useragent);
+		if(!is_null($post)) curl_setopt($ch,CURLOPT_POSTFIELDS, $post);
         // Set your login and password for authentication
         //curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
         //curl_setopt($ch, CURLOPT_USERPWD, $user.':'.$pw);

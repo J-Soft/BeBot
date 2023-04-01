@@ -1,6 +1,6 @@
 <?php
 if (!defined("DISCORD_API"))
-    define("DISCORD_API", "https://discordapp.com/api/v9");
+    define("DISCORD_API", "https://discord.com/api/v10");
 
 
 /**

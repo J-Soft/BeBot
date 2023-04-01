@@ -62,6 +62,7 @@ class NewRis extends BaseActiveModule
         $this -> register_command("all", "startri", "LEADER");
         $this -> register_command("all", "clearris", "LEADER");
 	$this -> register_alias('clearris', 'clearri');
+	$this -> register_alias('clearris', 'riclear');
         $this -> register_command("all", "addri", "LEADER");
         $this -> register_command("all", "remri", "LEADER");
         $this -> register_command("all", "delri", "LEADER");
@@ -74,6 +75,7 @@ class NewRis extends BaseActiveModule
 		$this -> register_command("all", "riauto", "LEADER");
 		$this -> register_command("all", "rialts", "LEADER");
 	$this -> register_alias('rialts', 'rialt');		
+		$this -> register_command("all", "richeck", "LEADER");
         $this -> register_command("all", "ritest", "OWNER");
 
         $this -> bot -> core("settings") -> create("Ris", "sendrate", 100000, "Microsecond (usleep) pause between each member manipulation (kick/invite)");
@@ -140,6 +142,10 @@ class NewRis extends BaseActiveModule
 		{
 			$this->RiAlts($msg[1],$name);
 		}		
+		else if($msg[0] == "richeck")
+		{
+			$this->RiCheck($name);
+		}			
 		else if($msg[0] == "ritest")
 		{
 			echo " (1-DEBUG-1) "; print_r($this->ris); echo " (0-DEBUG-0) ";
@@ -289,6 +295,40 @@ class NewRis extends BaseActiveModule
 		}		
 		$this -> bot -> send_tell($name,$return);
 	}
+	
+	function RiCheck($name)
+	{
+		if(count($this->ris)==0) { 
+			$this -> bot -> send_tell($name,"No RI created so far ... please do this first!");
+			return false;
+		}
+		$msg = ""; $check = array(); $count = 0;
+		foreach($this->ris as $index=>$ri) {			
+			$members = $ri->GetRiMembers();
+			$num = bcadd($index,1);
+			foreach($members as $index=>$rimember) {
+				$main = $this->bot->core("alts")->main($rimember->GetName());
+				$check[$main][$num][] = $rimember->GetName();
+			}			
+		}
+		foreach($check as $main=>$ris) {
+			if(count($ris)>1) {
+				$msg .= "\n".$main.": ";
+				foreach($ris as $ir=>$alts) {
+					foreach($alts as $alt) {
+						$count++;
+						$msg .= " ".$alt."(";
+						for($i=1;$i<=count($this -> ris);$i++) {
+							if($i==$ir) $msg .= $i;
+							else $msg .= $this -> bot -> core("tools") -> chatcmd("addri " . $i . " " . $alt, $i);
+						}
+						$msg .= ") ";					
+					}
+				}
+			}
+		}
+		$this -> bot -> send_tell($name, $count." separated alt(s) : ".$this->bot->core("tools")->make_blob("click to view", $msg));
+	} 
 	
 	function AutoRi($name)
 	{
@@ -829,7 +869,8 @@ class NewRis extends BaseActiveModule
 		$msg .= "##highlight##Commands:##end##\n";
 		$msg .= $this -> bot -> core("tools") -> chatcmd("riadmin", "Refresh this admin.")."\n";
 		$msg .= $this -> bot -> core("tools") -> chatcmd("riauto", "Auto distrib profs among RIs.")."\n";
-		$msg .= "Seek alt: "
+		$msg .= "Alt: "
+			.$this -> bot -> core("tools") -> chatcmd("richeck", "Check")." "
 			.$this -> bot -> core("tools") -> chatcmd("rialts enf", "Enf")." "
 			.$this -> bot -> core("tools") -> chatcmd("rialts doc", "Doc")." "
 			.$this -> bot -> core("tools") -> chatcmd("rialts bur", "Bu")." "

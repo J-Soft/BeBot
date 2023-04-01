@@ -188,8 +188,10 @@ class Security_Core extends BaseActiveModule
         $this->register_command("all", "security", "SUPERADMIN");
         $this->register_command("all", "adduser", "SUPERADMIN");
         $this->register_command("all", "deluser", "SUPERADMIN");
+		$this -> register_alias("deluser", "remuser");
         $this->register_command("all", "addgroup", "SUPERADMIN");
         $this->register_command("all", "delgroup", "SUPERADMIN");
+		$this -> register_alias("delgroup", "remgroup");
         $this->register_command("all", "admin", "SUPERADMIN");
 
         $this->enable();

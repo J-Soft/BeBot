@@ -509,7 +509,7 @@ class Raid extends BaseActiveModule
     function top_raid($asker, $source, $user)
     {
 		$timeout = $this->bot->core("settings")->get("Raid", "TopCache");
-		if($this->topcache!="" && $this->toptime!="" && $this->toptime<time() && time()-$this->toptime<$timeout*60 ) {
+		if($user=="" && $this->topcache!="" && $this->toptime!="" && $this->toptime<time() && time()-$this->toptime<$timeout*60 ) {
 				$output = $this->topcache;
 		} else {
 			if($this->bot->core("settings")->get("Raid", "Morebots")!="") {
@@ -641,8 +641,10 @@ class Raid extends BaseActiveModule
 			else $inside .= "\n\nNote: Raid in number of raids joined (alts joined in same raid are ignored), Damage in billions of points recorded (alts joined in same raid are included), Lead in number of raids leaded.";
 			if($user=="") $output = "Top ".$limit." in activity :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
 			else $output = $user." raid stat :: " . $this->bot->core("tools")->make_blob("click to view", $inside);
-			$this->topcache = $output;
-			$this->toptime = time();
+			if($user=="") {
+				$this->topcache = $output;
+				$this->toptime = time();
+			}
 		}
 		if ($source == "cron") {
 			return;

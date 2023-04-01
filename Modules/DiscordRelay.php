@@ -65,7 +65,7 @@ if ((float)phpversion() > 6.9) {
 }
 
 // REST API https://discord.com/developers/docs/reference#api-reference
-define("DISCORD_API", "https://discordapp.com/api/v9");
+define("DISCORD_API", "https://discord.com/api/v10");
 require_once('Sources/Discord/discord-php-kiss/discord_curl.php');
 
 $discordrelay = new DiscordRelay($bot);

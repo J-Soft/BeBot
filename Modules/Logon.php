@@ -100,6 +100,13 @@ class Logon extends BaseActiveModule
                 "Tell the bot to use the built in cache for logon notice. If nothing is cache, no details of the player will be displayed. Warning, setting this to false can cause delays in displaying the logon notice, especially if Funcom XML is being slow."
             );
         $this->bot->core("settings")
+            ->create(
+                "Logon",
+                "RemoteInviter",
+                "",
+                "If current raid/org bot's members logging are to be invited into a remote bot (in which current bot is at least leader), set its name (otherwise leave empty by default)."
+            );			
+        $this->bot->core("settings")
             ->create("Relay", "Logon", false, "Should logon spam be relayed to the linked org bots?");
         $this->bot->core("settings")
             ->create("Relay", "LogonInPgroup", true, "Should logons be shown in the private group of the bot too?");
@@ -151,6 +158,10 @@ class Logon extends BaseActiveModule
                     ->get("Logon", "Enable"))
             ) {
                 if ($this->bot->core("notify")->check($name)) {
+					if ($this->bot->core("settings")->get('Logon', 'RemoteInviter') && !$this->bot->core("player")->id($name) instanceof BotError) {
+						$remotinv = $this->bot->core("settings")->get('Logon', 'RemoteInviter');
+						$this->bot->send_tell($remotinv, "!invite ".$name, 1, false, TRUE);
+					}
                     $level = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '$name'");
                     if (!empty($level)) {
                         $level = $level[0][0];

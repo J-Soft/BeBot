@@ -269,7 +269,7 @@ class Orgs extends BaseActiveModule
 					$tmp = explode('</td>', $tmp[1]);
 					$faction = $tmp[0];
 					if ($this->debug) echo " faction : ".$faction." / ";
-					if ($this->debug) usleep(5000);					
+					if ($this->debug) usleep(500000);					
 					if ($members !== "<span>-</span>")
 						if ($d == $this->bot->dimension)
 							if ($id !== 0)

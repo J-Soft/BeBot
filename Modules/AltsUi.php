@@ -57,6 +57,7 @@ class Alts extends BaseActiveModule
         $this->help['command']['altadmin del <main> <alt>'] = "Removes <alt> as alt from <main>.";
         $this->help['command']['altadmin confirm <main> <alt>'] = "Confirms <alt> as alt of <main>.";
 		$this->help['command']['altadmin newmain <alt>'] = "Makes declared <alt> the new main of all declared alts.";
+		$this->help['command']['altadmin recache'] = "Refreshes mains/alts cache of bot fully (after manual altadmin add/del, e.g.).";
         $this->bot->core("settings")
             ->create(
                 "Alts",
@@ -132,7 +133,9 @@ class Alts extends BaseActiveModule
                     case 'confirm':
                         return $this->confirm($vars[3], $vars[2]);
                     case 'newmain':
-                        return $this->newmain($name, $vars[2], 1);						
+                        return $this->newmain($name, $vars[2], 1);	
+                    case 'recache':
+                        return $this->recache();						
                     default:
                         return "Unknown Subcommand: ##highlight##" . $vars[1] . "##end##";
                 }
@@ -142,7 +145,11 @@ class Alts extends BaseActiveModule
         return false;
     }
 
-
+	function recache() {
+		$this->bot->core("alts")->create_caches();
+		return "Bot mains/alts cache has been fully updated";
+	}
+	
     function display_alts($name)
     {
         if ($this->bot->core("player")->id($name) instanceof BotError) {
@@ -308,6 +315,7 @@ class Alts extends BaseActiveModule
         }
         $this->bot->db->query("INSERT INTO #___alts (alt, main) VALUES ('$alt', '$main')");
         $this->bot->core("alts")->add_alt($main, $alt);
+		$this->bot->core("alts")->create_caches();
         if ($this->bot->exists_module("points")) {
             $this->bot->core("points")->check_alts($main);
         }
@@ -344,6 +352,7 @@ class Alts extends BaseActiveModule
         } else {
             $this->bot->db->query("DELETE FROM #___alts WHERE alt = '" . ucfirst(strtolower($alt)) . "'");
             $this->bot->core("alts")->del_alt($main, $alt);
+			$this->bot->core("alts")->create_caches();
             return "##highlight##$alt##end## has been removed from ##highlight##$main##end##s alt-list.";
         }
     }
