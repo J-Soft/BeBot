@@ -1,4 +1,11 @@
 -------------------------
+Release 0.7.27 - ... 2023 
+-------------------------
+- For both: ...
+- For AO: ...
+- For AoC: ...
+
+-------------------------
 Release 0.7.26 - Apr 2023 
 -------------------------
 - For both: improving alts & ban ; updating Discord to API v10 ; remote invites on logon
