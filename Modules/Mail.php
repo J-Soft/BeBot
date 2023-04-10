@@ -308,7 +308,7 @@ class Mail extends BaseActiveModule
             $window .= "##highlight##To:##end## {$message['recipient']}<br>";
             $window .= "##highlight##From:##end## {$message['sender']}<br>";
             $window .= "##highlight##Sent:##end## {$message['received']}<br><br>";
-            $window .= "##normal##" . base64_decode($message['message']) . "##end##<br><br>";
+            $window .= "##normal##" . preg_replace('/\v+|\\\r\\\n/Ui', '<br>', base64_decode($message['message'])) . "##end##<br><br>";
             $window .= "[" . $this->bot->core("tools")
                     ->chatcmd("mail delete " . $message['id'], "delete") . "] ";
             $window .= "[" . $this->bot->core("tools")
