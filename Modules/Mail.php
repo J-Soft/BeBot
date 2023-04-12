@@ -64,7 +64,15 @@ class Mail extends BaseActiveModule
 		$test_db = $this -> bot -> db -> select($query, MYSQLI_ASSOC);
 		if($test_db[0]['cnt']>0) // The table is outdated, let's update it
 		{
-			$this->bot->db->query("ALTER TABLE `".$this->bot->botname."_mail_message` CHANGE `recieved` `received` timestamp NOT NULL");
+			$this->bot->db->update_table(
+				"mail_message",
+				array(
+					 "recieved",
+					 "received"
+				),
+				"change",
+				"ALTER TABLE #___mail_message CHANGE recieved received timestamp NOT NULL"
+			);			
 		}
         //Register commands for this module
         $this->register_command('all', 'mail', 'GUEST');
