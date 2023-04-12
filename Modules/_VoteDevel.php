@@ -210,7 +210,7 @@ class Vote extends BaseActiveModule
         $query = "SELECT id FROM #___votes WHERE endtime > $now AND endtime <> 0";
         if ($votes = $this->bot->db->select($query, MYSQLI_ASSOC)) {
             foreach ($votes as $vote) {
-                $this->end_vote($this->bot->name, $vote['id']);
+                $this->end_vote($this->bot->botname, $vote['id']);
             }
         }
     }

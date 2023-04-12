@@ -59,7 +59,13 @@ class Mail extends BaseActiveModule
 						recipient VARCHAR(13),
 						sender VARCHAR(13),
 						message TEXT)"
-        );
+		);	
+		$query = "SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '".$this->bot->botname."_mail_message' AND column_name = 'recieved'";
+		$test_db = $this -> bot -> db -> select($query, MYSQLI_ASSOC);
+		if($test_db[0]['cnt']>0) // The table is outdated, let's update it
+		{
+			$this->bot->db->query("ALTER TABLE `".$this->bot->botname."_mail_message` CHANGE `recieved` `received` timestamp NOT NULL");
+		}
         //Register commands for this module
         $this->register_command('all', 'mail', 'GUEST');
 		$this->register_command('all', 'mailed', 'GUEST');
@@ -235,7 +241,7 @@ class Mail extends BaseActiveModule
         $messages = $this->bot->db->select($query, MYSQLI_ASSOC);
         if (!empty($messages)) {
             foreach ($messages as $message) {
-                $message['message'] = base64_decode($message['message']);
+                $message['message'] = stripslashes(base64_decode($message['message']));
                 //Make the "unread" header if it hasn't been made already and there is unread mail
                 if (($message['is_read'] == '0') && (empty($unread_header))) {
                     $window .= "--- Unread messages ---<br>";
@@ -272,7 +278,7 @@ class Mail extends BaseActiveModule
         $messages = $this->bot->db->select($query, MYSQLI_ASSOC);
         if (!empty($messages)) {
             foreach ($messages as $message) {
-                $message['message'] = base64_decode($message['message']);
+                $message['message'] = stripslashes(base64_decode($message['message']));
                 //for unread
                 if (($message['is_read'] == '0')) {
                     $window .= "(Unread) ";
@@ -308,7 +314,7 @@ class Mail extends BaseActiveModule
             $window .= "##highlight##To:##end## {$message['recipient']}<br>";
             $window .= "##highlight##From:##end## {$message['sender']}<br>";
             $window .= "##highlight##Sent:##end## {$message['received']}<br><br>";
-            $window .= "##normal##" . preg_replace('/\v+|\\\r\\\n/Ui', '<br>', base64_decode($message['message'])) . "##end##<br><br>";
+            $window .= "##normal##" . stripslashes(preg_replace('/\v+|\\\r\\\n/Ui', '<br>', base64_decode($message['message']))) . "##end##<br><br>";
             $window .= "[" . $this->bot->core("tools")
                     ->chatcmd("mail delete " . $message['id'], "delete") . "] ";
             $window .= "[" . $this->bot->core("tools")
