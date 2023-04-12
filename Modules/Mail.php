@@ -60,9 +60,7 @@ class Mail extends BaseActiveModule
 						sender VARCHAR(13),
 						message TEXT)"
 		);	
-		$query = "SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '".$this->bot->botname."_mail_message' AND column_name = 'recieved'";
-		$test_db = $this -> bot -> db -> select($query, MYSQLI_ASSOC);
-		if($test_db[0]['cnt']>0) // The table is outdated, let's update it
+		if($this->bot->db->get_version('mail_message')<2) // The table is outdated, let's update it
 		{
 			$this->bot->db->update_table(
 				"mail_message",
@@ -72,7 +70,8 @@ class Mail extends BaseActiveModule
 				),
 				"change",
 				"ALTER TABLE #___mail_message CHANGE recieved received timestamp NOT NULL"
-			);			
+			);	
+			$this->bot->db->set_version('mail_message', 2);
 		}
         //Register commands for this module
         $this->register_command('all', 'mail', 'GUEST');
