@@ -118,7 +118,7 @@ class News extends BaseActiveModule
         $this->help['command']['raids'] = "Shows current raid events";
         $this->help['command']['headline add <newsitem>'] = "Adds <newsitem> to current news. ";
         $this->help['command']['news add <newsitem>'] = "Adds <newsitem> to current news. ";
-        $this->help['command']['raid add <newsitem>'] = "Adds <newsitem> to current news. ";
+        $this->help['command']['raids add <newsitem>'] = "Adds <newsitem> to current raids. ";
         $this->help['notes'] = "The deletion of headlines, news and raids are managed by the GUI.";
     }
 
