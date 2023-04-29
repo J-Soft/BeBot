@@ -733,7 +733,6 @@ class raidloot extends BaseActiveModule
 			unset($this->bot->core("loots")->loot); $this->bot->core("loots")->loot=array();
 			unset($this->bot->core("loots")->leftovers); $this->bot->core("loots")->leftovers=array();
 			$this->bot->core("loots")->count = 0;
-
 			$this->bot->core("loots")->loot[1]['item'] = "<a href='itemref://275909/275909/1'>Gelatinous Lump</a>";
 			$this->bot->core("loots")->loot[1]['num'] = 3;
 			$this->bot->core("loots")->loot[2]['item'] = "<a href='itemref://275916/275916/1'>Biotech Matrix</a>";
@@ -748,7 +747,7 @@ class raidloot extends BaseActiveModule
 			$this->bot->core("loots")->loot[6]['num'] = 1;
 			$this->bot->core("loots")->loot[7]['item'] = "<a href='itemref://257706/257706/1'>Kyr&#039;Ozch Helmet (2500 Token board)</a>";
 			$this->bot->core("loots")->loot[7]['num'] = 1;
-
+			$this->bot->core("loots")->count = 7;
 			$this->bot->core("loots")->rlist();
         }
 
@@ -757,7 +756,6 @@ class raidloot extends BaseActiveModule
 			unset($this->bot->core("loots")->loot); $this->bot->core("loots")->loot=array();
 			unset($this->bot->core("loots")->leftovers); $this->bot->core("loots")->leftovers=array();
 			$this->bot->core("loots")->count = 0;
-
 			$this->bot->core("loots")->loot[1]['item'] = "<a href='itemref://275912/275912/1'>Crystaline Matrix</a>";
 			$this->bot->core("loots")->loot[1]['num'] = 3;
 			$this->bot->core("loots")->loot[2]['item'] = "<a href='itemref://275914/275914/1'>Kyr&#039;Ozch Circuitry</a>";
@@ -772,7 +770,7 @@ class raidloot extends BaseActiveModule
 			$this->bot->core("loots")->loot[6]['num'] = 1;
 			$this->bot->core("loots")->loot[7]['item'] = "<a href='itemref://257706/257706/1'>Kyr&#039;Ozch Helmet (2500 Token board)</a>";
 			$this->bot->core("loots")->loot[7]['num'] = 1;
-
+			$this->bot->core("loots")->count = 7;
 			$this->bot->core("loots")->rlist();
         }
 
@@ -781,7 +779,6 @@ class raidloot extends BaseActiveModule
 			unset($this->bot->core("loots")->loot); $this->bot->core("loots")->loot=array();
 			unset($this->bot->core("loots")->leftovers); $this->bot->core("loots")->leftovers=array();
 			$this->bot->core("loots")->count = 0;
-
 			$this->bot->core("loots")->loot[1]['item'] = "<a href='itemref://275918/275918/1'>Alpha Program Chip</a>";
 			$this->bot->core("loots")->loot[1]['num'] = 3;
 			$this->bot->core("loots")->loot[2]['item'] = "<a href='itemref://275919/275919/1'>Beta Program Chip</a>";
@@ -800,7 +797,7 @@ class raidloot extends BaseActiveModule
 			$this->bot->core("loots")->loot[8]['num'] = 1;
 			$this->bot->core("loots")->loot[9]['item'] = "<a href='itemref://257706/257706/1'>Kyr&#039;Ozch Helmet (2500 Token board)</a>";
 			$this->bot->core("loots")->loot[9]['num'] = 1;
-
+			$this->bot->core("loots")->count = 9;
 			$this->bot->core("loots")->rlist();
         }
 		
@@ -809,12 +806,11 @@ class raidloot extends BaseActiveModule
 			unset($this->bot->core("loots")->loot); $this->bot->core("loots")->loot=array();
 			unset($this->bot->core("loots")->leftovers); $this->bot->core("loots")->leftovers=array();
 			$this->bot->core("loots")->count = 0;
-
 			$this->bot->core("loots")->loot[1]['item'] = "<a href='itemref://262656/262656/1'>Kyr'Ozch Invasion Plan (ACDC)</a>";
 			$this->bot->core("loots")->loot[1]['num'] = 1;
 			$this->bot->core("loots")->loot[2]['item'] = "<a href='itemref://260422/260422/1'>Unlearning Device (AI Reset)</a>";
 			$this->bot->core("loots")->loot[2]['num'] = 4;
-
+			$this->bot->core("loots")->count = 2;
 			$this->bot->core("loots")->rlist();
         }		
 		
