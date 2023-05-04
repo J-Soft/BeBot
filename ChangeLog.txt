@@ -1,9 +1,9 @@
 -------------------------
 Release 0.7.27 - ... 2023 
 -------------------------
-- For both: ...
-- For AO: ...
-- For AoC: ...
+- For both: mail fixed
+- For AO: apf improved
+- For AoC: no news in this version
 
 -------------------------
 Release 0.7.26 - Apr 2023 
