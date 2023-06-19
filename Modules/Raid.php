@@ -74,6 +74,7 @@ class Raid extends BaseActiveModule
         $this->register_command("all", "raidhistory", "LEADER");
         $this->register_command("all", "raidstats", "LEADER");
         $this->register_command("all", "raidstat", "GUEST");
+		$this->register_command("all", "raidhelp", "LEADER");
         if (strtolower($this->bot->game) == 'ao') {
             $this->register_event("pgleave");
             $this->register_event("pgjoin");
@@ -215,6 +216,7 @@ class Raid extends BaseActiveModule
         $this->help['command']['s <message>'] = "Raid command. Display <message> in a highly visiable manner.";
         $this->help['command']['c'] = "Raid command. Display cocoon warning in a highly visiable manner.";
         $this->help['command']['f'] = "Raid command. Display fence alert in a highly visiable manner.";
+		$this->help['command']['raidhelp'] = "Explains basics of raid commands for returning or new RLs.";
         $this->help['notes'] = "All commands except join and leave are restricted to users with " . $this->bot
                 ->core("settings")->get('Raid', 'Command') . " or higher access.";
         $this->bot->db->query(
@@ -267,7 +269,10 @@ class Raid extends BaseActiveModule
                 Break;
             case 'raidstats':
                 Return $this->raid_stats($name, $var[1]);
-                Break;			
+                Break;		
+            case 'raidhelp':
+                Return $this->raid_help($name);
+                Break;						
             case 'raidstat':
                 Return $this->raid_stat($name, $type, $var[1]);
                 Break;					
@@ -426,6 +431,21 @@ class Raid extends BaseActiveModule
     {
         $this->dd_check($name, $msg);
     }
+	
+    /*
+    Make the help
+    */
+    function raid_help()
+    {
+        $content = "<font color=CCInfoHeadline> :::: RaidHelp ::::</font>\n\n";
+        if (file_exists("./Text/" . $this->bot->botname . "Raidhelp.txt")) {
+            $content .= implode("", file("./Text/" . $this->bot->botname . "Raidhelp.txt"));
+        } elseif (file_exists("./Text/Raidhelp.txt")) {
+            $content .= implode("", file("./Text/Raidhelp.txt"));
+        }
+        return "<botname>'s Raidhelp :: " . $this->bot->core("tools")
+            ->make_blob("click to view", $content);
+    }	
 	
     /*
     This gets called upper for priv or org msg
