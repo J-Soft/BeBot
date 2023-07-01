@@ -723,7 +723,7 @@ class Raid extends BaseActiveModule
 			}
 			$stats = $this->bot->db->select("SELECT COUNT(*) FROM #___raid_log WHERE time =".$entry[0]);
 			if(isset($stats[0][0])&&$stats[0][0]>=0) {
-				$joiners = count($stats);
+				$joiners = $stats[0][0];
 			} else {
 				$joiners = "?";
 			}
