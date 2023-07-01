@@ -721,7 +721,13 @@ class Raid extends BaseActiveModule
 				$desc = "?";
 				$note = "?";
 			}
-			$inside .= "#".$id." ".$date." : ".$desc." by ".$rl." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats")."\n\n";
+			$stats = $this->bot->db->select("SELECT COUNT(*) FROM #___raid_log WHERE time =".$entry[0]);
+			if(isset($stats[0][0])&&$stats[0][0]>=0) {
+				$joiners = count($stats);
+			} else {
+				$joiners = "?";
+			}
+			$inside .= "#".$id." ".$date." : ".$desc." by ".$rl." (".$note.") - ".$this->bot->core("tools")->chatcmd("raidstats ".$entry[0], "Stats[".$joiners."]")."\n\n";
 		}
 		$back = $skip-$pager;
 		if($back>=0) {
@@ -745,7 +751,7 @@ class Raid extends BaseActiveModule
 		$inside = "";
 		if(count($stats)>0) {
 			$duration = floor(($stats[0][4]-$stats[0][3])/60);
-			$inside .= count($stats)." joiner(s) for ".$duration." min(s) :\n";
+			$inside .= "[".count($stats)."] joiner(s) for ".$duration." min(s) :\n";
 			foreach($stats as $stat) {
 				$inside .= $stat[1]." ";
 			}			
