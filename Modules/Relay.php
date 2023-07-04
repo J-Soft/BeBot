@@ -731,7 +731,13 @@ class Relay extends BaseActiveModule
                     } else {
                         $level = 0;
                     }
-                    $msg = "buddy $msg $name gc $level";
+					$whois = $this->bot->core("whois")->lookup($name);
+						if(isset($whois['org_id']) && is_numeric($whois['org_id']) && $whois['org_id']>0 && $whois['org_id']==$this->bot->guildid) {
+							$chan = "gc";
+						} else {
+							$chan = "pg";
+						}
+                    $msg = "buddy $msg $name $chan $level";
                     $this->relay_to_bot($msg, false, "gcrc");
                 }
             }
