@@ -804,9 +804,10 @@ class Relay extends BaseActiveModule
             } else {
                 foreach ($online as $on) {
                     $level = $on[3];
-                    if ($on[1] == 1) {
+					$whois = $this->bot->core("whois")->lookup($on[0]);
+                    if ($on[1] == 1 && isset($whois['org_id']) && is_numeric($whois['org_id']) && $whois['org_id']>0 && $whois['org_id']==$this->bot->guildid) {
                         $onmsg .= $on[0] . ",gc,$level;";
-                    } elseif ($on[2] == 1) {
+                    } else { // if ($on[2] == 1)
                         $onmsg .= $on[0] . ",pg;";
                     }
                 }
