@@ -77,6 +77,7 @@ class raidloot extends BaseActiveModule
                 $this -> register_command("all", "RIS", "LEADER");
                 $this -> register_command("all", "JACK", "LEADER");
                 $this -> register_command("all", "LOX", "LEADER");
+                $this -> register_command("all", "MERCS", "LEADER");				
                 $this -> register_command("all", "ZOD", "LEADER");
                 $this -> register_command("all", "PRISONERS", "LEADER");
                 $this -> register_command("all", "POH", "LEADER");
@@ -144,6 +145,8 @@ class raidloot extends BaseActiveModule
 				$this -> help['command']['LOX 12-man']="Shows Possible Items from 12m.";
 				$this -> help['command']['LOX alienthreat']="Shows Possible Items from Sinuh.";
 				$this -> help['command']['LOX vortexx']="Shows Possible Items from Vortexx.";
+				$this -> help['command']['MERCS mercarmor']="Shows Possible armors from Mercenaries.";
+				$this -> help['command']['MERCS mercweap']="Shows Possible weapons from Mercenaries.";
                 $this -> help['command']['ZOD beast beastarmor']="Shows Possible beastarmor Loot.";
                 $this -> help['command']['ZOD beast beastweaps']="Shows Possible beastweapons Loot.";
                 $this -> help['command']['ZOD beast beaststars']="Shows Possible beaststars Loot.";
@@ -497,6 +500,24 @@ class raidloot extends BaseActiveModule
                                                 break;
                                 }
                                 break;
+                //$this -> register_command("all", "MERCS", "LEADER");
+                        case 'MERCS':
+                                switch($subcom)
+                                {
+                                        case '':
+                                                return $this -> rloot_interface($source, 'MERCS');
+                                                break;
+                                        case 'mercarmor':
+                                                return $this -> show_aloot($source, 'mercarmor', $command);
+                                                break;
+                                        case 'mercweap':
+                                                return $this -> show_aloot($source, 'mercweap', $command);
+                                                break;
+                                        default:
+                                                return $this -> bot -> send_help($source, 'MERCS');
+                                                break;
+                                }
+                                break;								
                 //$this -> register_command("all", "ZOD", "LEADER");
                         case 'ZOD':
                                 switch($subcom)
@@ -1149,6 +1170,13 @@ class raidloot extends BaseActiveModule
                         $list .= $this -> bot -> core("tools") -> chatcmd("LOX alienthreat", "Sinuh")."\n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("LOX vortexx", "Vortexx")."\n";
                 }
+                else if($area === 'MERCS')
+                {
+                        $list = "<header>##highlight##::::: Mercenaries Loot :::::##end##<end>\n\n\n";
+                        $list .= "##highlight##\t\tEFP Loot##end##\n";
+                        $list .= $this -> bot -> core("tools") -> chatcmd("MERCS mercarmor", "Armors")."\n";
+                        $list .= $this -> bot -> core("tools") -> chatcmd("MERCS mercweap", "Weapons")."\n";
+                }				
                 else if($area === 'RHI')
                 {
                         $list = "<header>##highlight##::::: Hollow Island Loot :::::##end##<end>\n\n\n";
@@ -1256,6 +1284,8 @@ class raidloot extends BaseActiveModule
                         $list .= $this -> bot -> core("tools") -> chatcmd("JACK", "Jack Legchopper")."\n\n";
                         $list .= "##highlight##::::: Legacy of the Xan Loot :::::##end##\n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("LOX", "Legacy of the Xan")."\n\n";
+                        $list .= "##highlight##::::: Mercenaries Loot :::::##end##\n";
+                        $list .= $this -> bot -> core("tools") -> chatcmd("MERCS", "Mercenaries")."\n\n";						
                         $list .= "##highlight##::::: Pandemonium Loot :::::##end##\n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("ZOD", "Pandemonium")."\n\n";
                         $list .= "##highlight##::::: Prisoners Loot :::::##end##\n";

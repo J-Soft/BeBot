@@ -45,7 +45,7 @@ class raid_load extends BasePassiveModule
                 // name = the name of the loot
                 // img  = the aodb image number for the icon
                 // ref  = the aodb info details number
-                $version = 10;
+                $version = 11;
                 $this -> bot -> db -> query("CREATE TABLE IF NOT EXISTS " . $this -> bot -> db -> define_tablename("RaidLoot", "true") . "
                         (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                          table_version INT,
@@ -3958,7 +3958,127 @@ class raid_load extends BasePassiveModule
                         if(!$this -> bot -> db -> query($query))
                         {
                                 echo "\nError running query: ".$query."\n"; sleep(5);
-                        }						
+                        }		
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Helmet of Azure Reveries', '31734', '165307', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Breastplate of Azure Reveries', '31648', '165304', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Sleeves of Azure Reveries', '31644', '165303', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Gloves of Azure Reveries', '31656', '165306', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Pants of Azure Reveries', '22919', '165308', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Boots of Azure Reveries', '22884', '165305', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }												
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Heavy Notum Tank Armor', '22390', '165213', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Medium Notum Tank Armor', '22398', '165209', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Light Notum Tank Armor', '22394', '165208', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Luxurious Rubber Shirt', '22973', '168672', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Luxurious Rubber Sleeves', '22946', '168671', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Luxurious Rubber Pants', '22917', '168670', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Fancy Stethoscopic Glasses', '12711', '165177', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Rust-pitted Ring', '151931', '156772', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }							
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Pioneer of Jobe Cloak', '22968', '165204', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Stone Samurai Boots', '13275', '165205', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Flaxen Notum Pants', '30942', '165206', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Average Gloves', '37106', '165207', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Nelly Johnsons Little Black Dress', '88047', '165214', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercarmor', 'Common Loot', 'Anything', '130728', '165215', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }							
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercweap', 'Common Loot', 'Blood Bat', '13335', '165130', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercweap', 'Common Loot', 'Blood Mace', '13333', '165127', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercweap', 'Common Loot', 'Pain of Patricia', '13311', '168675', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }	
+						$query = "INSERT INTO #___RaidLoot (table_version, raid, area, boss, name, img, ref, multiloot) VALUES('$version', 'mercenaries', 'mercweap', 'Common Loot', 'Reign of Patricia', '13311', '212995', '0')";						
+                        if(!$this -> bot -> db -> query($query))
+                        {
+                                echo "\nError running query: ".$query."\n"; sleep(5);
+                        }										
                 } //end test_db
 
         }

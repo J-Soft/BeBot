@@ -2,7 +2,7 @@
 Release 0.7.27 - ... 2023 
 -------------------------
 - For both: relay, mail & discord fixed ; raidhelp added
-- For AO: apf & raidhistory improved
+- For AO: raidloot, apf & raidhistory improved
 - For AoC: no news in this version
 
 -------------------------
