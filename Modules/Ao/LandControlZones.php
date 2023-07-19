@@ -59,12 +59,12 @@ class LandControlZones extends BaseActiveModule
         );
         $this->help['description'] = 'Land Control Areas + Hot/Cold';
         $this->help['command']['lc'] = "Shows a link to each available area.";
-        $this->help['command']['lc [name]'] = "Shows all towersites in named area.";
-        $this->help['command']['lc [QL]'] = "Shows all towersites of given QL (in range of +10 to limit results).";
-        $this->help['command']['hot'] = "Shows hot towersites clickable interface.";
-        $this->help['command']['hot [QL] [side]'] = "Shows hot towersites of given side and QL (in range of +50 to limit results).";
-        $this->help['command']['plant'] = "Shows towersites currently available to be planted.";		
-		$this->help['notes'] = "The external Hot/Cold API requires cautions of limited use ; abusing it (pull every qls/zones, eg) may get your bot/server banned and unable to read it.";
+        $this->help['command']['lc [area]'] = "Shows all towersites in given area.";
+        $this->help['command']['lc [QL]'] = "Shows all towersites around given QL.";
+        $this->help['command']['hot'] = "Shows all hot towersites.";
+        $this->help['command']['hot [QL]'] = "Shows hot towersites around given QL.";
+        $this->help['command']['plant'] = "Shows all towersites currently available to be planted.";		
+		$this->help['notes'] = "The external Hot/Cold API accepts a cache time NO lower than 5 min (otherwise you might be banned) which is the default.";
         if ($this->bot->core("settings")
             ->exists("LandControl", "SchemaVersion")
         ) {
@@ -85,6 +85,7 @@ class LandControlZones extends BaseActiveModule
             case 3:
             case 4:
             case 5:
+			case 6:
                 $this->bot->db->update_table(
                     "land_control_zones",
                     "short",
@@ -107,15 +108,17 @@ class LandControlZones extends BaseActiveModule
                 }
             default:
         }
-        $this->bot->db->set_version("land_control_zones", 6);
+        $this->bot->db->set_version("land_control_zones", 7);
         $this->register_command("all", "lc", "MEMBER");
 		$this -> register_alias('lc', 'lca');
-		$this->bot->core("settings")->create("LandControl", "ApiUrl", "https://tower-api.jkbff.com/v1/api/towers", "What is HTTP(s) JSON Tower API URL (Tyrence's by default) ?");
-		if($this->bot->core("settings")->get("LandControl", "ApiUrl")=="https://tower-api.jkbff.com/api/towers") {
-			$this->bot->core("settings")->save("LandControl", "ApiUrl", "https://tower-api.jkbff.com/v1/api/towers");
+		$this->bot->core("settings")->create("LandControl", "ApiUrl", "https://towers.aobots.org/api/sites/", "What is HTTP(s) JSON Tower API URL (Nady's by default) ?");
+		if($this->bot->core("settings")->get("LandControl", "ApiUrl")!="https://towers.aobots.org/api/sites/") {
+			$this->bot->core("settings")->save("LandControl", "ApiUrl", "https://towers.aobots.org/api/sites/");
 		}
         $this->register_command("all", "hot", "MEMBER");		
-        $this->register_command("all", "plant", "MEMBER");		
+        $this->register_command("all", "plant", "MEMBER");
+		$this->towers= array();
+		$this->register_event("cron", "5min");
     }
 
 
@@ -127,8 +130,8 @@ class LandControlZones extends BaseActiveModule
             return $this->show_lc($info[1], null);
         } elseif (preg_match("/^lc$/i", $msg, $info)) {
             return $this->show_lc("--all--", null);
-        } elseif (preg_match("/^hot (\d+) (.+)$/i", $msg, $info)) {
-            return $this->show_hot($info[1], strtolower($info[2]));
+        } elseif (preg_match("/^hot (\d+)$/i", $msg, $info)) {
+            return $this->show_hot($info[1]);
         } elseif (preg_match("/^hot$/i", $msg, $info)) {
             return $this->show_hot();
         } elseif (preg_match("/^plant$/i", $msg, $info)) {
@@ -136,52 +139,51 @@ class LandControlZones extends BaseActiveModule
         } 
         return false;
     }
-
 	
-    function show_hot($ql = null, $side = null)
+    function cron($cron)
+    {
+		if ($cron == 300) {
+			$content = $this->bot->core("tools")->get_site($this->bot->core("settings")->get("LandControl", "ApiUrl"));
+			if (!($content instanceof BotError)) {				
+				if (strpos($content, '{"name":') !== false) {
+					$towers = json_decode($content);				
+					$this->towers= array();
+					$this->towers= $towers;
+				}
+			}
+		}
+	}
+	
+    function show_hot($ql = null)
     {
 		$return = "";
-		if($ql==NULL || !is_numeric($ql) || $ql<0 || $ql>250 || $side==NULL || ($side!="clan"&&$side!="omni"&&$side!="neutral")) {
-			$return .= "Choose a side & QL range by clicking below :";
-			$return .= "<br><br>##orange##CLAN##end##";
-			$return .= "<br>".$this->bot->core("tools")->chatcmd("hot 0 clan", "0-50")." ".$this->bot->core("tools")->chatcmd("hot 50 clan", "50-100")
-			." ".$this->bot->core("tools")->chatcmd("hot 100 clan", "100-150")." ".$this->bot->core("tools")->chatcmd("hot 150 clan", "150-200")." ".
-			$this->bot->core("tools")->chatcmd("hot 200 clan", "200-250")." ".$this->bot->core("tools")->chatcmd("hot 250 clan", "250-300");
-			$return .= "<br><br>##blue##OMNI##end##";
-			$return .= "<br>".$this->bot->core("tools")->chatcmd("hot 0 omni", "0-50")." ".$this->bot->core("tools")->chatcmd("hot 50 omni", "50-100")
-			." ".$this->bot->core("tools")->chatcmd("hot 100 omni", "100-150")." ".$this->bot->core("tools")->chatcmd("hot 150 omni", "150-200")." ".
-			$this->bot->core("tools")->chatcmd("hot 200 omni", "200-250")." ".$this->bot->core("tools")->chatcmd("hot 250 omni", "250-300");
-			$return .= "<br><br>##yellow##NEUTRAL##end##";
-			$return .= "<br>".$this->bot->core("tools")->chatcmd("hot 0 neutral", "0-50")." ".$this->bot->core("tools")->chatcmd("hot 50 neutral", "50-100")
-			." ".$this->bot->core("tools")->chatcmd("hot 100 neutral", "100-150")." ".$this->bot->core("tools")->chatcmd("hot 150 neutral", "150-200")." ".
-			$this->bot->core("tools")->chatcmd("hot 200 neutral", "200-250")." ".$this->bot->core("tools")->chatcmd("hot 250 neutral", "250-300");			
-			
+		$count = 0;
+		if($ql==NULL || !is_numeric($ql) || $ql<0 || $ql>250) {
+			$return .= "Any QL currently Hot sites :";
+			foreach ($this->towers as $tower) {
+				if($tower->gas!=75&&$tower->enabled==true) {
+					$count++;
+					$return .= $this->format($tower);
+				}
+			}
 		} else {
-			$apiurl = $this->bot->core("settings")->get("LandControl", "ApiUrl");
-			$mql = $ql+50;
-			$secday = time() % 86400;
-			$mint = $secday+3600;
-			if($mint>86400) $mint = $mint-86400;
-			$maxt = $secday+23400;
-			if($maxt>86400) $maxt = $maxt-86400;
-			$content = $this->bot->core("tools")->get_site($apiurl."?limit=50&faction=".$side."&min_ql=".$ql."&max_ql=".$mql."&min_close_time=".$mint."&max_close_time=".$maxt);
-			if (!($content instanceof BotError)) {
-				if (strpos($content, '{"count":') !== false) {
-					$datas = json_decode($content);
-					$count = count($datas->results);
-					$return .= $count." ".$side." field(s) found as hot now or soon :";
-					$return .= $this->format($content);
+			$return .= "Around QL ".$ql." currently Hot sites :";
+			foreach ($this->towers as $tower) {
+				if($ql>=$tower->min_ql&&$ql<=$tower->max_ql&&$tower->gas!=75&&$tower->enabled==true) {
+					$count++;
+					$return .= $this->format($tower);
 				}
 			}
 		}
 		return $this->bot->core("tools")
-                ->make_blob("Hot Notum Fields", $return."<br><br>*: Hot/Cold states provided by Tyrence's API courtesy of Unk & Draex");		
+                ->make_blob($count." Hot Notum Field(s)", $return."<br><br>*: Hot/Cold states provided by Nady's API");		
 	}
 
 	
     function show_lc($iarea = null, $ql = null)
     {
 		$return = "";
+		$count = 0;
         if ($iarea == "--all--") {
             $areas = $this->bot->db->select(
                 "select distinct(area),count(area) from #___land_control_zones where id < 264 group by area"
@@ -189,6 +191,7 @@ class LandControlZones extends BaseActiveModule
             if (!empty($areas)) {
                 $return .= "<div align=center><u><font color=#10a5e5>Land Control Areas</font></u></div>";
                 foreach ($areas as $area) {
+					$count++;
                     $return .= $this->bot->core("tools")
                             ->chatcmd("lc " . $area[0], $area[0]) . " (" . $area[1] . ")<br>";
                 }
@@ -198,105 +201,86 @@ class LandControlZones extends BaseActiveModule
                 return "No matches";
             }
 		} else {
-			$search = "?limit=50";
 			if($iarea!=NULL) {
-                $area = $this->bot->db->select(
-                    "select zoneid from #___land_control_zones where area like '%" . $iarea . "%' LIMIT 1"
-                );			
-				if(isset($area[0][0])&&is_numeric($area[0][0])&&$area[0][0]>0) {
-					$search .= "&playfield_id=".$area[0][0];
+				$area = $this->bot->db->select(
+					"select zoneid from #___land_control_zones where area = '".$iarea."' LIMIT 1"
+				);				
+				foreach ($this->towers as $tower) {
+					if($tower->playfield_id==$area[0][0]) {
+						$count++;
+						$return .= $this->format($tower);
+					}
 				}
 			} elseif(is_numeric($ql)) {
-				if($ql==0) $ql = 1;
-				$mql = $ql+10;
-				$search .= "&min_ql=".$ql."&max_ql=".$mql;
-			}
-			$apiurl = $this->bot->core("settings")->get("LandControl", "ApiUrl");
-			$content = $this->bot->core("tools")->get_site($apiurl.$search);
-			if (!($content instanceof BotError)) {
-				if (strpos($content, '{"count":') !== false) {
-					$datas = json_decode($content);
-					$count = count($datas->results);
-					$return .= $count." all-side field(s) found :";
-					$return .= $this->format($content);
+				foreach ($this->towers as $tower) {
+					if($ql>=$tower->min_ql&&$ql<=$tower->max_ql) {
+						$count++;
+						$return .= $this->format($tower);
+					}
 				}
 			}
 		}
 		return $this->bot->core("tools")
-                ->make_blob("Land Control Areas", $return."<br><br>*: Hot/Cold states provided by Tyrence's API courtesy of Unk & Draex");			
+                ->make_blob($count." Land Control Areas", $return."<br><br>*: Hot/Cold states provided by Nady's API");			
     }
 	
 
     function show_plant()
     {
 		$return = "";
-		$search = "?limit=50&enabled=1&planted=0";
-		$apiurl = $this->bot->core("settings")->get("LandControl", "ApiUrl");
-		$content = $this->bot->core("tools")->get_site($apiurl.$search);
-		if (!($content instanceof BotError)) {
-			if (strpos($content, '{"count":') !== false) {
-				$datas = json_decode($content);
-				$count = count($datas->results);
-				$return .= $count." unplanted field(s) found :";
-				$return .= $this->format($content);
+		$count = 0;
+		foreach ($this->towers as $tower) {
+			if($tower->enabled==true&&$tower->plant_time==null) {
+				$count++;
+				$return .= $this->format($tower);
 			}
 		}
 		return $this->bot->core("tools")
-                ->make_blob("Land Control Areas", $return."<br><br>*: Hot/Cold states provided by Tyrence's API courtesy of Unk & Draex");			
+                ->make_blob($count." Unplanted Field(s)", $return."<br><br>*: Hot/Cold states provided by Nady's API");			
     }	
 
 	
-	function format($content)
+	function format($result)
 	{
-		$datas = json_decode($content);
-		$return = "";
-		$secday = time() % 86400;
-		foreach($datas->results AS $result) {				
-			if ($result->faction == "Omni") { $color = "aqua"; }
-			elseif ($result->faction == "Clan") { $color = "orange"; }
-			else { $color = "gray"; }		
-			$state = "Unknown (?) current state ...";		
-			if($result->penalty_duration!=null&&$result->penalty_duration>0&&$result->penalty_until!=null&&$result->penalty_until>0) $penal = $result->penalty_until - time();
-			else $penal = 0;
-			if($penal<0) $penal = 0;
-			if($result->close_time!=null&&$result->close_time>0) {
-				$diff = $result->close_time - $secday;
-				if ($diff<0) $diff = $diff+86400;
-				if ($diff<=3600&&$diff>$penal) {
-					$state = "##yellow##CLOSING##end## (5%) off in ".$this->times($diff)." m";
-				} elseif ($diff<=21600&&$diff>$penal) {
-					$state = "##green##OPENED##end## (25%) off in ".$this->times($diff)." m";
-				} elseif ($penal>0) {
-					$state = "##yellow##PENALIZED##end## (25%) off in ".$this->times($penal)." m";
+		$return = "";		
+		if ($result->org_faction == "Omni") { $color = "aqua"; }
+		elseif ($result->org_faction == "Clan") { $color = "orange"; }
+		else { $color = "gray"; }		
+		$state = "##gray##Disabled ...##end##";
+		$def = "0D(0C+0T)";
+		if($result->enabled==true) {
+			if ($result->plant_time!=null) {
+				if ($result->gas==5) {
+					$state = "##yellow##CLOSING##end##(5%)";
+				} elseif ($result->gas==25) {
+					$state = "##green##OPENED##end##(25%)";
 				} else {
-					$upin = $diff-21600;				
-					$state = "##red##CLOSED##end## (75%) up in ".$this->times($upin)." m";
+					$state = "##red##CLOSED##end##(75%)";
 				}
+				$c = $result->num_conductors;
+				$t = $result->num_turrets;
+				$d = $t+$c;
+				$l = "##green##";
+				if($d>20) $l = "##yellow##";
+				if($d>40) $l = "##red##";
+				$def = $l.$d."D##end##(".$c."C+".$t."T)";
+			} else {
+				$state = "##white##Unplanted !!!##end##";
 			}
-			if($result->ql==null) { $rql="?"; } else { $rql=$result->ql; }
-			if($result->faction==null) { $rf="?"; } else { $rf=$result->faction; }
-			if($result->org_name==null) { $ron="?"; } else { $ron=$result->org_name; }
-			$return .= "<br><br>".$result->playfield_short_name." ".$result->site_number."x"
-					. "<br> Range: " . $result->min_ql . "-" . $result->max_ql
-					. "<br> Coord: " . $this->coords($result->x_coord,$result->y_coord,$result->playfield_id,$result->site_name)
-					. "<br> Infos: " . "QL ".$rql." CT of ".$rf." ##".$color."##".$ron."##end##"
-					. "<br> State*: " . $state;
-		}	
+		}
+		if($result->ql==null) { $rql="?"; } else { $rql=$result->ql; }
+		if($result->org_faction==null) { $rf="?"; } else { $rf=$result->org_faction; }
+		if($result->org_name==null) { $ron="?"; } else { $ron=$result->org_name; }
+		$infos = $this->bot->db->select(
+			"select short from #___land_control_zones where name = '".addslashes($result->name)."' LIMIT 1"
+		);		
+		$return .= "<br><br>".$infos[0][0]." ".$result->site_id."x"
+				. "<br> Range: " . $result->min_ql . "-" . $result->max_ql
+				. "<br> Coord: " . $this->coords($result->center->x,$result->center->y,$result->playfield_id,$result->name)
+				. "<br> Infos: " . "QL ".$rql." CT of ".$rf." ##".$color."##".$ron."##end##"
+				. "<br> State*: Gas=" . $state ." / Def=".$def;
 		return $return;
 	}
-
-	
-    function times($sec)
-    {
-		$min = ceil($sec/60);
-		if($min>60) {
-			$hour = floor($sec/3600);
-			$rest = $sec-($hour*3600);
-			$min = $hour." h ".ceil($rest/60);
-		}
-		return $min;
-    }	
-
 	
     function coords($x,$y,$zid,$name)
     {
