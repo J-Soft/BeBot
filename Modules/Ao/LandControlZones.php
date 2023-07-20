@@ -156,6 +156,8 @@ class LandControlZones extends BaseActiveModule
 	
     function show_hot($ql = null)
     {
+		$datas = array();
+		$temp = array();
 		$return = "";
 		$count = 0;
 		if($ql==NULL || !is_numeric($ql) || $ql<0 || $ql>250) {
@@ -163,7 +165,8 @@ class LandControlZones extends BaseActiveModule
 			foreach ($this->towers as $tower) {
 				if($tower->gas!=75&&$tower->enabled==true&&$tower->plant_time!=null) {
 					$count++;
-					$return .= $this->format($tower);
+					$temp = $this->format($tower);
+					$datas[$temp[0]][$temp[1]] = $temp[2];
 				}
 			}
 		} else {
@@ -171,8 +174,18 @@ class LandControlZones extends BaseActiveModule
 			foreach ($this->towers as $tower) {
 				if($ql>=$tower->min_ql&&$ql<=$tower->max_ql&&$tower->gas!=75&&$tower->enabled==true&&$tower->plant_time!=null) {
 					$count++;
-					$return .= $this->format($tower);
+					$temp = $this->format($tower);
+					$datas[$temp[0]][$temp[1]] = $temp[2];
 				}
+			}
+		}
+		ksort($datas);
+		foreach($datas AS $data => $val) {
+			ksort($datas[$data]);
+		}
+		foreach($datas AS $data) {
+			foreach($data AS $val => $ret) {
+				$return .= $ret;
 			}
 		}
 		return $this->bot->core("tools")
@@ -182,6 +195,8 @@ class LandControlZones extends BaseActiveModule
 	
     function show_lc($iarea = null, $ql = null)
     {
+		$datas = array();
+		$temp = array();
 		$return = "";
 		$count = 0;
         if ($iarea == "--all--") {
@@ -205,19 +220,34 @@ class LandControlZones extends BaseActiveModule
 				$area = $this->bot->db->select(
 					"select zoneid from #___land_control_zones where area = '".$iarea."' LIMIT 1"
 				);				
-				foreach ($this->towers as $tower) {
-					if($tower->playfield_id==$area[0][0]) {
-						$count++;
-						$return .= $this->format($tower);
+				if(isset($area[0][0])) {
+					foreach ($this->towers as $tower) {
+						if($tower->playfield_id==$area[0][0]) {
+							$count++;
+							$temp = $this->format($tower);
+							$datas[$temp[0]][$temp[1]] = $temp[2];
+						}
 					}
+				} else {
+					$return = "Wrong area, please retry with a valid name in the list of !lc.";
 				}
 			} elseif(is_numeric($ql)) {
 				foreach ($this->towers as $tower) {
 					if($ql>=$tower->min_ql&&$ql<=$tower->max_ql) {
 						$count++;
-						$return .= $this->format($tower);
+						$temp = $this->format($tower);
+						$datas[$temp[0]][$temp[1]] = $temp[2];
 					}
 				}
+			}
+		}
+		ksort($datas);
+		foreach($datas AS $data => $val) {
+			ksort($datas[$data]);
+		}
+		foreach($datas AS $data) {
+			foreach($data AS $val => $ret) {
+				$return .= $ret;
 			}
 		}
 		return $this->bot->core("tools")
@@ -227,14 +257,26 @@ class LandControlZones extends BaseActiveModule
 
     function show_plant()
     {
+		$datas = array();
+		$temp = array();
 		$return = "";
 		$count = 0;
 		foreach ($this->towers as $tower) {
 			if($tower->enabled==true&&$tower->plant_time==null) {
 				$count++;
-				$return .= $this->format($tower);
+				$temp = $this->format($tower);
+				$datas[$temp[0]][$temp[1]] = $temp[2];
 			}
 		}
+		ksort($datas);
+		foreach($datas AS $data => $val) {
+			ksort($datas[$data]);
+		}
+		foreach($datas AS $data) {
+			foreach($data AS $val => $ret) {
+				$return .= $ret;
+			}
+		}	
 		return $this->bot->core("tools")
                 ->make_blob($count." Unplanted Field(s)", $return."<br><br>CT QL/Org, Gas state/timer & Def Conductor+Turret provided by Nady's API");
     }	
@@ -242,7 +284,8 @@ class LandControlZones extends BaseActiveModule
 	
 	function format($result)
 	{
-		$return = "";		
+		$datas = array();
+		$return = "";	
 		if ($result->org_faction == "Omni") { $color = "aqua"; }
 		elseif ($result->org_faction == "Clan") { $color = "orange"; }
 		else { $color = "gray"; }		
@@ -284,7 +327,10 @@ class LandControlZones extends BaseActiveModule
 				. "<br> Coord: " . $this->coords($result->center->x,$result->center->y,$result->playfield_id,$result->name)
 				. "<br> Infos: " . "QL ".$rql." CT of ".$rf." ##".$color."##".$ron."##end##"
 				. "<br> State: Gas=" . $state;
-		return $return;
+		$datas[] = $result->playfield_id;
+		$datas[] = $result->site_id;
+		$datas[] = $return;
+		return $datas;
 	}
 
 	function clean($next)
