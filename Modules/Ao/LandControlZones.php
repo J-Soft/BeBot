@@ -1,7 +1,7 @@
 <?php
 /*
 * Database of the land control zones, based on code by Wolfbiter, modified by Pharexys.
-* Improved by Bitnykk using Tyrence's API courtesy of Unk & Draex
+* Improved by Bitnykk first using Tyrence's API courtesy of Unk & Draex, then Nady's API
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
 * Copyright (C) 2005-2020 J-Soft and the BeBot development team.
@@ -159,24 +159,24 @@ class LandControlZones extends BaseActiveModule
 		$return = "";
 		$count = 0;
 		if($ql==NULL || !is_numeric($ql) || $ql<0 || $ql>250) {
-			$return .= "Any QL currently Hot sites :";
+			$return .= "Any QL currently hot sites :";
 			foreach ($this->towers as $tower) {
-				if($tower->gas!=75&&$tower->enabled==true) {
+				if($tower->gas!=75&&$tower->enabled==true&&$tower->plant_time!=null) {
 					$count++;
 					$return .= $this->format($tower);
 				}
 			}
 		} else {
-			$return .= "Around QL ".$ql." currently Hot sites :";
+			$return .= "Around QL ".$ql." currently hot sites :";
 			foreach ($this->towers as $tower) {
-				if($ql>=$tower->min_ql&&$ql<=$tower->max_ql&&$tower->gas!=75&&$tower->enabled==true) {
+				if($ql>=$tower->min_ql&&$ql<=$tower->max_ql&&$tower->gas!=75&&$tower->enabled==true&&$tower->plant_time!=null) {
 					$count++;
 					$return .= $this->format($tower);
 				}
 			}
 		}
 		return $this->bot->core("tools")
-                ->make_blob($count." Hot Notum Field(s)", $return."<br><br>*: Hot/Cold states provided by Nady's API");		
+                ->make_blob($count." Hot Notum Field(s)", $return."<br><br>CT QL/Org, Gas state/timer & Def Conductor+Turret provided by Nady's API");		
 	}
 
 	
@@ -221,7 +221,7 @@ class LandControlZones extends BaseActiveModule
 			}
 		}
 		return $this->bot->core("tools")
-                ->make_blob($count." Land Control Areas", $return."<br><br>*: Hot/Cold states provided by Nady's API");			
+                ->make_blob($count." Land Control Areas", $return."<br><br>CT QL/Org, Gas state/timer & Def Conductor+Turret provided by Nady's API");			
     }
 	
 
@@ -236,7 +236,7 @@ class LandControlZones extends BaseActiveModule
 			}
 		}
 		return $this->bot->core("tools")
-                ->make_blob($count." Unplanted Field(s)", $return."<br><br>*: Hot/Cold states provided by Nady's API");			
+                ->make_blob($count." Unplanted Field(s)", $return."<br><br>CT QL/Org, Gas state/timer & Def Conductor+Turret provided by Nady's API");
     }	
 
 	
@@ -247,15 +247,20 @@ class LandControlZones extends BaseActiveModule
 		elseif ($result->org_faction == "Clan") { $color = "orange"; }
 		else { $color = "gray"; }		
 		$state = "##gray##Disabled ...##end##";
-		$def = "0D(0C+0T)";
+		$def = "##gray##?D##end##(?C+?T)";
 		if($result->enabled==true) {
 			if ($result->plant_time!=null) {
+				$times = $this->times($result->plant_time,$result->timing);
 				if ($result->gas==5) {
-					$state = "##yellow##CLOSING##end##(5%)";
+					$state = "##yellow##CLOSING##end##(5%) / Closes in ".$this->clean($times[0]);
 				} elseif ($result->gas==25) {
-					$state = "##green##OPENED##end##(25%)";
+					if($result->gas==$times[2]) {
+						$state = "##green##OPENED##end##(25%) / Closes in ".$this->clean($times[0]);
+					} else {
+						$state = "##orange##PENALTIED##end##(25%) / For about 1h or 2h ...";
+					}
 				} else {
-					$state = "##red##CLOSED##end##(75%)";
+					$state = "##red##CLOSED##end##(75%) / Opens in ".$this->clean($times[1]);
 				}
 				$c = $result->num_conductors;
 				$t = $result->num_turrets;
@@ -275,12 +280,126 @@ class LandControlZones extends BaseActiveModule
 			"select short from #___land_control_zones where name = '".addslashes($result->name)."' LIMIT 1"
 		);		
 		$return .= "<br><br>".$infos[0][0]." ".$result->site_id."x"
-				. "<br> Range: " . $result->min_ql . "-" . $result->max_ql
+				. "<br> Range: " . $result->min_ql . "-" . $result->max_ql." / Def=".$def
 				. "<br> Coord: " . $this->coords($result->center->x,$result->center->y,$result->playfield_id,$result->name)
 				. "<br> Infos: " . "QL ".$rql." CT of ".$rf." ##".$color."##".$ron."##end##"
-				. "<br> State*: Gas=" . $state ." / Def=".$def;
+				. "<br> State: Gas=" . $state;
 		return $return;
 	}
+
+	function clean($next)
+	{
+        $now = time();
+		$left = $next-$now;
+        $hour = floor($left/3600);
+        $left = $left - ($hour*3600);
+        $min = floor($left/60);
+        $sec = $left - ($min*60);
+		if ($sec < 10) { $sec = "0".$sec; }
+        if ($hour < 10) { $hour = "0".$hour; }
+        if ($min < 10) { $min = "0".$min; }
+		$msg = $hour."h".$min."m".$sec."s";
+		return $msg;
+    }	
+	
+    function times($plant,$type)
+    {
+		$times = array();
+		$now = time();
+		$ms = date('i:s', $plant);
+		$hms = date('H:i:s', $plant);
+		if($type=="StaticEurope") {
+			$closed = new DateTime('today 20:'.$ms);
+			$closet = $closed->getTimestamp();
+			$opened = new DateTime('today 14:'.$ms);
+			$openet = $opened->getTimestamp();			
+			if($now<$closet&&$now>$openet) {
+				$curgas = 25;
+				$fived = new DateTime('today 19:'.$ms);
+				$fivet = $fived->getTimestamp();
+				if($now<$closet&&$now>$fivet) {
+					$curgas = 5;
+				}
+			} else {
+				$curgas = 75;
+			}
+			if($closet<$now) {
+				$closed = new DateTime('tomorrow 20:'.$ms);
+				$closet = $closed->getTimestamp();
+			}		
+			if($openet<$now) {
+				$opened = new DateTime('tomorrow 14:'.$ms);
+				$openet = $opened->getTimestamp();
+			}				
+		} elseif($type=="StaticUS") {
+			$closed = new DateTime('today 04:'.$ms);
+			$closet = $closed->getTimestamp();
+			$opened = new DateTime('today 22:'.$ms);
+			$openet = $opened->getTimestamp();					
+			if($now<$closet||$now>$openet) {
+				$curgas = 25;
+				$fived = new DateTime('today 03:'.$ms);
+				$fivet = $fived->getTimestamp();
+				if($now<$closet&&$now>$fivet) {
+					$curgas = 5;
+				}
+			} else {
+				$curgas = 75;
+			}
+			if($closet<$now) {
+				$closed = new DateTime('tomorrow 04:'.$ms);
+				$closet = $closed->getTimestamp();
+			}		
+			if($openet<$now) {
+				$opened = new DateTime('tomorrow 22:'.$ms);
+				$openet = $opened->getTimestamp();
+			}			
+		} else { // "Dynamic"
+			$closed = new DateTime('today '.$hms);
+			$closet = $closed->getTimestamp();
+			$dynop = $plant+64800;
+			$dynhms = date('H:i:s', $dynop);
+			$opened = new DateTime('today '.$dynhms);
+			$openet = $opened->getTimestamp();
+			$dynfiv = $dynop+18000;
+			$fivhms = date('H:i:s', $dynfiv);					
+			if($closet>$openet) {	
+				if($now<$closet&&$now>$openet) {
+					$curgas = 25;
+					$fived = new DateTime('today '.$fivhms);
+					$fivet = $fived->getTimestamp();
+					if($now<$closet&&$now>$fivet) {
+						$curgas = 5;
+					}
+				} else {
+					$curgas = 75;
+				}				
+			} else {
+				if($now<$closet||$now>$openet) {
+					$curgas = 25;
+					$fived = new DateTime('today '.$fivhms);
+					$fivet = $fived->getTimestamp();
+					if($now<$closet&&$now>$fivet) {
+						$curgas = 5;
+					}
+				} else {
+					$curgas = 75;
+				}				
+			}
+			if($closet<$now) {
+				$closed = new DateTime('tomorrow '.$hms);
+				$closet = $closed->getTimestamp();
+			}
+			if($openet<$now) {
+				$opened = new DateTime('tomorrow '.$dynhms);
+				$openet = $opened->getTimestamp();
+			}				
+		}
+		$times[] = $closet;
+		$times[] = $openet;
+		$times[] = $curgas;
+        return $times;
+    }
 	
     function coords($x,$y,$zid,$name)
     {
