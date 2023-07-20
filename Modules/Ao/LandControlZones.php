@@ -285,7 +285,8 @@ class LandControlZones extends BaseActiveModule
 	function format($result)
 	{
 		$datas = array();
-		$return = "";	
+		$return = "";
+		$msg = "";
 		if ($result->org_faction == "Omni") { $color = "aqua"; }
 		elseif ($result->org_faction == "Clan") { $color = "orange"; }
 		else { $color = "gray"; }		
@@ -299,8 +300,21 @@ class LandControlZones extends BaseActiveModule
 				} elseif ($result->gas==25) {
 					if($result->gas==$times[2]) {
 						$state = "##green##OPENED##end##(25%) / Closes in ".$this->clean($times[0]);
-					} else {
-						$state = "##orange##PENALTIED##end##(25%) / For about 1h or 2h ...";
+					} else {				
+						$msg = "For about 1h or 2h";
+						if ($this->bot->exists_module("towerattack")) {
+							$check = $this->bot->db->select(
+								"select time from #___tower_attack where off_guild = '".addslashes($result->org_name)."' ORDER BY time DESC LIMIT 1"
+							);
+							if(isset($check[0][0])&&is_numeric($check[0][0])&&$check[0][0]>0) {
+								$now = time();
+								$end = $check[0][0]+5400;
+								if($now<$end) {
+									$msg = "For approx ".$this->clean($end);
+								}
+							}
+						}						
+						$state = "##orange##PENALTIED##end##(25%) / ".$msg;
 					}
 				} else {
 					$state = "##red##CLOSED##end##(75%) / Opens in ".$this->clean($times[1]);
