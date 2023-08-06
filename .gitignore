@@ -21,3 +21,5 @@ Custom/Modules/*
 Extras/Scripts/*
 Extras/History/*
 Extras/Bank/*
+
+docker-compose.override.yaml

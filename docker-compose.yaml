@@ -8,10 +8,10 @@ services:
     container_name: bebot
     hostname: bebot
     volumes:
-      - ./BeBot-master/:/BeBot-master/
-    working_dir: /BeBot-master/
+      - ./:/BeBot-master/
+    working_dir: /BeBot-master
     environment:
-      OSTYPE: "unix"
+      OSTYPE: "docker"
     command:
       - php
       - StartBot.php
