@@ -1,0 +1,17 @@
+version: '3'
+services:
+
+  bebot:
+    build:
+      context: .
+      dockerfile: .Dockerfile
+    container_name: bebot
+    hostname: bebot
+    volumes:
+      - ./BeBot-master/:/BeBot-master/
+    working_dir: /BeBot-master/
+    environment:
+      OSTYPE: "unix"
+    command:
+      - php
+      - StartBot.php
