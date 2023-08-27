@@ -1052,8 +1052,8 @@ class AOChat
 		try {
 			socket_write($this->socket, $data, strlen($data));
 		} catch(Throwable $e) { // if the AO bot is proxied while any of its accounts is frozen this will occur ...
-			 if (strtolower(AOCHAT_GAME) == 'ao') { $this->defreeze(); }
-			 else { die("AoC server connection lost ..."); }
+			 if (strtolower(AOCHAT_GAME) == 'ao' && $this->bot->port>9000) { $this->defreeze(); }
+			 else { die("Server connection seems lost ..."); }
 		}
         return true;
     }
