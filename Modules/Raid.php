@@ -75,6 +75,8 @@ class Raid extends BaseActiveModule
         $this->register_command("all", "raidstats", "LEADER");
         $this->register_command("all", "raidstat", "GUEST");
 		$this->register_command("all", "raidhelp", "LEADER");
+		$this->register_command("all", "raidtool", "ADMIN");
+		$this->register_command("all", "raidclear", "ADMIN");
         if (strtolower($this->bot->game) == 'ao') {
             $this->register_event("pgleave");
             $this->register_event("pgjoin");
@@ -217,6 +219,8 @@ class Raid extends BaseActiveModule
         $this->help['command']['c'] = "Raid command. Display cocoon warning in a highly visiable manner.";
         $this->help['command']['f'] = "Raid command. Display fence alert in a highly visiable manner.";
 		$this->help['command']['raidhelp'] = "Explains basics of raid commands for returning or new RLs.";
+		$this->help['command']['raidtool'] = "Show raids of too small duration under 30 min.";
+		$this->help['command']['raidclear'] = "Removes all entries and stats of a specific raid.";
         $this->help['notes'] = "All commands except join and leave are restricted to users with " . $this->bot
                 ->core("settings")->get('Raid', 'Command') . " or higher access.";
         $this->bot->db->query(
@@ -269,7 +273,13 @@ class Raid extends BaseActiveModule
                 Break;
             case 'raidstats':
                 Return $this->raid_stats($name, $var[1]);
-                Break;		
+                Break;	
+            case 'raidtool':
+                Return $this->raid_tool($name, $var[1]);
+                Break;
+            case 'raidclear':
+                Return $this->raid_clear($name, $var[1]);
+                Break;				
             case 'raidhelp':
                 Return $this->raid_help($name);
                 Break;						
@@ -694,6 +704,52 @@ class Raid extends BaseActiveModule
 			return $this->top_raid($name, $source, $player);
 		}
 	}
+
+    /*
+    This gets called by tool
+    */
+    function raid_tool($name, $skip)
+    {
+		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
+		$pager = 20; $range = $skip+$pager;		
+		$total = $this->bot->db->select("SELECT COUNT(DISTINCT(time)) FROM #___raid_log WHERE end < (time + 1800)");
+		if($range>$total[0][0]) { $range = $total[0][0]; }
+		$tool = $this->bot->db->select("SELECT DISTINCT(time) FROM #___raid_log WHERE end < (time + 1800) ORDER BY time DESC LIMIT ".$skip.", ".$pager);
+		$inside = "";
+		$cur = 0;
+		foreach($tool as $entry) {
+			$id = $total[0][0]-($skip+$cur);
+			$cur++;
+			$date = date('Y M D d H:i', $entry[0]);
+			$details = $this->bot->db->select("SELECT * FROM #___raid_details WHERE time =".$entry[0]);
+			if (count($details)==1) {
+				$rl = $details[0][1];
+				$desc = $details[0][2];
+				$note = $details[0][3];
+			} else {
+				$rl = "?";
+				$desc = "?";
+				$note = "?";
+			}
+			$stats = $this->bot->db->select("SELECT COUNT(*) FROM #___raid_log WHERE time =".$entry[0]);
+			if(isset($stats[0][0])&&$stats[0][0]>=0) {
+				$joiners = $stats[0][0];
+			} else {
+				$joiners = "?";
+			}
+			$inside .= "#".$id." ".$date." : ".$desc." by ".$rl." (".$note.") - Joined[".$joiners."] X ".$this->bot->core("tools")->chatcmd("raidclear ".$entry[0], "Clear!")."\n\n";
+		}
+		$back = $skip-$pager;
+		if($back>=0) {
+			$inside .= " ".$this->bot->core("tools")->chatcmd("raidtool ".$back, "Back")." ";
+		}		
+		if($range<$total[0][0]) {
+			$inside .= " ".$this->bot->core("tools")->chatcmd("raidtool ".$range, "Next")." ";
+		}
+		$first = $skip+1;
+		Return ("Raid Tool ".$first."-".$range." / ".$total[0][0]." :: " . $this->bot
+				->core("tools")->make_blob("click to view", $inside));
+    }
 	
     /*
     This gets called for history
@@ -761,6 +817,18 @@ class Raid extends BaseActiveModule
 		Return ("Raid Stats ".$ts." :: " . $this->bot
 				->core("tools")->make_blob("click to view", $inside));		
     }	
+	
+    /*
+    This gets called for a given raid clear
+    */
+    function raid_clear($name, $ts)
+    {
+		if ( !is_numeric($ts) ) { Return "No timestamp provided"; }
+		$clear = $this->bot->db->query("DELETE FROM #___raid_log WHERE time =".$ts);
+		$clear = $this->bot->db->query("DELETE FROM #___raid_damage WHERE time =".$ts);
+		$clear = $this->bot->db->query("DELETE FROM #___raid_details WHERE time =".$ts);
+		Return "Database has been fully cleared of this raid.";
+    }		
 
     /*
     This gets called on restart
