@@ -219,7 +219,7 @@ class Raid extends BaseActiveModule
         $this->help['command']['c'] = "Raid command. Display cocoon warning in a highly visiable manner.";
         $this->help['command']['f'] = "Raid command. Display fence alert in a highly visiable manner.";
 		$this->help['command']['raidhelp'] = "Explains basics of raid commands for returning or new RLs.";
-		$this->help['command']['raidtool'] = "Show raids of too small duration under 30 min.";
+		$this->help['command']['raidtool'] = "Show raids of too small duration under 20 min.";
 		$this->help['command']['raidclear'] = "Removes all entries and stats of a specific raid.";
         $this->help['notes'] = "All commands except join and leave are restricted to users with " . $this->bot
                 ->core("settings")->get('Raid', 'Command') . " or higher access.";
@@ -712,9 +712,9 @@ class Raid extends BaseActiveModule
     {
 		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
 		$pager = 20; $range = $skip+$pager;		
-		$total = $this->bot->db->select("SELECT COUNT(DISTINCT(time)) FROM #___raid_log WHERE end < (time + 1800)");
+		$total = $this->bot->db->select("SELECT COUNT(DISTINCT(time)) FROM #___raid_log WHERE end < (time + 1200)");
 		if($range>$total[0][0]) { $range = $total[0][0]; }
-		$tool = $this->bot->db->select("SELECT DISTINCT(time) FROM #___raid_log WHERE end < (time + 1800) ORDER BY time DESC LIMIT ".$skip.", ".$pager);
+		$tool = $this->bot->db->select("SELECT DISTINCT(time) FROM #___raid_log WHERE end < (time + 1200) ORDER BY time DESC LIMIT ".$skip.", ".$pager);
 		$inside = "";
 		$cur = 0;
 		foreach($tool as $entry) {
