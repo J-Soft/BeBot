@@ -1,5 +1,5 @@
 -------------------------
-Release 0.7.27 - ... 2023 
+Release 0.7.27 - Sep 2023 
 -------------------------
 - For both: relay, count, mail & discord fixed ; raidhelp & raidtool/clear added
 - For AO: raidloot, lc/hot/plant, defreezer, apf & raidhistory improved
