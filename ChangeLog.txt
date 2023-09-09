@@ -1,4 +1,11 @@
 -------------------------
+Release 0.7.28 - ... 202. 
+-------------------------
+- For both: ...
+- For AO: ...
+- For AoC: ...
+
+-------------------------
 Release 0.7.27 - Sep 2023 
 -------------------------
 - For both: relay, count, mail & discord fixed ; raidhelp & raidtool/clear added
