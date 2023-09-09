@@ -102,7 +102,7 @@ class OnlineCounting extends BaseActiveModule
 		return $this->bot->db->select(
             "SELECT DISTINCT(t1.nickname), t2.level" . $aodefrankid . " FROM " . $this->bot
                 ->core("online")
-                ->full_tablename() . " WHERE t2.org_name = '" . $orgname . "' ORDER BY t1.nickname ASC"
+                ->full_tablename() . " WHERE t2.org_name = '" . htmlentities($orgname) . "' ORDER BY t1.nickname ASC"
         );
     }
 
@@ -139,7 +139,7 @@ class OnlineCounting extends BaseActiveModule
 
     function make_org_assist($orgname)
     {
-        $org = $this->get_org_members($orgname);
+        $org = $this->get_org_members(htmlentities($orgname));
         if (empty($org)) {
             return "";
         }
@@ -147,7 +147,7 @@ class OnlineCounting extends BaseActiveModule
         foreach ($org as $mem) {
             $assist[] = "/assist " . $mem[0];
         }
-        return $this->make_assist($assist, "Check " . $orgname);
+        return $this->make_assist($assist, "Check " . htmlentities($orgname));
     }
 
 
@@ -236,7 +236,7 @@ class OnlineCounting extends BaseActiveModule
         foreach ($counts as $org) {
             $perc = (100 * $org['count']) / $totalcount;
             $orgcmd = $this->bot->core("tools")
-                ->chatcmd("count org " . $org['org'], $org['org']);
+                ->chatcmd("count org " . htmlentities($org['org']), htmlentities($org['org']));
             $orgstr = round($perc, 1) . "% " . $orgcmd . ": " . $org['count'] . " with an average level of " . round(
                     $org['avg_level'],
                     1
@@ -256,15 +256,15 @@ class OnlineCounting extends BaseActiveModule
         $pcount = $this->bot->db->select(
             "SELECT COUNT(DISTINCT t1.nickname) FROM " . $this->bot
                 ->core("online")
-                ->full_tablename() . " WHERE t2.org_name = '" . $orgname . "'"
+                ->full_tablename() . " WHERE t2.org_name = '" . htmlentities($orgname) . "'"
         );
         if ($pcount[0][0] == 0) {
             return $this->bot->core("colors")
-                ->colorize("counting_text", "No member of " . $prof . " in chat!");
+                ->colorize("counting_text", "No member of " . htmlentities($orgname) . " in chat!");
         }
         $profchars = $this->get_org_members($orgname);
         $first = 1;
-        $retstr = $pcount[0][0] . " member of " . $orgname . " in chat: ";
+        $retstr = $pcount[0][0] . " member of " . htmlentities($orgname) . " in chat: ";
         $strings = array();
         foreach ($profchars as $curchar) {
             $helpstr = $this->bot->core("colors")
@@ -323,7 +323,7 @@ class OnlineCounting extends BaseActiveModule
         }
         $orgassist = array();
         foreach ($orgs as $org) {
-            $orgblob = $this->make_org_assist($org['org']);
+            $orgblob = $this->make_org_assist(htmlentities($org['org']));
             if ($orgblob != "") {
                 $orgassist[] = $orgblob;
             }
@@ -335,11 +335,11 @@ class OnlineCounting extends BaseActiveModule
 
     function check_org_members($orgname)
     {
-        $blob = $this->make_org_assist($orgname);
+        $blob = $this->make_org_assist(htmlentities($orgname));
         if ($blob == "") {
-            return "Nobody of " . $orgname . " online!";
+            return "Nobody of " . htmlentities($orgname) . " online!";
         }
-        return $this->bot->core("tools")->make_blob("Check " . $orgname, $blob);
+        return $this->bot->core("tools")->make_blob("Check " . htmlentities($orgname), $blob);
     }
 }
 

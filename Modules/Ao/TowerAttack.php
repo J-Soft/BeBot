@@ -41,6 +41,7 @@ class TowerAttack extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
+		$this->register_module("towerattack");
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("tower_attack", "false") . "
 				(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

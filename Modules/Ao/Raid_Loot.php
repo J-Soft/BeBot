@@ -77,6 +77,7 @@ class raidloot extends BaseActiveModule
                 $this -> register_command("all", "RIS", "LEADER");
                 $this -> register_command("all", "JACK", "LEADER");
                 $this -> register_command("all", "LOX", "LEADER");
+                $this -> register_command("all", "MERCS", "LEADER");				
                 $this -> register_command("all", "ZOD", "LEADER");
                 $this -> register_command("all", "PRISONERS", "LEADER");
                 $this -> register_command("all", "POH", "LEADER");
@@ -144,6 +145,8 @@ class raidloot extends BaseActiveModule
 				$this -> help['command']['LOX 12-man']="Shows Possible Items from 12m.";
 				$this -> help['command']['LOX alienthreat']="Shows Possible Items from Sinuh.";
 				$this -> help['command']['LOX vortexx']="Shows Possible Items from Vortexx.";
+				$this -> help['command']['MERCS mercarmor']="Shows Possible armors from Mercenaries.";
+				$this -> help['command']['MERCS mercweap']="Shows Possible weapons from Mercenaries.";
                 $this -> help['command']['ZOD beast beastarmor']="Shows Possible beastarmor Loot.";
                 $this -> help['command']['ZOD beast beastweaps']="Shows Possible beastweapons Loot.";
                 $this -> help['command']['ZOD beast beaststars']="Shows Possible beaststars Loot.";
@@ -497,6 +500,24 @@ class raidloot extends BaseActiveModule
                                                 break;
                                 }
                                 break;
+                //$this -> register_command("all", "MERCS", "LEADER");
+                        case 'MERCS':
+                                switch($subcom)
+                                {
+                                        case '':
+                                                return $this -> rloot_interface($source, 'MERCS');
+                                                break;
+                                        case 'mercarmor':
+                                                return $this -> show_aloot($source, 'mercarmor', $command);
+                                                break;
+                                        case 'mercweap':
+                                                return $this -> show_aloot($source, 'mercweap', $command);
+                                                break;
+                                        default:
+                                                return $this -> bot -> send_help($source, 'MERCS');
+                                                break;
+                                }
+                                break;								
                 //$this -> register_command("all", "ZOD", "LEADER");
                         case 'ZOD':
                                 switch($subcom)
@@ -733,7 +754,6 @@ class raidloot extends BaseActiveModule
 			unset($this->bot->core("loots")->loot); $this->bot->core("loots")->loot=array();
 			unset($this->bot->core("loots")->leftovers); $this->bot->core("loots")->leftovers=array();
 			$this->bot->core("loots")->count = 0;
-
 			$this->bot->core("loots")->loot[1]['item'] = "<a href='itemref://275909/275909/1'>Gelatinous Lump</a>";
 			$this->bot->core("loots")->loot[1]['num'] = 3;
 			$this->bot->core("loots")->loot[2]['item'] = "<a href='itemref://275916/275916/1'>Biotech Matrix</a>";
@@ -748,7 +768,7 @@ class raidloot extends BaseActiveModule
 			$this->bot->core("loots")->loot[6]['num'] = 1;
 			$this->bot->core("loots")->loot[7]['item'] = "<a href='itemref://257706/257706/1'>Kyr&#039;Ozch Helmet (2500 Token board)</a>";
 			$this->bot->core("loots")->loot[7]['num'] = 1;
-
+			$this->bot->core("loots")->count = 7;
 			$this->bot->core("loots")->rlist();
         }
 
@@ -757,7 +777,6 @@ class raidloot extends BaseActiveModule
 			unset($this->bot->core("loots")->loot); $this->bot->core("loots")->loot=array();
 			unset($this->bot->core("loots")->leftovers); $this->bot->core("loots")->leftovers=array();
 			$this->bot->core("loots")->count = 0;
-
 			$this->bot->core("loots")->loot[1]['item'] = "<a href='itemref://275912/275912/1'>Crystaline Matrix</a>";
 			$this->bot->core("loots")->loot[1]['num'] = 3;
 			$this->bot->core("loots")->loot[2]['item'] = "<a href='itemref://275914/275914/1'>Kyr&#039;Ozch Circuitry</a>";
@@ -772,7 +791,7 @@ class raidloot extends BaseActiveModule
 			$this->bot->core("loots")->loot[6]['num'] = 1;
 			$this->bot->core("loots")->loot[7]['item'] = "<a href='itemref://257706/257706/1'>Kyr&#039;Ozch Helmet (2500 Token board)</a>";
 			$this->bot->core("loots")->loot[7]['num'] = 1;
-
+			$this->bot->core("loots")->count = 7;
 			$this->bot->core("loots")->rlist();
         }
 
@@ -781,7 +800,6 @@ class raidloot extends BaseActiveModule
 			unset($this->bot->core("loots")->loot); $this->bot->core("loots")->loot=array();
 			unset($this->bot->core("loots")->leftovers); $this->bot->core("loots")->leftovers=array();
 			$this->bot->core("loots")->count = 0;
-
 			$this->bot->core("loots")->loot[1]['item'] = "<a href='itemref://275918/275918/1'>Alpha Program Chip</a>";
 			$this->bot->core("loots")->loot[1]['num'] = 3;
 			$this->bot->core("loots")->loot[2]['item'] = "<a href='itemref://275919/275919/1'>Beta Program Chip</a>";
@@ -800,7 +818,7 @@ class raidloot extends BaseActiveModule
 			$this->bot->core("loots")->loot[8]['num'] = 1;
 			$this->bot->core("loots")->loot[9]['item'] = "<a href='itemref://257706/257706/1'>Kyr&#039;Ozch Helmet (2500 Token board)</a>";
 			$this->bot->core("loots")->loot[9]['num'] = 1;
-
+			$this->bot->core("loots")->count = 9;
 			$this->bot->core("loots")->rlist();
         }
 		
@@ -809,12 +827,11 @@ class raidloot extends BaseActiveModule
 			unset($this->bot->core("loots")->loot); $this->bot->core("loots")->loot=array();
 			unset($this->bot->core("loots")->leftovers); $this->bot->core("loots")->leftovers=array();
 			$this->bot->core("loots")->count = 0;
-
 			$this->bot->core("loots")->loot[1]['item'] = "<a href='itemref://262656/262656/1'>Kyr'Ozch Invasion Plan (ACDC)</a>";
 			$this->bot->core("loots")->loot[1]['num'] = 1;
 			$this->bot->core("loots")->loot[2]['item'] = "<a href='itemref://260422/260422/1'>Unlearning Device (AI Reset)</a>";
 			$this->bot->core("loots")->loot[2]['num'] = 4;
-
+			$this->bot->core("loots")->count = 2;
 			$this->bot->core("loots")->rlist();
         }		
 		
@@ -1153,6 +1170,13 @@ class raidloot extends BaseActiveModule
                         $list .= $this -> bot -> core("tools") -> chatcmd("LOX alienthreat", "Sinuh")."\n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("LOX vortexx", "Vortexx")."\n";
                 }
+                else if($area === 'MERCS')
+                {
+                        $list = "<header>##highlight##::::: Mercenaries Loot :::::##end##<end>\n\n\n";
+                        $list .= "##highlight##\t\tEFP Loot##end##\n";
+                        $list .= $this -> bot -> core("tools") -> chatcmd("MERCS mercarmor", "Armors")."\n";
+                        $list .= $this -> bot -> core("tools") -> chatcmd("MERCS mercweap", "Weapons")."\n";
+                }				
                 else if($area === 'RHI')
                 {
                         $list = "<header>##highlight##::::: Hollow Island Loot :::::##end##<end>\n\n\n";
@@ -1260,6 +1284,8 @@ class raidloot extends BaseActiveModule
                         $list .= $this -> bot -> core("tools") -> chatcmd("JACK", "Jack Legchopper")."\n\n";
                         $list .= "##highlight##::::: Legacy of the Xan Loot :::::##end##\n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("LOX", "Legacy of the Xan")."\n\n";
+                        $list .= "##highlight##::::: Mercenaries Loot :::::##end##\n";
+                        $list .= $this -> bot -> core("tools") -> chatcmd("MERCS", "Mercenaries")."\n\n";						
                         $list .= "##highlight##::::: Pandemonium Loot :::::##end##\n";
                         $list .= $this -> bot -> core("tools") -> chatcmd("ZOD", "Pandemonium")."\n\n";
                         $list .= "##highlight##::::: Prisoners Loot :::::##end##\n";

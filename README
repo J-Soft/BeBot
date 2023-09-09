@@ -166,7 +166,7 @@ To make a guild bot set "$guildbot" to true. Change "$guild_name" to the
 exact name of your guild. 
 
 AO only: Set "$guild_id" to the id of your guild. The easiest way to find 
-out the guild ID go http://www.anarchy-online.com/content/community/people/
+out the guild ID go https://people.anarchy-online.com/
 and find your guild. Then scroll to the bottom of the page and click the
 "XML version of this membership roster" link.
 It will start with:
@@ -211,7 +211,7 @@ For linux it could be :
   yum install mysql-server
 It depends on your OS packager (yum/apt) & what DB server you want (sql/maria).
   
-For windows : Download the Windows Essentials package from MySQL.com.
+For windows : Download the Windows Essentials package from MySQL.com
 This is a MSI based installer. If it doesn't work for you, go to 
 Microsoft Update to install the latest Windows Installer. 
 
@@ -278,7 +278,7 @@ PHASE 4: CREATE A DATABASE AND DATABASE USER FOR BEBOT
     (Change username and newpassword to your selected username and password, again keep @localhost)
 6.	Press Enter/Return. 
 7.	Type GRANT ALL on databasename.* TO username@localhost; 
-    (Again, change username, keep @localhost)
+    (Again, change username and databasename, keep @localhost)
 8.	Press Enter/Return. 
 9.	Type quit then Enter/Return to exit the MySQL Monitor. 
 

@@ -340,9 +340,8 @@ class BanManager extends BaseActiveModule
             } elseif (stristr($duration, 'y')) {
                 $timesize = 60 * 60 * 24 * 365;
             }
-			
-            settype($duration, "integer");
-            $endtime = time() + $duration * $timesize;
+			$int = intval($duration);
+            $endtime = time() + $int * $timesize;
         }
         $ban = $this->bot->core("security")
             ->set_ban($source, $user, $source, $reason, $endtime);

@@ -397,6 +397,50 @@ class AOChat
         return 0;
     }
 
+    /*
+    Defreeze function
+    */
+    function defreeze()
+    {	
+		$counter = 0; $confpath = "./Conf";
+		if ($handle = opendir($confpath)) {
+			while (false !== ($filename = readdir($handle))) {
+				if($filename!="."&&$filename!=".."&&$filename!="Aoaccount.ini") {
+					$file = pathinfo($filename, PATHINFO_FILENAME);
+					$ext = pathinfo($filename, PATHINFO_EXTENSION);
+					if ($ext=="ini"&&strpos($file, '.') === false) {
+						$this->bot->log("LOGIN", "AUTH", "Opening Conf/".$file.".ini");
+						$content = file_get_contents($confpath."/".$file.".ini");
+						$line = preg_split('#\r?\n#', $content, 0);			
+						for($i=0;$i<count($line);$i++) {
+							if(preg_match('/\$ao_account_pass = "([^"]+)"/',$line[$i],$value)&&$value[1]!="") {								
+								$ao_account_user = strtolower($file);
+								$ao_account_pass = $value[1];
+								$tasks = array(); // Structure : socket target (+ optional port & session cookie) & list of task (each with url + optional data array)
+								$tasks["target"] = "https://account.anarchy-online.com";
+								$tasks["port"] = 443;
+								$tasks["cookie"] = "session_id";
+								$tasks["task"][0]["url"] = "https://account.anarchy-online.com"; // to get session cookie
+								$tasks["task"][0]["data"] = "";
+								$tasks["task"][1]["url"] = "https://account.anarchy-online.com"; // to login
+								$datas = array("nickname" => $ao_account_user, "password" => $ao_account_pass);
+								$tasks["task"][1]["data"] = $datas;
+								$tasks["task"][2]["url"] = "https://account.anarchy-online.com/uncancel_sub"; // to defreeze
+								$tasks["task"][2]["data"] = "";
+								$tasks["task"][3]["url"] = "https://account.anarchy-online.com/log_out"; // to logoff
+								$tasks["task"][3]["data"] = "";
+								$defreezer = $this->bot->core("tools")->multi_site($tasks,9);
+								$counter++;
+								//file_put_contents($file."_defreezer.txt", $defreezer, FILE_APPEND | LOCK_EX); // uncomment for testing purposes only
+							}
+						}
+					}
+				}
+			}
+		}
+		if ($counter>0) die("AOChat restarting bot after attempting ".$counter." self defreezing\n");
+		else die("AOChat found no proper Conf/*.ini files to try self defreezing\n");	
+	}
 
     /*
     Authentication function
@@ -416,48 +460,11 @@ class AOChat
                                                            ));
         $this->send_packet($pak);
         $packet = $this->get_packet();
-        /* If the account was wrongly frozen we may attempt bot self defreezer below ...
+        /* If the account was wrongly frozen we may attempt bot self defreeze ...
 			But BEWARE : this can only work 5 times per 24 hours from same computer (must wait for more) */
         if ($packet->type == AOCP_LOGIN_ERROR && substr($packet->args[0],-28) == "/Account system denies login") {
             $this->bot->log("LOGIN", "AUTH", "AO account seems to be frozen, trying self defreezer");
-			$counter = 0; $confpath = "./Conf";
-			if ($handle = opendir($confpath)) {
-				while (false !== ($filename = readdir($handle))) {
-					if($filename!="."&&$filename!=".."&&$filename!="Aoaccount.ini") {
-						$file = pathinfo($filename, PATHINFO_FILENAME);
-						$ext = pathinfo($filename, PATHINFO_EXTENSION);
-						if ($ext=="ini"&&strpos($file, '.') === false) {
-							$this->bot->log("LOGIN", "AUTH", "Opening Conf/".$file.".ini");
-							$content = file_get_contents($confpath."/".$file.".ini");
-							$line = preg_split('#\r?\n#', $content, 0);			
-							for($i=0;$i<count($line);$i++) {
-								if(preg_match('/\$ao_account_pass = "([^"]+)"/',$line[$i],$value)&&$value[1]!="") {								
-									$ao_account_user = strtolower($file);
-									$ao_account_pass = $value[1];
-									$tasks = array(); // Structure : socket target (+ optional port & session cookie) & list of task (each with url + optional data array)
-									$tasks["target"] = "https://account.anarchy-online.com";
-									$tasks["port"] = 443;
-									$tasks["cookie"] = "session_id";
-									$tasks["task"][0]["url"] = "https://account.anarchy-online.com"; // to get session cookie
-									$tasks["task"][0]["data"] = "";
-									$tasks["task"][1]["url"] = "https://account.anarchy-online.com"; // to login
-									$datas = array("nickname" => $ao_account_user, "password" => $ao_account_pass);
-									$tasks["task"][1]["data"] = $datas;
-									$tasks["task"][2]["url"] = "https://account.anarchy-online.com/uncancel_sub"; // to defreeze
-									$tasks["task"][2]["data"] = "";
-									$tasks["task"][3]["url"] = "https://account.anarchy-online.com/log_out"; // to logoff
-									$tasks["task"][3]["data"] = "";
-									$defreezer = $this->bot->core("tools")->multi_site($tasks,9);
-									$counter++;
-									//file_put_contents($file."_defreezer.txt", $defreezer, FILE_APPEND | LOCK_EX); // uncomment for testing purposes only
-								}
-							}
-						}
-					}
-				}
-			}
-			if ($counter>0) die("AOChat restarting bot after attempting ".$counter." self defreezing\n");
-			else die("AOChat found no proper Conf/*.ini files to try self defreezing\n");
+			$this->defreeze();
 		}
 		// If we receive anything but the character list, something's wrong.
         if ($packet->type != AOCP_LOGIN_CHARLIST) {			
@@ -1041,7 +1048,13 @@ class AOChat
             fwrite($this->debug, $data);
             fwrite($this->debug, "\n=====\n");
         }
-        socket_write($this->socket, $data, strlen($data));
+		//socket_close($this->socket); // for testing purpose ONLY !
+		try {
+			socket_write($this->socket, $data, strlen($data));
+		} catch(Throwable $e) { // if the AO bot is proxied while any of its accounts is frozen this will occur ...
+			 if (strtolower(AOCHAT_GAME) == 'ao' && $this->bot->port>9000) { $this->defreeze(); }
+			 else { die("Server connection seems lost ..."); }
+		}
         return true;
     }
 

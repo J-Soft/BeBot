@@ -193,7 +193,7 @@ class DiscordRelay extends BaseActiveModule
 								$color = "##white##";
 								break;
 						}												
-						$sent .= $color.$member['username']."##end## ";
+						$sent .= $color.utf8_decode($member['username'])."##end## ";
 					}
 				}
 			}	
