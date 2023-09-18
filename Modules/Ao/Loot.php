@@ -408,6 +408,15 @@ class Rolls extends BaseActiveModule
     function rlist()
     {
         $msg = "";
+		$disclaim = "";
+        if (file_exists("./Text/" . $this->bot->botname . "Loot.txt")) {
+            $disclaim .= implode("", file("./Text/" . $this->bot->botname . "Loot.txt"));
+        } elseif (file_exists("./Text/Loot.txt")) {
+            $disclaim .= implode("", file("./Text/Loot.txt"));
+        }		
+		if ($disclaim != "") {
+			$msg .= $disclaim."\n\n";
+		}
 		$num = 0;
         foreach ($this->loot as $slot) {
 			$ico = "";
