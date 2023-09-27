@@ -146,6 +146,7 @@ $bot->connect();
 
 while (true) {
     if ($bot->aoc->wait_for_packet() == "disconnected") {
+		if (strtolower(AOCHAT_GAME) == 'ao' && $bot->port>9000) { $bot->aoc->defreeze(); }
         $bot->reconnect();
     }
     $bot->cron();
