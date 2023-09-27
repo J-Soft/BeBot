@@ -65,9 +65,9 @@ class admins extends BaseActiveModule
         $sql .= "ORDER BY access_level DESC, gid ASC, name";
         $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
         $owner = "##highlight##Owner (O)##end##\n";
-        $superadmins = "##highlight##Superadmin(s) (SA)##end##\n";
-        $admins = "##highlight##Admin(s) (A)##end##\n";
-        $leaders = "##highlight##Leader(s) (L)##end##\n";
+        $superadmins = "##highlight##Superadmin(s) (SA)##end##\n"; $scount = 0;
+        $admins = "##highlight##Admin(s) (A)##end##\n"; $acount = 0;
+        $leaders = "##highlight##Leader(s) (L)##end##\n"; $lcount = 0;
         //$members = "MEMBER:\n";
         //$guests = "GUEST:\n";
         //$anon = "ANONYMOUS:\n";
@@ -99,7 +99,7 @@ class admins extends BaseActiveModule
         foreach ($result as $group) {
             if ($group['access_level'] == SUPERADMIN) {
                 $users = $this->bot->core("security")->cache['groups'][$group['gid']]['members'];
-				$superadmins = count($users)." ".$superadmins;
+				$scount = count($users)+$scount;
                 if (!empty($users)) {
                     foreach ($users as $user) {
                         $main = $this->bot->core("alts")
@@ -138,7 +138,7 @@ class admins extends BaseActiveModule
                 }
             } elseif ($group['access_level'] == ADMIN) {
                 $users = $this->bot->core("security")->cache['groups'][$group['gid']]['members'];
-				$admins = count($users)." ".$admins;
+				$acount = count($users)+$acount;
                 if (!empty($users)) {
                     foreach ($users as $user) {
                         $main = $this->bot->core("alts")
@@ -176,7 +176,7 @@ class admins extends BaseActiveModule
                 }
             } elseif ($group['access_level'] == LEADER) {
                 $users = $this->bot->core("security")->cache['groups'][$group['gid']]['members'];
-				$leaders = count($users)." ".$leaders;
+				$lcount = count($users)+$lcount;
                 if (!empty($users)) {
                     foreach ($users as $user) {
                         $main = $this->bot->core("alts")
@@ -237,9 +237,9 @@ class admins extends BaseActiveModule
         }
         $inside = "##ao_ccheader##:::: <botname> Admins ::::##end##\n\n##seablue##";
         $inside .= $owner . "\n";
-        $inside .= $superadmins . "\n";
-        $inside .= $admins . "\n";
-        $inside .= $leaders . "\n";
+        $inside .= $scount." ".$superadmins . "\n";
+        $inside .= $acount." ".$admins . "\n";
+        $inside .= $lcount." ".$leaders . "\n";
         //$inside .= $members."\n";
         //$inside .= $guests."\n";
         //$inside .= $anon."\n";
