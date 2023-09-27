@@ -41,6 +41,7 @@ class admins extends BaseActiveModule
         parent::__construct($bot, get_class($this));
 
         $this->register_command('all', 'admins', 'GUEST');
+		$this -> register_alias("admins", "leaders");
 
         $this->help['description'] = 'Shows bots Admin list.';
         $this->help['command']['admins'] = "Shows the list of admins.";
@@ -64,9 +65,9 @@ class admins extends BaseActiveModule
         $sql .= "ORDER BY access_level DESC, gid ASC, name";
         $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
         $owner = "##highlight##Owner (O)##end##\n";
-        $superadmins = "##highlight##Superadmin (SA)##end##\n";
-        $admins = "##highlight##Admin (A)##end##\n";
-        $leaders = "##highlight##Leader (L)##end##\n";
+        $superadmins = "##highlight##Superadmin(s) (SA)##end##\n";
+        $admins = "##highlight##Admin(s) (A)##end##\n";
+        $leaders = "##highlight##Leader(s) (L)##end##\n";
         //$members = "MEMBER:\n";
         //$guests = "GUEST:\n";
         //$anon = "ANONYMOUS:\n";
@@ -98,6 +99,7 @@ class admins extends BaseActiveModule
         foreach ($result as $group) {
             if ($group['access_level'] == SUPERADMIN) {
                 $users = $this->bot->core("security")->cache['groups'][$group['gid']]['members'];
+				$superadmins = count($users)." ".$superadmins;
                 if (!empty($users)) {
                     foreach ($users as $user) {
                         $main = $this->bot->core("alts")
@@ -136,6 +138,7 @@ class admins extends BaseActiveModule
                 }
             } elseif ($group['access_level'] == ADMIN) {
                 $users = $this->bot->core("security")->cache['groups'][$group['gid']]['members'];
+				$admins = count($users)." ".$admins;
                 if (!empty($users)) {
                     foreach ($users as $user) {
                         $main = $this->bot->core("alts")
@@ -173,6 +176,7 @@ class admins extends BaseActiveModule
                 }
             } elseif ($group['access_level'] == LEADER) {
                 $users = $this->bot->core("security")->cache['groups'][$group['gid']]['members'];
+				$leaders = count($users)." ".$leaders;
                 if (!empty($users)) {
                     foreach ($users as $user) {
                         $main = $this->bot->core("alts")
