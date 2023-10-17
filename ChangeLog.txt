@@ -1,7 +1,7 @@
 -------------------------
 Release 0.7.28 - ... 202. 
 -------------------------
-- For both: raid, admins & defreeze improved
+- For both: irc/discord, raid, admins & defreeze improved
 - For AO: loot disclaimer added
 - For AoC: ...
 

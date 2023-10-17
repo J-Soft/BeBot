@@ -79,6 +79,7 @@ class DiscordRelay extends BaseActiveModule
 	var $lastcheck = 0;
 	var $crondelay = "2sec";
 	var $is;
+	var $note = "Discord side commands available are : help, tara, viza, is, online/sm, whois, alts, level/lvl/pvp";
 
     /*
     Constructor:
@@ -99,7 +100,7 @@ class DiscordRelay extends BaseActiveModule
         $this->help['description'] = "Handles the Discord relay of the bot.";
         $this->help['command']['discord connect'] = "Tries relaying from/to the Discord channel.";
         $this->help['command']['discord disconnect'] = "Stops relaying from/to the Discord channel.";
-        $this->help['notes'] = "The Discord relay is configured via settings, for all options check /tell <botname> <pre>settings discord. Discord side commands available are : is, online/sm, whois, alts, level/lvl/pvp";
+        $this->help['notes'] = "The Discord relay is configured via settings, for all options check /tell <botname> <pre>settings discord. ".$this->note;
         $this->bot->core("settings")
             ->create("discord", "DiscordRelay", false, "Should the bot be relaying from/to Discord server ?", "On;Off", true);	
         $this->bot->core("settings")
@@ -430,9 +431,9 @@ class DiscordRelay extends BaseActiveModule
 										case $this->bot->commpre . 'lvl':
 										case $this->bot->commpre . 'pvp':
 											$sent = $this->discord_lvl($msg['content']);
-											Break;										
+											Break;
 										Default:
-											$sent = "";
+											$sent = $this->note;
 											Break;
 									}
 									if($sent!="") {
