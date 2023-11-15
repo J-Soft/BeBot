@@ -157,6 +157,8 @@ class IRC extends BaseActiveModule
                 true,
                 "Should we announce logons and logoffs as controlled by the Logon module to IRC?"
             );
+        $this->bot->core("settings")
+            ->create("Irc", "ignoreSyntax", "", "Is there a first letter that should make the bot ignore messages for IRC relay (leave empty if none) ?");
 
         $this->bot->core("colors")->define_scheme("Irc", "Text", "normal");
         $this->bot->core("colors")->define_scheme("Irc", "User", "normal");
@@ -304,6 +306,8 @@ class IRC extends BaseActiveModule
     */
     function gmsg($name, $group, $msg)
     {
+		$ignore = $this->bot->core("settings")->get("Irc", "ignoreSyntax");
+		if($ignore!=""&&substr($msg,0,1)==$ignore) return false;		
         $msg = str_replace("&gt;", ">", $msg);
         $msg = str_replace("&lt;", "<", $msg);
         if (($this->irc != null)
@@ -347,6 +351,8 @@ class IRC extends BaseActiveModule
     */
     function privgroup($name, $msg)
     {
+		$ignore = $this->bot->core("settings")->get("Irc", "ignoreSyntax");
+		if($ignore!=""&&substr($msg,0,1)==$ignore) return false;			
         $msg = str_replace("&gt;", ">", $msg);
         $msg = str_replace("&lt;", "<", $msg);
         if (($this->irc != null)

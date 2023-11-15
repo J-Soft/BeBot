@@ -125,7 +125,10 @@ class DiscordRelay extends BaseActiveModule
                 "AOItems",
                 "Should AOItems or AUNO be used for links in item refs?",
                 "AOItems;AUNO"
-            );			
+            );
+        $this->bot->core("settings")
+            ->create("Discord", "ignoreSyntax", "", "Is there a first letter that should make the bot ignore messages for Discord relay (leave empty if none) ?");
+			
 	}
 	
     /*
@@ -281,6 +284,8 @@ class DiscordRelay extends BaseActiveModule
     */
     function gmsg($name, $group, $msg)
     {	
+		$ignore = $this->bot->core("settings")->get("Discord", "ignoreSyntax");
+		if($ignore!=""&&substr($msg,0,1)==$ignore) return false;	
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			if (strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="gc" || strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="both" ) {		
 				$channel = $this->bot->core("settings")->get("discord", "ChannelId");
@@ -363,6 +368,8 @@ class DiscordRelay extends BaseActiveModule
     */
     function privgroup($name, $msg)
     {
+		$ignore = $this->bot->core("settings")->get("Discord", "ignoreSyntax");
+		if($ignore!=""&&substr($msg,0,1)==$ignore) return false;		
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			if (strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="pgroup" || strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="both" ) {
 				$channel = $this->bot->core("settings")->get("discord", "ChannelId");
