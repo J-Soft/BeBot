@@ -715,7 +715,7 @@ class Bot
                     $to_name = $to;
                 }
                 $this->log("TELL", "OUT", "-> " . $to_name . ": " . $msg);
-                $msg = mb_convert_encoding($msg, 'UTF-8');
+                $msg = utf8_encode($msg);
                 $this->aoc->send_tell($to, $msg);
             } else {
                 $this->core("chat_queue")->into_queue($to, $msg, "tell", $low);
@@ -764,7 +764,7 @@ class Bot
         }
         if ($send) {
             $msg = $this->replace_string_tags($msg);
-            $msg = mb_convert_encoding($msg, 'UTF-8');
+            $msg = utf8_encode($msg);
             if (strtolower($group) == strtolower($this->botname)) {
                 if ($this->core("settings")->get("Core", "ColorizePGMSG")) {
                     $msg = $this->core("colors")->colorize("normal", $msg);
@@ -807,7 +807,7 @@ class Bot
                 $guild = "~Guild";
             }
             if ($this->core("chat_queue")->check_queue()) {
-                $msg = mb_convert_encoding($msg, 'UTF-8');
+                $msg = utf8_encode($msg);
                 $this->aoc->send_group($guild, $msg);
             } else {
                 $this->core("chat_queue")->into_queue($guild, $msg, "gc", $low);
@@ -1088,7 +1088,7 @@ class Bot
             //We probably sendt someone a tell when not here. Let's leave it at that.
             return;
         }
-        $args[1] = mb_convert_encoding($args[1], 'ISO-8859-1', 'UTF-8');
+        $args[1] = utf8_decode($args[1]);
         $this->log("TELL", "INC", $user . ": " . $args[1]);
         $found = $this->handle_command_input($user, $args[1], "tell");
         $found = $this->hand_to_chat($found, $user, $args[1], "tells");
@@ -1198,7 +1198,7 @@ class Bot
         if ($pgname == $this->botname && $dispgmsg && $dispgmsgchat) {
             return false;
         }
-        $args[2] = mb_convert_encoding($args[2], 'ISO-8859-1', 'UTF-8');
+        $args[2] = utf8_decode($args[2]);
         // Ignore bot chat, no need to handle it's own output as input again
         if (strtolower($this->botname) == strtolower($user)) {
             if ($this->core("settings")->get("Core", "LogPGOutput")) {
@@ -1277,7 +1277,7 @@ class Bot
         if (!$group) {
             $group = $this->core("chat")->get_gname($args[0]);
         }
-        $args[2] = mb_convert_encoding($args[2], 'ISO-8859-1', 'UTF-8');
+        $args[2] = utf8_decode($args[2]);
         if (isset($this->commands["gmsg"][$group]) || $group == $this->guildname || (strtolower(
                     $this->game
                 ) == 'aoc' && $group == "~Guild")

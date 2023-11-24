@@ -702,7 +702,7 @@ class tools extends BasePassiveModule
 	// mode : 0 cleans all, 1 cleans only specifics
 	function cleanString($msg,$mode=0) {
 		if($mode==0) {
-			$msg = strip_tags(mb_convert_encoding($msg, 'UTF-8'));
+			$msg = strip_tags(utf8_encode($msg));
 			$msg = str_replace("&gt;", ">", $msg);
 			$msg = str_replace("&lt;", "<", $msg);
 			$msg = str_replace("&amp;", "&", $msg);

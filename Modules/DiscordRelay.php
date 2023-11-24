@@ -197,7 +197,7 @@ class DiscordRelay extends BaseActiveModule
 								$color = "##white##";
 								break;
 						}												
-						$sent .= $color.mb_convert_encoding($member['username'], 'ISO-8859-1', 'UTF-8')."##end## ";
+						$sent .= $color.utf8_decode($member['username'])."##end## ";
 					}
 				}
 			}	
@@ -410,7 +410,7 @@ class DiscordRelay extends BaseActiveModule
 							if ($msg['id']>$this->lastmsg) { $this->lastmsg = $msg['id']; }
 							if ($msg['timestamp']>$this->lastcheck && !isset($msg['author']['bot'])) {
 								if(substr($msg['content'],0,1)!=$this->bot->commpre) {
-									$sent = "[Discord] ".ucfirst($msg['author']['username']).": ".strip_tags(mb_convert_encoding($msg['content'], 'ISO-8859-1', 'UTF-8'));
+									$sent = "[Discord] ".ucfirst($msg['author']['username']).": ".strip_tags(utf8_decode($msg['content']));
 									$this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
 								} else {
 									$com = explode(" ", $msg['content'], 2);
