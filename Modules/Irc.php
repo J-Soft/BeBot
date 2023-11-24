@@ -927,7 +927,6 @@ class IRC extends BaseActiveModule
     */
     function irc_receive(&$irc, &$data)
     {
-		if(mb_detect_encoding($data->message, 'ISO-8859-1', false)) $data->message = mb_convert_encoding($data->message, 'ISO-8859-1');
         if ((strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'online')))
             && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'is')))
             && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'whois')))
