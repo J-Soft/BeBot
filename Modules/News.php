@@ -241,7 +241,7 @@ class News extends BaseActiveModule
 					$valdate
                     . " GMT ##ao_cctext##" . $val[2] . "##end## Reported:\n";
 				if (mb_detect_encoding($val[3], 'UTF-8', true)) {
-					$text = utf8_decode($val[3]);
+					$text = mb_convert_encoding($val[3], 'ISO-8859-1', 'UTF-8');
 				} else {
 					$text = $val[3];
 				}					
@@ -310,7 +310,7 @@ class News extends BaseActiveModule
             return false;
         } else {
 			if (mb_detect_encoding($news[0]['news'], 'UTF-8', true)) {
-				$text = utf8_decode($news[0]['news']);
+				$text = mb_convert_encoding($news[0]['news'], 'ISO-8859-1', 'UTF-8');
 			} else {
 				$text = $news[0]['news'];
 			}				
@@ -349,7 +349,7 @@ class News extends BaseActiveModule
 					$valdate
                     . " GMT ##ao_cctext##" . $val[2] . "##end## wrote:\n";
 				if (mb_detect_encoding($val[3], 'UTF-8', true)) {
-					$text = utf8_decode($val[3]);
+					$text = mb_convert_encoding($val[3], 'ISO-8859-1', 'UTF-8');
 				} else {
 					$text = $val[3];
 				}						
@@ -378,7 +378,7 @@ class News extends BaseActiveModule
     */
     function set_news($name, $msg, $type)
     {
-		$msg = utf8_encode($msg);
+		$msg = mb_convert_encoding($msg, 'UTF-8');
         $this->bot->db->query(
             "INSERT INTO #___news (type, time, name, news) VALUES ('" . $type . "', " . time(
             ) . ", '" . $name . "', '" . addslashes($msg) . "')"

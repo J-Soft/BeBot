@@ -31,6 +31,7 @@
  * Website:	http://bebot.link/
   ***************************************************************************************************
  * Changelog:
+ *	2023-11-24	0.0.8	Updated for PHP8+ ; deprecated utf8 functions going to mb_convert_encoding
  *	2021-10-13	0.0.7	Adapted for PHP7+ & Bebot 0.7.x serie ; added idle clear/count & never seen.
  *	2018-06-03	0.0.6	Remove Yellow Gremlin integration.
 						Corrent checking/removing alts and not using correct table names.
@@ -295,7 +296,7 @@ class UserAdmin extends BaseActiveModule {
 		// let's build a blob
 		$output = $this -> blob_header('Buddylist') ."<b></b>\n";
 		foreach ($buddylist as $id => $name) {
-			$output .= sprintf("%s :: [ %s ]\n", utf8_decode($name), $this -> make_cmd('remove', 'buddy remove '. $id));
+			$output .= sprintf("%s :: [ %s ]\n", mb_convert_encoding($name, 'ISO-8859-1', 'UTF-8'), $this -> make_cmd('remove', 'buddy remove '. $id));
 		}
 		return sprintf("Found ##seablue##%d##end## buddies :: %s", $count, $this -> make_blob('Show', $output));
 	}
@@ -553,7 +554,7 @@ class UserAdmin extends BaseActiveModule {
 		$users = array();
 		if ($rows = $this -> bot -> db -> select("SELECT u.char_id, u.nickname, u.last_seen, FROM_UNIXTIME(u.last_seen) AS last_seen_str, IF(u.last_seen, DATE_FORMAT(FROM_UNIXTIME(u.last_seen), '%Y-%m-%d'), 'N/A') AS last_seen_date, u.added_at, u.banned_at, u.deleted_at, u.user_level FROM #___users u". $this -> where_sql($cond) . $orderby, MYSQLI_ASSOC)) {
 			foreach ($rows as $r) {
-				$r['nickname'] = utf8_decode($r['nickname']);
+				$r['nickname'] = mb_convert_encoding($r['nickname'], 'ISO-8859-1', 'UTF-8');
 				$users[$r['char_id']] = $r;
 			}
 		}
@@ -564,7 +565,7 @@ class UserAdmin extends BaseActiveModule {
 		$never = array();
 		if ($rows = $this -> bot -> db -> select("SELECT u.char_id, u.nickname, u.last_seen, FROM_UNIXTIME(u.last_seen) AS last_seen_str, IF(u.last_seen, DATE_FORMAT(FROM_UNIXTIME(u.last_seen), '%Y-%m-%d'), 'N/A') AS last_seen_date, u.added_at, u.banned_at, u.deleted_at, u.user_level FROM #___users u WHERE user_level >= 0 AND last_seen = 0 ORDER BY u.nickname", MYSQLI_ASSOC)) {
 			foreach ($rows as $r) {
-				$r['nickname'] = utf8_decode($r['nickname']);
+				$r['nickname'] = mb_convert_encoding($r['nickname'], 'ISO-8859-1', 'UTF-8');
 				$never[$r['char_id']] = $r;
 			}
 		}
@@ -575,8 +576,8 @@ class UserAdmin extends BaseActiveModule {
 		$alts = array();
 		if ($rows = $this -> bot -> db -> select("SELECT alt, main FROM #___alts". $this -> where_sql($cond) . $orderby, MYSQLI_ASSOC)) {
 			foreach ($rows as $r) {
-				$r['main'] = utf8_decode($r['main']);
-				$r['alt'] = utf8_decode($r['alt']);
+				$r['main'] = mb_convert_encoding($r['main'], 'ISO-8859-1', 'UTF-8');
+				$r['alt'] = mb_convert_encoding($r['alt'], 'ISO-8859-1', 'UTF-8');
 				$alts[$r['alt']] = $r['main'];
 			}
 		}
@@ -587,7 +588,7 @@ class UserAdmin extends BaseActiveModule {
 		$whois = array();
 		if ($rows = $this -> bot -> db -> select("SELECT ID, nickname FROM #___whois". $this -> where_sql($cond) . $orderby, MYSQLI_ASSOC)) {
 			foreach ($rows as $r) {
-				$whois[$r['ID']] = utf8_decode($r['nickname']);
+				$whois[$r['ID']] = mb_convert_encoding($r['nickname'], 'ISO-8859-1', 'UTF-8');
 			}
 		}
 		return $whois;

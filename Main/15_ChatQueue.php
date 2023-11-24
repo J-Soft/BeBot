@@ -71,10 +71,10 @@ class Chat_Queue_Core extends BasePassiveModule
                 "-> " . $this->bot->core("chat")
                     ->get_uname($to) . ": " . $msg
             );
-            $msg = utf8_encode($msg);
+            $msg = mb_convert_encoding($msg, 'UTF-8');
             $this->bot->aoc->send_tell($to, $msg);
         } else {
-            $msg = utf8_encode($msg);
+            $msg = mb_convert_encoding($msg, 'UTF-8');
             $this->bot->aoc->send_group($to, $msg);
         }
     }

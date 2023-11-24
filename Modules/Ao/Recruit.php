@@ -223,7 +223,7 @@ class Recruit extends BaseActiveModule
 			if($blob=="") { // default
 				$blob = "<a href=\"text://To initiate recruitment process: <a href='chatcmd:///tell ".$this->bot->botname." recruit'>Start application</a><br><br>\">Click this!</a>";
 			}
-			$this -> bot -> aoc -> send_group($channel,utf8_encode($msg.$blob));
+			$this -> bot -> aoc -> send_group($channel,mb_convert_encoding($msg.$blob, 'UTF-8'));
 			$this->bot->log("RECRUIT", "NOTICE", "Sent recruit message on ".$channel);
 		}
     }
