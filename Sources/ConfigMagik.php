@@ -19,7 +19,7 @@
  *
  * @version 0.04 - Sunday Dec 02 15:20:53 2007
  *      - Modified for Bebot by Ebag333
- *
+ *		- Verified 2023 by Bitnykk for PHP8.2/3
  *
  * ConfigMagik is licensed under GNU Lesser General Public License (LGPL)
  * http://www.opensource.org/licenses/lgpl-license.html
@@ -50,7 +50,7 @@ class ConfigMagik
      *
      * @return void Returns nothing, like any other constructor-method ��] .
      */
-    /*	function __construct(&$bot, $path=null, $synchronize=false, $process_sections=true)*/
+    /*	func/tion __cons/truct(&$bot, $path=null, $synchronize=false, $process_sections=true)*/
     function __construct(
         $path = null,
         $synchronize = false,

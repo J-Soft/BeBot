@@ -6,7 +6,7 @@ class ProtoEndpoint extends PBMessage
     var $wired_type = PBMessage::WIRED_LENGTH_DELIMITED;
     //var $wired_type = 0;
     var $value = "ProtoEndpoint";
-	var $fields;
+	var $fields, $values;
 
     public function __construct($reader = null)
     {
@@ -61,7 +61,7 @@ class RpcHeader extends PBMessage
 {
     //var $wired_type = 0;
     var $wired_type = PBMessage::WIRED_LENGTH_DELIMITED;
-
+	var $fields, $values;
 
     public function __construct($reader = null)
     {

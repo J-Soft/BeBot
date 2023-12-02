@@ -154,7 +154,8 @@ class Bot
     public static $instance;
     public $dispatcher;
 
-
+	// function __construct
+	
     public static function factory($config_file = null)
     {
         require('./Conf/ServerList.php');

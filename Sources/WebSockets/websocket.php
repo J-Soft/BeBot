@@ -76,8 +76,6 @@
 			... but it achieves intended without sacrificing responsivity for all other tasks !
 */
 
-
-
 class WebSocketException extends Exception {}
 
 class WebSocketClient extends WebSocketBase 
@@ -90,7 +88,7 @@ class WebSocketClient extends WebSocketBase
 	// функция, периодически вызываемая пока recv() ждёт результатов. 
 	// Может использоваться, чтобы выполнять некоторые действия во время ожидания, т.к. оно блокирующее.
 	// вызывается довольно часто (зависит от таймаута приема).
-	public $on_idle;
+	public $on_idle, $opened;
 	public $framesize = 4;	
 	protected $socket, $session;
 	protected $last_activity = 0;
@@ -345,6 +343,7 @@ class WebSocketClient extends WebSocketBase
 
 class WebSocketBase
 {
+	var $clients;
 	// посчитать серверный ключ на основе клиентского ключа
 	protected function server_key($key)
 	{

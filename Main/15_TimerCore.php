@@ -1,6 +1,6 @@
 <?php
 /*
-* Central timer handling class for the bot
+* Central timer handling module for the bot
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -33,15 +33,15 @@
 *  USA
 */
 /*
-* This class offers a couple of functions to all other modules to handle timed events:
-* - add_timer($relaying, $owner, $duration, $name, $channel, $repeat, $class = "")
+* This module offers a couple of functions to all other modules to handle timed events:
+* - add_timer($relaying, $owner, $duration, $name, $channel, $repeat, $type = "")
 *	$relaying is a boolean that has to be true if the timer is created over some relay, to avoid relay loops
 *	$owner is the nickname of the owner of the timer
 *	$duration is the duration of the timer in seconds
 *	$name is a string defining the name of the timer
 *	$channel is the chat channel the timer should be output to
 *	$repeat is the interval in seconds in which the timer should be repeated until it is deleted
-*	$class is the name of the timer class for this timer
+*	$type is the name of the timer type for this timer
 *   The function returns the ID of the newly created timer
 *
 * - list_timed_events($owner)
@@ -56,12 +56,12 @@
 *   This function returns a standard bebot array informing about success and status information.
 *
 * - create_timer_class($name, $description)
-*	$name is the shortcut for the new timer class
-*	$description is a string describing what this class is supposed to be used for
-*   The function returns the ID of the newly created timer class. A -1 as return value signifies some error.
+*	$name is the shortcut for the new timer type
+*	$description is a string describing what this type is supposed to be used for
+*   The function returns the ID of the newly created timer type. A -1 as return value signifies some error.
 *
 * - create_timer_class_entry($class_id, $next_id, $delay, $prefix, $suffix)
-*	$class_id is the ID of the class the entry should be added to
+*	$class_id is the ID of the type the entry should be added to
 *	$next_id is the ID of the next entry to follow after this entry has been used. -1 means use default last entry, -2 means this
 *		entry should be self-referencing, signifying an end of the notify chain
 *	$delay is the delay till the timer is finished when this notify should be shown
@@ -74,7 +74,7 @@
 * first using the register_callback($name, $module) function. The $name must be a unique string identifying the module,
 * &$module is a reference to the object of the module. The module has to implement a timer($name, $prefix, $suffix, $delay)
 * function, where $name is the name given to the timer on creation, and $prefix and $suffix are the corresponding entries
-* of the current notification of the timer class used and $delay is the current notify delay.
+* of the current notification of the timer type used and $delay is the current notify delay.
 * To create a timed event you have to call the add_timer() function with $channel set to 'internal' and $owner set to the
 * module name used to register the callback.
 */

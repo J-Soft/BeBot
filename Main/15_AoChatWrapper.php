@@ -1,6 +1,6 @@
 <?php
 /*
-* AOChatWrapper.php - A class of wrappers around AOChat functions.
+* AOChatWrapper.php - A module of wrappers around AOChat functions.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -33,7 +33,7 @@
 */
 $aochat_wrapper_core = new AOChatWrapper_Core($bot);
 /*
-The Class itself...
+The module itself...
 */
 class AOChatWrapper_Core extends BasePassiveModule
 {

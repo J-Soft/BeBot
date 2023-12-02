@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class is used by tests to mock and track various socket/stream calls.
+ * This module is used by tests to mock and track various socket/stream calls.
  */
 
 namespace WebSocket;

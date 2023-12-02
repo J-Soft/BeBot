@@ -1,5 +1,5 @@
 <?php
-/* The AOChatPacket class - turning packets into binary blobs and binary
+/* The AOChatPacket module - turning packets into binary blobs and binary
 * blobs into packets
 */
 
@@ -11,7 +11,7 @@
 * s - string array: uint16_t count, aochat_str_t[count]
 *
 * D - 'data', we have relabeled all 'D' type fields to 'S'
-* M - mapping [see t.class in ao_nosign.jar] - unsupported
+* M - mapping [see t.class:in ao_nosign.jar] - unsupported
 *
 */
 
