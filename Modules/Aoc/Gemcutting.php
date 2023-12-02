@@ -12,6 +12,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -39,7 +40,7 @@
 $Gemcut = new Gemcut($bot);
 class Gemcut extends BaseActiveModule
 {
-    var $server = 'http://aocdb.lunevo.net/';
+    var $server = 'http://aocdb.lunevo.net/'; // seems dead link 2023
     var $gem_types = array();
     var $gem_array = array();
     var $tier_info = array();
@@ -59,7 +60,9 @@ class Gemcut extends BaseActiveModule
             ->define_scheme("gemcut", "info", "lightgreen");
         $this->help['description'] = 'This module helps people with identifying gems and how to cut gems.';
         $this->help['command']['gem <itemref>'] = "Displays what bonuses an uncut gem will give and how to cut it.";
+        $this->help['command']['gems'] = "Shows a list of all tiers linking to all existing gems.";
         $this->help['command']['gemcut <tier>'] = "Displays a list of gems for the specified tier.";
+        $this->help['command']['geminfo <gem>'] = "Displays the features of the gem.";
         // Do this in the constructor so run-time speed is improved.
         // This array is the most easy to edit. It is then used to build another structure for lookups
         //         Colour                        // Tier 1       // Tier 2       // Tier 3     // Tier 4       // Tier 5     // Tier 6
@@ -433,7 +436,8 @@ class Gemcut extends BaseActiveModule
 
     function gem_info($msg)
     {
-        $gem_info = $this->gem_array[$msg];
+        if(isset($this->gem_array[ucwords($msg)])) $gem_info = $this->gem_array[ucwords($msg)];
+		else $gem_info = array();
         if (count($gem_info) == 2) {
             $tier = $gem_info[0];
             $type = $gem_info[1];

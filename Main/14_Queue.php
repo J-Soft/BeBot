@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -45,7 +46,7 @@ class Queue_Core extends BasePassiveModule
     private $que_low;
     private $queue_left;
     private $last_call;
-
+	var $queue, $queue_low, $link, $max, $filter, $delay;
 
     /*
     Constructor:

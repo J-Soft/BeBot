@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -86,7 +87,7 @@ class Timer_Core extends BasePassiveModule
     private $checking;
     private $modules;
     private $last_recovery_check;
-
+	var $schema_version;
 
     function __construct(&$bot)
     {

@@ -18,8 +18,12 @@ class ServerConnection
 
     private $m_ServerAddress;
     private $m_ServerPort;
-
-    private $m_ClientEndpointName;
+	
+	// Bitnykk 2023 PHP8.2/3
+    private $m_ClientEndpoint;
+    private $m_ServerEndpoint;
+	
+	private $m_ClientEndpointName;
     private $m_ClientEndpointID;
     private $m_ServerEndpointID;
     private $m_ServerEndpointName;

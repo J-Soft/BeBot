@@ -15,6 +15,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -39,7 +40,7 @@ $afk = new AFK($bot);
 class AFK extends BaseActiveModule
 {
     var $afk;
-
+	var $afkalias, $afkmsgs;
 
     function __construct(&$bot)
     {

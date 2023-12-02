@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -34,7 +35,7 @@
 $alias = new Alias($bot);
 class Alias extends BaseActiveModule
 {
-
+	var $main, $alias;
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
@@ -131,6 +132,7 @@ class Alias extends BaseActiveModule
 
     function add_alias($name, $alias)
     {
+		$mainmsg = "";
         if ($this->bot->core('player')->id($name) instanceof BotError) {
             return "##error##Character ##highlight##" . $name . "##end## does not exist.##end##";
         }

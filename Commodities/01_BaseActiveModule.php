@@ -32,8 +32,7 @@
 abstract class BaseActiveModule extends BasePassiveModule
 {
     public $help; //A window containing help text for this module
-    protected $source;
-
+    var $source, $module_name;
 
     function __construct(&$bot, $module_name)
     {

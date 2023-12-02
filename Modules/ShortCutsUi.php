@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -41,7 +42,7 @@ class ShortCutGUI extends BaseActiveModule
         $this->register_command("all", "shortcuts", "SUPERADMIN");
         $this->help['description'] = "Allows you view, add and delete entries in the shortcut database.";
         $this->help['command']['shortcuts'] = "Shows currently existing shortcuts with corresponding long entries and allows deleting selected entries.";
-        $this->help['command']['shortcuts add "<short>" "<long>"'] = "Adds <short> as shortcut for <long> to the database. Neither <short> nor <long> can contain any \".";
+        $this->help['command']['shortcuts add <short> <long>'] = "Adds <short> as shortcut for <long> to the database. Any quote is removed.";
     }
 
 
@@ -49,7 +50,7 @@ class ShortCutGUI extends BaseActiveModule
     {
         if (preg_match("/^shortcuts$/i", $msg)) {
             return $this->show_shortcuts();
-        } elseif (preg_match("/^shortcuts add &quot;(.*)&quot; &quot;(.*)&quot;$/i", $msg, $info)) {
+        } elseif (preg_match("/^shortcuts add (.*) (.*)$/i", $msg, $info)) {
             return $this->add($info[1], $info[2]);
         } elseif (preg_match("/^shortcuts del ([01-9]+)$/i", $msg, $info)) {
             return $this->del($info[1]);
@@ -76,7 +77,10 @@ class ShortCutGUI extends BaseActiveModule
 
     function add($short, $long)
     {
-        return $this->bot->core("shortcuts")->add($short, $long);
+		$short = str_replace('"', "", str_replace("'", "", $short));
+		$long = str_replace('"', "", str_replace("'", "", $long));
+		if(strlen($short)>=strlen($long)) return "Short cannot be longer (nor equal) than long.";
+        else return $this->bot->core("shortcuts")->add($short, $long);
     }
 
 

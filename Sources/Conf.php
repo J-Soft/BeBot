@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -36,7 +37,7 @@ class Conf
 {
     private $conf;
     private $login;
-
+    var $confc, $argv, $cf, $pw;
 
     function __construct($argv, $confc)
     {

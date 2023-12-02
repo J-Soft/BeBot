@@ -6,7 +6,7 @@
 * - Coded for Bebot 0.5 (SVN)
 * You are Free to Improve and Change as Long as My name Stays on it
 *
-* 2021 updated by Bitnykk for bebot 0.7.x
+* 2021 updated by Bitnykk for bebot 0.7.x / 2023 for PHP8.2/3
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@ $orgs = new Orgs($bot);
 
 class Orgs extends BaseActiveModule
 {
+	var $letters, $debug, $added, $updated, $updatedm, $checked, $next, $active, $info, $geterror;
 	function __construct(&$bot)
 	{
 		parent::__construct($bot, get_class($this));

@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -44,7 +45,7 @@ The Class itself...
 */
 class Mail extends BaseActiveModule
 {
-
+	var $start;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));

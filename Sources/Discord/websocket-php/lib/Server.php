@@ -26,7 +26,8 @@ class Server extends Base
     protected $listening;
     protected $request;
     protected $request_path;
-
+	var $socket;
+	
     /**
      * @param array $options
      *   Associative array containing:

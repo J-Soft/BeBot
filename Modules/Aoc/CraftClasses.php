@@ -12,6 +12,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -30,7 +31,7 @@
 *  USA
 */
 ///////////////////////////////////
-// craftclasses.php 1.2 for BeBot
+// craftclasses.php 1.3 for BeBot
 ///////////////////////////////////
 // (c) Copyright 2008 by Allan Noer
 // All Rights Reserved
@@ -38,7 +39,7 @@
 ///////////////////////////////////
 // Updated to 1.1 by Buffarse - Added additional parsing and user feedback to !setclass
 // Updated to 1.2 by Getrix - Added "None" profession as many have Alts that they dont want professions on.
-//
+// Updated to 1.3 by Bitnykk - PHP8.2/3 runnability
 $craftclasses = new craftclasses($bot);
 //////////////////////////////////////////////////////////////////////
 // The Class itself...
@@ -48,7 +49,7 @@ class craftclasses extends BaseActiveModule
     var $help;
     var $last_log;
     var $start;
-
+	var $output, $result;
 
     // Constructor
     function __construct(&$bot)

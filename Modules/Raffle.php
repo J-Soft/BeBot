@@ -46,7 +46,7 @@ class Raffle extends BaseActiveModule
     var $output;
     var $admin;
     var $result;
-
+	var $end, $announce;
 
     function __construct(&$bot)
     {

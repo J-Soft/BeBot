@@ -49,7 +49,7 @@ class IRC extends BaseActiveModule
     var $target;
     var $irc;
 	var $note = "Irc side commands available are : help, tara, viza, is, online/sm, whois, alts, level/lvl/pvp";
-
+	var $spam, $irconline, $ircmsg;
 
     /*
     Constructor:

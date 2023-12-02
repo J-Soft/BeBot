@@ -46,6 +46,7 @@ class Rolls extends BaseActiveModule
 {
 	var $leftovers = array();
 	var $loot = array();
+	var $count, $addmsg;
 
     function __construct(&$bot)
     {

@@ -5,7 +5,7 @@
 class PBFixedInt extends PBScalar
 {
     var $wired_type = PBMessage::WIRED_32BIT;
-
+	var $reader, $base128, $value;
 
     /**
      * Parses the message for this type

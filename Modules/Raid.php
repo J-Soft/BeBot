@@ -55,7 +55,8 @@ class Raid extends BaseActiveModule
 	var $ddin = false;
 	var $topcache;
 	var $toptime;
-
+	var $limit;
+	var $minlevel, $name, $points, $pgleave;
 
     function __construct(&$bot)
     {

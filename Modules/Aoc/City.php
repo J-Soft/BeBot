@@ -12,6 +12,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -1602,7 +1603,7 @@ class City extends BaseActiveModule
     function command_handler($name, $msg, $origin)
     {
         $vars = explode(' ', strtolower($msg));
-		if(!isset($var[1])) { $var[1]=""; }
+		if(!isset($vars[1])) { $vars[1]=""; }
         switch ($vars[0]) {
             case 'city':
                 switch ($vars[1]) {

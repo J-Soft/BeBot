@@ -90,9 +90,9 @@ class aggdef extends BaseActiveModule
 	function aggdef_blob($attackrate,$rechargerate,$inits)
 	{
 			$diminishratio = 1/3;
-					
+			$finalinit = 0;
 			if ($inits > 1200)
-			$inits = 1200+round(($inits-1200)*diminishratio);
+			$inits = 1200+round(($inits-1200)*$diminishratio);
 			
 			$attackspeed = $attackrate - ($inits/600);
 			$rechargespeed = $rechargerate - ($inits/300);
@@ -124,7 +124,7 @@ class aggdef extends BaseActiveModule
 			
 			if ($finalinit > 1200)
 			{
-				$finalinit = 1200 + round((finalinit-1200)/diminishratio);
+				$finalinit = 1200 + round(($finalinit-1200)/$diminishratio);
 			}	
 			$inside = "Aggdef slider calculator\n\n";
 			

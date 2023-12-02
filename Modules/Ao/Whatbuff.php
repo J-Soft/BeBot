@@ -34,6 +34,7 @@ $whatbuff = new Whatbuff($bot);
 
 class Whatbuff extends BaseActiveModule
 {
+	var $skills;
 	function __construct(&$bot)
 	{
 		parent::__construct($bot, get_class($this));

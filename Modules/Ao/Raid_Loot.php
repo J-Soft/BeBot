@@ -19,6 +19,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -50,6 +51,7 @@ The Class itself...
 */
 class raidloot extends BaseActiveModule
 {
+		var $count, $leftovers;
         function __construct(&$bot)
         {
                 parent::__construct($bot, get_class($this));

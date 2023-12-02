@@ -17,6 +17,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -38,7 +39,7 @@ $commandalias_core = new CommandAlias_Core($bot);
 class CommandAlias_Core extends BasePassiveModule
 {
     private $alias;
-
+	var $alias_sub;
 
     function __construct(&$bot)
     {

@@ -17,6 +17,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -88,7 +89,7 @@ class Settings_Core extends BasePassiveModule
     private $settings_cache;
     private $callbacks;
     private $change_user;
-
+	var $maintenance;
 
     /*
     Constructor:

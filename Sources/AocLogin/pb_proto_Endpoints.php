@@ -6,7 +6,7 @@ class ProtoEndpoint extends PBMessage
     var $wired_type = PBMessage::WIRED_LENGTH_DELIMITED;
     //var $wired_type = 0;
     var $value = "ProtoEndpoint";
-
+	var $fields;
 
     public function __construct($reader = null)
     {

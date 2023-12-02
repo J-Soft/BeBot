@@ -22,7 +22,9 @@ class LoginServerConnection extends ServerConnection
 
     private $m_CharacterServerAddress;
     private $m_CharacterServerPort;
-
+	
+	// Bitnykk 2023 PHP 8.2/3
+	var $m_EndpointType, $m_LogName;
 
     public function __construct(
         $parent,

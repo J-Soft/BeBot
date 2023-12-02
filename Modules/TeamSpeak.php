@@ -65,7 +65,7 @@ class Teamspeak Extends BaseActiveModule
 		if(empty($com['args']))
 			return $this -> show_tstatus();
 
-		return "I do not understand the command: $command";
+		return "I do not understand that command.";
 	}
 
 

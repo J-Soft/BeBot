@@ -5,7 +5,7 @@
 class PBInputStringReader extends PBInputReader
 {
     var $length = 0;
-
+	var $string, $pointer, $base128;
 
     public function __construct($string)
     {

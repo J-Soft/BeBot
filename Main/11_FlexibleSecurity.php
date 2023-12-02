@@ -16,6 +16,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -47,7 +48,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
 {
     private $cache; // saves the highest access level defined by all flexible groups for a player.
     private $querynames;
-
+	var $enabled;
 
     function __construct(&$bot)
     {

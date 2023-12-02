@@ -46,7 +46,7 @@ class Bid extends BaseActiveModule
     var $announced;
     var $end;
 	var $history;
-
+	var $name, $locked, $type;
 
     /*
     Constructor:

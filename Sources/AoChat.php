@@ -1,6 +1,6 @@
 <?php
 /*
-* AOChat, a PHP class for talking with the Age of Conan and Anarchy Online chat servers.
+* AOChat, a PHP lib for talking with the Age of Conan and Anarchy Online chat servers.
 * It requires the sockets extension (to connect to the chat server..)
 * from PHP 5.2.0+ and the BCMath extension (for generating
 * and calculating the login keys) to work.
@@ -8,7 +8,7 @@
 * Copyright (C) 2006-2012 J-Soft and the BeBot development team.
 * Copyright (c) 2008 Allan Noer <allan@noer.biz>
 * Copyright (C) 2002-2005  Oskari Saarenmaa <auno@auno.org>.
-* Edition 2023 From Bitnykk (RK5) for the self defreezer
+* Edition 2023 From Bitnykk (RK5) for the self defreezer + PHP8.2/3 runnability
 * This is an adapted version of Auno's original AOChat PHP class.
 * This version has been adapted for use with pre PHP 5 versions aswell as other bugfixes
 * by the community and BeBot development team.
@@ -19,7 +19,7 @@
 * to make it very easy to port existing Anarchy Online projects to Age of
 * Conan. Some things like the private channels are not currently supported
 * by the Age of Conan game client, but still works on the server. The
-* functions related to these has been kept in order secure backward compability.
+* methods related to these has been kept in order secure backward compability.
 *
 * With AoC update 1.05 the login protocol changed so that the bot can not login
 * directly to the chat server. It first has to login to the actual game world
@@ -163,7 +163,8 @@ class AOChat
     var $state, $debug, $gid, $chars, $char, $grp, $buddies;
     var $socket, $last_packet, $last_ping;
     public static $instance;
-
+	var $bot, $bothandle, $serverseed, $login_num, $sixtyfourbit, $username;
+	var $accountid, $ServerAddress, $ServerPort, $character, $password;	
 
     /* Initialization */
     private function __construct($bothandle)

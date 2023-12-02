@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -37,7 +38,7 @@ The Class itself...
 */
 class Maintenance extends BaseActiveModule
 {
-
+	var $croncount, $new_data, $old_data, $compare, $del, $update, $dontupdate;
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
@@ -187,7 +188,7 @@ class Maintenance extends BaseActiveModule
                     ->save("Maintenance", "info", "settings $name $origin 2");
                 $this->bot->send_output("", "Restarting for Maintenance", "both");
                 $this->bot->disconnect();
-                die("Restarting for Maintinance");
+                die("Restarting for Maintenance");
             Default:
                 Return ("Error Unknown Maintenance mode: $mode");
         }

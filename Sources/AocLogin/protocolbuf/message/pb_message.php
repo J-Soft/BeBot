@@ -16,7 +16,7 @@ require_once(dirname(__FILE__) . '/' . 'type/pb_fixed_int.php');
 require_once(dirname(__FILE__) . '/' . 'reader/pb_input_reader.php');
 require_once(dirname(__FILE__) . '/' . 'reader/pb_input_string_reader.php');
 /**
- * Abstract Message class
+ * Abstract Message
  *
  * @author Nikolai Kordulla
  */
@@ -36,10 +36,10 @@ abstract class PBMessage
     // the values for the fields
     var $values = array();
 
-    // type of the class
+    // type
     var $wired_type = 2;
 
-    // the value of a class
+    // the value 
     var $value = null;
 
     // modus byte or string parse (byte for productive string for better reading and debuging)
@@ -50,12 +50,11 @@ abstract class PBMessage
     // pointer to begin
     protected $reader;
 
-    // chunk which the class not understands
+    // chunk which the context not understands
     var $chunk = '';
 
     // variable for Send method
     var $_d_string = '';
-
 
     /**
      * Constructor - initialize base128 class

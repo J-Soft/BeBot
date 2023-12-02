@@ -36,7 +36,7 @@
 $tools = new tools($bot);
 class tools extends BasePassiveModule
 {
-
+	var $useragent, $randomsource, $use_proxy_server, $proxy_server_address;
     function __construct(&$bot)
     {
 

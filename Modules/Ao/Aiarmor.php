@@ -208,7 +208,7 @@ class Aiarmor extends BaseActiveModule
 	function single($name, $arr)
 	{
 		$armortype = ucfirst(strtolower($arr[1]));
-		if($arr[2] >= 1 && $arr[2] <= 300)
+		if(isset($arr[2]) && $arr[2] >= 1 && $arr[2] <= 300)
 			$ql = $arr[2];
 		else
 			$ql = 300;

@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -287,6 +288,7 @@ class Roster_Handler extends BaseActiveModule
 
     function list_buddies()
     {
+		$msg = '';
         $buddies = $this->bot->aoc->buddies;
         $count = 0;
         if (empty($buddies)) {

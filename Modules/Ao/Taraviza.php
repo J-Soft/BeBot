@@ -42,6 +42,7 @@ The Class itself...
 */
 class Taraviza extends BaseActiveModule
 {
+	var $tcycle, $vcycle, $apiver, $wlist;
 	function __construct(&$bot)
 	{
 		parent::__construct($bot, get_class($this));

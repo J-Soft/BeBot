@@ -37,7 +37,7 @@ The Class itself...
 */
 class TowerAttack extends BaseActiveModule
 {
-
+	var $suppress, $suppressdata;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
@@ -570,11 +570,14 @@ class TowerAttack extends BaseActiveModule
             $battle .= " " . $infos["off_profession"] . ")\n";
             if (!empty($infos["off_guild"])) {
                 $battle .= "Attacking Guild: ##" . $infos["off_side"] . "##" . $infos["off_guild"] . "##end##\n";
-            }
+            } else {
+				$infos["off_guild"] = "Unknown";
+			}
             $battle .= "Defending Guild: ##" . $infos["def_side"] . "##" . $infos["def_guild"] . "##end##";
             $infos["blob"] = $this->bot->core("tools")
                 ->make_blob("More", $battle);
         }
+		if(!isset($infos["off_player"])) $infos["off_player"] = "Unknown";
         $infos["br"] = "\n";
         $infos["time"] = gmdate(
             $this->bot->core("settings")

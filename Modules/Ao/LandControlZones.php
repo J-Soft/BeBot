@@ -34,7 +34,7 @@
 $landcontrol = new LandControlZones($bot);
 class LandControlZones extends BaseActiveModule
 {
-
+	var $towers;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));

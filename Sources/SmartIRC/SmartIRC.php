@@ -1,7 +1,7 @@
 <?php
 /**
  * Id: SmartIRC.php,v 1.54.2.14 2005/05/27 23:40:09 meebey Exp
- * Revision: 1.54.2.14
+ * Revision: 1.54.2.14 + 2023 by Bitnykk for PHP8.2/3
  * Author: meebey
  * Date: 2005/05/27 23:40:09
  *
@@ -61,6 +61,19 @@ define('SMARTIRC_VERSIONSTRING', 'Net_SmartIRC ' . SMARTIRC_VERSION);
  */
 class Net_SmartIRC_base
 {
+	
+    /**
+     * @var resource
+     * @access private
+     */
+    var $_users;
+
+    /**
+     * @var resource
+     * @access private
+     */
+    var $user;	
+	
     /**
      * @var resource
      * @access private

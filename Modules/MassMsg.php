@@ -45,7 +45,7 @@ class MassMsg extends BaseActiveModule
         $this->bot->core("queue")->register($this, "invite", 0.2, 5);
         $this->help['description'] = 'Sends out mass messages and invites.';
         $this->help['command']['announce <message>'] = "Sends out announcement <message> as tells to all online members.";
-        $this->help['command']['massinv <message>'] = "Sends out announcement <message> as tells to all online members and invites them to the private group.";
+        $this->help['command']['massinv <message>'] = "Sends out announcement <message> as tells to all online members and invites them to the private group (AO only).";
         $this->bot->core("settings")
             ->create('MassMsg', 'MassMsg', 'Both', 'Who should get mass messages and invites?', 'Guild;Private;Both;Online');
         $this->bot->core("settings")
@@ -104,8 +104,12 @@ class MassMsg extends BaseActiveModule
                 return ($this->mass_msg($name, $com['args'], 'Message'));
                 break;
             case 'massinv':
-                $this->bot->send_output($name, "Mass invite being sent. Please stand by...", $origin);
-                return ($this->mass_msg($name, $com['args'], 'Invite'));
+				if(strtolower($this->bot->game)=='aoc') {
+					return "Such command cannot work into this game.";
+				} else {
+					$this->bot->send_output($name, "Mass invite being sent. Please stand by...", $origin);
+					return ($this->mass_msg($name, $com['args'], 'Invite'));
+				}
                 break;
             default:
                 $this->bot->send_help($name);

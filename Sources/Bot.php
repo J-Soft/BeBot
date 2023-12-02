@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -133,6 +134,9 @@ class Bot
     var $starttime;
     var $commands;
 	var $sixtyfourbit;
+	var $server, $port, $username, $password, $other_bots, $guildname, $game, $connected_time;
+	var $accessallbots, $core_directories, $module_directories, $ini, $cron_activated;
+	var $command_error_text;
 	public $slave;
     public $owner;
     public $super_admin;

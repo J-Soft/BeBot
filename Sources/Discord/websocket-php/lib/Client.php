@@ -25,6 +25,7 @@ class Client extends Base
     ];
 
     protected $socket_uri;
+	var $socket;
 
     /**
      * @param string $uri     A ws/wss-URI

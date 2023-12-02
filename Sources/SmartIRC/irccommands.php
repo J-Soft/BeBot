@@ -28,6 +28,7 @@
 
 class Net_SmartIRC_irccommands extends Net_SmartIRC_base
 {
+	var $_nick;
     /**
      * sends a new message
      *

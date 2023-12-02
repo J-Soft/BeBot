@@ -17,7 +17,7 @@ class SimpleDiscord {
 	private $eventHandlers = [
 		"ALL" => []
 	];
-
+	var $sessionId;
 	public $guilds = [];
 
 	public function __construct(array $params) {		

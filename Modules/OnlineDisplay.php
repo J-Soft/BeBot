@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -37,7 +38,7 @@ The Class itself...
 */
 class OnlineDisplay extends BaseActiveModule
 {
-
+	var $cp, $listed;
     /*
     Constructor:
     Hands over a reference to the "Bot" class.

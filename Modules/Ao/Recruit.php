@@ -38,6 +38,7 @@ $recruit = new Recruit($bot);
 class Recruit extends BaseActiveModule
 {
 	var $bot;
+	var $verify;
 
 	function __construct(&$bot)
 	{

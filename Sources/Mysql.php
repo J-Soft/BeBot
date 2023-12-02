@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -39,6 +40,8 @@ class MySQL
     var $PASS = "";
     var $SERVER = "";
     var $bot;
+	var $botname, $error_count, $last_error, $last_reconnect, $underscore;
+	var $master_tablename, $table_prefix, $tablenames;
     public static $instance;
 
 

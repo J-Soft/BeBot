@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all aknowledgements.
 *
@@ -42,6 +43,7 @@ The Class itself...
 */
 class Twink extends BaseActiveModule
 {
+	var $mish_and_shop, $dyna_mish, $buffitems, $aliases, $skill_list, $cl_list;
 	function __construct(&$bot)
 	{
 		parent::__construct($bot, get_class($this));

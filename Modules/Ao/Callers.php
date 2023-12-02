@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -37,7 +38,7 @@ The Class itself...
 */
 class Callers extends BaseActiveModule
 {
-
+	var $callers;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));

@@ -179,7 +179,7 @@ class Points extends BaseActiveModule
 				}			
                 Break;
             case 'add':
-                if (strlen($msg[4]) < 5) {
+                if (!isset($msg[4]) || strlen($msg[4]) < 5) {
                     Return ("Error: Reason required, min ##highlight##5##end## letters");
                 }
                 $this->add_points($name, $msg[2], $msg[3], $msg[4]);

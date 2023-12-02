@@ -16,6 +16,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -45,6 +46,7 @@ class Rolls extends BaseActiveModule
 	
 	var $leftovers = array();
 	var $loot = array();
+	var $count, $addmsg;
 
     function __construct(&$bot)
     {
