@@ -85,6 +85,10 @@ class IRC extends BaseActiveModule
             $announcewhat = "joins";
         }
         $this->bot->core("settings")
+            ->create("IRC", "IncLog", false, "Should the bot be logging IRC Incoming messages ?", "On;Off");
+        $this->bot->core("settings")
+            ->create("IRC", "OutLog", false, "Should the bot be logging IRC Outgoing messages ?", "On;Off");		
+        $this->bot->core("settings")
             ->create("IRC", "Connected", false, "Is the bot connected to the IRC server?", "On;Off", true);
         $this->bot->core("settings")->save("irc", "connected", false);
         $this->bot->core("settings")
@@ -291,6 +295,7 @@ class IRC extends BaseActiveModule
             $ircmsg .= $name . ': ';
         }
         $ircmsg .= $msg;
+		if ($this->bot->core("settings")->get("IRC", "OutLog")) $this->bot->log("IRC", "Outgoing", $ircmsg);
         $ircmsg = htmlspecialchars_decode($ircmsg);
         $this->irc->message(
             SMARTIRC_TYPE_CHANNEL,
@@ -971,6 +976,7 @@ class IRC extends BaseActiveModule
                 $this->bot->core("settings")
                     ->get("Irc", "Chat")
             );
+			if ($this->bot->core("settings")->get("IRC", "IncLog")) $this->bot->log("IRC", "Incoming", $txt);
             /*if ($this->bot->core("settings")
                     ->get("Irc", "UseGuildRelay")
                 && $this->bot
