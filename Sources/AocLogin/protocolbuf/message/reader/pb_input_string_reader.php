@@ -29,7 +29,7 @@ class PBInputStringReader extends PBInputReader
             }
 
             $string = '';
-            $string = $this->string[$this->pointer];
+            $string = @$this->string[$this->pointer];
             $this->pointer++;
 
             if ($is_string == true) {
