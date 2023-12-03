@@ -100,6 +100,10 @@ Note that you can use forward slashes (recommended) or double backslashes
 (not recommended) on windows systems. Using single backslashes WILL NOT WORK 
 as php interprets \ as a special escape character.
 
+On linux, all depends on which OS you run. Install is usually apt (or yum) based :
+install phpX.Y phpX.Y-mysqli phpX.Y-bcmath phpX.Y-curl phpX.Y-mbstring
+(X.Y being the PHP version you aim for, eg 7.0 or 8.1, etc).
+
 On windows, according to the PHP version you'd want Bebot to run into, you may
 need to copy a php.exe file right into bot's root folder (where StartBot.bat is).
 Unless windows PATH and/or php.ini are well set so the exe can locate required
