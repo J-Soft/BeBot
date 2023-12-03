@@ -73,8 +73,8 @@ class VhItems extends BaseActiveModule
 				$filename = "./Extras/Items/"."aorefs-".$current."ep1.sql";
 				if(file_exists($filename)) {
 					$handle = fopen($filename, "r");
-					if (preg_match("/^windows/i", getenv("OS"))) {
-						$used = round(memory_get_usage(true)/1048576,2);
+					$used = round(memory_get_usage(true)/1048576,2);
+					if (preg_match("/^windows/i", getenv("OS"))) {						
 						exec('wmic memorychip get capacity', $totalMemory);
 						$total = round(array_sum($totalMemory)/1048576);
 					} else {
