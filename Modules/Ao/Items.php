@@ -74,7 +74,7 @@ class VhItems extends BaseActiveModule
 				if(file_exists($filename)) {
 					$handle = fopen($filename, "r");
 					$used = round((memory_get_usage(true)/1048576),2);
-					if (OS_WINDOWS) {
+					if ('OS_WINDOWS') {
 						exec('wmic OS get FreePhysicalMemory', $totalMemory);
 						$total = round(array_sum($totalMemory)/1024);
 					} else {

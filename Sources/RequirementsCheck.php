@@ -12,6 +12,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -41,8 +42,8 @@ if ((float)phpversion() < 5.4) {
     die("BeBot requires PHP version 5.4.0 or later to work.\n");
 }
 // The recommended PHP version to run.
-if ((float)phpversion() < 7.0) {
-    echo "BeBot recommends PHP version 7.0.0 or later.\n";
+if ((float)phpversion() < 8.0) {
+    echo "BeBot recommends PHP version 8.0.0 or later to run.\n";
 }
 /*
 Load extentions we need
@@ -53,7 +54,9 @@ if (!extension_loaded("sockets")) {
             die("Loading php_sockets.dll failed. Sockets extention required to run this bot");
         }
     } else {
-        die("Sockets extention required to run this bot");
+        if (!dl("sockets.so")) {
+            die("Loading sockets.so failed. Sockets extention required to run this bot");
+        }
     }
 }
 if (!extension_loaded("mysqli")) {
@@ -62,7 +65,31 @@ if (!extension_loaded("mysqli")) {
             die("Loading php_mysqli.dll failed. MySQLi extention required to run this bot");
         }
     } else {
-        die("MySQLi support required to run this bot");
+        if (!dl("mysqli.so")) {
+            die("Loading mysqli.so failed. MySQLi extention required to run this bot");
+        }
+    }
+}
+if (!extension_loaded("mbstring")) {
+    if ('OS_WINDOWS') {
+        if (!dl("php_mbstring.dll")) {
+            die("Loading php_mbstring.dll failed. MbString extention required to run this bot");
+        }
+    } else {
+        if (!dl("mbstring.so")) {
+            die("Loading mbstrin.so failed. MbString extention required to run this bot");
+        }
+    }
+}
+if (!extension_loaded("bcmath")) {
+    if ('OS_WINDOWS') {
+        if (!dl("php_bcmath.dll")) {
+            die("Loading php_bcmath.dll failed. BcMath extention required to run this bot");
+        }
+    } else {
+        if (!dl("bcmath.so")) {
+            die("Loading bcmath.so failed. BcMath extention required to run this bot");
+        }
     }
 }
 //From AOChat.php
