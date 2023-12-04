@@ -59,6 +59,7 @@ if (preg_match("/^windows/i", $os)) {
 			$os = exec("if [ -f '/etc/os-release' ]; then grep '^PRETTY_NAME' /etc/os-release | sed -E 's/PRETTY_NAME=|\"\ ?//g' ; else if hash lsb_release 2>/dev/null ; then lsb_release -d | sed -E 's/Description:|\t\ ?//g' ; else hostnamectl | grep 'Operating System:' | sed -E 's/Operating System:|\t\ ?//g' ; fi ; fi");
         }	
 }
+define('BOT_OPERATING_SYSTEM', $os);
 
 echo "
                                                    \n

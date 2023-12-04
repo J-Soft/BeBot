@@ -68,11 +68,7 @@ class BotStatisticsUI extends BaseActiveModule
     {
 		$php_version = phpversion();
 		$sql_version = mysqli_get_server_info($this->bot->db->CONN);
-		$os = getenv("OSTYPE");
-		if (empty($os)) {
-			$os = getenv("OS");
-		}
-		$msg = BOT_VERSION_NAME . " v." . BOT_VERSION." -- OS: ".$os." -- PHP: ".$php_version." -- SQL: ".$sql_version;
+		$msg = BOT_VERSION_NAME . " v." . BOT_VERSION." -- OS: ".BOT_OPERATING_SYSTEM." -- PHP: ".$php_version." -- SQL: ".$sql_version;
 		Return $msg;		
 	}
 
