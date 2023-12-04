@@ -111,6 +111,14 @@ libraries alone, you may have to copy correct .dll files for this specific PHP.
 For 5.4/5.6 : libeay32, libmysql, php5ts and ssleay32, php_mysqli & php_sockets.
 For 7/8 : libcrypt, libssl, libssh2, sockets, nghttp2, curl & phpX(ts).
 
+You also should look after the value of the parameter "memory_limit" in php.ini.
+It could be set at -1 (unlimited) which is fine if you got lot of RAM.
+Otherwise you'd want to control how much RAM each bot uses (if you run many).
+Anything around 10M (linux) or 50M (windows) should work safe enough :
+memory_limit = 50M
+If you see errors about exhausted allowed memory size, raise that number up
+of, e.g., 10M more (50M becomes 60M for example) until it works fine.
+
 Bot will tell you what misses to run during startup, so check all lines !
 You may need to install some modules (e.g. curl) and activate them in php.ini
 So be sure of what php.ini file is loaded by the PHP client Bebot uses.
