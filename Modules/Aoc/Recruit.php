@@ -73,7 +73,7 @@ class Recruit extends BaseActiveModule
 
 	function do_recruit($name)
 	{
-		$guildname = $this->bot->core("settings")->get("Recruit","GuildName");
+		$guildname = str_replace("'","`",$this->bot->core("settings")->get("Recruit","GuildName"));
 		$lastofficer = $this->bot->core("settings")->get("Recruit","LastOfficer");
 		$lastofficer1 = $this->bot->core("settings")->get("Recruit","LastOfficer1");
 		$lastofficer2 = $this->bot->core("settings")->get("Recruit","LastOfficer2");

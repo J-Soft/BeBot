@@ -73,7 +73,7 @@ class Recruit extends BaseActiveModule
 
 	function do_recruit($name)
 	{
-		$guildname = $this->bot->core("settings")->get("Recruit","GuildName");
+		$guildname = str_replace("'","`",$this->bot->core("settings")->get("Recruit","GuildName"));
 		$lastofficer = $this->bot->core("settings")->get("Recruit","LastOfficer");
 		$lastofficer1 = $this->bot->core("settings")->get("Recruit","LastOfficer1");
 		$lastofficer2 = $this->bot->core("settings")->get("Recruit","LastOfficer2");
@@ -214,7 +214,7 @@ class Recruit extends BaseActiveModule
 					$channel = "Neu. Newbie OOC";
 					break;					
 			}
-			$msg = $this->bot->core("settings")->get("Recruit","GuildName")." ";
+			$msg = str_replace("'","`",$this->bot->core("settings")->get("Recruit","GuildName"))." ";
 			$blob = "";
 			if (file_exists("./Text/" . $this->bot->botname . "Recruit.txt")) { // custom
 				$blob .= implode("", file("./Text/" . $this->bot->botname . "Recruit.txt"));
