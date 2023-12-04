@@ -46,7 +46,7 @@ $php_version = phpversion();
 // Set the time zone to UTC
 date_default_timezone_set('UTC');
 /*
-OS detection, borrowed from Angelsbot.
+OS detection, borrowed from Angelsbot ; improved by Bitnykk 2023
 */
 $os = getenv("OSTYPE");
 if (empty($os)) {
@@ -54,6 +54,10 @@ if (empty($os)) {
 }
 if (preg_match("/^windows/i", $os)) {
     define('OS_WINDOWS', true);
+} else {
+        if (empty($os)) {
+			$os = exec("if [ -f '/etc/os-release' ]; then grep '^PRETTY_NAME' /etc/os-release | sed -E 's/PRETTY_NAME=|\"\ ?//g' ; else if hash lsb_release 2>/dev/null ; then lsb_release -d | sed -E 's/Description:|\t\ ?//g' ; else hostnamectl | grep 'Operating System:' | sed -E 's/Operating System:|\t\ ?//g' ; fi ; fi");
+        }	
 }
 
 echo "

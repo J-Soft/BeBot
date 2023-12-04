@@ -73,21 +73,19 @@ class VhItems extends BaseActiveModule
 				$filename = "./Extras/Items/"."aorefs-".$current."ep1.sql";
 				if(file_exists($filename)) {
 					$handle = fopen($filename, "r");
-					$used = round(memory_get_usage(true)/1048576,2);
-					if (preg_match("/^windows/i", getenv("OS"))) {						
-						exec('wmic memorychip get capacity', $totalMemory);
-						$total = round(array_sum($totalMemory)/1048576);
+					$used = round((memory_get_usage(true)/1048576),2);
+					if (OS_WINDOWS) {
+						exec('wmic OS get FreePhysicalMemory', $totalMemory);
+						$total = round(array_sum($totalMemory)/1024);
 					} else {
-						$contents = file_get_contents('/proc/meminfo');
-						preg_match_all('/(\w+):\s+(\d+)\s/', $contents, $matches);
-						$info = array_combine($matches[1], $matches[2]);
-						$total = round($info['MemTotal']/1048576);
+						$total = intval(exec("grep '^MemFree' /proc/meminfo | sed -E 's/MemFree:| kB|  \ ?//g'"));
+						$total = round($memtotal/1024);
 					}
 					$free = floor($total-$used);
-					if($free<10) {
+					if($free<$used) {
 						$this->bot->log("ITEMS", "AOREFS", "Too few RAM available, going (slow) ram-saving mode ...");
 						$step = 9;
-					} elseif($free<30) {
+					} elseif($free<($used*3)) {
 						$this->bot->log("ITEMS", "AOREFS", "Average RAM available, trying (moderate) ram-balanced mode.");
 						$step = 99;
 					} else {
