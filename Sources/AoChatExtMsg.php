@@ -210,7 +210,7 @@ $GLOBALS["ref_cat"] = array(
 
 class AOExtMsg
 {
-
+	var $type, $args, $text; // PHP8.2/3
 	function __construct($str = null)
     {
         $this->type = 'AOEM_UNKNOWN';
