@@ -351,6 +351,12 @@ class Conf
 	' . $prefix . '
 
 	/*
+	If you have $table_prefix Defined your tables will be prefixed as above with a _ added on
+	if you dont want the _ added uncomment below
+	*/
+	//$nounderscore = TRUE;
+	
+	/*
 	Master prefix table.
 	This is the mastertable containing information about all tablenames and whether those use
 	or don\'t use a prefix. Only uncomment the line below by removing the // in front of it if
