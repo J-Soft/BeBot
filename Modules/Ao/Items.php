@@ -74,12 +74,13 @@ class VhItems extends BaseActiveModule
 				if(file_exists($filename)) {
 					$handle = fopen($filename, "r");
 					$used = round((memory_get_usage(true)/1048576),2);
-					if ('OS_WINDOWS') {
-						exec('wmic OS get FreePhysicalMemory', $totalMemory);
-						$total = round(array_sum($totalMemory)/1024);
+					if (preg_match("/^windows/i", BOT_OPERATING_SYSTEM)) {
+						$winMemory = array();
+						exec('wmic OS get FreePhysicalMemory', $winMemory);
+						$total = round(array_sum($winMemory)/1024);
 					} else {
 						$total = intval(exec("grep '^MemFree' /proc/meminfo | sed -E 's/MemFree:| kB|  \ ?//g'"));
-						$total = round($memtotal/1024);
+						$total = round($total/1024);
 					}
 					$free = floor($total-$used);
 					if($free<$used) {
