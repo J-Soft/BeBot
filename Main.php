@@ -35,6 +35,11 @@ define('BOT_VERSION', "0.7.28");
 define('BOT_VERSION_INFO', ".git(official)");
 define('BOT_VERSION_NAME', "BeBot");
 
+// Overriding some ini values for compatibility
+ini_set("default_socket_timeout", 600);
+ini_set("max_input_time", 600);
+ini_set("max_execution_time", 600);
+
 // Is this a development snapshot from BZR?
 define('BOT_VERSION_SNAPSHOT', false);
 
