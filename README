@@ -75,10 +75,15 @@ For tower wars to work as intended the bot needs to be in the top three
 ranks of an org. This is because the [ALL TOWERS] channel is restricted to 
 these ranks. 
 
-PLACEHOLDER FOR NEW ENTRY
--------------------------
+Docker for BeBot
+----------------
 
-... soon adding item ...
+We recently added the possibility to run Bebot from Docker.
+
+That is ideal if you ignore all of PHP/SQL and just want to test Bebot.
+Also nice if you run 1 bot only, or if you have no SQL service yet
+
+If you're into it follow guide @ http://wiki.bebot.link/index.php/Docker
 
 INSTALL THE BOT FILES
 ---------------------
