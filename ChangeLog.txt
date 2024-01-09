@@ -1,7 +1,7 @@
 -------------------------
 Release 0.7.28 - ... 202. 
 -------------------------
-- For both: irc/discord, raid, recruit, admins, ts & defreeze improved ; PHP 8.2/3 & Docker supported
+- For both: irc/discord, raid, recruit, admins, mail, ts & defreeze improved ; PHP 8.2/3 & Docker supported
 - For AO: loot disclaimer added ; items & its cidb updated ; orgs improved
 - For AoC: ...
 

@@ -249,7 +249,7 @@ class Mail extends BaseActiveModule
         $messages = $this->bot->db->select($query, MYSQLI_ASSOC);
         if (!empty($messages)) {
             foreach ($messages as $message) {
-                $message['message'] = stripslashes(base64_decode($message['message']));
+                $message['message'] = stripslashes(preg_replace('/\v+|\\\r|\\\n/Ui', ' ', base64_decode($message['message'])));
                 //Make the "unread" header if it hasn't been made already and there is unread mail
                 if (($message['is_read'] == '0') && (empty($unread_header))) {
                     $window .= "--- Unread messages ---<br>";
@@ -286,7 +286,7 @@ class Mail extends BaseActiveModule
         $messages = $this->bot->db->select($query, MYSQLI_ASSOC);
         if (!empty($messages)) {
             foreach ($messages as $message) {
-                $message['message'] = stripslashes(base64_decode($message['message']));
+                $message['message'] = stripslashes(preg_replace('/\v+|\\\r|\\\n/Ui', ' ', base64_decode($message['message'])));
                 //for unread
                 if (($message['is_read'] == '0')) {
                     $window .= "(Unread) ";
@@ -322,7 +322,7 @@ class Mail extends BaseActiveModule
             $window .= "##highlight##To:##end## {$message['recipient']}<br>";
             $window .= "##highlight##From:##end## {$message['sender']}<br>";
             $window .= "##highlight##Sent:##end## {$message['received']}<br><br>";
-            $window .= "##normal##" . stripslashes(preg_replace('/\v+|\\\r\\\n/Ui', '<br>', base64_decode($message['message']))) . "##end##<br><br>";
+            $window .= "##normal##" . stripslashes(preg_replace('/\v+|\\\r|\\\n/Ui', '<br>', base64_decode($message['message']))) . "##end##<br><br>";
             $window .= "[" . $this->bot->core("tools")
                     ->chatcmd("mail delete " . $message['id'], "delete") . "] ";
             $window .= "[" . $this->bot->core("tools")
