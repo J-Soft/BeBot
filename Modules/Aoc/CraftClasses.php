@@ -119,8 +119,8 @@ class craftclasses extends BaseActiveModule
                 "Weaponsmith",
                 "None"
             );
-            $options[0] = ucwords(strtolower($options[0]));
-            $options[1] = ucwords(strtolower($options[1]));
+            if(isset($options[0])) $options[0] = ucwords(strtolower($options[0]));
+            if(isset($options[1])) $options[1] = ucwords(strtolower($options[1]));
             if (empty($options[0]) || empty($options[1])) {
                 $output = "You MUST set both craft classes at the same time.";
             } elseif ((array_search($options[0], $craftclass) !== false) && (array_search(
