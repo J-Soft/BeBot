@@ -178,9 +178,10 @@ class Taraviza extends BaseActiveModule
 				$content = $this->bot->core("tools")->get_site($url);	
 				if (!($content instanceof BotError)) {
 					if (strpos($content, '{"name":') !== false) {							
-						$timers = json_decode($content);		
+						$timers = json_decode($content);
 						$this->wlist= array();							
 						foreach($timers as $timer) {
+							if(!isset($timer->dimension)) $timer->dimension=5; // RK5 surveyed by default							
 							if($timer->name=='tara'&&$this->bot->dimension==$timer->dimension&&$timer->last_spawn>0) {							
 								$this -> bot -> db -> query("TRUNCATE TABLE tara");
 								$this -> bot -> db -> query("INSERT INTO tara (time) VALUES ('".$timer->last_spawn."')");
