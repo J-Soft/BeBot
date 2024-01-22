@@ -114,13 +114,13 @@ class Whois_Core extends BasePassiveModule
                     "whois",
                     "class1",
                     "modify",
-                    "ALTER TABLE #___whois modify `class1` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
+                    "ALTER TABLE #___whois MODIFY `class1` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
                 );
                 $this->bot->db->update_table(
                     "whois",
                     "class2",
                     "modify",
-                    "ALTER TABLE #___whois modify `class2` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
+                    "ALTER TABLE #___whois MODIFY `class2` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
                 );
             case 3:
                 $this->bot->db->update_table(

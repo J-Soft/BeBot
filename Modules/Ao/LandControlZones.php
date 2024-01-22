@@ -86,18 +86,24 @@ class LandControlZones extends BaseActiveModule
             case 4:
             case 5:
 			case 6:
-                $this->bot->db->update_table(
-                    "land_control_zones",
-                    "short",
-                    "add",
-                    "ALTER TABLE #___land_control_zones ADD short VARCHAR(5) DEFAULT NULL"
-                );
-                $this->bot->db->update_table(
-                    "land_control_zones",
-                    "zoneid",
-                    "add",
-                    "ALTER TABLE #___land_control_zones ADD zoneid INT(11) DEFAULT NULL"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___land_control_zones' AND COLUMN_NAME = 'short'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"land_control_zones",
+						"short",
+						"add",
+						"ALTER TABLE #___land_control_zones ADD short VARCHAR(5) DEFAULT NULL"
+					);
+				}
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___land_control_zones' AND COLUMN_NAME = 'zoneid'");
+				if(count($col)==0) {				
+					$this->bot->db->update_table(
+						"land_control_zones",
+						"zoneid",
+						"add",
+						"ALTER TABLE #___land_control_zones ADD zoneid INT(11) DEFAULT NULL"
+					);
+				}
                 $this->bot->db->query("truncate table #___land_control_zones");
                 $filename = "./Extras/TableData/LcZones.sql";
                 $handle = fopen($filename, "r");

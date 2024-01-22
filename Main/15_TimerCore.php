@@ -244,14 +244,25 @@ class Timer_Core extends BasePassiveModule
         }
         switch ($this->bot->db->get_version("timer_class_entries")) {
             case 1:
-                $res = $this->bot->db->select("SELECT notify_suffix FROM #___timer_class_entries");
-                $this->bot->db->update_table(
-                    "timer_class_entries",
-                    "notify_prefix",
-                    "add",
-                    "ALTER TABLE #___timer_class_entries ADD notify_prefix VARCHAR(255) NOT "
-                    . "NULL DEFAULT '' AFTER notify_delay, CHANGE notify_text notify_suffix VARCHAR(255) NOT NULL DEFAULT ''"
-                );
+                $res = $this->bot->db->select("SELECT notify_suffix FROM #___timer_class_entries");			
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___timer_class_entries' AND COLUMN_NAME = 'notify_prefix'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"timer_class_entries",
+						"notify_prefix",
+						"add",
+						"ALTER TABLE #___timer_class_entries ADD notify_prefix VARCHAR(255) NOT NULL DEFAULT '' AFTER notify_delay"
+					);
+				}
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___timer_class_entries' AND COLUMN_NAME = 'notify_text'");
+				if(count($col)==1) {
+					$this->bot->db->update_table(
+						"timer_class_entries",
+						"notify_text",
+						"alter",
+						"CHANGE notify_text notify_suffix VARCHAR(255) NOT NULL DEFAULT ''"
+					);
+				}				
                 if (empty($res)) {
                     $this->bot->db->query(
                         "UPDATE #___timer_class_entries SET notify_prefix = 'Timer' " . "WHERE notify_prefix = ''"
