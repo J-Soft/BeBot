@@ -119,7 +119,7 @@ class OnlineDB_Core extends BasePassiveModule
                 "Should the reinvite be silent without any output, or not? On means silent, Off means notifies are sent."
             );
         if ($this->bot->guildbot) {
-            $reinvnot = "You are reinvited to the guest channel of " . mysql_real_escape_string(htmlentities($this->bot->guildname)) . "!";
+            $reinvnot = "You are reinvited to the guest channel of " . mysqli_real_escape_string(htmlentities($this->bot->guildname)) . "!";
         } else {
             $reinvnot = "You are reinvited to " . $this->bot->botname . "!";
         }
