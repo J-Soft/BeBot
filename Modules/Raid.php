@@ -1341,7 +1341,7 @@ class Raid extends BaseActiveModule
 			return "Error looking up your character infos.";
 		} elseif (isset($this->user[$name])) {
             return "You are already in the raid";
-        } elseif ($who["level"] < $minlevel) {
+        } elseif (isset($who["level"]) && $who["level"] < $minlevel) {
             return "This raid is ##highlight##$minlevel+##end##";
         } elseif ($this->limit>0 && count($this->user)>=$this->limit) {
             return "This raid is already ##highlight##full##end##";
