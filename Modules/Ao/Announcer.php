@@ -158,7 +158,7 @@ class Announcer extends BaseActiveModule
 				$this->bot->core("settings")->save("Announcer", "BotName", str_replace($botnet, "", $new));
 			}						
 			$this->bot->send_tell($botnet, "unregister", 1, false);
-			return "Unregister command sent to ##highlight##$main##end##";
+			return "Unregister command sent to ##highlight##$botnet##end##";
 		} else {
 			return "##error##Character ##highlight##$botnet##end## does not exist.##end##";
 		}
