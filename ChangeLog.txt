@@ -1,4 +1,11 @@
 ------------------------
+Release 0.8.1 - ... 2024 
+------------------------
+- For both: ...
+- For AO: ...
+- For AoC: ...
+
+------------------------
 Release 0.8.0 - Feb 2024 
 ------------------------
 This is a major patch also marking 20th year of Bebot's existence !
