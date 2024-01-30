@@ -35,7 +35,7 @@ class BasePassiveModule
     public $module_name; //Name of the module extending this class.
     protected $error; //This holds an error class.
     protected $link_name;
-
+	var $source;
 
     function __construct(&$bot, $module_name)
     {

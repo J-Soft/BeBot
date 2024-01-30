@@ -1,6 +1,6 @@
 <?php
 /**
- * Abstract class for an input reader
+ * Abstract module for an input reader
  */
 abstract class PBInputReader
 {

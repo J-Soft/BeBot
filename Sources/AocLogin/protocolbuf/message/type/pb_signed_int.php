@@ -5,7 +5,7 @@
 class PBSignedInt extends PBScalar
 {
     var $wired_type = PBMessage::WIRED_VARINT;
-
+	var $value;
 
     /**
      * Parses the message for this type

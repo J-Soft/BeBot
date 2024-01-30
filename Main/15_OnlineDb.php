@@ -119,7 +119,7 @@ class OnlineDB_Core extends BasePassiveModule
                 "Should the reinvite be silent without any output, or not? On means silent, Off means notifies are sent."
             );
         if ($this->bot->guildbot) {
-            $reinvnot = "You are reinvited to the guest channel of " . $this->bot->guildname . "!";
+            $reinvnot = "You are reinvited to the guest channel of " . $this->bot->db->real_escape_string(htmlentities($this->bot->guildname)) . "!";
         } else {
             $reinvnot = "You are reinvited to " . $this->bot->botname . "!";
         }
@@ -150,36 +150,72 @@ class OnlineDB_Core extends BasePassiveModule
         }
         switch ($this->bot->db->get_version("online")) {
             case 1:
-                $this->bot->db->update_table(
-                    "online",
-                    "profession",
-                    "drop",
-                    "ALTER TABLE #___online DROP `profession`, DROP `level`, DROP `ailevel`"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___online' AND COLUMN_NAME = 'profession'");
+				if(count($col)==1) {
+					$this->bot->db->update_table(
+						"online",
+						"profession",
+						"drop",
+						"ALTER TABLE #___online DROP `profession`"
+					);
+				}
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___online' AND COLUMN_NAME = 'level'");
+				if(count($col)==1) {
+					$this->bot->db->update_table(
+						"online",
+						"level",
+						"drop",
+						"ALTER TABLE #___online DROP `level`"
+					);
+				}
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___online' AND COLUMN_NAME = 'ailevel'");
+				if(count($col)==1) {
+					$this->bot->db->update_table(
+						"online",
+						"ailevel",
+						"drop",
+						"ALTER TABLE #___online DROP `ailevel`"
+					);				
+				}
             case 2:
-                $this->bot->db->update_table(
-                    "online",
-                    array(
-                         "status_irc",
-                         "status_irc_changetime"
-                    ),
-                    "drop",
-                    "ALTER TABLE #___online DROP status_irc, DROP status_irc_changetime"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___online' AND COLUMN_NAME = 'status_irc'");
+				if(count($col)==1) {
+					$this->bot->db->update_table(
+						"online",
+						"status_irc",
+						"drop",
+						"ALTER TABLE #___online DROP status_irc"
+					);
+				}
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___online' AND COLUMN_NAME = 'status_irc_changetime'");
+				if(count($col)==1) {
+					$this->bot->db->update_table(
+						"online",
+						"status_irc_changetime",
+						"drop",
+						"ALTER TABLE #___online DROP status_irc_changetime"
+					);				
+				}	
             case 3:
-                $this->bot->db->update_table(
-                    "online",
-                    "reinvite",
-                    "add",
-                    "ALTER TABLE #___online ADD reinvite INT(1) DEFAULT '0'"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___online' AND COLUMN_NAME = 'reinvite'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"online",
+						"reinvite",
+						"add",
+						"ALTER TABLE #___online ADD reinvite INT(1) DEFAULT '0'"
+					);
+				}
             case 4:
-                $this->bot->db->update_table(
-                    "online",
-                    "level",
-                    "add",
-                    "ALTER TABLE #___online ADD level INT(1) DEFAULT '0'"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___online' AND COLUMN_NAME = 'level'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"online",
+						"level",
+						"add",
+						"ALTER TABLE #___online ADD level INT(1) DEFAULT '0'"
+					);
+				}
             default:
         }
         $this->bot->db->set_version("online", 5);

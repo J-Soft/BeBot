@@ -5,7 +5,7 @@
 class PBBool extends PBInt
 {
     var $wired_type = PBMessage::WIRED_VARINT;
-
+	var $value, $reader;
 
     /**
      * Parses the message for this type

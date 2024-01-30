@@ -3,6 +3,9 @@
 namespace SimpleDiscord\DiscordSocket;
 
 class BetterClient extends \WebSocket\Client {
+	
+	var $socket, $is_connected, $last_opcode, $close_status, $is_closing, $huge_payload;
+	
 	public function getSocket() {
 		return $this->socket;
 	}

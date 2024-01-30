@@ -16,6 +16,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -47,7 +48,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
 {
     private $cache; // saves the highest access level defined by all flexible groups for a player.
     private $querynames;
-
+	var $enabled;
 
     function __construct(&$bot)
     {
@@ -96,18 +97,24 @@ class FlexibleSecurity_Core extends BasePassiveModule
         }
         switch ($this->bot->db->get_version("security_flexible")) {
             case 1:
-                $this->bot->db->update_table(
-                    "security_flexible",
-                    "id",
-                    "add",
-                    "ALTER TABLE #___security_flexible ADD `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST"
-                );
-                $this->bot->db->update_table(
-                    "security_flexible",
-                    "condition",
-                    "modify",
-                    "ALTER TABLE #___security_flexible CHANGE `condition` `op` ENUM( '=', '<', '<=', '>', '>=', '!=', '&&', '||' )"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___security_flexible' AND COLUMN_NAME = 'id'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"security_flexible",
+						"id",
+						"add",
+						"ALTER TABLE #___security_flexible ADD `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST"
+					);
+				}
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___security_flexible' AND COLUMN_NAME = 'condition'");
+				if(count($col)==1) {			
+					$this->bot->db->update_table(
+						"security_flexible",
+						"condition",
+						"modify",
+						"ALTER TABLE #___security_flexible CHANGE `condition` `op` ENUM( '=', '<', '<=', '>', '>=', '!=', '&&', '||' )"
+					);
+				}
         }
         $this->bot->db->set_version("security_flexible", 2);
     }

@@ -19,6 +19,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -46,7 +47,7 @@ class Colors_Core extends BasePassiveModule
     private $color_tags;
     private $theme_info;
     private $theme;
-
+	var $startup;
 
     /*
     Constructor:

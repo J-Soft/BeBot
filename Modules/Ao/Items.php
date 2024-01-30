@@ -1,6 +1,6 @@
 <?php
 /**
- * Items database changed to Xyphos then Demoder
+ * Items database serially changed to Xyphos then Demoder then Bebot.link
  *
  * Central Items Database v1.1, By Vhab
  * Latest version can always be found at: http://bebot.link/index.php/topic,380.0.html
@@ -45,7 +45,7 @@ class VhItems extends BaseActiveModule
     var $color_header = 'DFDF00';
     var $color_highlight = '97BE37';
     var $color_normal = 'CCF0AD';
-    var $server = 'http://cidb.botsharp.net/';
+    var $server = 'http://cidb.bebot.link/';
     var $max = 50;
 
 
@@ -56,16 +56,16 @@ class VhItems extends BaseActiveModule
         $this->register_command('all', 'items', 'GUEST');
         $this->help['description'] = 'Searches the central database for information about an item.';
         $this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";
-        $this->help['notes'] = "This module uses CIDB from Demoder, Adbp/Aoppa from Auno with ItemsExtractor filter from Tyrence.";
+        $this->help['notes'] = "This module uses CIDB from Bebot.link, Adbp/Aoppa from Auno with ItemsExtractor filter from Tyrence.";
 		$this->bot->db->define_tablename("aorefs", "false");
 		$this->table();
     }
 
     function table()
     {
-		$current = 18085300;
+		$current = 18086200;
         Switch ($this->bot->db->get_version("aorefs")) {
-            case 2:
+            case 3:
 				$this->bot->log("ITEMS", "AOREFS", "DB is up to date with what this bot version expected: ".$current);
 				break;
 			default:
@@ -73,21 +73,20 @@ class VhItems extends BaseActiveModule
 				$filename = "./Extras/Items/"."aorefs-".$current."ep1.sql";
 				if(file_exists($filename)) {
 					$handle = fopen($filename, "r");
-					if (preg_match("/^windows/i", getenv("OS"))) {
-						$used = round(memory_get_usage(true)/1048576,2);
-						exec('wmic memorychip get capacity', $totalMemory);
-						$total = round(array_sum($totalMemory)/1048576);
+					$used = round((memory_get_usage(true)/1048576),2);
+					if (preg_match("/^windows/i", BOT_OPERATING_SYSTEM)) {
+						$winMemory = array();
+						exec('wmic OS get FreePhysicalMemory', $winMemory);
+						$total = round(array_sum($winMemory)/1024);
 					} else {
-						$contents = file_get_contents('/proc/meminfo');
-						preg_match_all('/(\w+):\s+(\d+)\s/', $contents, $matches);
-						$info = array_combine($matches[1], $matches[2]);
-						$total = round($info['MemTotal']/1048576);
+						$total = intval(exec("grep '^MemFree' /proc/meminfo | sed -E 's/MemFree:| kB|  \ ?//g'"));
+						$total = round($total/1024);
 					}
 					$free = floor($total-$used);
-					if($free<10) {
+					if($free<$used) {
 						$this->bot->log("ITEMS", "AOREFS", "Too few RAM available, going (slow) ram-saving mode ...");
 						$step = 9;
-					} elseif($free<30) {
+					} elseif($free<($used*3)) {
 						$this->bot->log("ITEMS", "AOREFS", "Average RAM available, trying (moderate) ram-balanced mode.");
 						$step = 99;
 					} else {
@@ -108,7 +107,7 @@ class VhItems extends BaseActiveModule
 						}
 					}
 				}
-				$this->bot->db->set_version("aorefs", 2);
+				$this->bot->db->set_version("aorefs", 3);
 				$this->bot->log("ITEMS", "AOREFS", "DB has been updated, thanks for your patience, we're now in: ".$current);
 				break;
         }

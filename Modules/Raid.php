@@ -55,7 +55,8 @@ class Raid extends BaseActiveModule
 	var $ddin = false;
 	var $topcache;
 	var $toptime;
-
+	var $limit;
+	var $minlevel, $name, $points, $pgleave;
 
     function __construct(&$bot)
     {
@@ -213,7 +214,7 @@ class Raid extends BaseActiveModule
         $this->help['command']['raid notin'] = "Sent tells to all user in privgroup saying they arnt in raid if they arnt.";
         $this->help['command']['raid notinkick'] = "Kicks all user in privgroup who arnt in raid.";
         $this->help['command']['raid list'] = "List all user who are or where in the raid and there status.";
-        $this->help['command']['raid top'] = "List top leaders and readers per raid (declared alts included) ; 30min cached.";
+        $this->help['command']['raid top'] = "List top leaders and readers per raid (declared alts included) ; 60 min cached (by default).";
 		$this->help['command']['raidstat <player>'] = "Shows given player various raid stat.";
         $this->help['command']['s <message>'] = "Raid command. Display <message> in a highly visiable manner.";
         $this->help['command']['c'] = "Raid command. Display cocoon warning in a highly visiable manner.";
@@ -539,7 +540,7 @@ class Raid extends BaseActiveModule
     function top_raid($asker, $source, $user)
     {
 		$timeout = $this->bot->core("settings")->get("Raid", "TopCache");
-		if($user=="" && $this->topcache!="" && $this->toptime!="" && $this->toptime<time() && time()-$this->toptime<$timeout*60 ) {
+		if( $user=="" && $this->topcache!="" && $this->toptime!="" && (($this->toptime<time()&&time()-$this->toptime<$timeout*60)||$this->raid) ) {
 				$output = $this->topcache;
 		} else {
 			if($this->bot->core("settings")->get("Raid", "Morebots")!="") {
@@ -1340,7 +1341,7 @@ class Raid extends BaseActiveModule
 			return "Error looking up your character infos.";
 		} elseif (isset($this->user[$name])) {
             return "You are already in the raid";
-        } elseif ($who["level"] < $minlevel) {
+        } elseif (isset($who["level"]) && $who["level"] < $minlevel) {
             return "This raid is ##highlight##$minlevel+##end##";
         } elseif ($this->limit>0 && count($this->user)>=$this->limit) {
             return "This raid is already ##highlight##full##end##";

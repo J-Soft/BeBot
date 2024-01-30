@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -37,7 +38,7 @@ The Class itself...
 */
 class OnlineDisplay extends BaseActiveModule
 {
-
+	var $cp, $listed;
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
@@ -67,6 +68,7 @@ class OnlineDisplay extends BaseActiveModule
         $this->help['command']['online'] = 'Shows who is online in org or chatgroup.';
         $this->help['command']['online <prof>'] = "Shows all characters of " . $cp . " <prof> online in org or chatgroup.";
         $this->help['command']['sm'] = "Lists all characters online sorted alphabetical by name.";
+        $this->help['command']['sm <side>'] = "Lists all characters of corresponding AO side present in the chat.";
 		$this->help['command']['recent'] = "Lists logons of last 24 hours by known main names (with logons of declared alts).";
         $this->bot->core("settings")
             ->create("Online", "Mode", $mode, "Which mode should be used in the online display?", "Basic;Fancy");
@@ -234,8 +236,13 @@ class OnlineDisplay extends BaseActiveModule
                 if (preg_match("/^sm$/i", $msg)) {
                     return $this->sm_msg($what);
                 } else {
-					if (preg_match("/^recent$/i", $msg)) {
-						return $this->recent_msg($what);
+					if (preg_match("/^sm (.+)$/i", $msg, $info)) {
+						if (strtolower($this->bot->game) == 'ao') return $this->sm_list($info[1]);
+						else return $this->sm_msg($what);
+					} else {
+						if (preg_match("/^recent$/i", $msg)) {
+							return $this->recent_msg($what);
+						}					
 					}
 				}
             }
@@ -682,6 +689,33 @@ class OnlineDisplay extends BaseActiveModule
         return $countonline[0][0] . " Members Online :: " . $this->bot
             ->core("tools")->make_blob("click to view", $msg);
     }
+
+	function sm_list($what)
+	{		
+		$msg = ''; $side = ''; $count = 0; $color = 'white';
+		if(strtolower($what)=='clan'|strtolower($what)=='cl') { $side = "Clan"; $color = "orange"; }
+		if(strtolower($what)=='omni'|strtolower($what)=='ot') { $side = "Omni"; $color = "aqua"; }
+		if(strtolower($what)=='neutral'|strtolower($what)=='neut') { $side = "Neutral"; $color = "gray"; }
+		if($side=='') return $what." is not a correct AO side (retry with clan, omni or neutral)";
+		$list = $this->bot->db->select("SELECT DISTINCT(t1.nickname), t1.botname FROM " . $this->bot
+                ->core("online") 
+                ->full_tablename()." WHERE t2.faction = '".$side."'");
+        if (!empty($list))
+		{
+				$count = count($list);
+				$msg = "There is ".$count." ##".$color."##".$side."##end## player(s) now in chat : ";
+                foreach ($list as $toon)
+				{
+					if($toon[1] == $this->bot->botname) {
+						$msg .= $toon[0]." ";
+					}
+				}
+		} else {
+			$msg = "There is no ##".$color."##".$side."##end## player currently in this chat";
+		}
+        return $count." Member(s) Found :: " . $this->bot
+            ->core("tools")->make_blob("click to view", $msg);
+	}
 	
 	function recent_msg($what)
 	{

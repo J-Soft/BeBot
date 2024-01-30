@@ -1,15 +1,15 @@
 <?php
 /**
  * Id: SmartIRC.php,v 1.54.2.14 2005/05/27 23:40:09 meebey Exp
- * Revision: 1.54.2.14
+ * Revision: 1.54.2.14 + 2023 by Bitnykk for PHP8.2/3
  * Author: meebey
  * Date: 2005/05/27 23:40:09
  *
  * Net_SmartIRC
- * This is a PHP class for communication with IRC networks,
+ * This is a PHP module for communication with IRC networks,
  * which conforms to the RFC 2812 (IRC protocol).
  * It's an API that handles all IRC protocol messages.
- * This class is designed for creating IRC bots, chats and show irc related info on webpages.
+ * This module is designed for creating IRC bots, chats and show irc related info on webpages.
  *
  * Documenation, a HOWTO and examples are in SmartIRC included.
  *
@@ -61,6 +61,19 @@ define('SMARTIRC_VERSIONSTRING', 'Net_SmartIRC ' . SMARTIRC_VERSION);
  */
 class Net_SmartIRC_base
 {
+	
+    /**
+     * @var resource
+     * @access private
+     */
+    var $_users;
+
+    /**
+     * @var resource
+     * @access private
+     */
+    var $user;	
+	
     /**
      * @var resource
      * @access private
@@ -332,6 +345,7 @@ class Net_SmartIRC_base
      */
     var $channel;
 
+	var $_modules; // PHP8.2/3
 
     /**
      * Constructor. Initiales the messagebuffer and "links" the replycodes from

@@ -15,6 +15,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -183,7 +184,7 @@ class PlayerNotes_UI extends BaseActiveModule
                         2
                     ) as $n
                 ) {
-                    if (isset($data[$n]) && $data[$n] < 1) {
+                    if (!isset($data[$n]) || $data[$n] < 1) {
                         $data[$n] = 0;
                     }
                 }

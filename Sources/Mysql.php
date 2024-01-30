@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -39,6 +40,8 @@ class MySQL
     var $PASS = "";
     var $SERVER = "";
     var $bot;
+	var $botname, $error_count, $last_error, $last_reconnect, $underscore;
+	var $master_tablename, $table_prefix, $tablenames;
     public static $instance;
 
 
@@ -171,7 +174,8 @@ class MySQL
     {
         return mysqli_real_escape_string($this->CONN, (string)$string);
     }
-
+	
+	
     function error($text, $fatal = false, $connected = true)
     {
         $msg = ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error(
@@ -188,7 +192,29 @@ class MySQL
         }
     }
 
-
+	
+	function prepbindexec($sql, $params, $result_form = MYSQLI_NUM)
+	{ // experimented for future prepared queries ; needs PHP 5.6 or over	
+		$this->connect();
+		$sql = $this->add_prefix($sql);
+		$stmt = $this->CONN->prepare($sql);
+		$types = "";
+		foreach($params as $param) {
+			$type = gettype($param);
+			$types .= strtolower(substr($type, 0, 1));
+		}
+		$stmt->bind_param($types, ...$params); // ... is >=5.6 supported
+		$stmt->execute();
+		$result = $stmt->get_result();
+		if(strtolower(substr($sql, 0, 6))=='select') { // SELECT
+			if($result) return $result->fetch_all($result_form);
+		} else { // UPDATE INSERT DELETE etc ...
+			if(is_numeric($stmt->affected_rows)) return $stmt->affected_rows;
+		}		
+		return false;
+	}
+	
+	
     function select($sql, $result_form = MYSQLI_NUM)
     {
         $this->connect();

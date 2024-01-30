@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -34,7 +35,7 @@
 $whois_core = new Whois_Core($bot);
 class Whois_Core extends BasePassiveModule
 {
-
+	var $cache, $class_name;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
@@ -113,13 +114,13 @@ class Whois_Core extends BasePassiveModule
                     "whois",
                     "class1",
                     "modify",
-                    "ALTER TABLE #___whois modify `class1` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
+                    "ALTER TABLE #___whois MODIFY `class1` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
                 );
                 $this->bot->db->update_table(
                     "whois",
                     "class2",
                     "modify",
-                    "ALTER TABLE #___whois modify `class2` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
+                    "ALTER TABLE #___whois MODIFY `class2` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
                 );
             case 3:
                 $this->bot->db->update_table(

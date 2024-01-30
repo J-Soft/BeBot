@@ -50,7 +50,7 @@ class Player
 
 
     //When constructing a new player we need to have the bot handle so that the
-    //class can look up certain variables automagically.
+    //module can look up certain variables automagically.
     public function __construct(&$bothandle, $data)
     {
         $this->bot = $bothandle;

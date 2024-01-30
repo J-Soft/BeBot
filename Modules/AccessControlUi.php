@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -40,7 +41,7 @@ class AccessControlGUI extends BaseActiveModule
     private $access_levels;
     private $access_shorts;
     private $channels;
-
+	var $shortcuts;
 
     function __construct(&$bot)
     {

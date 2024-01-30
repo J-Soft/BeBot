@@ -42,8 +42,8 @@ PREREQUISITES (WHAT DO YOU NEED?)
 To install and run BeBot you need the following: 
 
 * Anarchy Online (free or paid) or Age of Conan
-* PHP version from 5.4 (minimal requirement) upto 8.1 (max tested so far)
-* database server of either Mysql (from 4.1 upto 8.0) or MariaDB (10.0 upto 10.4)
+* PHP version from 5.4 (minimally but 7+ advised) upto 8.3 ("Max Tested So Far" aka MTSF)
+* database server of either Mysql (from 4.1 upto 8.0 MTSF) or MariaDB (10.0 upto 11.2 MTSF)
 * either "Official" files at https://github.com/J-Soft/BeBot/archive/master.zip (stable)
   or "Beta" files from https://github.com/bitnykk/BeBot/archive/master.zip (sandbox)
   NB : if you know how to use git, you also can clone/pull from any of these urls.
@@ -75,6 +75,16 @@ For tower wars to work as intended the bot needs to be in the top three
 ranks of an org. This is because the [ALL TOWERS] channel is restricted to 
 these ranks. 
 
+Docker for BeBot
+----------------
+
+We recently added the possibility to run Bebot from Docker.
+
+That is ideal if you ignore all of PHP/SQL and just want to test Bebot.
+Also nice if you run 1 bot only, or if you have no SQL service yet
+
+If you're into it follow guide @ http://wiki.bebot.link/index.php/Docker
+
 INSTALL THE BOT FILES
 ---------------------
 
@@ -100,12 +110,24 @@ Note that you can use forward slashes (recommended) or double backslashes
 (not recommended) on windows systems. Using single backslashes WILL NOT WORK 
 as php interprets \ as a special escape character.
 
+On linux, all depends on which OS you run. Install is usually apt (or yum) based :
+install phpX.Y phpX.Y-mysqli phpX.Y-bcmath phpX.Y-curl phpX.Y-mbstring
+(X.Y being the PHP version you aim for, eg 7.0 or 8.1, etc).
+
 On windows, according to the PHP version you'd want Bebot to run into, you may
 need to copy a php.exe file right into bot's root folder (where StartBot.bat is).
 Unless windows PATH and/or php.ini are well set so the exe can locate required
 libraries alone, you may have to copy correct .dll files for this specific PHP.
 For 5.4/5.6 : libeay32, libmysql, php5ts and ssleay32, php_mysqli & php_sockets.
 For 7/8 : libcrypt, libssl, libssh2, sockets, nghttp2, curl & phpX(ts).
+
+You also should look after the value of the parameter "memory_limit" in php.ini.
+It could be set at -1 (unlimited) which is fine if you got lot of RAM.
+Otherwise you'd want to control how much RAM each bot uses (if you run many).
+Anything around 10M (linux) or 50M (windows) should work safe enough :
+memory_limit = 50M
+If you see errors about exhausted allowed memory size, raise that number up
+of, e.g., 10M more (50M becomes 60M for example) until it works fine.
 
 Bot will tell you what misses to run during startup, so check all lines !
 You may need to install some modules (e.g. curl) and activate them in php.ini

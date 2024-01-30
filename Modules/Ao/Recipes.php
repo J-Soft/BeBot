@@ -22,6 +22,7 @@ $recipes = new Recipes($bot);
 
 class Recipes extends BaseActiveModule
 {
+	var $reciplist;
 	function __construct(&$bot)
 	{
 		parent::__construct($bot, get_class($this));

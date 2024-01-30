@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -47,7 +48,8 @@ class IRC extends BaseActiveModule
     var $whois;
     var $target;
     var $irc;
-
+	var $note = "Irc side commands available are : help, tara, viza, is, online/sm, whois, alts, level/lvl/pvp";
+	var $spam, $irconline, $ircmsg;
 
     /*
     Constructor:
@@ -69,7 +71,7 @@ class IRC extends BaseActiveModule
         $this->help['command']['irconline'] = "Shows users in the IRC Channel.";
         $this->help['command']['irc connect'] = "Tries to connect to the IRC channel.";
         $this->help['command']['irc disconnect'] = "Disconnects from the IRC server.";
-        $this->help['notes'] = "The IRC relay is configured via settings, for all options check /tell <botname> <pre>settings IRC. Irc side commands available are : tara, viza, is, online/sm, whois, alts, level/lvl/pvp";
+        $this->help['notes'] = "The IRC relay is configured via settings, for all options check /tell <botname> <pre>settings IRC. ".$this->note;
         // Create default settings:
         if ($this->bot->guildbot) {
             $guildprefix = "[" . $this->bot->guildname . "]";
@@ -82,6 +84,10 @@ class IRC extends BaseActiveModule
             $chatgroups = "pgroup";
             $announcewhat = "joins";
         }
+        $this->bot->core("settings")
+            ->create("IRC", "IncLog", false, "Should the bot be logging IRC Incoming messages ?", "On;Off");
+        $this->bot->core("settings")
+            ->create("IRC", "OutLog", false, "Should the bot be logging IRC Outgoing messages ?", "On;Off");		
         $this->bot->core("settings")
             ->create("IRC", "Connected", false, "Is the bot connected to the IRC server?", "On;Off", true);
         $this->bot->core("settings")->save("irc", "connected", false);
@@ -156,6 +162,8 @@ class IRC extends BaseActiveModule
                 true,
                 "Should we announce logons and logoffs as controlled by the Logon module to IRC?"
             );
+        $this->bot->core("settings")
+            ->create("Irc", "ignoreSyntax", "", "Is there a first letter that should make the bot ignore messages for IRC relay (leave empty if none) ?");
 
         $this->bot->core("colors")->define_scheme("Irc", "Text", "normal");
         $this->bot->core("colors")->define_scheme("Irc", "User", "normal");
@@ -287,6 +295,7 @@ class IRC extends BaseActiveModule
             $ircmsg .= $name . ': ';
         }
         $ircmsg .= $msg;
+		if ($this->bot->core("settings")->get("IRC", "OutLog")) $this->bot->log("IRC", "Outgoing", $ircmsg);
         $ircmsg = htmlspecialchars_decode($ircmsg);
         $this->irc->message(
             SMARTIRC_TYPE_CHANNEL,
@@ -303,6 +312,8 @@ class IRC extends BaseActiveModule
     */
     function gmsg($name, $group, $msg)
     {
+		$ignore = $this->bot->core("settings")->get("Irc", "ignoreSyntax");
+		if($ignore!=""&&substr($msg,0,1)==$ignore) return false;		
         $msg = str_replace("&gt;", ">", $msg);
         $msg = str_replace("&lt;", "<", $msg);
         if (($this->irc != null)
@@ -346,6 +357,8 @@ class IRC extends BaseActiveModule
     */
     function privgroup($name, $msg)
     {
+		$ignore = $this->bot->core("settings")->get("Irc", "ignoreSyntax");
+		if($ignore!=""&&substr($msg,0,1)==$ignore) return false;			
         $msg = str_replace("&gt;", ">", $msg);
         $msg = str_replace("&lt;", "<", $msg);
         if (($this->irc != null)
@@ -713,7 +726,13 @@ class IRC extends BaseActiveModule
             $this->bot->commpre . 'viza',
             $this->bot->commands["tell"]["irc"],
             'irc_viza'
-        );	
+        );
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_CHANNEL,
+            $this->bot->commpre . 'help',
+            $this->bot->commands["tell"]["irc"],
+            'irc_help'
+        );		
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_CHANNEL,
             $this->bot->commpre . 'whois',
@@ -805,7 +824,13 @@ class IRC extends BaseActiveModule
             $this->bot->commpre . 'viza',
             $this->bot->commands["tell"]["irc"],
             'irc_viza'
-        );		
+        );	
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_QUERY,
+            $this->bot->commpre . 'help',
+            $this->bot->commands["tell"]["irc"],
+            'irc_help'
+        );			
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_QUERY,
             $this->bot->commpre . 'whois',
@@ -908,12 +933,14 @@ class IRC extends BaseActiveModule
     */
     function irc_receive(&$irc, &$data)
     {
+		if(mb_detect_encoding($data->message, 'UTF-8', true)) $data->message = mb_convert_encoding($data->message, 'ISO-8859-1', 'UTF-8');
         if ((strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'online')))
             && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'is')))
             && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'whois')))
             && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'level')))
 			&& (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'tara')))
 			&& (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'viza')))
+			&& (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'help')))
         ) {
             $msg = str_replace("<", "&lt;", $data->message);
             $msg = str_replace(">", "&gt;", $msg);
@@ -949,6 +976,7 @@ class IRC extends BaseActiveModule
                 $this->bot->core("settings")
                     ->get("Irc", "Chat")
             );
+			if ($this->bot->core("settings")->get("IRC", "IncLog")) $this->bot->log("IRC", "Incoming", $txt);
             /*if ($this->bot->core("settings")
                     ->get("Irc", "UseGuildRelay")
                 && $this->bot
@@ -1265,6 +1293,12 @@ class IRC extends BaseActiveModule
         $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
     }		
 	
+    function irc_help(&$irc)
+    {
+        $target = $this->bot->core("settings")->get("Irc", "Channel");
+        $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $this->note);
+    }		
+	
     function irc_whois(&$irc, &$data)
     {
 		$msg = "";
@@ -1433,6 +1467,7 @@ class IRC extends BaseActiveModule
             case $this->bot->commpre . 'pvp':
             case $this->bot->commpre . 'tara':
             case $this->bot->commpre . 'viza':
+            case $this->bot->commpre . 'help':
                 Break; //These should of been handled elsewere
             case 'is':
                 $data->message = $this->bot->commpre . $data->message;
@@ -1468,7 +1503,10 @@ class IRC extends BaseActiveModule
 			case 'viza':
                 $data->message = $this->bot->commpre . $data->message;
                 $this->irc_viza($irc, $data);
-                Break;				
+                Break;
+			case 'help':
+				$this->irc_help($irc);
+                Break;
             Default:
                 if ($data->type == SMARTIRC_TYPE_QUERY) {
                     $target = $data->nick;

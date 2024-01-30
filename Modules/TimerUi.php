@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -117,13 +118,16 @@ class TimerGUI extends BaseActiveModule
                 ) {
                     if ($info[1] != "") {
                         $classused = $info[1];
-                    }
+                    } else {
+						$classused = "";
+					}
                     return $this->add_timer($name, $info[2], $info[6], $classused, $info[4], $channel);
                 } else {
                     return "Correct Format: ##highlight##<pre>rtimer [class] <dur>[mshd] <repeat>[mshd] title##end## or ##highlight##<pre>rtimer [class] <dur>[:##[:##[:##]]] <repeat>[:##[:##[:##]]] title##end## [class] is an optional parameter";
                 }
             case 'remtimer':
-                return $this->rem_timer($name, $command[1]);
+                if(isset($command[1])&&is_numeric($command[1])) return $this->rem_timer($name, $command[1]);
+				else return "No timer id provided.";
             case 'ptimer':
                 if (isset($command[1])) {
                     return $this->command_handler($name, 'timer ' . $command[1], 'gc');
@@ -214,7 +218,8 @@ class TimerGUI extends BaseActiveModule
 
     function rem_timer($name, $id)
     {
-        return $this->bot->core("timer")->del_timer($name, $id, false);
+        if(isset($id)&&is_numeric($id)) return $this->bot->core("timer")->del_timer($name, $id, false);
+		else return "Timer id is missing";
     }
 
 

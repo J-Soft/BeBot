@@ -12,6 +12,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -30,9 +31,9 @@
 *  USA
 */
 ///////////////////////////////////
-// nroll.php 1.1 for BeBot
+// nroll.php 1.2 for BeBot
 ///////////////////////////////////
-// (c) Copyright 2007 by Philip Stolarczyk
+// (c) Copyright 2007 by Philip Stolarczyk / 2023 by Bitnykk for PHP8.2/3
 // All Rights Reserved
 // Licensed for distribution under the GPL (Gnu General Public License) version 2.0 or later
 ///////////////////////////////////
@@ -46,7 +47,7 @@ class Nroll extends BaseActiveModule
     var $verifyresult;
     var $verifytime;
     var $verifyname;
-
+	var $output, $result;
 
     // Constructor
     function __construct(&$bot)

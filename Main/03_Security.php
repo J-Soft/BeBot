@@ -65,6 +65,7 @@ class Security_Core extends BaseActiveModule
     var $_owner; // Owner from Bot.conf
     var $_cache; // Security Cache.
     var $last_alts_status; // Check status of setting UseAlts, if it changes clear main cache.
+	var $owner, $super_admin, $cache, $last_leader;
     /*
     Constructor:
     Hands over a reference to the "Bot" class.

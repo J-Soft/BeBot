@@ -38,6 +38,7 @@ $recruit = new Recruit($bot);
 class Recruit extends BaseActiveModule
 {
 	var $bot;
+	var $verify;
 
 	function __construct(&$bot)
 	{
@@ -72,7 +73,7 @@ class Recruit extends BaseActiveModule
 
 	function do_recruit($name)
 	{
-		$guildname = $this->bot->core("settings")->get("Recruit","GuildName");
+		$guildname = str_replace("'","`",$this->bot->core("settings")->get("Recruit","GuildName"));
 		$lastofficer = $this->bot->core("settings")->get("Recruit","LastOfficer");
 		$lastofficer1 = $this->bot->core("settings")->get("Recruit","LastOfficer1");
 		$lastofficer2 = $this->bot->core("settings")->get("Recruit","LastOfficer2");
@@ -213,7 +214,7 @@ class Recruit extends BaseActiveModule
 					$channel = "Neu. Newbie OOC";
 					break;					
 			}
-			$msg = $this->bot->core("settings")->get("Recruit","GuildName")." ";
+			$msg = str_replace("'","`",$this->bot->core("settings")->get("Recruit","GuildName"))." ";
 			$blob = "";
 			if (file_exists("./Text/" . $this->bot->botname . "Recruit.txt")) { // custom
 				$blob .= implode("", file("./Text/" . $this->bot->botname . "Recruit.txt"));
@@ -223,7 +224,9 @@ class Recruit extends BaseActiveModule
 			if($blob=="") { // default
 				$blob = "<a href=\"text://To initiate recruitment process: <a href='chatcmd:///tell ".$this->bot->botname." recruit'>Start application</a><br><br>\">Click this!</a>";
 			}
-			$this -> bot -> aoc -> send_group($channel,utf8_encode($msg.$blob));
+			if(mb_detect_encoding($msg, 'UTF-8', false)) $msg = mb_convert_encoding($msg, 'UTF-8', mb_list_encodings());
+			if(mb_detect_encoding($blob, 'UTF-8', false)) $blob = mb_convert_encoding($blob, 'UTF-8', mb_list_encodings());
+			$this -> bot -> aoc -> send_group($channel,$msg.$blob);
 			$this->bot->log("RECRUIT", "NOTICE", "Sent recruit message on ".$channel);
 		}
     }

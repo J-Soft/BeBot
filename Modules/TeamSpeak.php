@@ -2,7 +2,6 @@
 /*
 * TeamSpeak.php - Adds TeamSpeak3 support to the bot
 * Bitnykk module from available Bebot archives
-* Thanks Teknologist & AoSpeak to accept being default server
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
 * Copyright (C) 2005-2020 J-Soft and the BeBot development team.
@@ -45,12 +44,12 @@ class Teamspeak Extends BaseActiveModule
 		$this -> help['description'] = "Shows information about teamspeak.";
 		$this -> help['command']['ts'] = "See description";
 		
-		$this -> bot -> core("settings") -> create("Teamspeak", "tsip", "141.157.197.21", "What is TS server fixed IP or dynamic hostname ?");
+		$this -> bot -> core("settings") -> create("Teamspeak", "tsip", "0.0.0.0", "What is TS server fixed IP or dynamic hostname ?");
 		$this -> bot -> core("settings") -> create("Teamspeak", "tsqp", "10011", "What is TS Query Port ?");
 		$this -> bot -> core("settings") -> create("Teamspeak", "tssp", "9987", "What is TS Server Port ?");
-		$this -> bot -> core("settings") -> create("Teamspeak", "tssn", "AoSpeak", "What is TS Server Name ?");
-		$this -> bot -> core("settings") -> create("Teamspeak", "tsdh", "voice.aospeak.com", "What is TS Display Host ?");
-		$this -> bot -> core("settings") -> create("Teamspeak", "tssi", "1", "What is TS Server Id ?");
+		$this -> bot -> core("settings") -> create("Teamspeak", "tssn", "TsServerName", "What is TS Server Name ?");
+		$this -> bot -> core("settings") -> create("Teamspeak", "tsdh", "ts.server.dom", "What is TS Display Host ?");
+		$this -> bot -> core("settings") -> create("Teamspeak", "tssi", "0", "What is TS Server Id ?");
 		$this -> bot -> core("settings") -> create("Teamspeak", "tsln", "", "What is TS Login Name ?");
 		$this -> bot -> core("settings") -> create("Teamspeak", "tslp", "", "What is TS Login Password ?");
 		
@@ -65,7 +64,7 @@ class Teamspeak Extends BaseActiveModule
 		if(empty($com['args']))
 			return $this -> show_tstatus();
 
-		return "I do not understand the command: $command";
+		return "I do not understand that command.";
 	}
 
 

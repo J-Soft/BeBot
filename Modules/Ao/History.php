@@ -41,7 +41,7 @@ $history = new History($bot);
 
 class History extends BaseActiveModule
 {
-
+	var $path;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));

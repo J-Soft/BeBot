@@ -27,6 +27,12 @@ class CharacterServerConnection extends ServerConnection
     private $m_CharacterName;
     /// The key we use to log in with
     private $m_LoginCookie;
+    
+	// Bitnykk 2023 PHP8.2/3
+	private $m_AccountID;
+	private $m_CharacterID;
+	private $m_CharacterLanguage;
+	var $chars, $m_LogName;
 
     // Chat server info
     private $m_ChatServerAddress;

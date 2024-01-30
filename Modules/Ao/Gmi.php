@@ -40,6 +40,7 @@ The Class itself...
 */
 class Gmi extends BaseActiveModule
 {
+	var $apiver;
 	function __construct(&$bot)
 	{
 		parent::__construct($bot, get_class($this));

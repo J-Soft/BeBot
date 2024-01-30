@@ -1,6 +1,6 @@
 <?php
 /*
-* TowerAttack.php - Handle Alien attack events.
+* AlienAttack.php - Handle Alien attack events.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -37,7 +37,7 @@ The Class itself...
 */
 class AlienAttack extends BaseActiveModule
 {
-
+	var $spam, $timerid;
     /*
     Constructor:
     Hands over a reference to the "Bot" class.

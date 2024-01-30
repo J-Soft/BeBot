@@ -79,6 +79,7 @@ class DiscordRelay extends BaseActiveModule
 	var $lastcheck = 0;
 	var $crondelay = "2sec";
 	var $is;
+	var $note = "Discord side commands available are : help, tara, viza, is, online/sm, whois, alts, level/lvl/pvp";
 
     /*
     Constructor:
@@ -99,9 +100,13 @@ class DiscordRelay extends BaseActiveModule
         $this->help['description'] = "Handles the Discord relay of the bot.";
         $this->help['command']['discord connect'] = "Tries relaying from/to the Discord channel.";
         $this->help['command']['discord disconnect'] = "Stops relaying from/to the Discord channel.";
-        $this->help['notes'] = "The Discord relay is configured via settings, for all options check /tell <botname> <pre>settings discord. Discord side commands available are : is, online/sm, whois, alts, level/lvl/pvp";
+        $this->help['notes'] = "The Discord relay is configured via settings, for all options check /tell <botname> <pre>settings discord. ".$this->note;
         $this->bot->core("settings")
-            ->create("discord", "DiscordRelay", false, "Should the bot be relaying from/to Discord server ?", "On;Off", true);	
+            ->create("discord", "DiscordRelay", false, "Should the bot be relaying from/to Discord server ?", "On;Off");	
+        $this->bot->core("settings")
+            ->create("discord", "IncLog", false, "Should the bot be logging Discord Incoming messages ?", "On;Off");
+        $this->bot->core("settings")
+            ->create("discord", "OutLog", false, "Should the bot be logging Discord Outgoing messages ?", "On;Off");
         $this->bot->core("settings")
             ->create("discord", "ServerId", "", "Discord server ID for the widget online checks ?");			
         $this->bot->core("settings")
@@ -124,7 +129,10 @@ class DiscordRelay extends BaseActiveModule
                 "AOItems",
                 "Should AOItems or AUNO be used for links in item refs?",
                 "AOItems;AUNO"
-            );			
+            );
+        $this->bot->core("settings")
+            ->create("Discord", "ignoreSyntax", "", "Is there a first letter that should make the bot ignore messages for Discord relay (leave empty if none) ?");
+			
 	}
 	
     /*
@@ -193,7 +201,8 @@ class DiscordRelay extends BaseActiveModule
 								$color = "##white##";
 								break;
 						}												
-						$sent .= $color.utf8_decode($member['username'])."##end## ";
+						if(mb_detect_encoding($member['username'], 'UTF-8', true)) $member['username'] = mb_convert_encoding($member['username'], 'ISO-8859-1', 'UTF-8');
+						$sent .= $color.$member['username']."##end## ";
 					}
 				}
 			}	
@@ -280,6 +289,8 @@ class DiscordRelay extends BaseActiveModule
     */
     function gmsg($name, $group, $msg)
     {	
+		$ignore = $this->bot->core("settings")->get("Discord", "ignoreSyntax");
+		if($ignore!=""&&substr($msg,0,1)==$ignore) return false;	
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			if (strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="gc" || strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="both" ) {		
 				$channel = $this->bot->core("settings")->get("discord", "ChannelId");
@@ -290,6 +301,7 @@ class DiscordRelay extends BaseActiveModule
 					$sent = "[Guildchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,0);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
+					if ($this->bot->core("settings")->get("discord", "OutLog")) $this->bot->log("DISCORD", "Outgoing", $sent);
 					if(isset($result['message'])&& isset($result['code'])) {
 						$this->bot->log("DISCORD", "ERROR", "Erroneous configuration : do !settings discord to fix");
 					}					
@@ -350,6 +362,7 @@ class DiscordRelay extends BaseActiveModule
 				$sent = $this->bot->core("tools")->cleanString($form,0);
 				$data = array("content" => $sent);
 				$result = discord_post($route, $token, $data);
+				if ($this->bot->core("settings")->get("discord", "OutLog")) $this->bot->log("DISCORD", "Outgoing", $sent);
 				if(isset($result['message'])&& isset($result['code'])) {
 					$this->bot->log("DISCORD", "ERROR", "Missed configuration : do !settings discord to fix");
 				}				
@@ -362,6 +375,8 @@ class DiscordRelay extends BaseActiveModule
     */
     function privgroup($name, $msg)
     {
+		$ignore = $this->bot->core("settings")->get("Discord", "ignoreSyntax");
+		if($ignore!=""&&substr($msg,0,1)==$ignore) return false;		
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			if (strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="pgroup" || strtolower($this->bot->core("settings")->get("discord", "WhatChat"))=="both" ) {
 				$channel = $this->bot->core("settings")->get("discord", "ChannelId");
@@ -370,8 +385,9 @@ class DiscordRelay extends BaseActiveModule
 					$route = "/channels/{$channel}/messages";
 					$form = $this->strip_formatting($msg);
 					$sent = "[Privchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,0);
-					$data = array("content" => $sent);
+					$data = array("content" => $sent);	
 					$result = discord_post($route, $token, $data);
+					if ($this->bot->core("settings")->get("discord", "OutLog")) $this->bot->log("DISCORD", "Outgoing", $sent);
 					if(isset($result['message'])&& isset($result['code'])) {
 						$this->bot->log("DISCORD", "ERROR", "Misconfiguration : do !settings discord to fix");
 					}
@@ -401,8 +417,10 @@ class DiscordRelay extends BaseActiveModule
 					foreach ($invert as $msg) {
 							if ($msg['id']>$this->lastmsg) { $this->lastmsg = $msg['id']; }
 							if ($msg['timestamp']>$this->lastcheck && !isset($msg['author']['bot'])) {
+								if ($this->bot->core("settings")->get("discord", "IncLog")) $this->bot->log("DISCORD", "Incoming", ucfirst($msg['author']['username']).": ".strip_tags($msg['content']));
 								if(substr($msg['content'],0,1)!=$this->bot->commpre) {
-									$sent = "[Discord] ".ucfirst($msg['author']['username']).": ".strip_tags(utf8_decode($msg['content']));
+									if(mb_detect_encoding($msg['content'], 'UTF-8', true)) $msg['content'] = mb_convert_encoding($msg['content'], 'ISO-8859-1', 'UTF-8');
+									$sent = "[Discord] ".ucfirst($msg['author']['username']).": ".strip_tags($msg['content']);									
 									$this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
 								} else {
 									$com = explode(" ", $msg['content'], 2);
@@ -430,9 +448,9 @@ class DiscordRelay extends BaseActiveModule
 										case $this->bot->commpre . 'lvl':
 										case $this->bot->commpre . 'pvp':
 											$sent = $this->discord_lvl($msg['content']);
-											Break;										
+											Break;
 										Default:
-											$sent = "";
+											$sent = $this->note;
 											Break;
 									}
 									if($sent!="") {

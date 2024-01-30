@@ -114,18 +114,21 @@ class Points extends BaseActiveModule
                     "raid_points",
                     "points",
                     "modify",
-                    "ALTER TABLE #___raid_points modify `points` decimal(11,2) default '0.00'"
+                    "ALTER TABLE #___raid_points MODIFY `points` decimal(11,2) default '0.00'"
                 );
                 if ($updatepoints) {
                     $this->bot->db->query("UPDATE #___raid_points SET points = points / 10");
                 }
             case 2:
-                $this->bot->db->update_table(
-                    "raid_points",
-                    "nickname",
-                    "add",
-                    "ALTER TABLE #___raid_points ADD nickname VARCHAR(20) DEFAULT '' after id"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___raid_points' AND COLUMN_NAME = 'nickname'");
+				if(count($col)==0) {			
+					$this->bot->db->update_table(
+						"raid_points",
+						"nickname",
+						"add",
+						"ALTER TABLE #___raid_points ADD nickname VARCHAR(20) DEFAULT '' after id"
+					);
+				}
                 $users = $this->bot->db->select("SELECT id from #___raid_points");
                 if (!empty($users)) {
                     foreach ($users as $id) {
@@ -146,12 +149,15 @@ class Points extends BaseActiveModule
                     }
                 }
             case 3:
-                $this->bot->db->update_table(
-                    "raid_points",
-                    "raidingas",
-                    "add",
-                    "ALTER TABLE #___raid_points ADD raidingas VARCHAR(20) DEFAULT '' after raiding"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___raid_points' AND COLUMN_NAME = 'raidingas'");
+				if(count($col)==0) {				
+					$this->bot->db->update_table(
+						"raid_points",
+						"raidingas",
+						"add",
+						"ALTER TABLE #___raid_points ADD raidingas VARCHAR(20) DEFAULT '' after raiding"
+					);
+				}
 			case 4:
 				$this->bot->db->query(
 					"UPDATE #___settings
@@ -179,7 +185,7 @@ class Points extends BaseActiveModule
 				}			
                 Break;
             case 'add':
-                if (strlen($msg[4]) < 5) {
+                if (!isset($msg[4]) || strlen($msg[4]) < 5) {
                     Return ("Error: Reason required, min ##highlight##5##end## letters");
                 }
                 $this->add_points($name, $msg[2], $msg[3], $msg[4]);

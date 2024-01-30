@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -38,7 +39,7 @@ class BotError
     private $is_fatal;
     private $description;
     private $source;
-
+	var $is_error;
 
     function __construct(&$bot, $module)
     {

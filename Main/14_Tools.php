@@ -36,7 +36,7 @@
 $tools = new tools($bot);
 class tools extends BasePassiveModule
 {
-
+	var $useragent, $randomsource, $use_proxy_server, $proxy_server_address;
     function __construct(&$bot)
     {
 
@@ -702,7 +702,8 @@ class tools extends BasePassiveModule
 	// mode : 0 cleans all, 1 cleans only specifics
 	function cleanString($msg,$mode=0) {
 		if($mode==0) {
-			$msg = strip_tags(utf8_encode($msg));
+			if(mb_detect_encoding($msg, 'UTF-8', false)) $msg = mb_convert_encoding($msg, 'UTF-8', mb_list_encodings());
+			$msg = strip_tags($msg);
 			$msg = str_replace("&gt;", ">", $msg);
 			$msg = str_replace("&lt;", "<", $msg);
 			$msg = str_replace("&amp;", "&", $msg);

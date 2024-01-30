@@ -31,7 +31,9 @@ class PBParser
             'string' => 'PBString',
             'bytes' => 'PBString'
         );
-
+	
+	// PHP 8.2/3
+	var $fields, $values;
 
     /**
      * parses the profile and generates a filename with the name
@@ -61,7 +63,7 @@ class PBParser
 
 
     /**
-     * Creates php class file for the proto file
+     * Creates php module file for the proto file
      *
      * @param String $filename - the filename of the php file
      */

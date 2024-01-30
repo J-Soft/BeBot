@@ -1,3 +1,17 @@
+------------------------
+Release 0.8.0 - Feb 2024 
+------------------------
+This is a major patch also marking 20th year of Bebot's existence !
+- For both games:
+	PHP 8.2/8.3 supports have both been prepared and extensively tested
+	Docker (win/nux) is now supported & documented with a dedicated config repository
+	improvements across mysql, irc/discord, raid, recruit, admins, mail, ts & defreeze
+- For AO only:
+	loot disclaimer added ; items & its cidb updated ; sm, taraviza & orgs improved
+- For AoC only:
+	craftclasses, whois and blacklist fixed
+Thanks to the beta team for helping/testing, congrats to all that participated Bebot since 2004.
+
 -------------------------
 Release 0.7.27 - Sep 2023 
 -------------------------

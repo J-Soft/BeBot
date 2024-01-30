@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -212,7 +213,9 @@ class PrivGroup extends BaseActiveModule
         $target = explode(" ", $target, 2);
         if (!empty($target[1])) {
             $pmsg = " (" . $target[1] . ")";
-        }
+        } else {
+			$pmsg = "";
+		}
         $target = ucfirst(strtolower($target[0]));
         if ($name == $target) {
             $this->bot->core("chat")->pgroup_kick($name);

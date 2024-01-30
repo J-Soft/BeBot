@@ -38,6 +38,7 @@ $guide = new Guide($bot);
 
 class Guide extends BaseActiveModule
 {
+	var $path;
     function __construct(&$bot)
     {
 

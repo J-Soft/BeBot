@@ -37,7 +37,7 @@ The Class itself...
 */
 class TowerAttack extends BaseActiveModule
 {
-
+	var $suppress, $suppressdata;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
@@ -214,26 +214,72 @@ class TowerAttack extends BaseActiveModule
         }
         switch ($this->bot->db->get_version("tower_result")) {
             case 1:
-                $this->bot->db->update_table(
-                    "tower_result",
-                    "zone",
-                    "add",
-                    "ALTER TABLE #___tower_result ADD zone VARCHAR(50)"
-                );
-                $this->bot->db->update_table(
-                    "tower_result",
-                    array(
-                         "time",
-                         "win_guild",
-                         "win_side",
-                         "lose_guild",
-                         "lose_side",
-                         "zone"
-                    ),
-                    "alter",
-                    "ALTER TABLE #___tower_result " . "ADD UNIQUE (time, win_guild, win_side, lose_guild, lose_side, zone), "
-                    . "ADD INDEX (win_guild), ADD INDEX (win_side), ADD INDEX (zone)"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___tower_result' AND COLUMN_NAME = 'zone'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"tower_result",
+						"zone",
+						"add",
+						"ALTER TABLE #___tower_result ADD UNIQUE (zone) VARCHAR(50)"
+					);
+				}
+				$index = $this->bot->db->select("SHOW INDEX FROM #___tower_result WHERE KEY_NAME = 'zone'");
+				if(count($index)==0) {				
+					$this->bot->db->query("ALTER TABLE #___tower_result ADD INDEX (zone)");
+				}				
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___tower_result' AND COLUMN_NAME = 'win_guild'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"tower_result",
+						"win_guild",
+						"add",
+						"ALTER TABLE #___tower_result ADD UNIQUE (win_guild) VARCHAR(50)"
+					);
+				}
+				$index = $this->bot->db->select("SHOW INDEX FROM #___tower_result WHERE KEY_NAME = 'win_guild'");
+				if(count($index)==0) {				
+					$this->bot->db->query("ALTER TABLE #___tower_result ADD INDEX (win_guild)");
+				}					
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___tower_result' AND COLUMN_NAME = 'win_side'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"tower_result",
+						"win_side",
+						"add",
+						"ALTER TABLE #___tower_result ADD UNIQUE (win_side) VARCHAR(50)"
+					);
+				}
+				$index = $this->bot->db->select("SHOW INDEX FROM #___tower_result WHERE KEY_NAME = 'win_side'");
+				if(count($index)==0) {				
+					$this->bot->db->query("ALTER TABLE #___tower_result ADD INDEX (win_side)");
+				}				
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___tower_result' AND COLUMN_NAME = 'time'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"tower_result",
+						"time",
+						"add",
+						"ALTER TABLE #___tower_result ADD UNIQUE (time) VARCHAR(50)"
+					);
+				}				
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___tower_result' AND COLUMN_NAME = 'lose_guild'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"tower_result",
+						"lose_guild",
+						"add",
+						"ALTER TABLE #___tower_result ADD UNIQUE (lose_guild) VARCHAR(50)"
+					);
+				}
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___tower_result' AND COLUMN_NAME = 'lose_side'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"tower_result",
+						"lose_side",
+						"add",
+						"ALTER TABLE #___tower_result ADD UNIQUE (lose_side) VARCHAR(50)"
+					);
+				}			
         }
         $this->bot->db->set_version("tower_result", 2);
         switch ($this->bot->db->get_version("tower_attack")) {
@@ -570,11 +616,14 @@ class TowerAttack extends BaseActiveModule
             $battle .= " " . $infos["off_profession"] . ")\n";
             if (!empty($infos["off_guild"])) {
                 $battle .= "Attacking Guild: ##" . $infos["off_side"] . "##" . $infos["off_guild"] . "##end##\n";
-            }
+            } else {
+				$infos["off_guild"] = "Unknown";
+			}
             $battle .= "Defending Guild: ##" . $infos["def_side"] . "##" . $infos["def_guild"] . "##end##";
             $infos["blob"] = $this->bot->core("tools")
                 ->make_blob("More", $battle);
         }
+		if(!isset($infos["off_player"])) $infos["off_player"] = "Unknown";
         $infos["br"] = "\n";
         $infos["time"] = gmdate(
             $this->bot->core("settings")

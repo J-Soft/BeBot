@@ -43,7 +43,6 @@ class Alts_Core extends BasePassiveModule
     private $mains;
     private $alts;
 
-
     /*
     Constructor:
     Hands over a reference to the "Bot" class.

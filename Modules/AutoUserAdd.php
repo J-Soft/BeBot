@@ -38,7 +38,7 @@
 $AutoUserAdd = new AutoUserAdd($bot);
 class AutoUserAdd extends BasePassiveModule
 {
-    var $checked;
+    var $checked, $hooks;
 
 
     function __construct(&$bot)

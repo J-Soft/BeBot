@@ -5,7 +5,7 @@
 class PBEnum extends PBScalar
 {
     var $wired_type = PBMessage::WIRED_VARINT;
-
+	var $value, $reader, $base128;
 
     /**
      * Parses the message for this type

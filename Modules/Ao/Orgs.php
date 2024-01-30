@@ -6,7 +6,7 @@
 * - Coded for Bebot 0.5 (SVN)
 * You are Free to Improve and Change as Long as My name Stays on it
 *
-* 2021 updated by Bitnykk for bebot 0.7.x
+* 2021 updated by Bitnykk for bebot 0.7.x / 2023 for PHP8.2/3
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@ $orgs = new Orgs($bot);
 
 class Orgs extends BaseActiveModule
 {
+	var $letters, $debug, $added, $updated, $updatedm, $checked, $next, $active, $info, $geterror;
 	function __construct(&$bot)
 	{
 		parent::__construct($bot, get_class($this));
@@ -195,13 +196,29 @@ class Orgs extends BaseActiveModule
 					}
 				}
 			if ($this->debug) echo " inserts ";
+			$inpre = "INSERT INTO #___orgs (dim, org_id, org, last_update, members, faction) VALUES ";
+			$incur = 0; $inlim = 19; $inreq = ""; $instr = "";
 			if (!empty($insert))
 			{
 				foreach ($insert as $key => $value)
 				{
-					$this->bot->db->query("INSERT INTO #___orgs (dim, org_id, org, last_update, members, faction) VALUES ('".mysqli_real_escape_string($this->bot->db->CONN,$value[3])."', '".$key."', '".mysqli_real_escape_string($this->bot->db->CONN,$value[0])."', ".time().", ".mysqli_real_escape_string($this->bot->db->CONN,$value[1]).", '".mysqli_real_escape_string($this->bot->db->CONN,$value[2])."')");
+					$instr = "('".mysqli_real_escape_string($this->bot->db->CONN,$value[3])."', '".$key."', '".mysqli_real_escape_string($this->bot->db->CONN,$value[0])."', ".time().", ".mysqli_real_escape_string($this->bot->db->CONN,$value[1]).", '".mysqli_real_escape_string($this->bot->db->CONN,$value[2])."')";
+					if($incur==0) {
+						$inreq = $inpre.$instr;
+						$incur ++;
+					}
+					elseif($incur<$inlim) {
+						$inreq .= ",".$instr;
+						$incur ++;
+					}
+					else {
+						$inreq .= ",".$instr.";";
+						$this->bot->db->query($inreq);
+						$incur = 0; $inreq = "";
+					}					
 					$this->added++;
 				}
+				if($inreq!="") $this->bot->db->query($inreq.";");
 			}
 			unset($insert, $update);
 			$this->bot->log("ORGS", "NOTICE", "Finished updating letter : ".$letter);

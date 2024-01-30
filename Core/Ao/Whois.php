@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -56,7 +57,7 @@ $array["pictureurl"] - URL to character picture
 $whois_core = new Whois_Core($bot);
 class Whois_Core extends BasePassiveModule
 {
-
+	var $cache, $alien_rank, $alien_rank_name;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));

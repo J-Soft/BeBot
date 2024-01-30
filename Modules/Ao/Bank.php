@@ -36,7 +36,7 @@
 $Bank = new Bank($bot);
 class Bank extends BaseActiveModule
 {	
-
+	var $path;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));

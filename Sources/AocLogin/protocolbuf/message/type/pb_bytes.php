@@ -5,7 +5,7 @@
 class PBBytes extends PBScalar
 {
     var $wired_type = PBMessage::WIRED_LENGTH_DELIMITED;
-
+	var $value, $reader, $base128;
 
     /**
      * Parses the message for this type

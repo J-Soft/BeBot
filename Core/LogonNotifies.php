@@ -17,6 +17,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -52,7 +53,7 @@ class Logon_Notifies_Core extends BasePassiveModule
 {
     var $bot;
     var $modules;
-
+	var $cron_running, $notifies, $waiting, $startup;
 
     function __construct(&$bot)
     {

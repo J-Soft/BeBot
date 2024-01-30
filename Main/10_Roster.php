@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -34,7 +35,7 @@
 $roster_core = new Roster_Core($bot);
 class Roster_Core extends BasePassiveModule
 {
-
+	var $startup, $running, $lastrun, $removed, $rerolled, $added;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));

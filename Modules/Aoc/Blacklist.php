@@ -226,18 +226,24 @@ class Blacklist extends BaseActiveModule
             ->create("Blacklist", "table_version", 0, "Table version for Blacklist database table", null, true, 99);
         switch ($this->bot->core("settings")->get('Blacklist', 'Table_version')) {
             case 0: // Previous version of BeBot.
-                $this->bot->db->update_table(
-                    "blacklist",
-                    "noteid",
-                    "add",
-                    "ALTER IGNORE TABLE #___blacklist ADD noteid INT NOT NULL"
-                );
-                $this->bot->db->update_table(
-                    "blacklist",
-                    "expire",
-                    "add",
-                    "ALTER IGNORE TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___blacklist' AND COLUMN_NAME = 'noteid'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"blacklist",
+						"noteid",
+						"add",
+						"ALTER TABLE #___blacklist ADD noteid INT NOT NULL"
+					);
+				}
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___blacklist' AND COLUMN_NAME = 'expire'");
+				if(count($col)==0) {				
+					$this->bot->db->update_table(
+						"blacklist",
+						"expire",
+						"add",
+						"ALTER TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0"
+					);
+				}
                 $this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 1.");
                 $this->bot->core("settings")
                     ->save("Blacklist", "table_version", 1);
@@ -245,7 +251,7 @@ class Blacklist extends BaseActiveModule
                 // db->update_table does not work for indexes, so let's do it manually
 				$index = $this->bot->db->select("SHOW INDEX FROM #___blacklist WHERE KEY_NAME = 'expire'");
 				if(count($index)==0) {				
-					$this->bot->db->query("ALTER IGNORE TABLE #___blacklist ADD INDEX expire (expire)");
+					$this->bot->db->query("ALTER TABLE #___blacklist ADD INDEX expire (expire)");
 				}
                 $this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 2.");
                 $this->bot->core("settings")

@@ -31,9 +31,14 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-define('BOT_VERSION', "0.7.27");
+define('BOT_VERSION', "0.8.0");
 define('BOT_VERSION_INFO', ".git(official)");
 define('BOT_VERSION_NAME', "BeBot");
+
+// Overriding some ini values for compatibility
+ini_set("default_socket_timeout", 600);
+ini_set("max_input_time", 600);
+ini_set("max_execution_time", 600);
 
 // Is this a development snapshot from BZR?
 define('BOT_VERSION_SNAPSHOT', false);
@@ -46,7 +51,7 @@ $php_version = phpversion();
 // Set the time zone to UTC
 date_default_timezone_set('UTC');
 /*
-OS detection, borrowed from Angelsbot.
+OS detection, borrowed from Angelsbot ; improved by Bitnykk 2023
 */
 $os = getenv("OSTYPE");
 if (empty($os)) {
@@ -54,7 +59,12 @@ if (empty($os)) {
 }
 if (preg_match("/^windows/i", $os)) {
     define('OS_WINDOWS', true);
+} else {
+        if (empty($os)) {
+			$os = exec("if [ -f '/etc/os-release' ]; then grep '^PRETTY_NAME' /etc/os-release | sed -E 's/PRETTY_NAME=|\"\ ?//g' ; else if hash lsb_release 2>/dev/null ; then lsb_release -d | sed -E 's/Description:|\t\ ?//g' ; else hostnamectl | grep 'Operating System:' | sed -E 's/Operating System:|\t\ ?//g' ; fi ; fi");
+        }	
 }
+define('BOT_OPERATING_SYSTEM', $os);
 
 echo "
                                                    \n
@@ -146,6 +156,7 @@ $bot->connect();
 
 while (true) {
     if ($bot->aoc->wait_for_packet() == "disconnected") {
+		if (strtolower(AOCHAT_GAME) == 'ao' && $bot->port>9000) { $bot->aoc->defreeze(); }
         $bot->reconnect();
     }
     $bot->cron();

@@ -3,7 +3,7 @@
 * OnlineOrg.php - Module to get the Online List of Another Org.
 *
 * Made by Temar
-* - Coded for Bebot 0.5 (SVN)
+* - Coded for Bebot 0.5 (SVN) / Updated by Bitnykk for PHP 8.2/3
 * You are Free to Improve and Change as Long as My name Stays on it
 *
 * 2021 updated by Bitnykk for bebot 0.7.x
@@ -37,6 +37,8 @@ $onlineorg = new OnlineOrg($bot);
 
 class OnlineOrg extends BaseActiveModule
 {
+	var $version, $debug, $running, $org_cache, $delay, $online;
+	var $tempbud, $pending, $updating, $name, $origin, $id, $limit;
 	function __construct(&$bot)
 	{
 		parent::__construct($bot, get_class($this));

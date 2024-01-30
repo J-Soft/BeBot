@@ -9,7 +9,7 @@
  *               This program is distributed without ANY WARRANTY.
  *
  * File        : BinaryStream
- * Description : Wrapper class to make it easier to read and write datatypes
+ * Description : Wrapper module to make it easier to read and write datatypes
  *               to and from a binary data blob. Also to make it more clear
  *               how many bytes we are reading and writing.
  *************************************************************************/

@@ -147,23 +147,29 @@ class AccessControl_Core extends BasePassiveModule
         }
         switch ($this->bot->db->get_version("access_control")) {
             case 1:
-                $this->bot->db->update_table(
-                    "access_control",
-                    "subcommand",
-                    "add",
-                    "ALTER TABLE #___access_control ADD COLUMN subcommand VARCHAR(50) NOT NULL DEFAULT '*' AFTER command"
-                );
-                $this->bot->db->query("ALTER TABLE #___access_control DROP PRIMARY KEY");
-                $this->bot->db->update_table(
-                    "access_control",
-                    array(
-                         "command",
-                         "subcommand",
-                         "channel"
-                    ),
-                    "alter",
-                    "ALTER TABLE #___access_control ADD PRIMARY KEY (command, subcommand, channel)"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___access_control' AND COLUMN_NAME = 'subcommand'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"access_control",
+						"subcommand",
+						"add",
+						"ALTER TABLE #___access_control ADD COLUMN subcommand VARCHAR(50) NOT NULL DEFAULT '*' AFTER command"
+					);
+				}
+				$keys = $this->bot->db->select("SHOW KEYS FROM #___access_control");
+				if(count($keys)>0) {
+					$this->bot->db->query("ALTER TABLE #___access_control DROP PRIMARY KEY");
+					$this->bot->db->update_table(
+						"access_control",
+						array(
+							 "command",
+							 "subcommand",
+							 "channel"
+						),
+						"alter",
+						"ALTER TABLE #___access_control ADD PRIMARY KEY (command, subcommand, channel)"
+					);
+				}
                 $this->bot->db->query("UPDATE #___access_control SET subcommand = '*' WHERE subcommand = ''");
             case 2:
                 $this->bot->db->update_table(

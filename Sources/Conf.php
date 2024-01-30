@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -36,7 +37,7 @@ class Conf
 {
     private $conf;
     private $login;
-
+    var $confc, $argv, $cf, $pw;
 
     function __construct($argv, $confc)
     {
@@ -349,6 +350,12 @@ class Conf
 	*/
 	' . $prefix . '
 
+	/*
+	If you have $table_prefix Defined your tables will be prefixed as above with a _ added on
+	if you dont want the _ added uncomment below
+	*/
+	//$nounderscore = TRUE;
+	
 	/*
 	Master prefix table.
 	This is the mastertable containing information about all tablenames and whether those use

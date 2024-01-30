@@ -14,6 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
+* - Bitnykk (RK5)
 *
 * See Credits file for all acknowledgements.
 *
@@ -35,6 +36,7 @@ $botstatistics_core = new BotStatistics_Core($bot);
 class BotStatistics_Core extends BasePassiveModule
 {
 	var $online=false;
+	var $DB;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
@@ -79,18 +81,21 @@ class BotStatistics_Core extends BasePassiveModule
     {
         Switch ($this->bot->db->get_version("bots")) {
             case 1:
-                $this->bot->db->update_table(
-                    "bots",
-                    "restarts",
-                    "add",
-                    "ALTER TABLE " . $this->DB . "bots ADD restarts INT DEFAULT '0'"
-                );
+				$col = $this->bot->db->select("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '#___bots' AND COLUMN_NAME = 'restarts'");
+				if(count($col)==0) {
+					$this->bot->db->update_table(
+						"bots",
+						"restarts",
+						"add",
+						"ALTER TABLE " . $this->DB . "bots ADD restarts INT DEFAULT '0'"
+					);
+				}
             case 2:
                 $this->bot->db->update_table(
                     "bots",
                     "dim",
                     "alter",
-                    "ALTER TABLE " . $this->DB . "bots modify dim VARCHAR(20) NOT NULL default ''"
+                    "ALTER TABLE " . $this->DB . "bots MODIFY dim VARCHAR(20) NOT NULL default ''"
                 );
             Default:
         }
@@ -101,7 +106,7 @@ class BotStatistics_Core extends BasePassiveModule
                     "bots",
                     "dim",
                     "alter",
-                    "ALTER TABLE " . $this->DB . "bots_log modify dim VARCHAR(20) NOT NULL default ''"
+                    "ALTER TABLE " . $this->DB . "bots_log MODIFY dim VARCHAR(20) NOT NULL default ''"
                 );
             Default:
         }
