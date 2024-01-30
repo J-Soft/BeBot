@@ -696,7 +696,7 @@ class OnlineDisplay extends BaseActiveModule
 		if(strtolower($what)=='clan'|strtolower($what)=='cl') { $side = "Clan"; $color = "orange"; }
 		if(strtolower($what)=='omni'|strtolower($what)=='ot') { $side = "Omni"; $color = "aqua"; }
 		if(strtolower($what)=='neutral'|strtolower($what)=='neut') { $side = "Neutral"; $color = "gray"; }
-		if($side=='') return $what." is not a correct AO side (retry with clan, omni or neutral";
+		if($side=='') return $what." is not a correct AO side (retry with clan, omni or neutral)";
 		$list = $this->bot->db->select("SELECT DISTINCT(t1.nickname), t1.botname FROM " . $this->bot
                 ->core("online") 
                 ->full_tablename()." WHERE t2.faction = '".$side."'");
