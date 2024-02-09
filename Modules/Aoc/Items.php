@@ -53,7 +53,7 @@ class Items extends BaseActiveModule
         parent::__construct($bot, get_class($this));
 
         $this -> register_event("gmsg", "org");
-
+		$this->register_event("tells");
         $this -> bot -> core("colors") -> define_scheme("items", "discover", "lightteal");
 
 		$this -> register_command('all', 'items', 'ANONYMOUS');
@@ -146,6 +146,16 @@ class Items extends BaseActiveModule
             $this -> submit($name, $msg, "gmsg");
 		}
     }
+	
+    function tells($name, $msg)
+    {
+		$autosubmit = $this -> bot -> core("settings") -> get("Items", "Autosubmit");
+
+        if ($autosubmit)
+		{
+            $this -> submit($name, $msg, "tell");
+		}
+    }	
 
     function submit($name, $msg, $origin)
     {

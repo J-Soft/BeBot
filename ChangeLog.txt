@@ -3,7 +3,7 @@ Release 0.8.1 - ... 2024
 ------------------------
 - For both: raid rejoin for alts ; update check improved
 - For AO: ...
-- For AoC: ...
+- For AoC: improved items
 
 ------------------------
 Release 0.8.0 - Feb 2024 
