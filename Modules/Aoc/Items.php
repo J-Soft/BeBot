@@ -74,6 +74,12 @@ class Items extends BaseActiveModule
         $this -> bot -> core("settings") -> create("Items", "Autosubmit", TRUE, "Automatically submit new items the bot sees to the items database?");
         $this -> bot -> core("settings") -> create("Items", "LogURL", FALSE, "Write all URL's used to the log file.");
         $this -> bot -> core("settings") -> create("Items", "Passkey", "none", "Passkey used to access the item database");
+        
+		$this -> bot -> core("settings") -> create("Items", "ListenPublic", FALSE, "Does the bot listen to public channels (Trial, NewbieHelp). Restart bot if you change this value.");
+		if($this->bot->core("settings")->get("Items", "ListenPublic")) {
+			$this->register_event("gmsg", "~NewbieHelp");
+			$this->register_event("gmsg", "~Trial");
+		}		
     }
 
     function command_handler($name, $msg, $origin)
