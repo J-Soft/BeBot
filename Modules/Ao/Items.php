@@ -45,7 +45,6 @@ class VhItems extends BaseActiveModule
     var $color_header = 'DFDF00';
     var $color_highlight = '97BE37';
     var $color_normal = 'CCF0AD';
-    var $server = 'http://cidb.bebot.link/';
     var $max = 50;
 
 
@@ -57,6 +56,7 @@ class VhItems extends BaseActiveModule
         $this->help['description'] = 'Searches the central database for information about an item.';
         $this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";
         $this->help['notes'] = "This module uses CIDB from Bebot.link, Adbp/Aoppa from Auno with ItemsExtractor filter from Tyrence.";
+		$this->bot->core("settings")->create("Items", "CIDB", "http://cidb.bebot.link", "What is HTTP(s) Central Item Database URL (Bebot.link by default, or your prefered mirror) ?");
 		$this->bot->db->define_tablename("aorefs", "false");
 		$this->table();
     }
@@ -135,7 +135,8 @@ class VhItems extends BaseActiveModule
 				$ql = 0;
 				$search = $words;
 			}
-			$url = $this->server;
+			$url = $this->bot->core("settings")->get("Items", "CIDB");
+			$url .= "/";
 			$url .= '?bot=BeBot';
 			$url .= '&output='.$format;
 			$url .= '&max=' . $this->max;
