@@ -58,6 +58,7 @@ class Items extends BaseActiveModule
 
 		$this -> register_command('all', 'items', 'ANONYMOUS');
 		$this -> register_command('all', 'itemrecipes', 'MEMBER');
+		$this -> register_command('all', 'itemgroups', 'OWNER');		
 
 
         $this -> help['description'] = 'Submit and searches the Central Item Database for information about an item (MeatHooks Minions by default).';
@@ -67,6 +68,8 @@ class Items extends BaseActiveModule
 
 		$this -> help['command']['itemrecipes <makes#> <[recipeitem]> <needed#> <[item]>'] = "Submit the recipie item into the item database as a recipie (and how many items it would make) with the item that is needed to craft (and how many of the item are needed). Submit item and number combination one at a time only.";
         $this -> help['command']['itemrecipes <text>'] = "Searches for recipes with the <text> in the name.";
+
+        $this -> help['command']['itemgroups'] = "Lists the accessible channels in bot console for item listenability.";
 
         $this -> bot -> core("settings") -> create("Items", "Autosubmit", TRUE, "Automatically submit new items the bot sees to the items database?");
         $this -> bot -> core("settings") -> create("Items", "LogURL", FALSE, "Write all URL's used to the log file.");
@@ -82,6 +85,9 @@ class Items extends BaseActiveModule
 
 		switch($com)
 		{
+			case 'itemgroups':
+				print_r($this->bot->aoc->gid);
+				break;			
 			case 'items':
 				if (!empty($items))
 				{
