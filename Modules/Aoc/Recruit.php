@@ -49,12 +49,14 @@ class Recruit extends BaseActiveModule
 
 		$this -> register_command('tell', 'recruit', 'ANONYMOUS');
 		$this -> help['description'] = 'Allows a person to send a tell to the bot to start the recruitment process. Uses the !news system to warn offline officers.';
-		
+		$this -> register_event("cron", "59min");
 		$this -> bot -> core("settings") -> create("Recruit", "GuildName", "", "Guild Name to use for all messages (tells, public, etc).");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer1", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer2", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficerNo", 2, "Last Officer slot used");
+		$this -> bot -> core("settings") -> create("Recruit", "SpamPublic", false, "Should the bot be spamming a public channel every hour ?", "On;Off");	
+		$this -> bot -> core("settings") -> create("Recruit", "WhatChan", "NewbieHelp", "Which channel should be spammed every hour ?", "NewbieHelp;Trial");		
 	}
 
 	function command_handler($name, $msg, $origin)
@@ -195,6 +197,35 @@ class Recruit extends BaseActiveModule
 			return $tell_reply_msg_notfound;
 		}
 	}
+	
+    function cron()
+    {
+		if ($this->bot->core("settings")->get("Recruit", "SpamPublic")) {
+			$whatchan = $this->bot->core("settings")->get("Recruit", "WhatChan");
+			switch($whatchan) {
+				case 'Trial':
+					$channel = "~Trial";
+					break;
+					default:
+					$channel = "~NewbieHelp";
+					break;					
+			}
+			$msg = str_replace("'","`",$this->bot->core("settings")->get("Recruit","GuildName"))." ";
+			$blob = "";
+			if (file_exists("./Text/" . $this->bot->botname . "Recruit.txt")) { // custom
+				$blob .= implode("", file("./Text/" . $this->bot->botname . "Recruit.txt"));
+			} elseif (file_exists("./Text/Recruit.txt")) {
+				$blob .= implode("", file("./Text/Recruit.txt"));
+			}
+			if($blob=="") { // default
+				$blob = "<a href=\"text://To initiate recruitment process: <a href='chatcmd:///tell ".$this->bot->botname." recruit'>Start application</a><br><br>\">Click this!</a>";
+			}
+			if(mb_detect_encoding($msg, 'UTF-8', false)) $msg = mb_convert_encoding($msg, 'UTF-8', mb_list_encodings());
+			if(mb_detect_encoding($blob, 'UTF-8', false)) $blob = mb_convert_encoding($blob, 'UTF-8', mb_list_encodings());
+			$this -> bot -> aoc -> send_group($channel,$msg.$blob);
+			$this->bot->log("RECRUIT", "NOTICE", "Sent recruit message on ".$channel);
+		}
+    }	
 	
 }
 ?>
