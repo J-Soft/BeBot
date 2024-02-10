@@ -33,8 +33,6 @@
 *  USA
 */
 
-/* FIXME : are there specific channels that AoC announces could be posted into ? */
-
 $recruit = new Recruit($bot);
 
 class Recruit extends BaseActiveModule
