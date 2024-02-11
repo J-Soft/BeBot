@@ -54,7 +54,7 @@ class Recruit extends BaseActiveModule
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer2", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficerNo", 2, "Last Officer slot used");
 		$this -> bot -> core("settings") -> create("Recruit", "SpamPublic", false, "Should the bot be spamming a public channel every hour ?", "On;Off");	
-		$this -> bot -> core("settings") -> create("Recruit", "WhatChan", "NewbieHelp", "Which channel should be spammed every hour ?", "NewbieHelp;Trial");		
+		$this -> bot -> core("settings") -> create("Recruit", "WhatChan", "NewbieHelp", "Which channel (access depends if toon is free or paid) should be spammed every hour (can be randomized) ?", "NewbieHelp;Trial;Random");		
 	}
 
 	function command_handler($name, $msg, $origin)
@@ -199,14 +199,27 @@ class Recruit extends BaseActiveModule
     function cron()
     {
 		if ($this->bot->core("settings")->get("Recruit", "SpamPublic")) {
-			$whatchan = $this->bot->core("settings")->get("Recruit", "WhatChan");
-			switch($whatchan) {
-				case 'Trial':
-					$channel = "~Trial";
-					break;
-					default:
-					$channel = "~NewbieHelp";
-					break;					
+			$whatchan = ucfirst($this->bot->core("settings")->get("Recruit", "WhatChan"));
+			$channel = ""; $channels = array();
+			if($whatchan=="Random") {			
+				foreach($this->bot->aoc->gid as $key => $val) {
+					if(preg_match('/\~([a-z]+)/i', $val, $match)) {
+						$channels[] = substr($val,1);
+					}
+				}
+				if(count($channels)>0) {
+					$max = count($channels)-1;
+					$rand = random_int(0,$max);
+					$channel = "~".$channels[$rand];
+				}
+			} else {
+				foreach($this->bot->aoc->gid as $key => $val) {
+					if ($val == "~".$whatchan) $channel = "~".$whatchan;
+				}
+			}
+			if($channel=="") {
+				$this->bot->log("RECRUIT", "ERROR", "Bot has no access to channel ".$whatchan);
+				return false;
 			}
 			$msg = str_replace("'","`",$this->bot->core("settings")->get("Recruit","GuildName"))." ";
 			$blob = "";
