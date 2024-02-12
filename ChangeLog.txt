@@ -1,7 +1,7 @@
 ------------------------
 Release 0.8.1 - ... 2024 
 ------------------------
-- For both: raid rejoin for alts ; update check improved
+- For both: raid rejoin for alts ; discord & update check improved
 - For AO: improved items
 - For AoC: improved items & recruit
 

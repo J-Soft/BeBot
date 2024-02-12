@@ -114,7 +114,7 @@ class DiscordRelay extends BaseActiveModule
         $this->bot->core("settings")
             ->create("discord", "BotToken", "", "Bot Token obtain from https://discord.com/developers/applications ?");
         $this->bot->core("settings")
-            ->create("discord", "WhatChat", "both", "Which channel(s) should be relayed into Discord and vice versa ?", "gc;pgroup;both");
+            ->create("discord", "WhatChat", "both", "Which channel(s) should be relayed into Discord and vice versa (user gc only for AoC) ?", "gc;pgroup;both");
         $this->bot->core("settings")
             ->create(
                 "discord",
@@ -176,6 +176,7 @@ class DiscordRelay extends BaseActiveModule
     */	
     function discord_online($name = "", $output= "output")
     {
+		$sent = "No valid link set to discord ... ";
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			$guild = $this->bot->core("settings")->get("discord", "ServerId");
 			$token = $this->bot->core("settings")->get("discord", "BotToken");			
