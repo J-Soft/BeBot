@@ -286,6 +286,7 @@ class Logon extends BaseActiveModule
 
     function show_logon($txt)
     {
+		if(mb_detect_encoding($txt, 'UTF-8', true)) $txt = mb_convert_encoding($txt, 'ISO-8859-1', 'UTF-8');
         $this->bot->send_gc($txt);
         if ($this->bot->core("settings")->get("Relay", "Logoninpgroup")) {
             $this->bot->send_pgroup($txt);
