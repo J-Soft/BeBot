@@ -54,7 +54,9 @@ class Logon extends BaseActiveModule
         $this->help['description'] = 'Announces logon logoff events in guildchat.';
         $this->help['command']['logon <message>'] = "Sets a custom logon message to be displayed when you log on.";
         $this->help['command']['logon'] = "Deletes your custom logon message.";
+        $this->help['command']['mylogon'] = "Simulates your custom logon message.";
         $this->register_command("all", "logon", "MEMBER");
+        $this->register_command("all", "mylogon", "MEMBER");
         $this->register_event("buddy");
         $this->register_event("connect");
         $this->update_table();
@@ -143,7 +145,9 @@ class Logon extends BaseActiveModule
             return $this->set_msg($name, $info[1]);
         } elseif (preg_match("/^logon$/i", $msg, $info)) {
             return $this->set_msg($name, '');
-        }
+        } elseif (preg_match("/^mylogon$/i", $msg, $info)) {
+            return $this->get_msg($name);
+        }		
         return false;
     }
 
@@ -328,10 +332,17 @@ class Logon extends BaseActiveModule
     function set_msg($name, $message)
     {
         $id = $this->bot->core('player')->id($name);
+		if(mb_detect_encoding($message, 'UTF-8', false)) $message = mb_convert_encoding($message, 'UTF-8', mb_list_encodings());
         $message = mysqli_real_escape_string($this->bot->db->CONN,$message);
         $this->bot->db->query("REPLACE INTO #___logon (id, message) VALUES ('" . $id . "', '" . $message . "')");
         return "Thank you " . $name . ". You logon message has been set.";
     }
+	
+	
+    function get_msg($name)
+    {
+        $this->buddy($name,1);
+    }	
 }
 
 ?>
