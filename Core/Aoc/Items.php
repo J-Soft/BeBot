@@ -76,7 +76,10 @@ class Items_Core extends BasePassiveModule
             $item['midcrc']  = $match[6];
             $item['highcrc'] = $match[7];
             $item['color']   = $match[8];
-            $item['name']    = $match[9];
+			$base = $match[9];
+			$conv = iconv("ISO-8859-1", "UTF-8", $base);
+			if($base!=$conv) $item['name'] = $conv; // ISO->UTF
+			else $item['name'] = $base; // ISO==UTF
             $items[] = $item;
         }
         return $items;
@@ -118,7 +121,10 @@ class Items_Core extends BasePassiveModule
             $item['midcrc']  = $match[6];
             $item['highcrc'] = $match[7];
             $item['color']   = $match[8];
-            $item['name']    = $match[9];
+			$base = $match[9];
+			$conv = iconv("ISO-8859-1", "UTF-8", $base);
+			if($base!=$conv) $item['name'] = $conv; // ISO->UTF
+			else $item['name'] = $base; // ISO==UTF
             $items[] = $item;
         }
 
@@ -160,7 +166,6 @@ class Items_Core extends BasePassiveModule
         $salt = $item['lowid']."_".$item['highid']."_".$item['lowlvl']."_".$item['highlvl']."_".$item['lowcrc']."_".$item['midcrc']."_".$item['highcrc']."_".$item['color']."_".$item['name']."_".$item_botname."_".$name."_".$passkey;
 
         $checksum = md5('aocitems' . $salt );
-
         $url  = $this->bot->core("settings")->get("Items", "CIDB")."/".$this->bot->core("settings")->get("Items", "ItemSubmit");
         $url .= '?lowid='.urlencode($item['lowid']);
         $url .= '&highid='.urlencode($item['highid']);
