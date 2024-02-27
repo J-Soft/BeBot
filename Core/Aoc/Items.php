@@ -76,10 +76,7 @@ class Items_Core extends BasePassiveModule
             $item['midcrc']  = $match[6];
             $item['highcrc'] = $match[7];
             $item['color']   = $match[8];
-			$base = $match[9];
-			$conv = iconv("ISO-8859-1", "UTF-8", $base);
-			if($base!=$conv) $item['name'] = $conv; // ISO->UTF
-			else $item['name'] = $base; // ISO==UTF
+			$item['name']	 = $this->rencode($match[9]);
             $items[] = $item;
         }
         return $items;
@@ -121,10 +118,7 @@ class Items_Core extends BasePassiveModule
             $item['midcrc']  = $match[6];
             $item['highcrc'] = $match[7];
             $item['color']   = $match[8];
-			$base = $match[9];
-			$conv = iconv("ISO-8859-1", "UTF-8", $base);
-			if($base!=$conv) $item['name'] = $conv; // ISO->UTF
-			else $item['name'] = $base; // ISO==UTF
+			$item['name']	 = $this->rencode($match[9]);
             $items[] = $item;
         }
 
@@ -138,13 +132,20 @@ class Items_Core extends BasePassiveModule
     {
         if(empty($item))
             return '';
-
+		$item['name'] = $this->rencode($item['name']);
         if($alternate)
             return '<a style="text-decoration:none" href="itemref://'.$item['lowid'].'/'.$item['highid'].'/'.$item['lowlvl']."/".$item['highlvl'].'/'.$item['lowcrc'].'/'.$item['midcrc']."/".$item['highcrc'].'"><font color=#'.$item['color'].'>['.$item['name'].']</font></a>';
         else
             return "<a style='text-decoration:none' href='itemref://".$item['lowid']."/".$item['highid']."/".$item['lowlvl']."/".$item['highlvl']."/".$item['lowcrc']."/".$item['midcrc']."/".$item['highcrc']."'><font color=#".$item['color'].">[".$item['name']."]</font></a>";
     }
 
+    function rencode($base)
+    {
+		$conv = iconv("ISO-8859-1", "UTF-8", $base);
+		if($base!=$conv) return $conv; // ISO->UTF
+		else return $base; // ISO==UTF
+	}
+	
     function is_item($item)
     {
         if(1 > preg_match('/'.$this->itemPattern.'/i', $item))
