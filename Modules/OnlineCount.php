@@ -237,7 +237,7 @@ class OnlineCounting extends BaseActiveModule
         foreach ($counts as $org) {
             $perc = (100 * $org['count']) / $totalcount;
             $orgcmd = $this->bot->core("tools")
-                ->chatcmd("count org " . htmlentities($org['org']), htmlentities($org['org']));
+                ->chatcmd("count org " . str_replace("'","`",$org['org']), str_replace("'","`",$org['org']));
             $orgstr = round($perc, 1) . "% " . $orgcmd . ": " . $org['count'] . " with an average level of " . round(
                     $org['avg_level'],
                     1
