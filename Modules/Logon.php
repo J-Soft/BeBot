@@ -121,6 +121,10 @@ class Logon extends BaseActiveModule
             );
         $this->bot->core("settings")
             ->create("Relay", "Alias", true, "Should a Users Main Alias be Shown with logon message?");
+		if (strtolower($this->bot->game) == 'aoc') {
+			$this->bot->core("settings")
+				->create("Logon", "ShowLinks", false, "Should we display Invite/Raid links (for AoC context only) ?");
+		}
     }
 
 
@@ -266,6 +270,13 @@ class Logon extends BaseActiveModule
                                     }
                                 }
 
+								if (strtolower($this->bot->game) == 'aoc') {
+									if($this->bot->core("settings")->get('Logon', 'ShowLinks') == true) {
+										$res .= " <a href='chatcmd:///invite ".$name."'>Invite</a> ";
+										$res .= " <a href='chatcmd:///invitetoraid ".$name."'>Raid</a> ";
+									}
+								}								
+								
                                 $result = $this->bot->db->select("SELECT message FROM #___logon WHERE id = " . $id);
 
                                 if (!empty($result)) {
