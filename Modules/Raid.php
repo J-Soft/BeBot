@@ -301,7 +301,8 @@ class Raid extends BaseActiveModule
 							if($var[3]!="") {
 								$desc .= " ".$var[3];
 							}
-							Return $this->start_raid($name, $desc);
+							if(strlen($desc)<=50) Return $this->start_raid($name, $desc);
+							else Return "Description cannot exceed 50 letters. Retry shorter, please.";
 						}
                     case 'stop':
                     case 'end':
