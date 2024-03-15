@@ -101,9 +101,6 @@ class Items extends BaseActiveModule
 
 		switch($com)
 		{
-			case 'itemgroups':
-				print_r($this->bot->aoc->gid);
-				break;			
 			case 'items':
 				if (!empty($items))
 				{
