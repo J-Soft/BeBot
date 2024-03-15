@@ -2,8 +2,8 @@
 Release 0.8.1 - ... 2024 
 ------------------------
 - For both: raid, logon, count, discord & update improved
-- For AO: improved items & echo ; tokens added
-- For AoC: improved items & recruit
+- For AO: items & echo improved
+- For AoC: items & recruit improved ; tokens added
 
 ------------------------
 Release 0.8.0 - Feb 2024 
