@@ -299,7 +299,7 @@ class DiscordRelay extends BaseActiveModule
 				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
 					$form = $this->strip_formatting($msg);			
-					$sent = "[Guildchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,0);
+					$sent = "[Guildchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,1);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
 					if ($this->bot->core("settings")->get("discord", "OutLog")) $this->bot->log("DISCORD", "Outgoing", $sent);
@@ -385,7 +385,7 @@ class DiscordRelay extends BaseActiveModule
 				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
 					$form = $this->strip_formatting($msg);
-					$sent = "[Privchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,0);
+					$sent = "[Privchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,1);
 					$data = array("content" => $sent);	
 					$result = discord_post($route, $token, $data);
 					if ($this->bot->core("settings")->get("discord", "OutLog")) $this->bot->log("DISCORD", "Outgoing", $sent);

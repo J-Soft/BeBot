@@ -271,7 +271,7 @@ class IRC extends BaseActiveModule
         $msg = preg_replace("/<\/a>/iU", "", $msg);
         $msg = preg_replace("/<font(.+)>/iU", "", $msg);
         $msg = preg_replace("/<\/font>/iU", "", $msg);
-		$msg = $this->bot->core("tools")->cleanString($msg,0);
+		$msg = $this->bot->core("tools")->cleanString($msg,1);
         return $msg;
     }	
 
