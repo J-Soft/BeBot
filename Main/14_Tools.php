@@ -699,7 +699,7 @@ class tools extends BasePassiveModule
     }
 	
 	// generic message cleanup called by various relays
-	// mode : 0 cleans all, 1 cleans only specifics
+	// mode : 0 cleans+strips all, 1 cleans only urlencodable+htmlentities
 	function cleanString($msg,$mode=0) {
 		if($mode==0) {
 			if(mb_detect_encoding($msg, 'UTF-8', false)) $msg = mb_convert_encoding($msg, 'UTF-8', mb_list_encodings());
@@ -760,7 +760,8 @@ class tools extends BasePassiveModule
 			$replacements[23] = 's';				
 			$replacements[24] = 'z';				
 			$replacements[25] = 'D';				
-			return urldecode(preg_replace($patterns, $replacements, urlencode($msg)));
+			$msg = urldecode(preg_replace($patterns, $replacements, urlencode($msg)));
+			$msg = html_entity_decode($msg);
 		}
 		return $msg;
 	}	
