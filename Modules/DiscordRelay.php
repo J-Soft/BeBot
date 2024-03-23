@@ -126,7 +126,7 @@ class DiscordRelay extends BaseActiveModule
             ->create(
                 "discord",
                 "ItemRef",
-                "AOItems",
+                "AUNO",
                 "Should AOItems or AUNO be used for links in item refs?",
                 "AOItems;AUNO"
             );

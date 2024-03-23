@@ -127,7 +127,7 @@ class IRC extends BaseActiveModule
             ->create(
                 "Irc",
                 "ItemRef",
-                "AOItems",
+                "AUNO",
                 "Should AOItems or AUNO be used for links in item refs?",
                 "AOItems;AUNO"
             );

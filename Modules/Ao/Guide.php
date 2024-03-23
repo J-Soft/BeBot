@@ -57,7 +57,7 @@ class Guide extends BaseActiveModule
 		$this -> help['command']['light'] = "Display a list of lighting options.";
 		$this->register_command('all', 'aou', 'GUEST');
 		$this -> help['command']['aou <search|read> [keywords|id]'] = "AO Universe guide <search> for [keyword] or <read> [id]";
-		$this->bot->core("settings")->create("Guide", "RefSite", "Aoitems", "What site should be used for default items references ?", "Aoitems;Auno");
+		$this->bot->core("settings")->create("Guide", "RefSite", "Auno", "What site should be used for default items references ?", "Aoitems;Auno");
 		$this->path = "./Modules/Ao/";
     }
 	
