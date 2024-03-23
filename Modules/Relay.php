@@ -733,8 +733,7 @@ class Relay extends BaseActiveModule
                         $level = 0;
                     }
 					$whois = $this->bot->core("whois")->lookup($name);
-					if($whois instanceof BotError) return false;
-					if(isset($whois['org_id']) && is_numeric($whois['org_id']) && $whois['org_id']>0 && $whois['org_id']==$this->bot->guildid) {
+					if(!$whois instanceof BotError && isset($whois['org_id']) && is_numeric($whois['org_id']) && $whois['org_id']>0 && $whois['org_id']==$this->bot->guildid) {
 						$chan = "gc";
 					} else {
 						$chan = "pg";
@@ -807,8 +806,7 @@ class Relay extends BaseActiveModule
                 foreach ($online as $on) {
                     $level = $on[3];
 					$whois = $this->bot->core("whois")->lookup($on[0]);
-					if($whois instanceof BotError) return false;
-                    if ($on[1] == 1 && isset($whois['org_id']) && is_numeric($whois['org_id']) && $whois['org_id']>0 && $whois['org_id']==$this->bot->guildid) {
+                    if (!$whois instanceof BotError && $on[1] == 1 && isset($whois['org_id']) && is_numeric($whois['org_id']) && $whois['org_id']>0 && $whois['org_id']==$this->bot->guildid) {
                         $onmsg .= $on[0] . ",gc,$level;";
                     } else { // if ($on[2] == 1)
                         $onmsg .= $on[0] . ",pg;";
