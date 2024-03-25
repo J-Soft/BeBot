@@ -211,6 +211,7 @@ class Relay extends BaseActiveModule
     */
     function privgroup($name, $msg)
     {
+		$msg = $this->bot->core("tools")->cleanString($msg,1);
         $this->relay_to_gc($name, $msg);
     }
 
@@ -221,6 +222,7 @@ class Relay extends BaseActiveModule
     */
     function gmsg($name, $group, $msg)
     {
+		$msg = $this->bot->core("tools")->cleanString($msg,1);
         $this->relay_to_pgroup($name, $msg, "chat");
     }
 
