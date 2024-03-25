@@ -305,6 +305,12 @@ class PrivGroup extends BaseActiveModule
             default:
                 break;
         }
+		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("discord", "PrivRelay")) {
+			$this->bot->core("discord")->disc_alert($name." joined private group", $this->bot->core("settings")->get("discord", "ChannelId"));
+		}
+		if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Irc", "PrivRelay")) {
+			$this->bot->core("irc")->send_irc("", "", $name." joined private group");
+		}		
     }
 
 
@@ -339,6 +345,12 @@ class PrivGroup extends BaseActiveModule
             default:
                 break;
         }
+		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("discord", "PrivRelay")) {
+			$this->bot->core("discord")->disc_alert($name." left private group", $this->bot->core("settings")->get("discord", "ChannelId"));
+		}
+		if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Irc", "PrivRelay")) {
+			$this->bot->core("irc")->send_irc("", "", $name." left private group");
+		}
     }
 
 

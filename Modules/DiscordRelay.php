@@ -132,7 +132,8 @@ class DiscordRelay extends BaseActiveModule
             );
         $this->bot->core("settings")
             ->create("Discord", "ignoreSyntax", "", "Is there a first letter that should make the bot ignore messages for Discord relay (leave empty if none) ?");
-			
+		$this->bot->core("settings")
+            ->create("discord", "PrivRelay", false, "Should the bot be relaying private join/leave to Discord ?", "On;Off");
 	}
 	
     /*
