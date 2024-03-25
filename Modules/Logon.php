@@ -285,10 +285,7 @@ class Logon extends BaseActiveModule
                         }
 						if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("discord", "LogOnOffRelay")) {
 							$this->bot->core("discord")->disc_alert($relaymsg, $this->bot->core("settings")->get("discord", "ChannelId"));
-						}
-						if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Irc", "LogOnOffRelay")) {
-							$this->bot->core("irc")->send_irc("", "", $relaymsg);
-						}						
+						}					
                     }
                 }
             }
