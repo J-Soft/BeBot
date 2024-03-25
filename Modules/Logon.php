@@ -273,19 +273,14 @@ class Logon extends BaseActiveModule
                                 }
 
                                 $this->show_logon("##logon_logon_spam##" . $res . "##end##");
-								$relaymsg = $name." logged on";
                                 $this->last_log["on"][$name] = time();
                             }
                         } else {
                             if ($this->last_log["off"][$name] < (time() - 5)) {
                                 $this->show_logon("##logon_logoff_spam##" . $name . " logged off##end##");
-								$relaymsg = $name." logged off";
                                 $this->last_log["off"][$name] = time();
                             }
                         }
-						if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("discord", "LogOnOffRelay")) {
-							$this->bot->core("discord")->disc_alert($relaymsg, $this->bot->core("settings")->get("discord", "ChannelId"));
-						}					
                     }
                 }
             }
