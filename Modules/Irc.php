@@ -164,7 +164,8 @@ class IRC extends BaseActiveModule
             );
         $this->bot->core("settings")
             ->create("Irc", "ignoreSyntax", "", "Is there a first letter that should make the bot ignore messages for IRC relay (leave empty if none) ?");
-
+        $this->bot->core("settings")
+            ->create("Irc", "LogOnOffRelay", false, "Should the bot be relaying logon/logoff messages to IRC ?", "On;Off");			
         $this->bot->core("colors")->define_scheme("Irc", "Text", "normal");
         $this->bot->core("colors")->define_scheme("Irc", "User", "normal");
         $this->bot->core("colors")->define_scheme("Irc", "Group", "normal");
