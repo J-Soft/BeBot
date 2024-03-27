@@ -58,6 +58,8 @@ class Items extends BaseActiveModule
         $this -> bot -> core("colors") -> define_scheme("items", "discover", "lightteal");
 
 		$this -> register_command('all', 'items', 'ANONYMOUS');
+		$this -> register_alias("items", "item");
+		$this -> register_alias("items", "i");
 		$this -> register_command('all', 'itemrecipes', 'MEMBER');
 
         $this -> help['description'] = 'Submit and searches the Central Item Database for information about an item (MeatHooks Minions by default).';

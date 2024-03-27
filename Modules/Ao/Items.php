@@ -53,6 +53,8 @@ class VhItems extends BaseActiveModule
         parent::__construct($bot, get_class($this));
 		$this->register_module("items");
         $this->register_command('all', 'items', 'GUEST');
+		$this -> register_alias("items", "item");
+		$this -> register_alias("items", "i");		
         $this->help['description'] = 'Searches the central database for information about an item.';
         $this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";
         $this->help['notes'] = "This module uses CIDB from Bebot.link, Adbp/Aoppa from Auno with ItemsExtractor filter from Tyrence.";

@@ -35,6 +35,7 @@ class Nanoline extends BaseActiveModule
 		parent::__construct($bot, get_class($this));
         $this -> register_command('all', 'nanoline', 'GUEST');
 		$this -> register_alias("nanoline", "nanolines");
+		$this -> register_alias("nanoline", "nl");
         $this -> register_command('all', 'lineid', 'GUEST');
 		$this -> help['description'] = 'Display nanolines by profession.';
 		$this -> help['command']['nanoline [profession]']="Shows the chosen profession nanolines.";
