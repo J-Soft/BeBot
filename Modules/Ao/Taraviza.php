@@ -177,7 +177,7 @@ class Taraviza extends BaseActiveModule
 				$url = $this->bot->core("settings")->get("Taraviza", "ApiUrl")."/".$this->apiver."/"."bosses";
 				$content = $this->bot->core("tools")->get_site($url);	
 				if (!($content instanceof BotError)) {
-					if (strpos($content, '{"name":') !== false) {							
+					if (strpos($content, '"name":') !== false) {							
 						$timers = json_decode($content);
 						$this->wlist= array();							
 						foreach($timers as $timer) {
@@ -313,7 +313,7 @@ class Taraviza extends BaseActiveModule
 			$url = $this->bot->core("settings")->get("Taraviza", "ApiUrl")."/".$this->apiver."/"."gaubuffs";
 			$content = $this->bot->core("tools")->get_site($url);	
 			if (!($content instanceof BotError)) {
-				if (strpos($content, '{"faction":') !== false) {
+				if (strpos($content, '"faction":') !== false) {
 					$buffs = json_decode($content);
 					$now = time(); $faction = ""; $expires = 0;
 					foreach($buffs as $buff) {
