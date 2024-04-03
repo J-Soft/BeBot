@@ -72,6 +72,7 @@ class Raid extends BaseActiveModule
         $this->register_command("all", "c", "MEMBER");
         $this->register_command("all", "f", "LEADER");
         $this->register_command("all", "raid", "GUEST");
+		$this -> register_alias("raid", "r");
         $this->register_command("all", "raidhistory", "LEADER");
         $this->register_command("all", "raidstats", "LEADER");
         $this->register_command("all", "raidstat", "GUEST");
