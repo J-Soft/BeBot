@@ -53,7 +53,7 @@ class Alts extends BaseActiveModule
         $this->help['command']['alts del <player>'] = "Removes <player> from your alt list.";
         $this->help['command']['alts confirm <main>'] = "Confirms you as alt of <main>.";
 		$this->help['command']['alts newmain <alt>'] = "Makes declared <alt> the new main of all declared alts.";
-        $this->help['command']['altadmin add <main> <alt>'] = "Adds <alt> as alt to <main>.";
+        $this->help['command']['altadmin add <main> <alt>'] = "Adds <alt> as alt to <main> (can add more than 1 coma-separated eg: Toon1,Toon2,etc).";
         $this->help['command']['altadmin del <main> <alt>'] = "Removes <alt> as alt from <main>.";
         $this->help['command']['altadmin confirm <main> <alt>'] = "Confirms <alt> as alt of <main>.";
 		$this->help['command']['altadmin newmain <alt>'] = "Makes declared <alt> the new main of all declared alts.";
@@ -122,10 +122,26 @@ class Alts extends BaseActiveModule
                             ) {
                                 return "##error##Character ##highlight##$vars[3]##end## has a higher security level then you, so you cannot add ##highlight##$vars[3]##end## to ##highlight##$vars[2]##end##'s alts.##end##";
                             } else {
-                                return $this->add_alt($vars[2], $vars[3], 1);
+								if(strpos($vars[3], ',') !== false) {
+									$toons = explode(',', $vars[3]);
+									foreach($toons as $toon) {
+										$this->add_alt($vars[2], $toon, 1);
+									}
+									return "Alts have been all sorted.";
+								} else {
+									return $this->add_alt($vars[2], $vars[3], 1);
+								}	
                             }
                         } else {
-                            return $this->add_alt($vars[2], $vars[3], 1);
+							if(strpos($vars[3], ',') !== false) {
+								$toons = explode(',', $vars[3]);
+								foreach($toons as $toon) {
+									$this->add_alt($vars[2], $toon, 1);
+								}
+								return "Alts have all been sorted.";
+							} else {
+								return $this->add_alt($vars[2], $vars[3], 1);
+							}	
                         }
                     case 'rem':
                     case 'del':
