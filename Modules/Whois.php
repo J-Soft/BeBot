@@ -45,6 +45,7 @@ class Whois extends BaseActiveModule
         $this->help['description'] = 'Shows information about a player';
         $this->help['command']['whois <name>'] = "Shows information about player <name>.";
         $this->register_command("all", "whois", "GUEST");
+		$this -> register_alias("whois", "w");
         $this->bot->core("colors")
             ->define_scheme("whois", "alienlevel", "lightgreen");
         $this->bot->core("colors")
