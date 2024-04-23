@@ -220,7 +220,7 @@ class Alts extends BaseActiveModule
 			$return .= "\n\n##normal##Unconfirmed##end##: ";
             foreach($unconfirmed AS $key => $value) {
 				$return .= "<a href='chatcmd:///tell ".$this->bot->botname.
-						" altadmin confirm ".$main." ".$value[0]."'>".$value[0]."</a>";
+						" altadmin confirm ".$main." ".$value[0]."'>".$value[0]."</a> ";
 				$total ++;
 			}
 		}
