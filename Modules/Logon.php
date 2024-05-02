@@ -292,6 +292,7 @@ class Logon extends BaseActiveModule
 
     function show_logon($txt)
     {
+		$this->bot->send_gc($txt);
         if ($this->bot->core("settings")->get("Relay", "Logoninpgroup")) {
             $this->bot->send_pgroup($txt);
         }
