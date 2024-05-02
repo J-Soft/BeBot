@@ -269,7 +269,9 @@ class Logon extends BaseActiveModule
                                 $result = $this->bot->db->select("SELECT message FROM #___logon WHERE id = " . $id);
 
                                 if (!empty($result)) {
-                                    $res .= "  ::  " . stripslashes($result[0][0]);
+									if(mb_detect_encoding($result[0][0], 'UTF-8', true)) $txt = mb_convert_encoding($result[0][0], 'ISO-8859-1', 'UTF-8');
+									else $txt = $result[0][0];
+                                    $res .= "  ::  " . stripslashes($txt);
                                 }
 
                                 $this->show_logon("##logon_logon_spam##" . $res . "##end##");
@@ -290,8 +292,6 @@ class Logon extends BaseActiveModule
 
     function show_logon($txt)
     {
-		if(mb_detect_encoding($txt, 'UTF-8', true)) $txt = mb_convert_encoding($txt, 'ISO-8859-1', 'UTF-8');
-        $this->bot->send_gc($txt);
         if ($this->bot->core("settings")->get("Relay", "Logoninpgroup")) {
             $this->bot->send_pgroup($txt);
         }

@@ -111,6 +111,7 @@ class Quotes extends BaseActiveModule
 
     function add_quote($strquote, $name)
     {
+		if(mb_detect_encoding($strquote, 'UTF-8', false)) $strquote = mb_convert_encoding($strquote, 'UTF-8', mb_list_encodings());
         $this->bot->db->query(
             "INSERT INTO #___quotes (quote, contributor) VALUES ('" . addslashes($strquote) . "', '" . $name . "')"
         );
