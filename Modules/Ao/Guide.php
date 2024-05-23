@@ -142,8 +142,10 @@ class Guide extends BaseActiveModule
 					if($current!=$topic) { $current = $topic; $blob .= "\n\n".$current.": "; }
 					$id = $this -> bot -> core("tools") -> xmlparse($guide, "id");
 					$title = $this -> bot -> core("tools") -> xmlparse($guide, "name");
-					$blob .= $this->bot->core("tools")->chatcmd("aou read ".$id, $title)." ";
-					$count++;
+					if($id>0&&$title!='') {
+						$blob .= $this->bot->core("tools")->chatcmd("aou read ".$id, $title)." ";
+						$count++;
+					}
 				}
 			}
 		}
