@@ -73,6 +73,14 @@ class Recruit extends BaseActiveModule
 
 	function do_recruit($name)
 	{
+		
+        $result_check = $this->bot->db->select(
+            "SELECT COUNT(*) FROM #___news WHERE news LIKE '%$name%$name%'"
+        );		
+        if (!empty($result_check)) {
+			if($result_check[0][0]>0) return "Your request was already stored, you will be contacted as soon as possible.";
+		}
+				
 		$guildname = str_replace("'","`",$this->bot->core("settings")->get("Recruit","GuildName"));
 		$lastofficer = $this->bot->core("settings")->get("Recruit","LastOfficer");
 		$lastofficer1 = $this->bot->core("settings")->get("Recruit","LastOfficer1");
