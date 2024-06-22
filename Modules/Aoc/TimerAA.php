@@ -161,7 +161,7 @@ class TimerAA extends BaseActiveModule
 
     function timer_show($name, $args) {
         if (!empty($args)) {
-          $name = mysqli_real_escape_string($this->bot->db->CONN,$args);
+          $name = ucfirst(mysqli_real_escape_string($this->bot->db->CONN,$args));
         }
 
         $chk_time = $this -> bot -> db -> select("SELECT * FROM #___timer_aa WHERE timeraa_username='$name'");
@@ -183,12 +183,12 @@ class TimerAA extends BaseActiveModule
 
     function timer_show_all($name, $args) {
         if (!empty($args)) {
-          $name = mysqli_real_escape_string($this->bot->db->CONN,$args);
+          $name = ucfirst(mysqli_real_escape_string($this->bot->db->CONN,$args));
         }
 
         $findmain = $this -> bot -> db -> select("SELECT main FROM alts WHERE alts.alt='$name'");
         if (empty($findmain)) {$main=$name;}
-        else {$main = current($findmain[0]);}
+        else {$main = current(ucfirst$findmain[0]);}
         $output = "<Center>##ao_infoheadline##:::: Offline timer info for $main and alts ::::##end##</Center>".$this->brfix(2);
 
       $notsetoutput = $this->brfix()."<Center>##ao_infoheadline##:::: No timers ::::##end##</Center>".$this->brfix(2);

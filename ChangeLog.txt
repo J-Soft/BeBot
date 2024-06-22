@@ -3,7 +3,7 @@ Release 0.8.1 - ... 2024
 ------------------------
 - For both: alts, roster, relay, raid, logon, count, discord/irc, recruit & update improved
 - For AO: guide, items & echo improved
-- For AoC: items & recruit improved ; tokens added
+- For AoC: items, timeraa & recruit improved ; tokens added
 
 ------------------------
 Release 0.8.0 - Feb 2024 
