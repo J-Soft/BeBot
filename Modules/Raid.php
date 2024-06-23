@@ -72,6 +72,7 @@ class Raid extends BaseActiveModule
         $this->register_command("all", "c", "MEMBER");
         $this->register_command("all", "f", "LEADER");
         $this->register_command("all", "raid", "GUEST");
+		$this -> register_alias("raid", "r");
         $this->register_command("all", "raidhistory", "LEADER");
         $this->register_command("all", "raidstats", "LEADER");
         $this->register_command("all", "raidstat", "GUEST");
@@ -104,7 +105,7 @@ class Raid extends BaseActiveModule
                     "Raid",
                     "AddOnRejoin",
                     true,
-                    "Automatically add players to the raid if they where in the raid but left and rejoin <botname>'s channel?",
+                    "Automatically add players (or their alts) to the raid if they where in the raid but left and rejoin <botname>'s channel?",
                     "On;Off",
                     false,
                     15
@@ -301,7 +302,8 @@ class Raid extends BaseActiveModule
 							if($var[3]!="") {
 								$desc .= " ".$var[3];
 							}
-							Return $this->start_raid($name, $desc);
+							if(strlen($desc)<=50) Return $this->start_raid($name, $desc);
+							else Return "Description cannot exceed 50 letters. Retry shorter, please.";
 						}
                     case 'stop':
                     case 'end':
@@ -886,7 +888,17 @@ class Raid extends BaseActiveModule
             && $this->bot->core("settings")
                 ->get("Raid", "AddOnRejoin")
         ) {
-            if (isset($this->user2[$name]) && ($this->user2[$name] == "Left PrivGroup" || $this->user2[$name] == "Bot Restart")) {
+			$wasinraid = false;
+            if (isset($this->user2[$name]) && ($this->user2[$name] == "Left PrivGroup" || $this->user2[$name] == "Bot Restart")) $wasinraid = true;
+			$main = $this->bot->core("alts")->main($name);
+			if (isset($this->user2[$main]) && ($this->user2[$main] == "Left PrivGroup" || $this->user2[$main] == "Bot Restart")) $wasinraid = true;
+			$alts = $this->bot->core("alts")->get_alts($main);
+			if (!empty($alts)) {
+				foreach ($alts as $alt) {
+					if (isset($this->user2[$alt]) && ($this->user2[$alt] == "Left PrivGroup" || $this->user2[$alt] == "Bot Restart")) $wasinraid = true;
+				}
+			}
+            if ($wasinraid) {
                 if (empty($this->user)) {
                     $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
                 }

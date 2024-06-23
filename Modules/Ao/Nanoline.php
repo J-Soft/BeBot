@@ -35,6 +35,7 @@ class Nanoline extends BaseActiveModule
 		parent::__construct($bot, get_class($this));
         $this -> register_command('all', 'nanoline', 'GUEST');
 		$this -> register_alias("nanoline", "nanolines");
+		$this -> register_alias("nanoline", "nl");
         $this -> register_command('all', 'lineid', 'GUEST');
 		$this -> help['description'] = 'Display nanolines by profession.';
 		$this -> help['command']['nanoline [profession]']="Shows the chosen profession nanolines.";
@@ -284,7 +285,7 @@ class Nanoline extends BaseActiveModule
        $msg .= "<a href='chatcmd:///tell ".$bot." !lineid 169'>Aura-Damage/Snare Reduction Buff</a>\n";
        $msg .= "<a href='chatcmd:///tell ".$bot." !lineid 170'>Aura-HP and NP Heal</a>\n";
        $msg .= "<a href='chatcmd:///tell ".$bot." !lineid 171'>Evade/Dodge/Duck Buff</a>\n";
-       $msg .= "<a href='chatcmd:///tell ".$bot." !lineid 172'>Fast Attack/Sneak Attack Buff</a>\n";
+       $msg .= "<a href='chatcmd:///tell ".$bot." !lineid 172'>Fast Attack Buff</a>\n";
        $msg .= "<a href='chatcmd:///tell ".$bot." !lineid 173'>Parry/Riposte Buff</a>\n";
        $msg .= "<a href='chatcmd:///tell ".$bot." !lineid 174'>Proc Buff</a>\n";
        $msg .= "<a href='chatcmd:///tell ".$bot." !lineid 175'>Str/Stam/Agi Buff</a>\n";

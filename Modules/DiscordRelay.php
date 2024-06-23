@@ -114,7 +114,7 @@ class DiscordRelay extends BaseActiveModule
         $this->bot->core("settings")
             ->create("discord", "BotToken", "", "Bot Token obtain from https://discord.com/developers/applications ?");
         $this->bot->core("settings")
-            ->create("discord", "WhatChat", "both", "Which channel(s) should be relayed into Discord and vice versa ?", "gc;pgroup;both");
+            ->create("discord", "WhatChat", "both", "Which channel(s) should be relayed into Discord and vice versa (user gc only for AoC) ?", "gc;pgroup;both");
         $this->bot->core("settings")
             ->create(
                 "discord",
@@ -126,13 +126,14 @@ class DiscordRelay extends BaseActiveModule
             ->create(
                 "discord",
                 "ItemRef",
-                "AOItems",
+                "AUNO",
                 "Should AOItems or AUNO be used for links in item refs?",
                 "AOItems;AUNO"
             );
         $this->bot->core("settings")
             ->create("Discord", "ignoreSyntax", "", "Is there a first letter that should make the bot ignore messages for Discord relay (leave empty if none) ?");
-			
+		$this->bot->core("settings")
+            ->create("discord", "PrivRelay", false, "Should the bot be relaying private join/leave to Discord ?", "On;Off");
 	}
 	
     /*
@@ -176,6 +177,7 @@ class DiscordRelay extends BaseActiveModule
     */	
     function discord_online($name = "", $output= "output")
     {
+		$sent = "No valid link set to discord ... ";
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			$guild = $this->bot->core("settings")->get("discord", "ServerId");
 			$token = $this->bot->core("settings")->get("discord", "BotToken");			
@@ -298,7 +300,7 @@ class DiscordRelay extends BaseActiveModule
 				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
 					$form = $this->strip_formatting($msg);			
-					$sent = "[Guildchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,0);
+					$sent = "[Guildchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,1);
 					$data = array("content" => $sent);
 					$result = discord_post($route, $token, $data);
 					if ($this->bot->core("settings")->get("discord", "OutLog")) $this->bot->log("DISCORD", "Outgoing", $sent);
@@ -384,7 +386,7 @@ class DiscordRelay extends BaseActiveModule
 				if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
 					$route = "/channels/{$channel}/messages";
 					$form = $this->strip_formatting($msg);
-					$sent = "[Privchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,0);
+					$sent = "[Privchat] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,1);
 					$data = array("content" => $sent);	
 					$result = discord_post($route, $token, $data);
 					if ($this->bot->core("settings")->get("discord", "OutLog")) $this->bot->log("DISCORD", "Outgoing", $sent);
@@ -410,7 +412,7 @@ class DiscordRelay extends BaseActiveModule
 				if ($this->lastmsg>0) { $route = "/channels/{$channel}/messages?after=".$this->lastmsg; }
 				$result = discord_get($route, $token);
 				if ($this->lastcheck==0) $this->lastcheck = date('Y-m-d').'T'.date("H:i:s").'.000000+00:00';
-				$invert = array_reverse($result);
+				if(is_array($result)) $invert = array_reverse($result);
 				if(isset($invert['message'])&& isset($invert['code'])) {
 					$this->bot->log("DISCORD", "ERROR", "Wrong configuration : do !settings discord to fix");
 				} else {

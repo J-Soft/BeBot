@@ -275,7 +275,12 @@ class News extends BaseActiveModule
                 $inside .= "##ao_infoheader##On " .
 					$valdate
                     . " GMT ##ao_cctext##" . $val[2] . "##end## Reported:\n";
-                $inside .= "##ao_infotext##" . stripslashes($val[3]);
+				if (mb_detect_encoding($val[3], 'UTF-8', true)) {
+					$text = mb_convert_encoding($val[3], 'ISO-8859-1', 'UTF-8');
+				} else {
+					$text = $val[3];
+				}					
+                $inside .= "##ao_infotext##" . stripslashes($text);
                 if (($this->bot->core("security")
                         ->check_access(
                             $name,

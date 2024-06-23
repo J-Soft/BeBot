@@ -184,7 +184,7 @@ class About extends BaseActiveModule
 				}
 				else
 				{
-					$newer = TRUE;
+					if(!$available) $newer = TRUE;
 				}
 			}
 			elseif (BOT_VERSION_SNAPSHOT == TRUE)
@@ -201,7 +201,7 @@ class About extends BaseActiveModule
 				}
 				else
 				{
-					$newer = TRUE;
+					if(!$available) $newer = TRUE;
 				}
 			}
 			elseif (BOT_VERSION_SNAPSHOT == TRUE)

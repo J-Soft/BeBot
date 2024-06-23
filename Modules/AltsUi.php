@@ -53,7 +53,8 @@ class Alts extends BaseActiveModule
         $this->help['command']['alts del <player>'] = "Removes <player> from your alt list.";
         $this->help['command']['alts confirm <main>'] = "Confirms you as alt of <main>.";
 		$this->help['command']['alts newmain <alt>'] = "Makes declared <alt> the new main of all declared alts.";
-        $this->help['command']['altadmin add <main> <alt>'] = "Adds <alt> as alt to <main>.";
+        $this->help['command']['altadmin add <main> <alt>'] = "Adds <alt> as alt to <main> (can add more than 1 coma-separated eg: Toon1,Toon2,etc).";
+		$this->help['command']['altadmin list <main>'] = "Lists all alts unconfirmed included.";
         $this->help['command']['altadmin del <main> <alt>'] = "Removes <alt> as alt from <main>.";
         $this->help['command']['altadmin confirm <main> <alt>'] = "Confirms <alt> as alt of <main>.";
 		$this->help['command']['altadmin newmain <alt>'] = "Makes declared <alt> the new main of all declared alts.";
@@ -122,10 +123,26 @@ class Alts extends BaseActiveModule
                             ) {
                                 return "##error##Character ##highlight##$vars[3]##end## has a higher security level then you, so you cannot add ##highlight##$vars[3]##end## to ##highlight##$vars[2]##end##'s alts.##end##";
                             } else {
-                                return $this->add_alt($vars[2], $vars[3], 1);
+								if(strpos($vars[3], ',') !== false) {
+									$toons = explode(',', $vars[3]);
+									foreach($toons as $toon) {
+										$this->add_alt($vars[2], $toon, 1);
+									}
+									return "Alts have been all sorted.";
+								} else {
+									return $this->add_alt($vars[2], $vars[3], 1);
+								}	
                             }
                         } else {
-                            return $this->add_alt($vars[2], $vars[3], 1);
+							if(strpos($vars[3], ',') !== false) {
+								$toons = explode(',', $vars[3]);
+								foreach($toons as $toon) {
+									$this->add_alt($vars[2], $toon, 1);
+								}
+								return "Alts have all been sorted.";
+							} else {
+								return $this->add_alt($vars[2], $vars[3], 1);
+							}	
                         }
                     case 'rem':
                     case 'del':
@@ -135,7 +152,9 @@ class Alts extends BaseActiveModule
                     case 'newmain':
                         return $this->newmain($name, $vars[2], 1);	
                     case 'recache':
-                        return $this->recache();						
+                        return $this->recache();
+                    case 'list':
+                        return $this->display_all($vars[2]);						
                     default:
                         return "Unknown Subcommand: ##highlight##" . $vars[1] . "##end##";
                 }
@@ -178,6 +197,37 @@ class Alts extends BaseActiveModule
         }
         return $retstr;
     }
+	
+    function display_all($main)
+    {
+        $return = '';
+		$total = 0;
+		$main = ucfirst(strtolower($main));
+        //Check that that $main is a valid character
+        if ($this->bot->core('player')->id($main) instanceof BotError) {
+            return "##error##Character ##highlight##$main##end## does not exist.##end##";
+        }
+        $confirmed = $this->bot->db->select("SELECT alt FROM #___alts WHERE confirmed = 1 AND main = '$main'");
+        if (!empty($confirmed) && count($confirmed)>0) {
+			$return .= "\n\n##normal##Confirmed##end##: ";
+            foreach($confirmed AS $key => $value) {
+				$return .= $value[0]." ";
+				$total ++;
+			}
+		}
+        $unconfirmed = $this->bot->db->select("SELECT alt FROM #___alts WHERE confirmed = 0 AND main = '$main'");
+        if (!empty($unconfirmed) && count($unconfirmed)>0) {
+			$return .= "\n\n##normal##Unconfirmed##end##: ";
+            foreach($unconfirmed AS $key => $value) {
+				$return .= "<a href='chatcmd:///tell ".$this->bot->botname.
+						" altadmin confirm ".$main." ".$value[0]."'>".$value[0]."</a> ";
+				$total ++;
+			}
+		}
+		// generate response from lists
+		if ($return == '') return "No alt (even unconfirmed) yet declared from ".$main;
+		else return $this->bot->core("tools")->make_blob($total." alt(s) found (confirmed or not).", $return);
+	}
 
     /*
     Changes given alt to new main

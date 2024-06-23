@@ -1,4 +1,11 @@
 ------------------------
+Release 0.8.1 - Jun 2024 
+------------------------
+- For both: alts, roster, relay, raid, logon, count, discord/irc, recruit & update improved
+- For AO: guide, items & echo improved
+- For AoC: items, timeraa & recruit improved ; tokens added
+
+------------------------
 Release 0.8.0 - Feb 2024 
 ------------------------
 This is a major patch also marking 20th year of Bebot's existence !

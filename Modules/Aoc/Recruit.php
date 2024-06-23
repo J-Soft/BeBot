@@ -33,8 +33,6 @@
 *  USA
 */
 
-/* FIXME : are there specific channels that AoC announces could be posted into ? */
-
 $recruit = new Recruit($bot);
 
 class Recruit extends BaseActiveModule
@@ -49,12 +47,14 @@ class Recruit extends BaseActiveModule
 
 		$this -> register_command('tell', 'recruit', 'ANONYMOUS');
 		$this -> help['description'] = 'Allows a person to send a tell to the bot to start the recruitment process. Uses the !news system to warn offline officers.';
-		
+		$this -> register_event("cron", "59min");
 		$this -> bot -> core("settings") -> create("Recruit", "GuildName", "", "Guild Name to use for all messages (tells, public, etc).");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer1", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficer2", $this->bot->owner, "Last Officer to receive a recruitment tell message");
 		$this -> bot -> core("settings") -> create("Recruit", "LastOfficerNo", 2, "Last Officer slot used");
+		$this -> bot -> core("settings") -> create("Recruit", "SpamPublic", false, "Should the bot be spamming a public channel every hour ?", "On;Off");	
+		$this -> bot -> core("settings") -> create("Recruit", "WhatChan", "NewbieHelp", "Which channel (access depends if toon is free or paid) should be spammed every hour (can be randomized) ?", "NewbieHelp;Trial;Random");		
 	}
 
 	function command_handler($name, $msg, $origin)
@@ -73,6 +73,14 @@ class Recruit extends BaseActiveModule
 
 	function do_recruit($name)
 	{
+		
+        $result_check = $this->bot->db->select(
+            "SELECT COUNT(*) FROM #___news WHERE news LIKE '%$name%$name%'"
+        );		
+        if (!empty($result_check)) {
+			if($result_check[0][0]>0) return "Your request was already stored, you will be contacted as soon as possible.";
+		}		
+		
 		$guildname = str_replace("'","`",$this->bot->core("settings")->get("Recruit","GuildName"));
 		$lastofficer = $this->bot->core("settings")->get("Recruit","LastOfficer");
 		$lastofficer1 = $this->bot->core("settings")->get("Recruit","LastOfficer1");
@@ -195,6 +203,48 @@ class Recruit extends BaseActiveModule
 			return $tell_reply_msg_notfound;
 		}
 	}
+	
+    function cron()
+    {
+		if ($this->bot->core("settings")->get("Recruit", "SpamPublic")) {
+			$whatchan = ucfirst($this->bot->core("settings")->get("Recruit", "WhatChan"));
+			$channel = ""; $channels = array();
+			if($whatchan=="Random") {			
+				foreach($this->bot->aoc->gid as $key => $val) {
+					if(preg_match('/\~([a-z]+)/i', $val, $match)) {
+						$channels[] = substr($val,1);
+					}
+				}
+				if(count($channels)>0) {
+					$max = count($channels)-1;
+					$rand = random_int(0,$max);
+					$channel = "~".$channels[$rand];
+				}
+			} else {
+				foreach($this->bot->aoc->gid as $key => $val) {
+					if ($val == "~".$whatchan) $channel = "~".$whatchan;
+				}
+			}
+			if($channel=="") {
+				$this->bot->log("RECRUIT", "ERROR", "Bot has no access to channel ".$whatchan);
+				return false;
+			}
+			$msg = str_replace("'","`",$this->bot->core("settings")->get("Recruit","GuildName"))." ";
+			$blob = "";
+			if (file_exists("./Text/" . $this->bot->botname . "Recruit.txt")) { // custom
+				$blob .= implode("", file("./Text/" . $this->bot->botname . "Recruit.txt"));
+			} elseif (file_exists("./Text/Recruit.txt")) {
+				$blob .= implode("", file("./Text/Recruit.txt"));
+			}
+			if($blob=="") { // default
+				$blob = "<a href=\"text://To initiate recruitment process: <a href='chatcmd:///tell ".$this->bot->botname." recruit'>Start application</a><br><br>\">Click this!</a>";
+			}
+			if(mb_detect_encoding($msg, 'UTF-8', false)) $msg = mb_convert_encoding($msg, 'UTF-8', mb_list_encodings());
+			if(mb_detect_encoding($blob, 'UTF-8', false)) $blob = mb_convert_encoding($blob, 'UTF-8', mb_list_encodings());
+			$this -> bot -> aoc -> send_group($channel,$msg.$blob);
+			$this->bot->log("RECRUIT", "NOTICE", "Sent recruit message on ".$channel);
+		}
+    }	
 	
 }
 ?>

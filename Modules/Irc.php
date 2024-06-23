@@ -127,7 +127,7 @@ class IRC extends BaseActiveModule
             ->create(
                 "Irc",
                 "ItemRef",
-                "AOItems",
+                "AUNO",
                 "Should AOItems or AUNO be used for links in item refs?",
                 "AOItems;AUNO"
             );
@@ -164,7 +164,8 @@ class IRC extends BaseActiveModule
             );
         $this->bot->core("settings")
             ->create("Irc", "ignoreSyntax", "", "Is there a first letter that should make the bot ignore messages for IRC relay (leave empty if none) ?");
-
+		$this->bot->core("settings")
+            ->create("Irc", "PrivRelay", false, "Should the bot be relaying private join/leave to Irc ?", "On;Off");			
         $this->bot->core("colors")->define_scheme("Irc", "Text", "normal");
         $this->bot->core("colors")->define_scheme("Irc", "User", "normal");
         $this->bot->core("colors")->define_scheme("Irc", "Group", "normal");
@@ -271,7 +272,7 @@ class IRC extends BaseActiveModule
         $msg = preg_replace("/<\/a>/iU", "", $msg);
         $msg = preg_replace("/<font(.+)>/iU", "", $msg);
         $msg = preg_replace("/<\/font>/iU", "", $msg);
-		$msg = $this->bot->core("tools")->cleanString($msg,0);
+		$msg = $this->bot->core("tools")->cleanString($msg,1);
         return $msg;
     }	
 

@@ -48,17 +48,19 @@ $Items = new Items($bot);
 
 class Items extends BaseActiveModule
 {
+	var $registered;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
 
         $this -> register_event("gmsg", "org");
-
+		$this->register_event("tells");
         $this -> bot -> core("colors") -> define_scheme("items", "discover", "lightteal");
 
 		$this -> register_command('all', 'items', 'ANONYMOUS');
+		$this -> register_alias("items", "item");
+		$this -> register_alias("items", "i");
 		$this -> register_command('all', 'itemrecipes', 'MEMBER');
-
 
         $this -> help['description'] = 'Submit and searches the Central Item Database for information about an item (MeatHooks Minions by default).';
         $this -> help['command']['items <text>'] = "Searches for items with the <text> in the name.";
@@ -69,10 +71,29 @@ class Items extends BaseActiveModule
         $this -> help['command']['itemrecipes <text>'] = "Searches for recipes with the <text> in the name.";
 
         $this -> bot -> core("settings") -> create("Items", "Autosubmit", TRUE, "Automatically submit new items the bot sees to the items database?");
+        $this -> bot -> core("settings") -> create("Items", "Autoreply", FALSE, "Automatically reply when new item has been submitted to database?");
         $this -> bot -> core("settings") -> create("Items", "LogURL", FALSE, "Write all URL's used to the log file.");
         $this -> bot -> core("settings") -> create("Items", "Passkey", "none", "Passkey used to access the item database");
+        
+		$this -> bot -> core("settings") -> create("Items", "ListenPublic", FALSE, "Does the bot listen to public channels (Trial, NewbieHelp, etc). Restart bot if you change this value.");
+		$this->register_event("cron", "1min");
+		$this->registered = FALSE;
     }
 
+    function cron()
+    {		
+		if(!$this->registered && $this->bot->core("settings")->get("Items", "ListenPublic")) {
+			foreach($this->bot->aoc->gid as $key => $val) {
+				if(preg_match('/\~([a-z]+)/i', $val, $match)) {
+					$this->register_event("gmsg", $val);
+					$this->registered = TRUE;
+				}
+			}
+		} else {
+			$this->unregister_event("cron", "1min");
+		}		
+    }	
+	
     function command_handler($name, $msg, $origin)
     {
 		$vars = explode(' ', strtolower($msg));
@@ -146,6 +167,16 @@ class Items extends BaseActiveModule
             $this -> submit($name, $msg, "gmsg");
 		}
     }
+	
+    function tells($name, $msg)
+    {
+		$autosubmit = $this -> bot -> core("settings") -> get("Items", "Autosubmit");
+
+        if ($autosubmit)
+		{
+            $this -> submit($name, $msg, "tell");
+		}
+    }	
 
     function submit($name, $msg, $origin)
     {
@@ -164,25 +195,26 @@ class Items extends BaseActiveModule
         foreach ($items as $item)
         {
             $result = $this -> bot -> core('items') -> submit_item($item, $name, $passkey);
-
-            if ($result == "1")
-            {
-				if ($origin != "gmsg")
+			if($this -> bot -> core("settings") -> get("Items", "Autoreply")) {
+				if ($result == "1")
 				{
-	                $output = "Thank you for submitting the item, however the item has already been previously submitted.";
-		            $this -> bot -> send_output($name, $output, "tell");
+					if ($origin != "gmsg")
+					{
+						$output = "Thank you for submitting the item, however the item has already been previously submitted.";
+						$this -> bot -> send_output($name, $output, "tell");
+					}
 				}
-            }
-            elseif ($result == "2")
-            {
-                $output = "Congratulations!! You have successfully submitted the new item:  ".$this -> bot -> core('items') -> make_item($item).". Thank You!";
-                $this -> bot -> send_output($name, $output, "tell");
-            }
-            else
-            {
-                $output = "##error##Error: Item Database returned Error (Info: ".$result.").##end##";
-                $this -> bot -> send_output($name, $output, "tell");
-            }
+				elseif ($result == "2")
+				{
+					$output = "Congratulations!! You have successfully submitted the new item:  ".$this -> bot -> core('items') -> make_item($item).". Thank You!";
+					$this -> bot -> send_output($name, $output, "tell");
+				}
+				else
+				{
+					$output = "##error##Error: Item Database returned Error (Info: ".$result.").##end##";
+					$this -> bot -> send_output($name, $output, "tell");
+				}
+			}
         }
 
         return true;
@@ -204,28 +236,28 @@ class Items extends BaseActiveModule
 		if (count($items, COUNT_NORMAL) == 4)
 		{
             $result = $this -> bot -> core('items') -> submit_item($items[0], $name, $passkey);
-            $result = $this -> bot -> core('items') -> submit_item($items[1], $name, $passkey);
-			
+            $result = $this -> bot -> core('items') -> submit_item($items[1], $name, $passkey);			
 	        $result = $this -> bot -> core('items') -> submit_recipe_item($items[0], $items[2], $items[1], $items[3], $name, $passkey);
-			
-            if ($result == "1")
-            {
-				if ($origin != "gmsg")
+			if($this -> bot -> core("settings") -> get("Items", "Autoreply")) {
+				if ($result == "1")
 				{
-	                $output = "Thank you for submitting the recipe and needed item, however the recipe and needed item has already been previously submitted.";
-		            $this -> bot -> send_output($name, $output, "tell");
+					if ($origin != "gmsg")
+					{
+						$output = "Thank you for submitting the recipe and needed item, however the recipe and needed item has already been previously submitted.";
+						$this -> bot -> send_output($name, $output, "tell");
+					}
 				}
-            }
-            elseif ($result == "2")
-            {
-                $output = "Congratulations!! You have successfully submitted the new recipe ".$this -> bot -> core('items') -> make_item($items[0])." and needed item ".$this -> bot -> core('items') -> make_item($items[1]).". Thank You!";
-                $this -> bot -> send_output($name, $output, "tell");
-            }
-            else
-            {
-                $output = "##error##Error: Item Database returned Error (Info: ".$result.").##end##";
-                $this -> bot -> send_output($name, $output, "tell");
-            }
+				elseif ($result == "2")
+				{
+					$output = "Congratulations!! You have successfully submitted the new recipe ".$this -> bot -> core('items') -> make_item($items[0])." and needed item ".$this -> bot -> core('items') -> make_item($items[1]).". Thank You!";
+					$this -> bot -> send_output($name, $output, "tell");
+				}
+				else
+				{
+					$output = "##error##Error: Item Database returned Error (Info: ".$result.").##end##";
+					$this -> bot -> send_output($name, $output, "tell");
+				}
+			}
 		}
 
         return true;

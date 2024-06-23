@@ -1084,7 +1084,7 @@ class AOChat
     function lookup_group($arg, $type = 0)
     {
         $is_gid = false;
-        // This should probably be moved out of AOChat and into Core/PlayerList.php
+        // This should probably be moved out of AOChat and into Core/GroupList.php
         if ($type && ($is_gid = (strlen($arg) === 5 && (ord($arg[0]) & ~0x80) < 0x10))) {
             return $arg;
         }
@@ -1098,7 +1098,7 @@ class AOChat
 
     function get_gid($g)
     {
-        // This should probably be moved out of AOChat and into Core/PlayerList.php
+        // This should probably be moved out of AOChat and into Core/GroupList.php
         return $this->lookup_group($g, 1);
     }
 

@@ -147,7 +147,8 @@ class LeadEcho extends BaseActiveModule
             && $this->bot->core("settings")
                 ->get("Leader", "Echo")
         ) {
-            $txt = "##leader_echo_spam##" . $msg . "##end##";
+			if(mb_detect_encoding($msg, 'UTF-8', true)) $msg = mb_convert_encoding($msg, 'ISO-8859-1', 'UTF-8');
+            $txt = "##leader_echo_spam##" . $msg . "##end##";			
             $this->bot->send_pgroup($txt);
         }
     }

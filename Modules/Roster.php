@@ -48,11 +48,11 @@ class Roster_Handler extends BaseActiveModule
         }
         $this->help['description'] = 'Handles member roster commands.';
         $this->help['command']['member'] = "Shows the members count.";
-        $this->help['command']['member add <name>'] = "Adds player <name> as a member to the bot.";
+        $this->help['command']['member add <name>'] = "Adds player <name> as a member to the bot (can add more than 1 coma-separated eg: Toon1,Toon2,etc).";
         $this->help['command']['member del <name>'] = "Removes player <name> from the member list.";
         $this->help['command']['member list'] = "Shows the members list.";
         $this->help['command']['guest'] = "Shows the guest list.";
-        $this->help['command']['guest add <name>'] = "Adds player <name> as a guest to the bot.";
+        $this->help['command']['guest add <name>'] = "Adds player <name> as a guest to the bot (can add more than 1 coma-separated eg: Toon1,Toon2,etc).";
         $this->help['command']['guest del <name>'] = "Removes player <name> from the guest list.";
         $this->help['command']['rosterupdate'] = "Forces the bot to run through a roster update.";
         $this->help['command']['buddylist'] = "Displays a list of all of the bots buddies.";
@@ -96,8 +96,17 @@ class Roster_Handler extends BaseActiveModule
                             ->del($source, $vars[2], 0, 0);
                         break;
                     case 'add':
-                        return $this->bot->core("user")
-                            ->add($source, $vars[2], 0, MEMBER, 0);
+						if(strpos($vars[2], ',') !== false) {
+							$toons = explode(',', $vars[2]);
+							foreach($toons as $toon) {
+								$this->bot->core("user")
+									->add($source, $toon, 0, MEMBER, 0);
+							}
+							return "Members have been sorted out.";
+						} else {							
+							return $this->bot->core("user")
+								->add($source, $vars[2], 0, MEMBER, 0);
+						}														
                         break;
                     case 'list':
                         return $this->memberslist();
@@ -114,28 +123,42 @@ class Roster_Handler extends BaseActiveModule
                             $this->bot->core('notify')->del($vars[2]);
                         }
                         return $return;
-                    case 'add':
-                        $userlevel = $this->bot->db->select(
-                            "SELECT user_level FROM #___users WHERE nickname = '" . $vars[2] . "'"
-                        );
-                        if (!empty($userlevel)) {
-                            $userlevel = $userlevel[0][0];
-                        } else {
-                            $userlevel = 0;
-                        }
-                        if ($userlevel == 2) {
-                            return "##highlight##" . $vars[2] . " ##end##is already a MEMBER and connot be added as GUEST!";
-                        }
-                        if ($userlevel == 1) {
-                            return "##highlight##" . $vars[2] . " ##end##is already a GUEST!";
-                        }
-                        $return = $this->bot->core("user")
-                            ->add($source, $vars[2], 0, GUEST, 0);
-                        //if (!($return instanceof BotError))
-                        //{
-                        //	$this -> bot -> core('notify') -> add ($source, $vars[2]);
-                        //}
-                        return $return;
+                    case 'add':					
+						if(strpos($vars[2], ',') !== false) {
+							$toons = explode(',', $vars[2]);
+							foreach($toons as $toon) {
+								$userlevel = $this->bot->db->select(
+									"SELECT user_level FROM #___users WHERE nickname = '" . $toon . "'"
+								);
+								if ( empty($userlevel[0][0]) || ($userlevel[0][0]!=2 && $userlevel[0][0]!=1) ) {
+									$this->bot->core("user")
+										->add($source, $toon, 0, GUEST, 0);
+								}
+							}
+							return "Guests have been sorted out.";
+						} else {							
+							$userlevel = $this->bot->db->select(
+								"SELECT user_level FROM #___users WHERE nickname = '" . $vars[2] . "'"
+							);
+							if (!empty($userlevel)) {
+								$userlevel = $userlevel[0][0];
+							} else {
+								$userlevel = 0;
+							}
+							if ($userlevel == 2) {
+								return "##highlight##" . $vars[2] . " ##end##is already a MEMBER and cannot be added as GUEST!";
+							}
+							if ($userlevel == 1) {
+								return "##highlight##" . $vars[2] . " ##end##is already a GUEST!";
+							}
+							$return = $this->bot->core("user")
+								->add($source, $vars[2], 0, GUEST, 0);
+							//if (!($return instanceof BotError))
+							//{
+							//	$this -> bot -> core('notify') -> add ($source, $vars[2]);
+							//}
+							return $return;												
+						}					
                     case 'list':
                     default:
                         return $this->guest_list();

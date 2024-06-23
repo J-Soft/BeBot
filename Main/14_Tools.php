@@ -699,7 +699,7 @@ class tools extends BasePassiveModule
     }
 	
 	// generic message cleanup called by various relays
-	// mode : 0 cleans all, 1 cleans only specifics
+	// mode : 0 cleans+strips all, 1 cleans only urlencodable+htmlentities
 	function cleanString($msg,$mode=0) {
 		if($mode==0) {
 			if(mb_detect_encoding($msg, 'UTF-8', false)) $msg = mb_convert_encoding($msg, 'UTF-8', mb_list_encodings());
@@ -708,27 +708,32 @@ class tools extends BasePassiveModule
 			$msg = str_replace("&lt;", "<", $msg);
 			$msg = str_replace("&amp;", "&", $msg);
 		} else {	
-			$patterns[0] = '/%(E1|E2|E0|E5|E4|E3)/'; // áâàåäã
+			$patterns[0] = '/%(E1|E2|E0|E5|E4|E3|AA)/'; // áâàåäãª
 			$patterns[1] = '/%(C0|C1|C2|C3|C4|C5)/'; // ÀÁÂÃÄÅ
 			$patterns[2] = '/%(E9|EA|E8|EB)/'; // éêèë
 			$patterns[3] = '/%(C8|C9|CA|CB)/'; // ÈÉÊË
 			$patterns[4] = '/%(ED|EE|EC|EF)/'; // íîìï
 			$patterns[5] = '/%(CC|CD|CE|CF)/'; // ÌÍÎÏ
-			$patterns[6] = '/%(F3|F4|F2|F8|F0|F5|F6)/'; // óôòøðõö
+			$patterns[6] = '/%(F3|F4|F2|F8|F0|F5|F6|B0)/'; // óôòøðõö°
 			$patterns[7] = '/%(D2|D3|D4|D5|D6|D8)/'; // ÒÓÔÕÖØ
 			$patterns[8] = '/%(FA|FB|F9|FC)/'; // úûùü
 			$patterns[9] = '/%(D9|DA|DB|DC)/'; // ÙÚÛÜ
 			$patterns[10] = '/%E6/'; // æ
 			$patterns[11] = '/%C6/'; // Æ
-			$patterns[12] = '/%E7/'; // ç
+			$patterns[12] = '/%(E7|A2)/'; // ç¢
 			$patterns[13] = '/%C7/'; // Ç
 			$patterns[14] = '/%DF/'; // ß
 			$patterns[15] = '/%(FD|FF)/'; // ýÿ
-			$patterns[16] = '/%DD/'; // Ý
+			$patterns[16] = '/%(DD|9F|A5)/'; // ÝŸ¥
 			$patterns[17] = '/%F1/';// ñ
 			$patterns[18] = '/%D1/';// Ñ
 			$patterns[19] = '/%DE/';// Þ
 			$patterns[20] = '/%FE/';// þ
+			$patterns[21] = '/%8C/';// Œ
+			$patterns[22] = '/%9C/';// œ
+			$patterns[23] = '/%9A/';// š
+			$patterns[24] = '/%9E/';// z
+			$patterns[25] = '/%DO/';// Ð
 			$replacements[0] = 'a';
 			$replacements[1] = 'A';
 			$replacements[2] = 'e';
@@ -750,7 +755,13 @@ class tools extends BasePassiveModule
 			$replacements[18] = 'N';		
 			$replacements[19] = 'b';				
 			$replacements[20] = 'B';				
-			return urldecode(preg_replace($patterns, $replacements, urlencode($msg)));
+			$replacements[21] = 'OE';				
+			$replacements[22] = 'oe';				
+			$replacements[23] = 's';				
+			$replacements[24] = 'z';				
+			$replacements[25] = 'D';				
+			$msg = urldecode(preg_replace($patterns, $replacements, urlencode($msg)));
+			$msg = html_entity_decode($msg);
 		}
 		return $msg;
 	}	
