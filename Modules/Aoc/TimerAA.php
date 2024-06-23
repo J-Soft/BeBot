@@ -188,7 +188,7 @@ class TimerAA extends BaseActiveModule
 
         $findmain = $this -> bot -> db -> select("SELECT main FROM alts WHERE alts.alt='$name'");
         if (empty($findmain)) {$main=$name;}
-        else {$main = current(ucfirst$findmain[0]);}
+        else {$main = current(ucfirst($findmain[0]));}
         $output = "<Center>##ao_infoheadline##:::: Offline timer info for $main and alts ::::##end##</Center>".$this->brfix(2);
 
       $notsetoutput = $this->brfix()."<Center>##ao_infoheadline##:::: No timers ::::##end##</Center>".$this->brfix(2);
