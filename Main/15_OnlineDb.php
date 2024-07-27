@@ -471,11 +471,11 @@ class OnlineDB_Core extends BasePassiveModule
     // The specific channels which should be included have to be defined in addition to this.
     function otherbots($prefix = "")
     {
-        if ($this->bot->core("settings")->get("Online", "Otherbots") != "") {
+        if ($this->bot->core("settings")->get("Online", "OtherBots") != "") {
             $bots = explode(
                 ",",
                 $this->bot->core("settings")
-                    ->get("Online", "Otherbots")
+                    ->get("Online", "OtherBots")
             );
             $botnames = array();
             foreach ($bots as $bot) {
@@ -517,11 +517,20 @@ class OnlineDB_Core extends BasePassiveModule
 
     //Returns an array of people currently online in $channel
     //Valid channels are ('gc', 'pg', 'both')
-    function list_users($channel)
+    function list_users($channel,$botlist="")
     {
         $channel = strtolower($channel);
 		$table = "online";
 		$botpart = "AND botname = '".$this->bot->botname."' ";
+		if($botlist!="") {
+			$botpart = "AND (";
+			$bots = explode(",", $botlist);
+			foreach($bots as $bot) {
+				$botpart .= "botname='".ucfirst($bot)."' OR ";
+			}
+			$botpart = substr($botpart,0,-4);
+			$botpart .= ") ";
+		}
         switch ($channel) {
             case 'gc':
             case 'guild':

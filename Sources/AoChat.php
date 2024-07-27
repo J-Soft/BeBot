@@ -50,18 +50,18 @@ set_time_limit(0);
 ini_set("html_errors", 0);
 
 // Make sure we can handle BIGINT on 32bit systems
-echo "Debug: PHP_INT_SIZE is ";
+echo "PHP_INT_SIZE is ";
 var_dump(PHP_INT_SIZE);
 echo "\n";
 if (PHP_INT_SIZE != 8) {
     $precision = ini_get('precision');
-    echo "Debug: Precision is $precision\n";
+    echo "Precision is $precision\n";
     if ($precision <= 16) {
         if (!ini_set('precision', 16)) {
             die("On 32bit systems we need precision of 16 or greater and we where unable to raise the limit.\nPlease set precision in php.ini to 16.");
         }
 
-        echo "Debug: Setting precision to 16...";
+        echo "Setting precision to 16...";
         $precision = ini_get('precision');
 
         if ($precision == 16) {
@@ -775,7 +775,18 @@ class AOChat
                 // Deprecated call: Should listen to the signal already sendt.
                 $bot->inc_pginvite($packet->args);
                 break;
-            // buddy/player
+            case AOCP_PRIVGRP_KICK:
+            case AOCP_PRIVGRP_KICKALL:
+                // Event is a privgroup kick/kickall
+                list ($gid) = $packet->args;
+
+                $name = $this->bot->core("player")->name($gid);
+				
+                if(isset($this->gid[$gid])) unset($this->gid[$gid]);
+                if(isset($this->gid[strtolower($name)])) unset($this->gid[strtolower($name)]);
+				
+                break;			
+            // buddy/player			
             case AOCP_CLIENT_NAME:
                 // Cross-game compatibility
                 if (strtolower(AOCHAT_GAME) == 'aoc') {
@@ -1192,7 +1203,8 @@ class AOChat
         if (($gid = $this->get_gid($group)) === false) {
             return false;
         }
-        return $this->grp[$gid];
+        if(isset($this->grp[$gid])) return $this->grp[$gid];
+		else return false;
     }
 
 
@@ -1221,7 +1233,7 @@ class AOChat
     {
         // FIXME We are not getting a GID back!
         $gid = $this->get_gid($group);
-        echo "Debug: Sending join packet for privategroup: " . $gid . " (" . $group . ")\n";
+        //echo "Debug: Sending join packet for privategroup: " . $gid . " (" . $group . ")\n";
         return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_JOIN, $gid));
     }
 
