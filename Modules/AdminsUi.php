@@ -42,10 +42,12 @@ class admins extends BaseActiveModule
 
         $this->register_command('all', 'admins', 'GUEST');
 		$this -> register_alias("admins", "leaders");
+		$this->register_command('all', 'adminsfix', 'OWNER');
 
         $this->help['description'] = 'Shows bots Admin list.';
-        $this->help['command']['admins'] = "Shows the list of admins.";
-        //$this -> help['command']['admins all'] = "Shows all the bot admins by org.";
+        $this->help['command']['admins'] = "Shows a short list of admins.";
+        $this -> help['command']['admins all'] = "Shows a full list of admins.";
+		$this->help['command']['adminsfix'] = "Refreshes admins notify & memberships.";
     }
 
 
@@ -54,13 +56,35 @@ class admins extends BaseActiveModule
         Return ($this->admins_blob($msg));
     }
 
-
+    function all_fixer($name)
+    {
+		$uid = $this->bot->core("player")->id($name);
+		if (!$uid instanceof BotError) {
+			$result = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '" . $name . "'");
+			if (!empty($result)) {
+				if ($result[0][0] != 2) {
+					$this->bot->core("user")->add($this->bot->botname, $name, 0, MEMBER, 1);
+				}
+			} else {
+				$this->bot->core("user")->add($this->bot->botname, $name, 0, MEMBER, 1);
+			}
+			if (!$this->bot->core("chat")->buddy_exists($name)) {
+				$this->bot->core("chat")->buddy_add($name);
+			}
+		}
+	}
+	
     function admins_blob($msg)
     {
 		$all = false;
         if (preg_match("/^admins all$/i", $msg, $info)) {
             $all = true;
         }
+		$fix = false;
+        if (preg_match("/^adminsfix$/i", $msg, $info)) {
+            $all = true;
+			$fix = true;
+        }		
         $sql = "SELECT gid, name, description, access_level FROM #___security_groups ";
         $sql .= "ORDER BY access_level DESC, gid ASC, name";
         $result = $this->bot->db->select($sql, MYSQLI_ASSOC);
@@ -75,6 +99,7 @@ class admins extends BaseActiveModule
         $online2 = false;
         $ow = $this->bot->core("security")->owner;
         $main = $this->bot->core("alts")->main($ow);
+		if($fix) $this->all_fixer($main);
         $online = $this->bot->core("online")->get_online_state($main);
         $temp .= "\n- ##highlight##$main##end## is " . $online["content"];
         if ($online['status'] == 1) {
@@ -83,6 +108,7 @@ class admins extends BaseActiveModule
         $alts = $this->bot->core("alts")->get_alts($main);
         if (!empty($alts)) {
             foreach ($alts as $alt) {
+				if($fix) $this->all_fixer($alt);
                 $online = $this->bot->core("online")->get_online_state($alt);
                 if ($online['status'] == 1 || $all) {
                     $temp .= "\n   - $alt is " . $online["content"];
@@ -111,6 +137,7 @@ class admins extends BaseActiveModule
                         $temp = "";
                         $online2 = false;
                         //$admins .= " + ".$group['name']." (".stripslashes($group['description']).") ";
+						if($fix) $this->all_fixer($main);
                         $online = $this->bot->core("online")
                             ->get_online_state($main);
                         $temp .= "\n- ##highlight##$main##end## is " . $online["content"];
@@ -120,6 +147,7 @@ class admins extends BaseActiveModule
                         $alts = $this->bot->core("alts")->get_alts($main);
                         if (!empty($alts)) {
                             foreach ($alts as $alt) {
+								if($fix) $this->all_fixer($alt);
                                 $online = $this->bot->core("online")
                                     ->get_online_state($alt);
                                 if ($online['status'] == 1 || $all) {
@@ -149,6 +177,7 @@ class admins extends BaseActiveModule
                     foreach ($mains['A'] as $main => $v) {
                         $temp = "";
                         $online2 = false;
+						if($fix) $this->all_fixer($main);
                         $online = $this->bot->core("online")
                             ->get_online_state($main);
                         if ($online['status'] == 1) {
@@ -158,6 +187,7 @@ class admins extends BaseActiveModule
                         $alts = $this->bot->core("alts")->get_alts($main);
                         if (!empty($alts)) {
                             foreach ($alts as $alt) {
+								if($fix) $this->all_fixer($alt);
                                 $online = $this->bot->core("online")
                                     ->get_online_state($alt);
                                 if ($online['status'] == 1 || $all) {
@@ -187,6 +217,7 @@ class admins extends BaseActiveModule
                     foreach ($mains['L'] as $main => $v) {
                         $temp = "";
                         $online2 = false;
+						if($fix) $this->all_fixer($main);
                         $online = $this->bot->core("online")
                             ->get_online_state($main);
                         if ($online['status'] == 1) {
@@ -196,6 +227,7 @@ class admins extends BaseActiveModule
                         $alts = $this->bot->core("alts")->get_alts($main);
                         if (!empty($alts)) {
                             foreach ($alts as $alt) {
+								if($fix) $this->all_fixer($alt);
                                 $online = $this->bot->core("online")
                                     ->get_online_state($alt);
                                 if ($online['status'] == 1 || $all) {
