@@ -80,6 +80,7 @@ class NewRis extends BaseActiveModule
 
         $this -> bot -> core("settings") -> create("Ris", "sendrate", 100000, "Microsecond (usleep) pause between each member manipulation (kick/invite)");
         $this -> bot -> core("settings") -> create("Ris", "sendbot", "", "Name of preparation bot allowed to send RI player list to be invited");
+		$this -> bot -> core("settings") -> create("Ris", "ignlvl", "0", "Level under which toons are ignored in the module (0 by default)");
 
         $this -> register_event("pgjoin");
         $this -> register_event("pgleave");
@@ -854,7 +855,8 @@ class NewRis extends BaseActiveModule
 
 	function pgjoin($name)
 	{
-		$this->pgroup[$name] = $this->GetPlayerInfo($name);
+		$member = $this->GetPlayerInfo($name);
+		if(is_numeric($member[1])&&$member[1]>$this->bot->core("settings")->get("Ris","ignlvl")) $this->pgroup[$name] = $member;
 	}
 
 	function pgleave($name)

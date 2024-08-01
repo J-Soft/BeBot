@@ -2,7 +2,7 @@
 Release 0.8.2 - ... 202.
 ------------------------
 - For both: Online, MassMsg, AoChat, AutoUserAdd, Admins improved
-- For AO: (Send)Com added
+- For AO: Ris improved, (Send)Com added
 - For AoC: ...
 
 ------------------------
