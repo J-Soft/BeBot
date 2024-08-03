@@ -1122,11 +1122,13 @@ class Bot
     */
     function inc_pgjoin($args)
     {
-        $pgname = $this->core("player")->name($args[0]);
+        if(is_numeric($args[0])) $pgname = $this->core("player")->name($args[0]);
+		else $pgname = $args[0];
         if (empty($pgname) || $pgname == "") {
             $pgname = $this->botname;
         }
-        $user = $this->core("player")->name($args[1]);
+        if(is_numeric($args[0])) $user = $this->core("player")->name($args[1]);
+		else $user = $args[1];
         if (strtolower($pgname) == strtolower($this->botname)) {
             $this->log("PGRP", "JOIN", $user . " joined privategroup.");
             if (!empty($this->commands["pgjoin"])) {
