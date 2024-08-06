@@ -79,7 +79,7 @@ class DiscordRelay extends BaseActiveModule
 	var $lastcheck = 0;
 	var $crondelay = "2sec";
 	var $is;
-	var $note = "Discord side commands available are : help, tara, viza, is, online/sm, whois, alts, level/lvl/pvp";
+	var $note = "Discord side commands available are : help, tara, viza, is, online/sm, whois, alts, level/lvl/pvp, bots/bot/up";
 
     /*
     Constructor:
@@ -451,6 +451,11 @@ class DiscordRelay extends BaseActiveModule
 										case $this->bot->commpre . 'pvp':
 											$sent = $this->discord_lvl($msg['content']);
 											Break;
+										case $this->bot->commpre . 'bots':
+										case $this->bot->commpre . 'bot':
+										case $this->bot->commpre . 'up':										
+											$sent = $this->discord_up($msg['content']);
+											Break;											
 										Default:
 											$sent = $this->note;
 											Break;
@@ -604,6 +609,14 @@ class DiscordRelay extends BaseActiveModule
 			$sent = "No Vizaresh/Gauntlet timer found.";
 		}
 		return $sent;		
+	}	
+
+    /*
+    * Gets called when someone does !bots !bot !up
+    */
+    function discord_up($msg)
+    {
+		return $this->bot->core("bot_statistics")->up_bots($this->bot->botname, "Discord");
 	}		
 
     /*

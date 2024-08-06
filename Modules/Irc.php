@@ -48,7 +48,7 @@ class IRC extends BaseActiveModule
     var $whois;
     var $target;
     var $irc;
-	var $note = "Irc side commands available are : help, tara, viza, is, online/sm, whois, alts, level/lvl/pvp";
+	var $note = "Irc side commands available are : help, tara, viza, is, online/sm, whois, alts, level/lvl/pvp, bots/bot/up";
 	var $spam, $irconline, $ircmsg;
 
     /*
@@ -769,7 +769,7 @@ class IRC extends BaseActiveModule
             $this->bot->commpre . 'pvp (.*)',
             $this->bot->commands["tell"]["irc"],
             'irc_level'
-        );
+        );			
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_QUERY,
             $this->bot->commpre . 'level (.*)',
@@ -788,6 +788,42 @@ class IRC extends BaseActiveModule
             $this->bot->commands["tell"]["irc"],
             'irc_level'
         );
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_CHANNEL,
+            $this->bot->commpre . 'bots',
+            $this->bot->commands["tell"]["irc"],
+            'irc_up'
+        );
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_CHANNEL,
+            $this->bot->commpre . 'bot',
+            $this->bot->commands["tell"]["irc"],
+            'irc_up'
+        );			
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_CHANNEL,
+            $this->bot->commpre . 'up',
+            $this->bot->commands["tell"]["irc"],
+            'irc_up'
+        );		
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_QUERY,
+            $this->bot->commpre . 'bots',
+            $this->bot->commands["tell"]["irc"],
+            'irc_up'
+        );
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_QUERY,
+            $this->bot->commpre . 'bot',
+            $this->bot->commands["tell"]["irc"],
+            'irc_up'
+        );
+        $this->irc->registerActionhandler(
+            SMARTIRC_TYPE_QUERY,
+            $this->bot->commpre . 'up',
+            $this->bot->commands["tell"]["irc"],
+            'irc_up'
+        );		
         //$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'command', $this -> bot -> commands["tell"]["irc"], 'command');
         $this->irc->registerActionhandler(
             SMARTIRC_TYPE_QUERY,
@@ -942,6 +978,7 @@ class IRC extends BaseActiveModule
 			&& (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'tara')))
 			&& (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'viza')))
 			&& (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'help')))
+			&& (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'bots')))
         ) {
             $msg = str_replace("<", "&lt;", $data->message);
             $msg = str_replace(">", "&gt;", $msg);
@@ -1294,6 +1331,12 @@ class IRC extends BaseActiveModule
         $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
     }		
 	
+    function irc_up(&$irc)
+    {
+        $target = $this->bot->core("settings")->get("Irc", "Channel");
+        $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $this->bot->core("bot_statistics")->up_bots($this->bot->botname, "Irc"));
+    }	
+	
     function irc_help(&$irc)
     {
         $target = $this->bot->core("settings")->get("Irc", "Channel");
@@ -1469,6 +1512,9 @@ class IRC extends BaseActiveModule
             case $this->bot->commpre . 'tara':
             case $this->bot->commpre . 'viza':
             case $this->bot->commpre . 'help':
+            case $this->bot->commpre . 'bots':
+            case $this->bot->commpre . 'bot':
+            case $this->bot->commpre . 'up':			
                 Break; //These should of been handled elsewere
             case 'is':
                 $data->message = $this->bot->commpre . $data->message;
@@ -1505,6 +1551,11 @@ class IRC extends BaseActiveModule
                 $data->message = $this->bot->commpre . $data->message;
                 $this->irc_viza($irc, $data);
                 Break;
+			case 'bots':			
+			case 'bot':
+			case 'up':
+				$this->irc_up($irc);
+                Break;				
 			case 'help':
 				$this->irc_help($irc);
                 Break;
