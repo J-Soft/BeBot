@@ -599,7 +599,7 @@ class Bot
 			if($this->core("settings")->get("Com", "Channels")!="") {
 				$bots = explode(",", $this->core("settings")->get("Com", "Channels"));
 				foreach($bots as $bot) {
-					if(ucfirst($bot)==$to) {
+					if(!$this->core('player')->id($bot) instanceof BotError && $this->core('player')->id($bot)==$to) {
 						return false;
 					}
 				}
