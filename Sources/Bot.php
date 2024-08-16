@@ -596,7 +596,7 @@ class Bot
     function send_help($to, $command = false)
     {
 		if ($this->exists_module("com")) {
-			if($this->bot->core("settings")->get("Com", "Channels")!="") {
+			if($this->core("settings")->get("Com", "Channels")!="") {
 				$bots = explode(",", $this->bot->core("settings")->get("Com", "Channels"));
 				foreach($bots as $bot) {
 					if(ucfirst($bot)==$to) {
