@@ -1247,7 +1247,7 @@ class Bot
                 $found = $this->handle_command_input($user, $args[2], "extpgmsg", $pgname);
                 $found = $this->hand_to_chat($found, $user, $args[2], "extprivgroup", $pgname);
             }
-            if (isset($this->command_error_text)) {
+            if (isset($this->command_error_text)&&$this->command_error_text!="") {
                 $this->send_pgroup($this->command_error_text, $pgname);
             }
             unset($this->command_error_text);
