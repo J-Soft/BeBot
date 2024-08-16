@@ -597,7 +597,7 @@ class Bot
     {
 		if ($this->exists_module("com")) {
 			if($this->core("settings")->get("Com", "Channels")!="") {
-				$bots = explode(",", $this->bot->core("settings")->get("Com", "Channels"));
+				$bots = explode(",", $this->core("settings")->get("Com", "Channels"));
 				foreach($bots as $bot) {
 					if(ucfirst($bot)==$to) {
 						return false;
