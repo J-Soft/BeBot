@@ -703,6 +703,8 @@ class AOChat
 
     function get_packet()
     {
+		$searches = array("œ");
+		$replaces = array("oe");
         // Get the bot instance
         $bot = Bot::get_instance($this->bothandle);
         // Include a the signal_message (Should probably be included somewhere else)
@@ -962,14 +964,14 @@ class AOChat
                 // Event is a tell
                 // Tells should always be commands
                 list ($id, $message) = $packet->args;
-
+				$packet->args[1] = str_replace($searches,$replaces,$message);
                 //$signal = new signal_message('aochat', $id, $message);
                 //$dispatcher->post($signal, 'onTell');
                 //unset($signal);
 
                 $event = new sfEvent($this, 'Core.on_tell', array(
                                                                  'source' => $id,
-                                                                 'message' => $message
+                                                                 'message' => str_replace($searches,$replaces,$message)
                                                             ));
                 $this->bot->dispatcher->notify($event);
 
@@ -980,12 +982,13 @@ class AOChat
             case AOCP_PRIVGRP_MESSAGE:
                 // Event is a privgroup message
                 list (, $id, $message) = $packet->args;
+				$packet->args[2] = str_replace($searches,$replaces,$message);
                 //$signal = new signal_message('aochat', $id, $message);
                 //$dispatcher->post($signal, 'onPgMessage');
 
                 $event = new sfEvent($this, 'Core.on_privgroup_message', array(
                                                                               'source' => $id,
-                                                                              'message' => $message
+                                                                              'message' => str_replace($searches,$replaces,$message)
                                                                          ));
                 $this->bot->dispatcher->notify($event);
 
@@ -999,6 +1002,7 @@ class AOChat
                 /* Hack to support extended messages */
                 // This should be re-hacked so that we can handle the extmsgs here.
                 if ($packet->args[1] === 0 && substr($packet->args[2], 0, 2) == "~&") {
+					$packet->args[2] = str_replace($searches,$replaces,$packet->args[2]);
                     $em = new AOExtMsg($packet->args[2]);
                     if ($em->type != AOEM_UNKNOWN) {
                         $packet->args[2] = $em->text;
