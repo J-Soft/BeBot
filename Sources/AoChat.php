@@ -12,6 +12,7 @@
 * This is an adapted version of Auno's original AOChat PHP class.
 * This version has been adapted for use with pre PHP 5 versions aswell as other bugfixes
 * by the community and BeBot development team.
+* Notably : Mithrionne for AoC items letter languaged bug replacements.
 *
 * Age of Conan Changes:
 * This was later ported and adjusted to the protocol used for the Age of Conan
@@ -703,8 +704,51 @@ class AOChat
 
     function get_packet()
     {
-		$searches = array("œ");
-		$replaces = array("oe");
+		$searches = array(
+			// French special letters (upper)
+			"À", "Â", "Ç", "É", "È", "Ê", "Ë", "Î", "Ï", "Ô", "Ù", "Û", "Ÿ",
+			// French special letters (lower)
+			"à", "â", "ç", "é", "è", "ê", "ë", "î", "ï", "ô", "ù", "û", "ÿ",
+			// French ligaturs (upper)
+			"Œ", "Æ",
+			// French ligaturs (lower)
+			"œ", "æ",
+			// German special letters (upper)
+			"Ä", "Ö", "Ü", "ẞ",
+			// German special letters (lower)
+			"ä", "ö", "ü", "ß",
+			// Spanish special letters (upper)
+			"Á", "É", "Í", "Ó", "Ú", "Ñ",
+			// Spanish special letters (lower)
+			"á", "é", "í", "ó", "ú", "ñ",
+			// Polski special letters (upper)
+			"Ą", "Ć", "Ę", "Ł", "Ń", "Ó", "Ś", "Ź", "Ż",
+			// Polski special letters (lower)
+			"ą", "ć", "ę", "ł", "ń", "ó", "ś", "ź", "ż",
+			// to test [FR]À,Â,Ç,É,È,Ê,Ë,Î,Ï,Ô,Ù,Û,Ÿ,à,â,ç,é,è,ê,ë,î,ï,ô,ù,û,ÿ,Œ,œ,æ,[DE]Ä,Ö,Ü,ẞ,ä,ö,ü,ß,[ES]Á,É,Í,Ó,Ú,Ñ,á,é,í,ó,ú,ñ,[PL]Ą,Ć,Ę,Ł,Ń,Ó,Ś,Ź,Ż,ą,ć,ę,ł,ń,ó,ś,ź,ż,
+		);
+		$replaces = array(
+			// French special letters (upper)
+			"A", "A", "C", "E", "E", "E", "E", "I", "I", "O", "U", "U", "Y",
+			// French special letters (lower)
+			"a", "a", "c", "e", "e", "e", "e", "i", "i", "o", "u", "u", "y",
+			// French ligaturs (upper)
+			"Oe", "Ae",
+			// French ligaturs (lower)
+			"oe", "ae",
+			// German special letters (upper)
+			"Ae", "Oe", "Ue", "SS",
+			// German special letters (lower)
+			"ae", "oe", "ue", "ss",
+			// Spanish special letters (upper)
+			"A", "E", "I", "O", "U", "N",
+			// Spanish special letters (lower)
+			"a", "e", "i", "o", "u", "n",
+			// Polski special letters (upper)
+			"A", "C", "E", "L", "N", "O", "S", "Z", "Z",
+			// Polski special letters (lower)
+			"a", "c", "e", "l", "n", "o", "s", "z", "Z",
+		);
         // Get the bot instance
         $bot = Bot::get_instance($this->bothandle);
         // Include a the signal_message (Should probably be included somewhere else)
