@@ -412,7 +412,7 @@ class DiscordRelay extends BaseActiveModule
 				if ($this->lastmsg>0) { $route = "/channels/{$channel}/messages?after=".$this->lastmsg; }
 				$result = discord_get($route, $token);
 				if ($this->lastcheck==0) $this->lastcheck = date('Y-m-d').'T'.date("H:i:s").'.000000+00:00';
-				if(is_array($result)) $invert = array_reverse($result);
+				if(is_array($result)&&!is_null($result)) $invert = array_reverse($result);
 				if(isset($invert['message'])&& isset($invert['code'])) {
 					$this->bot->log("DISCORD", "ERROR", "Wrong configuration : do !settings discord to fix");
 				} else {
