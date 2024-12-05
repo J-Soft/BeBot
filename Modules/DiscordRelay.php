@@ -404,6 +404,7 @@ class DiscordRelay extends BaseActiveModule
     */	
     function cron()
     {
+		$invert = null;
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			$channel = $this->bot->core("settings")->get("discord", "ChannelId");
 			$token = $this->bot->core("settings")->get("discord", "BotToken");
@@ -413,7 +414,7 @@ class DiscordRelay extends BaseActiveModule
 				$result = discord_get($route, $token);
 				if ($this->lastcheck==0) $this->lastcheck = date('Y-m-d').'T'.date("H:i:s").'.000000+00:00';
 				if(is_array($result)&&!is_null($result)) $invert = array_reverse($result);
-				if(isset($invert['message'])&& isset($invert['code'])) {
+				if( (isset($invert['message'])&&isset($invert['code'])) || is_null($invert) ) {
 					$this->bot->log("DISCORD", "ERROR", "Wrong configuration : do !settings discord to fix");
 				} else {
 					foreach ($invert as $msg) {
