@@ -3,7 +3,7 @@ Release 0.8.2 - Dec 2024
 ------------------------
 - For both: Online, MassMsg, AoChat, AutoUserAdd, Admins, Bots, Discord/Irc improved
 - For AO: Ris & Pgroup improved, (Send)Com added
-- For AoC: fixed weird letter bugs
+- For AoC: Tokens + Items improved & fixed weird letter bugs
 
 ------------------------
 Release 0.8.1 - Jun 2024
