@@ -190,7 +190,15 @@ class Tokens extends BaseActiveModule
     
     function showAlts($name)
 	{
-        return "To be deved soon ..."; // LEFT TO DO
+		$inside = "Alts tokens links ::\n\n";
+		$main = $this->bot->core("alts")->main($name);
+		$alts = $this->bot->core("alts")->get_alts($main);
+        if (!empty($alts)) {
+			foreach ($alts as $alt) {
+				$inside .= $alt.":".$this -> bot -> core("tools") -> chatcmd("tokens show ".$alt, "see")."\n";;
+			}
+		}
+		return (count($alts)." alts found :: " . $this->bot->core("tools")->make_blob("click to view", $inside));
 		// NOTE carefull that if the player has set tokens to hidden, he won't be able to read from other alts unless more checks are done
 	}	
 	
@@ -206,18 +214,18 @@ class Tokens extends BaseActiveModule
 		// $token = $args[0]; // token type ie: shards or 7  or 30 or empty
 		$token = $argumenter[0];
 
-		$today = date("Y-m-d H:i:s", strtotime("+2 hours"));
+		$today = date("Y-m-d", strtotime("+2 hours"));
 		$output = "<center>##ao_infoheader##::::##end####ao_infoheadline## $name's##end## ##ao_infoheader## token history, today: UTC: ##end####ao_infoheadline##$today##end## ##ao_infoheader##::::##end##</center>";
 
 		if (is_numeric($token)) {
 			// Show x days history up to 60 days
 			if ($token >= 0 && $token <= 60) {
-				$tid = date("Y-m-d H:i:s", strtotime("-$token days"));
+				$tid = date("Y-m-d", strtotime("-$token days"));
 				$outputLast = "##ao_feedback##Showing activity for the last $token days ($tid).<br>##end##";
 				$sql = "SELECT token, token_amount, track_action, track_date FROM #___tokens_track WHERE track_username='$name' AND track_date > '$tid' ORDER BY track_date DESC";
 			}else{
                 // if more than 60 show last 60 days.
-				$tid = date("Y-m-d H:i:s", strtotime("-60 days"));
+				$tid = date("Y-m-d", strtotime("-60 days"));
 				$outputLast = "##ao_feedback##Showing activity for the last 60 days ($tid).<br>##end##";
 				$sql = "SELECT token, token_amount, track_action, track_date FROM #___tokens_track WHERE track_username='$name' AND track_date > '$tid' ORDER BY track_date DESC";
             }
@@ -243,7 +251,7 @@ class Tokens extends BaseActiveModule
 				$tr_token = $result[0];
 				$token_amount = $result[1];
 				$add_rem = $result[2];
-				$added_date = $result[3];
+				$added_date = explode(" ",$result[3])[0];
 				if ($this->valid($tr_token)) {
 					$vistoken = $this->valid($tr_token, true);
 				} else {
@@ -568,9 +576,11 @@ class Tokens extends BaseActiveModule
         // True returns the full name of the token, ie: shards will return Atlantean Shards
         // False returns false or shortname of token, ie: shards will return shards
         if (!$option) {
-            return (($validTokens[$tokenType]) ? $tokenType : false);
+			if (isset($validTokens[$tokenType])) return $tokenType;
+			else return false;
         } else {
-            return ($validTokens[$tokenType]);
+			if (isset($validTokens[$tokenType])) return $validTokens[$tokenType];
+			else return false;
         }
     }
 
