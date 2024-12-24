@@ -1045,8 +1045,8 @@ class AOChat
             case AOCP_GROUP_MESSAGE:
                 /* Hack to support extended messages */
                 // This should be re-hacked so that we can handle the extmsgs here.
-                if ($packet->args[1] === 0 && substr($packet->args[2], 0, 2) == "~&") {
-					$packet->args[2] = str_replace($searches,$replaces,$packet->args[2]);
+				$packet->args[2] = str_replace($searches,$replaces,$packet->args[2]);
+                if ($packet->args[1] === 0 && substr($packet->args[2], 0, 2) == "~&") {					
                     $em = new AOExtMsg($packet->args[2]);
                     if ($em->type != AOEM_UNKNOWN) {
                         $packet->args[2] = $em->text;
