@@ -70,7 +70,7 @@ class StringFilter_Interface extends BaseActiveModule
     }
 
 
-    function add($string, $new = null)
+    function add($string, ?string $new = null)
     {
         return $this->bot->core("stringfilter")->add_string($string, $new);
     }

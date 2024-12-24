@@ -160,7 +160,7 @@ class LandControlZones extends BaseActiveModule
 		}
 	}
 	
-    function show_hot($ql = null)
+    function show_hot(?int $ql = null)
     {
 		$datas = array();
 		$temp = array();
@@ -199,7 +199,7 @@ class LandControlZones extends BaseActiveModule
 	}
 
 	
-    function show_lc($iarea = null, $ql = null)
+    function show_lc(?string $iarea = null, ?int $ql = null)
     {
 		$datas = array();
 		$temp = array();

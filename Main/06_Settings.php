@@ -482,7 +482,7 @@ class Settings_Core extends BasePassiveModule
     /*
     Deletes a setting or group of settings from the database.
     */
-    function del($module, $setting = null)
+    function del($module, ?string $setting = null)
     { // Start function del()
         // Remove whitespace from $module, $setting, and $value
         $module = $this->remove_space($module);

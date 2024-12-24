@@ -129,7 +129,7 @@ class BanManager extends BaseActiveModule
     }
 
 	
-    function ban_search($skip = 0, $string = null)
+    function ban_search($skip = 0, ?string $string = null)
     {
 		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }
 		$pager = 20; $range = $skip+$pager;			

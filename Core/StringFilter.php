@@ -135,7 +135,7 @@ class stringfilter_core extends BasePassiveModule
     /*
     Adds a string to the filtered string list.
     */
-    function add_string($search, $new = null)
+    function add_string($search, ?string $new = null)
     { // Start function add_string()
         $search = $this->bot->db->real_escape_string(strtolower($search));
         if (isset($this->stringlist[$search])) {

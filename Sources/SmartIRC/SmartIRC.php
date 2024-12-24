@@ -835,7 +835,7 @@ class Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function log($level, $entry, $file = null, $line = null)
+    function log($level, $entry, $file = null, ?string $line = null)
     {
         // prechecks
         if (!(is_integer($level)) || !($level & SMARTIRC_DEBUG_ALL)
@@ -1160,7 +1160,7 @@ class Net_SmartIRC_base
      * @return boolean
      * @access public
      */
-    function isJoined($channel, $nickname = null)
+    function isJoined($channel, ?string $nickname = null)
     {
         if ($this->_channelsyncing != true) {
             $this->log(
@@ -1196,7 +1196,7 @@ class Net_SmartIRC_base
      * @return boolean
      * @access public
      */
-    function isOpped($channel, $nickname = null)
+    function isOpped($channel, ?string $nickname = null)
     {
         if ($this->_channelsyncing != true) {
             $this->log(
@@ -1234,7 +1234,7 @@ class Net_SmartIRC_base
      * @return boolean
      * @access public
      */
-    function isVoiced($channel, $nickname = null)
+    function isVoiced($channel, ?string $nickname = null)
     {
         if ($this->_channelsyncing != true) {
             $this->log(
