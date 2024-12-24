@@ -1,5 +1,5 @@
 ------------------------
-Release 0.8.2 - Dec 2024
+Release 0.8.2 - Jan 2025
 ------------------------
 - For both: PHP 8.4 fixes, Online, MassMsg, AoChat, AutoUserAdd, Admins, Bots, Discord/Irc improved
 - For AO: Ris & Pgroup improved, (Send)Com added
