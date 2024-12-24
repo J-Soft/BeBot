@@ -184,7 +184,7 @@ class DiscordRelay extends BaseActiveModule
 			if ($guild>0 && $token!="") {
 				$route = "/guilds/{$guild}/widget.json";
 				$result = discord_get($route, $token);
-				if(isset($result['message'])&& isset($result['code'])) {
+				if(!is_array($result) || (isset($result['message'])&&isset($result['code'])) ) {
 					$this->bot->log("DISCORD", "ERROR", "Bad configuration : check discord widget + !settings discord");
 				} else {
 					$sent = $result['presence_count']." online in discord ... ";
