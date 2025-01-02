@@ -40,6 +40,7 @@ class MassMsg extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
+		$this->register_module("massmsg");
         $this->register_command('all', 'announce', 'LEADER');
         $this->register_command('all', 'massinv', 'LEADER');
         $this->bot->core("queue")->register($this, "invite", 0.2, 5);
@@ -118,7 +119,23 @@ class MassMsg extends BaseActiveModule
 
 
     function mass_msg($sender, $msg, $type)
-    {		
+    {
+		$pgroup = $this->bot->botname;
+		if ($this->bot->exists_module("com")) {
+			if($this->bot->core("settings")->get("Com", "Channels")!="") {
+				$bots = explode(",", $this->bot->core("settings")->get("Com", "Channels"));
+				if($type!="Message"&&$type!="Invite") {
+					$pgroup = $type;
+					$type = "Message";
+					$joiners = $this->bot->core('online')->list_users(
+						"pgroup", $this->bot->core("settings")->get("Com", "Channels")
+					);
+					if ($joiners instanceof BotError) {
+						$joiners = array();
+					}				
+				}			
+			}
+		}
 		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("MassMsg", "AlertDisc")) {
 			if($this->bot->core("settings")->get("MassMsg", "DiscChanId")) { $chan = $this->bot->core("settings")->get("MassMsg", "DiscChanId"); } else { $chan = ""; }
 			if($this->bot->core("settings")->get("MassMsg", "DiscTag")) { $dctag = $this->bot->core("settings")->get("MassMsg", "DiscTag")." "; } else { $dctag = ""; }
@@ -139,8 +156,15 @@ class MassMsg extends BaseActiveModule
 		if($this->bot->core('settings')->get('MassMsg', 'MassMsg')=='Online') {
 			foreach ($users as $num => $recipient) {
 				$check = $this->bot->core("online")->get_online_state($recipient);
-				if($check['status']==0) {
+				if($check['status']!=1) {
 					unset($users[$num]);
+				}
+				if (count($bots)>0&&$this->bot->botname!=$pgroup) {
+					foreach($bots as $bot) {
+						if($recipient==ucfirst($bot)) {
+							unset($users[$num]);
+						}
+					}
 				}
 			}
 		}
@@ -149,13 +173,19 @@ class MassMsg extends BaseActiveModule
         $inchattell = $this->bot->core('settings')
             ->get('MassMsg', 'tell_to_PG_users');
         if (!$inchattell) {
-            //Send to PG and ignore all in PG
-            $this->bot->send_pgroup("\n" . $msg, null, true, false);
+            //Send to PG and ignore all in PG            
+			if (count($bots)>0&&$this->bot->botname!=$pgroup) {
+				foreach($bots as $bot) {
+					$this->bot->send_pgroup("\n" . $msg, $bot, true, false);
+				}				
+			} else {
+				$this->bot->send_pgroup("\n" . $msg, null, true, false);
+			}
         }
-		$msg = $msg." <a href=\"text://To join the bot click: <a href='chatcmd:///tell ".$this->bot->botname." join'>Join</a>";
-		if ($this->bot->exists_module("raid")&&$this->bot->core("raid")->raid) {
-			$msg = $msg."<br>To join the raid click: <a href='chatcmd:///tell ".$this->bot->botname." raid join'>Raid</a>";
-			$msg = $msg."<br>To go lft click: <a href='chatcmd:///lft ".$this->bot->botname."'>LFT</a>";
+		$msg = $msg." <a href=\"text://To join the bot click: <a href='chatcmd:///tell ".$pgroup." join'>Join</a>";
+		if (($this->bot->exists_module("raid")&&$this->bot->core("raid")->raid)||$this->bot->botname!=$pgroup) {
+			$msg = $msg."<br>To join the raid click: <a href='chatcmd:///tell ".$pgroup." raid join'>Raid</a>";
+			$msg = $msg."<br>To go lft click: <a href='chatcmd:///lft ".$pgroup."'>LFT</a>";
 		}
 		$msg = $msg."\">Link(s)</a>";
         if ($this->bot->core('settings')->get('MassMsg', 'IncludePrefLink')) {
@@ -197,12 +227,12 @@ class MassMsg extends BaseActiveModule
 				}
             } else {
                 $message = $msg;
-            }			
+            }						
             //If they want messages they will get them regardless of type
-            if ($massmsg) {
-                if (!$inchattell
-                    && $this->bot->core("online")
-                        ->in_chat($recipient)
+            if ($massmsg) {				
+                if (!$inchattell &&
+                    ( $this->bot->core("online")->in_chat($recipient) ||
+					  array_search($recipient, $joiners) )
                 ) {
                     $status[$recipient]['sent'] = false;
                     $status[$recipient]['pg'] = true;
@@ -213,7 +243,7 @@ class MassMsg extends BaseActiveModule
                 }
             } else {
                 $status[$recipient]['sent'] = false;
-            }
+            }			
             //If type is an invite and they want invites, they will receive both a message and an invite regardless of receive_message setting
             if ($type == 'Invite') {
                 if ($massinv) {
@@ -240,7 +270,9 @@ class MassMsg extends BaseActiveModule
                 }
             }
         }
-        return (count($users)." mass messages/invites complete. " . $this->make_status_blob($status));
+		$return = count($users)." mass messages/invites complete. " . $this->make_status_blob($status);
+		if (count($bots)>0&&$this->bot->botname!=$pgroup) $this->bot->send_tell($sender, $return);
+        else return $return;
     }
 
 
@@ -250,9 +282,9 @@ class MassMsg extends BaseActiveModule
         $window = "<center>##blob_title##::: Status report for mass message :::##end##</center>\n";
         foreach ($status_array as $recipient => $status) {
             $window .= "\n##highlight##$recipient##end## - Message: ";
-            if ($status['sent']) {
+            if (isset($status['sent'])&&$status['sent']) {
                 $window .= "##lime##Sent to user##end##";
-            } elseif ($status['pg']) {
+            } elseif (isset($status['pg'])&&$status['pg']) {
                 $window .= "##lime##Viewed in PG##end##";
             } else {
                 $window .= "##error##Blocked by preferences##end##";
@@ -264,7 +296,7 @@ class MassMsg extends BaseActiveModule
                     $window .= " - Invite to pgroup: ##error##blocked by preferences##end##";
                 }
             }
-            if (strtolower($this->bot->botname) == "bangbot") {
+            /*if (strtolower($this->bot->botname) == "bangbot") { // disabling bot specific part
                 if ($status['sent'] || $status['pg']) {
                     //Update announce count...
                     $result = $this->bot->db->select(
@@ -276,7 +308,7 @@ class MassMsg extends BaseActiveModule
                         );
                     }
                 }
-            }
+            }*/
         }
         return ($this->bot->core('tools')->make_blob('report', $window));
     }

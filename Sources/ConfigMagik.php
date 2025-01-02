@@ -135,7 +135,7 @@ class ConfigMagik
      *                            NOTE:                   An empty directive will always return an empty string.
      *                            Only when directive can not be found, NULL is returned.
      */
-    function get($key = null, $section = null)
+    function get(?string $key = null, ?string $section = null)
     {
         // if section was passed, change the PROCESS_SECTION-switch (FIX: 11/08/2004 BennyZaminga)
         if ($section) {
@@ -176,7 +176,7 @@ class ConfigMagik
      *
      * @return bool            Returns TRUE on success, FALSE on failure.
      */
-    function set($key, $value, $section = null)
+    function set($key, $value, ?string $section = null)
     {
         // when sections are enabled and user tries to genarate non-sectioned vars,
         // throw an error, this is definitely not allowed.
@@ -211,7 +211,7 @@ class ConfigMagik
      *
      * @return bool            Returns TRUE on success, FALSE on failure.
      */
-    function removeKey($key, $section = null)
+    function removeKey($key, ?string $section = null)
     {
         // check if section was passed and it's valid
         if ($section != null) {
@@ -286,7 +286,7 @@ class ConfigMagik
      *
      * @return bool Returns TRUE on success, FALSE on failure.
      */
-    function load($path = null)
+    function load(?string $path = null)
     {
         // if path was specified, check if valid else abort
         if ($path != null and !is_file($path)) {
@@ -315,7 +315,7 @@ class ConfigMagik
      *
      * @return bool Returns TRUE on success, FALSE on failure.
      */
-    function save($path = null)
+    function save(?string $path = null)
     {
         // if no path was specified, fall back to class-var
         if ($path == null) {
@@ -439,7 +439,7 @@ class ConfigMagik
      *
      * @return array           Returns a numeric array containing the keys as string.
      */
-    function listKeys($section = null)
+    function listKeys(?string $section = null)
     {
         // check if section was passed
         if ($section !== null) {

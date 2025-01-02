@@ -140,7 +140,7 @@ class UserAdmin extends BaseActiveModule {
 	/**
 	 * Create a standard header with optional $title
 	 */
-	function blob_header($title = null) {
+	function blob_header(?string $title = null) {
 		if ($title) return "<font color='#8CB6FF'>UserAdmin :: $title</font>\n";
 		else return "<font color='#8CB6FF'>UserAdmin</font>\n";
 	}
@@ -447,7 +447,7 @@ class UserAdmin extends BaseActiveModule {
 		}
 	}
 
-	function list_users($level = null) {
+	function list_users(?string $level = null) {
 		$users = array();
 		if ($level == 'all' || !$level) {
 			$users = $this -> load_users();

@@ -39,7 +39,7 @@ The Class itself...
 */
 class HeartBeat extends BaseActiveModule
 {
-
+	var $path;
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));

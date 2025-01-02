@@ -595,6 +595,16 @@ class Bot
     */
     function send_help($to, $command = false)
     {
+		if ($this->exists_module("com")) {
+			if($this->core("settings")->get("Com", "Channels")!="") {
+				$bots = explode(",", $this->core("settings")->get("Com", "Channels"));
+				foreach($bots as $bot) {
+					if(!$this->core('player')->id($bot) instanceof BotError && $this->core('player')->id($bot)==$to) {
+						return false;
+					}
+				}
+			}			
+		}
         if ($command == false) {
             $this->send_tell($to, "/tell <botname> <pre>help");
         } else {
@@ -1122,11 +1132,13 @@ class Bot
     */
     function inc_pgjoin($args)
     {
-        $pgname = $this->core("player")->name($args[0]);
+        if(is_numeric($args[0])) $pgname = $this->core("player")->name($args[0]);
+		else $pgname = $args[0];
         if (empty($pgname) || $pgname == "") {
             $pgname = $this->botname;
         }
-        $user = $this->core("player")->name($args[1]);
+        if(is_numeric($args[0])) $user = $this->core("player")->name($args[1]);
+		else $user = $args[1];
         if (strtolower($pgname) == strtolower($this->botname)) {
             $this->log("PGRP", "JOIN", $user . " joined privategroup.");
             if (!empty($this->commands["pgjoin"])) {
@@ -1235,7 +1247,7 @@ class Bot
                 $found = $this->handle_command_input($user, $args[2], "extpgmsg", $pgname);
                 $found = $this->hand_to_chat($found, $user, $args[2], "extprivgroup", $pgname);
             }
-            if ($this->command_error_text) {
+            if (isset($this->command_error_text)&&$this->command_error_text!="") {
                 $this->send_pgroup($this->command_error_text, $pgname);
             }
             unset($this->command_error_text);

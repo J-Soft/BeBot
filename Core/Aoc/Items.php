@@ -53,13 +53,21 @@ class Items_Core extends BasePassiveModule
         parent::__construct($bot, get_class($this));
 
         $this -> register_module("items");
-		$this->bot->core("settings")->create("Items", "CIDB", "https://conan.meathooksminions.com", "What is HTTP(s) Central Item Database URL (MeatHooks Minions by default, or your prefered mirror) ?");
-		$this->bot->core("settings")->create("Items", "ItemSubmit", "aoc_items/itemdb_botsubmit.php", "What is CIBD inner path to the Item Submit ; by default from Meathook's API value is : aoc_items/itemdb_botsubmit.php");
-		$this->bot->core("settings")->create("Items", "RecipeSubmit", "aoc_items/itemdb_botrecipesubmit.php", "What is CIBD inner path to the Recipe Submit ; by default from Meathook's API value is : aoc_items/itemdb_botrecipesubmit.php");
-		$this->bot->core("settings")->create("Items", "ItemSearch", "aoc_items/itemdb_botsearch.php", "What is CIBD inner path to the Item Search ; by default from Meathook's API value is : aoc_items/itemdb_botsearch.php");
-		$this->bot->core("settings")->create("Items", "RecipeSearch", "aoc_items/itemdb_botrecipesearch.php", "What is CIBD inner path to the Recipe Search ; by default from Meathook's API value is : aoc_items/itemdb_botrecipesearch.php");
+		$this->bot->core("settings")->create("Items", "CIDB", "http://aoc.bebot.link", "What is HTTP(s) Central Item Database URL (Bebot by default, or your prefered mirror) ?");
+		$this->cidb_update();
+		$this->bot->core("settings")->create("Items", "ItemSubmit", "aoc_items/itemdb_botsubmit.php", "What is CIBD inner path to the Item Submit ; by default from Bebot's API value is : aoc_items/itemdb_botsubmit.php");
+		$this->bot->core("settings")->create("Items", "RecipeSubmit", "aoc_items/itemdb_botrecipesubmit.php", "What is CIBD inner path to the Recipe Submit ; by default from Bebot's API value is : aoc_items/itemdb_botrecipesubmit.php");
+		$this->bot->core("settings")->create("Items", "ItemSearch", "aoc_items/itemdb_botsearch.php", "What is CIBD inner path to the Item Search ; by default from Bebot's API value is : aoc_items/itemdb_botsearch.php");
+		$this->bot->core("settings")->create("Items", "RecipeSearch", "aoc_items/itemdb_botrecipesearch.php", "What is CIBD inner path to the Recipe Search ; by default from Bebot's API value is : aoc_items/itemdb_botrecipesearch.php");		
     }
 
+	function cidb_update()
+	{
+		if($this -> bot -> core("settings") -> get("Items", "CIDB") == "https://conan.meathooksminions.com") {
+			$this->bot->core("settings")->save("Items", "CIDB", "http://aoc.bebot.link");
+		}		
+	}	
+	
     function parse_items($itemText)
     {
         $items = array();
@@ -198,9 +206,8 @@ class Items_Core extends BasePassiveModule
             return -1;
 		}
                 
-         $result = $this -> bot -> core('items') -> submit_item($recipeitem, $name, $passkey);
-
-         $result = $this -> bot -> core('items') -> submit_item($item, $name, $passkey);
+        $result = $this -> bot -> core('items') -> submit_item($recipeitem, $name, $passkey);
+        $result = $this -> bot -> core('items') -> submit_item($item, $name, $passkey);
 		
 		$item_botname    = $this -> bot -> botname;
         $item_botname    = ucfirst(strtolower($item_botname));

@@ -937,7 +937,6 @@ class Raid extends BaseActiveModule
             $this->bot->send_tell(
                 $name,
                 "Raid is running: ##highlight##" . $this->description . "##end## started by " . $this->name . $since . $move . " :: " . $this->clickjoin(
-                    true
                 )
             );
         }
@@ -1641,7 +1640,7 @@ class Raid extends BaseActiveModule
     /*
     Make click to join blob
     */
-    function clickjoin($join = false)
+    function clickjoin()
     {
         if ($this->locked) {
             return "<font color=#FF6D4C>raid is locked</font>.";
@@ -1690,18 +1689,14 @@ class Raid extends BaseActiveModule
 		
 		$inside .= "\n";
 		
-        if ($join) {
-            $inside .= $this->bot->core("tools")
-                    ->chatcmd("join", "Join <botname>")." || ";
-        }
+		$inside .= $this->bot->core("tools")
+				->chatcmd("join", "Join <botname>")." || ";
         $inside .= $this->bot->core("tools")
                 ->chatcmd("raid join", "Join the raid")." || ";
         if ($this->bot->core("settings")->get("Raid", "showlft")) {
             $inside .= $this->bot->core("tools")
-                    ->chatcmd("<botname>", "Go LFT", "lft")." || ";
+                    ->chatcmd("<botname>", "Go LFT", "lft");
         }
-        $inside .= $this->bot->core("tools")
-                ->chatcmd("raid leave", "Leave the raid");
 		
 		$onarr = $this->bot->core("onlinedisplay")->online_array();
 		$inside .= "\n\n:: ".count($this->user)." Joined User(s) ::\n";

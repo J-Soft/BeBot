@@ -12,6 +12,7 @@
 * This is an adapted version of Auno's original AOChat PHP class.
 * This version has been adapted for use with pre PHP 5 versions aswell as other bugfixes
 * by the community and BeBot development team.
+* Notably : Mithrionne for AoC items letter languaged bug replacements.
 *
 * Age of Conan Changes:
 * This was later ported and adjusted to the protocol used for the Age of Conan
@@ -50,18 +51,18 @@ set_time_limit(0);
 ini_set("html_errors", 0);
 
 // Make sure we can handle BIGINT on 32bit systems
-echo "Debug: PHP_INT_SIZE is ";
+echo "PHP_INT_SIZE is ";
 var_dump(PHP_INT_SIZE);
 echo "\n";
 if (PHP_INT_SIZE != 8) {
     $precision = ini_get('precision');
-    echo "Debug: Precision is $precision\n";
+    echo "Precision is $precision\n";
     if ($precision <= 16) {
         if (!ini_set('precision', 16)) {
             die("On 32bit systems we need precision of 16 or greater and we where unable to raise the limit.\nPlease set precision in php.ini to 16.");
         }
 
-        echo "Debug: Setting precision to 16...";
+        echo "Setting precision to 16...";
         $precision = ini_get('precision');
 
         if ($precision == 16) {
@@ -703,6 +704,51 @@ class AOChat
 
     function get_packet()
     {
+		$searches = array(
+			// French special letters (upper)
+			"À", "Â", "Ç", "É", "È", "Ê", "Ë", "Î", "Ï", "Ô", "Ù", "Û", "Ÿ",
+			// French special letters (lower)
+			"à", "â", "ç", "é", "è", "ê", "ë", "î", "ï", "ô", "ù", "û", "ÿ",
+			// French ligaturs (upper)
+			"Œ", "Æ",
+			// French ligaturs (lower)
+			"œ", "æ",
+			// German special letters (upper)
+			"Ä", "Ö", "Ü", "ẞ",
+			// German special letters (lower)
+			"ä", "ö", "ü", "ß",
+			// Spanish special letters (upper)
+			"Á", "É", "Í", "Ó", "Ú", "Ñ",
+			// Spanish special letters (lower)
+			"á", "é", "í", "ó", "ú", "ñ",
+			// Polski special letters (upper)
+			"Ą", "Ć", "Ę", "Ł", "Ń", "Ó", "Ś", "Ź", "Ż",
+			// Polski special letters (lower)
+			"ą", "ć", "ę", "ł", "ń", "ó", "ś", "ź", "ż",
+			// to test [FR]À,Â,Ç,É,È,Ê,Ë,Î,Ï,Ô,Ù,Û,Ÿ,à,â,ç,é,è,ê,ë,î,ï,ô,ù,û,ÿ,Œ,œ,æ,[DE]Ä,Ö,Ü,ẞ,ä,ö,ü,ß,[ES]Á,É,Í,Ó,Ú,Ñ,á,é,í,ó,ú,ñ,[PL]Ą,Ć,Ę,Ł,Ń,Ó,Ś,Ź,Ż,ą,ć,ę,ł,ń,ó,ś,ź,ż,
+		);
+		$replaces = array(
+			// French special letters (upper)
+			"A", "A", "C", "E", "E", "E", "E", "I", "I", "O", "U", "U", "Y",
+			// French special letters (lower)
+			"a", "a", "c", "e", "e", "e", "e", "i", "i", "o", "u", "u", "y",
+			// French ligaturs (upper)
+			"Oe", "Ae",
+			// French ligaturs (lower)
+			"oe", "ae",
+			// German special letters (upper)
+			"Ae", "Oe", "Ue", "SS",
+			// German special letters (lower)
+			"ae", "oe", "ue", "ss",
+			// Spanish special letters (upper)
+			"A", "E", "I", "O", "U", "N",
+			// Spanish special letters (lower)
+			"a", "e", "i", "o", "u", "n",
+			// Polski special letters (upper)
+			"A", "C", "E", "L", "N", "O", "S", "Z", "Z",
+			// Polski special letters (lower)
+			"a", "c", "e", "l", "n", "o", "s", "z", "Z",
+		);
         // Get the bot instance
         $bot = Bot::get_instance($this->bothandle);
         // Include a the signal_message (Should probably be included somewhere else)
@@ -775,7 +821,18 @@ class AOChat
                 // Deprecated call: Should listen to the signal already sendt.
                 $bot->inc_pginvite($packet->args);
                 break;
-            // buddy/player
+            case AOCP_PRIVGRP_KICK:
+            case AOCP_PRIVGRP_KICKALL:
+                // Event is a privgroup kick/kickall
+                list ($gid) = $packet->args;
+
+                $name = $this->bot->core("player")->name($gid);
+				
+                if(isset($this->gid[$gid])) unset($this->gid[$gid]);
+                if(isset($this->gid[strtolower($name)])) unset($this->gid[strtolower($name)]);
+				
+                break;			
+            // buddy/player			
             case AOCP_CLIENT_NAME:
                 // Cross-game compatibility
                 if (strtolower(AOCHAT_GAME) == 'aoc') {
@@ -951,14 +1008,14 @@ class AOChat
                 // Event is a tell
                 // Tells should always be commands
                 list ($id, $message) = $packet->args;
-
+				$packet->args[1] = str_replace($searches,$replaces,$message);
                 //$signal = new signal_message('aochat', $id, $message);
                 //$dispatcher->post($signal, 'onTell');
                 //unset($signal);
 
                 $event = new sfEvent($this, 'Core.on_tell', array(
                                                                  'source' => $id,
-                                                                 'message' => $message
+                                                                 'message' => str_replace($searches,$replaces,$message)
                                                             ));
                 $this->bot->dispatcher->notify($event);
 
@@ -969,12 +1026,13 @@ class AOChat
             case AOCP_PRIVGRP_MESSAGE:
                 // Event is a privgroup message
                 list (, $id, $message) = $packet->args;
+				$packet->args[2] = str_replace($searches,$replaces,$message);
                 //$signal = new signal_message('aochat', $id, $message);
                 //$dispatcher->post($signal, 'onPgMessage');
 
                 $event = new sfEvent($this, 'Core.on_privgroup_message', array(
                                                                               'source' => $id,
-                                                                              'message' => $message
+                                                                              'message' => str_replace($searches,$replaces,$message)
                                                                          ));
                 $this->bot->dispatcher->notify($event);
 
@@ -987,7 +1045,8 @@ class AOChat
             case AOCP_GROUP_MESSAGE:
                 /* Hack to support extended messages */
                 // This should be re-hacked so that we can handle the extmsgs here.
-                if ($packet->args[1] === 0 && substr($packet->args[2], 0, 2) == "~&") {
+				$packet->args[2] = str_replace($searches,$replaces,$packet->args[2]);
+                if ($packet->args[1] === 0 && substr($packet->args[2], 0, 2) == "~&") {					
                     $em = new AOExtMsg($packet->args[2]);
                     if ($em->type != AOEM_UNKNOWN) {
                         $packet->args[2] = $em->text;
@@ -1192,7 +1251,8 @@ class AOChat
         if (($gid = $this->get_gid($group)) === false) {
             return false;
         }
-        return $this->grp[$gid];
+        if(isset($this->grp[$gid])) return $this->grp[$gid];
+		else return false;
     }
 
 
@@ -1221,7 +1281,7 @@ class AOChat
     {
         // FIXME We are not getting a GID back!
         $gid = $this->get_gid($group);
-        echo "Debug: Sending join packet for privategroup: " . $gid . " (" . $group . ")\n";
+        //echo "Debug: Sending join packet for privategroup: " . $gid . " (" . $group . ")\n";
         return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_JOIN, $gid));
     }
 

@@ -1321,7 +1321,7 @@ class Security_Core extends BaseActiveModule
     /*
     Changes the access level of a security group or org rank.
     */
-    function change_level($groupid, $newacl, $government = null)
+    function change_level($groupid, $newacl, ?string $government = null)
     { // Start function change_level()
         if (!is_numeric($newacl)) {
             return "Access Levels should be an integer.";
@@ -1923,7 +1923,7 @@ class Security_Core extends BaseActiveModule
     $info: The information to add (or remove)
     $more: Extra informaion needed for some actions.
     */
-    function cache_mgr($action, $cache, $info, $more = null)
+    function cache_mgr($action, $cache, $info, ?string $more = null)
     { // Start function cache_mgr()
         $action = strtolower($action);
         if ($action == "add") {

@@ -208,7 +208,7 @@ class PrivGroup extends BaseActiveModule
     /*
     Allows a user to kick someone.
     */
-    function kick_user($name, $type, $target = null)
+    function kick_user($name, $type, ?string $target = null)
     {
         $target = explode(" ", $target, 2);
         if (!empty($target[1])) {

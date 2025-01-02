@@ -30,7 +30,7 @@ WebSocket\Client {
     public setTimeout(int $seconds) : void
     public setFragmentSize(int $fragment_size) : self
     public getFragmentSize() : int
-    public setLogger(Psr\Log\LoggerInterface $logger = null) : void
+    public setLogger(?Psr\Log\LoggerInterface $logger = null) : void
 }
 ```
 

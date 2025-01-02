@@ -146,6 +146,26 @@ class BotStatistics_Core extends BasePassiveModule
         }
     }
 
+    function up_bots($name, $origin, $bot = false, $dim = false)
+    {
+		if(!$bot) $bot = $this->bot->botname;
+		if(!$dim) $dim = $this->bot->dimension;
+		$result = $this->bot->db->select(
+			"SELECT bot, dim, online, time, start, total, restarts FROM " . $this->DB . "#___bots WHERE bot = '" . $bot . "' AND dim = '" . $dim . "' LIMIT 1"
+		);
+		$inside = "Status: ";
+		if (!empty($result)) {
+			$bot = $result[0];			
+			if ($bot[3] + (60 * 3) > time()) {
+				$inside .= "Online for " . $this->timedif($bot[2], $bot[3]);
+			} else {
+				$inside .= " Offline for " . $this->timedif($bot[3], time());
+			}
+		} else {
+			$inside = " Unknown ...";
+		}
+		return $inside;
+	}
 
     function check_bots($name, $origin, $bot = false, $dim = false)
     { 

@@ -59,7 +59,7 @@ abstract class PBMessage
     /**
      * Constructor - initialize base128 class
      */
-    public function __construct($reader = null)
+    public function __construct(?object $reader = null)
     {
         $this->reader = $reader;
         $this->value = $this;

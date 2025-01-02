@@ -83,7 +83,7 @@ class OrgHistory extends BaseActiveModule
     /*
     Makes the history results
     */
-    function history_blob($skip = 0, $string = null)
+    function history_blob($skip = 0, ?string $string = null)
     {
         $blob = "##blob_title##:::: Org Event History Results ::::##end##\n\n";
 		if ( $skip == '' || !is_numeric($skip) ) { $skip = 0; }

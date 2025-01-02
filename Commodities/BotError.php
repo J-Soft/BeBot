@@ -39,7 +39,7 @@ class BotError
     private $is_fatal;
     private $description;
     private $source;
-	var $is_error;
+	private $is_error;
 
     function __construct(&$bot, $module)
     {

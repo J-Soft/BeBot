@@ -79,7 +79,7 @@ class DiscordRelay extends BaseActiveModule
 	var $lastcheck = 0;
 	var $crondelay = "2sec";
 	var $is;
-	var $note = "Discord side commands available are : help, tara, viza, is, online/sm, whois, alts, level/lvl/pvp";
+	var $note = "Discord side commands available are : help, tara, viza, is, online/sm, whois, alts, level/lvl/pvp, bots/bot/up";
 
     /*
     Constructor:
@@ -184,7 +184,7 @@ class DiscordRelay extends BaseActiveModule
 			if ($guild>0 && $token!="") {
 				$route = "/guilds/{$guild}/widget.json";
 				$result = discord_get($route, $token);
-				if(isset($result['message'])&& isset($result['code'])) {
+				if(!is_array($result) || (isset($result['message'])&&isset($result['code'])) ) {
 					$this->bot->log("DISCORD", "ERROR", "Bad configuration : check discord widget + !settings discord");
 				} else {
 					$sent = $result['presence_count']." online in discord ... ";
@@ -404,6 +404,7 @@ class DiscordRelay extends BaseActiveModule
     */	
     function cron()
     {
+		$invert = null;
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
 			$channel = $this->bot->core("settings")->get("discord", "ChannelId");
 			$token = $this->bot->core("settings")->get("discord", "BotToken");
@@ -412,8 +413,8 @@ class DiscordRelay extends BaseActiveModule
 				if ($this->lastmsg>0) { $route = "/channels/{$channel}/messages?after=".$this->lastmsg; }
 				$result = discord_get($route, $token);
 				if ($this->lastcheck==0) $this->lastcheck = date('Y-m-d').'T'.date("H:i:s").'.000000+00:00';
-				if(is_array($result)) $invert = array_reverse($result);
-				if(isset($invert['message'])&& isset($invert['code'])) {
+				if(is_array($result)&&!is_null($result)) $invert = array_reverse($result);
+				if( (isset($invert['message'])&&isset($invert['code'])) || is_null($invert) ) {
 					$this->bot->log("DISCORD", "ERROR", "Wrong configuration : do !settings discord to fix");
 				} else {
 					foreach ($invert as $msg) {
@@ -451,6 +452,11 @@ class DiscordRelay extends BaseActiveModule
 										case $this->bot->commpre . 'pvp':
 											$sent = $this->discord_lvl($msg['content']);
 											Break;
+										case $this->bot->commpre . 'bots':
+										case $this->bot->commpre . 'bot':
+										case $this->bot->commpre . 'up':										
+											$sent = $this->discord_up($msg['content']);
+											Break;											
 										Default:
 											$sent = $this->note;
 											Break;
@@ -604,6 +610,14 @@ class DiscordRelay extends BaseActiveModule
 			$sent = "No Vizaresh/Gauntlet timer found.";
 		}
 		return $sent;		
+	}	
+
+    /*
+    * Gets called when someone does !bots !bot !up
+    */
+    function discord_up($msg)
+    {
+		return $this->bot->core("bot_statistics")->up_bots($this->bot->botname, "Discord");
 	}		
 
     /*

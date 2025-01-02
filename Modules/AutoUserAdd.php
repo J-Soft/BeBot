@@ -31,7 +31,7 @@
 */
 /*
 * Autouseradd v1.0, By Noer
-* Improved by Temar
+* Improved by Temar & check by Bitnykk for Com direct call compatibility
 * This module automatically adds new users it sees chat on the guildchat to the user database.
 *
 */
@@ -47,7 +47,6 @@ class AutoUserAdd extends BasePassiveModule
 		$this->register_module("autouseradd");
         $this->register_event("gmsg", "org");
 		if(strtolower($this->bot->game)=='ao') $this->register_event("pgjoin");
-        $this->register_module("autouseradd");
         $this->bot->core("settings")
             ->create("Autouseradd", "Enabled", true, "Should Ao/Aoc bot users be added to the Bot?");
         $this->bot->core("settings")

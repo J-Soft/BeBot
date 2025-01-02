@@ -68,7 +68,7 @@ class Base implements LoggerAwareInterface
         return $this->options['fragment_size'];
     }
 
-    public function setLogger(LoggerInterface $logger = null): void
+    public function setLogger(?LoggerInterface $logger = null): void
     {
         $this->logger = $logger ?: new NullLogger();
     }
