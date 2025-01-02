@@ -1,4 +1,11 @@
 ------------------------
+Release 0.8.3 - ??? 2025
+------------------------
+- For both: ...
+- For AO: ...
+- For AoC: ...
+
+------------------------
 Release 0.8.2 - Jan 2025
 ------------------------
 - For both: PHP 8.4 fixes, Online, MassMsg, AoChat, AutoUserAdd, Admins, Bots, Discord/Irc improved
