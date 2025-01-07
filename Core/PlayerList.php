@@ -83,7 +83,7 @@ class PlayerList extends BasePassiveModule
 
     public function add($id, $name)
     {
-        $name = ucfirst(strtolower($name));
+        $name = $this->bot->core('tools')->sanitize_player($name);
 
         //echo "Debug caching $name ($id)\n";
         if ($id == 0 || $id == -1) {
@@ -125,7 +125,7 @@ class PlayerList extends BasePassiveModule
             //$this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
             return $this->error;
         }
-        $uname = ucfirst(strtolower($uname));
+		$uname = $this->bot->core('tools')->sanitize_player($uname);
         if (is_numeric($uname)) {
             $this->debug_output("Attempting to look up an id for an id ($uname)");
             return $uname;

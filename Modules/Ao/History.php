@@ -75,7 +75,7 @@ class History extends BaseActiveModule
 
     function player_history($asker, $origin, $name)
     {
-        $name = ucfirst(strtolower($name));
+        $name = $this->bot->core('tools')->sanitize_player($name);
         if (! ($this->bot->core("player")->id($name) instanceof BotError) ) {
 			// START AP/Tyr HISTORY
 			$dim = $this->bot->dimension;			
@@ -141,7 +141,7 @@ class History extends BaseActiveModule
 	
     function player_archive($asker, $origin, $name)
     {
-        $name = ucfirst(strtolower($name));
+        $name = $this->bot->core('tools')->sanitize_player($name);
         if (! ($this->bot->core("player")->id($name) instanceof BotError) ) {
 			// START AUNO ARCHIVES
 			for($j=1;$j<=2;$j++) {

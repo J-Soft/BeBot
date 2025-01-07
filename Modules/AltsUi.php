@@ -171,6 +171,7 @@ class Alts extends BaseActiveModule
 	
     function display_alts($name)
     {
+		$name = $this->bot->core('tools')->sanitize_player($name);
         if ($this->bot->core("player")->id($name) instanceof BotError) {
             return "##error##Character ##highlight##$name##end## does not exist.##end##";
         }
@@ -202,7 +203,7 @@ class Alts extends BaseActiveModule
     {
         $return = '';
 		$total = 0;
-		$main = ucfirst(strtolower($main));
+		$main = $this->bot->core('tools')->sanitize_player($main);
         //Check that that $main is a valid character
         if ($this->bot->core('player')->id($main) instanceof BotError) {
             return "##error##Character ##highlight##$main##end## does not exist.##end##";
@@ -235,8 +236,8 @@ class Alts extends BaseActiveModule
     function newmain($name, $alt, $admin = 0)
     {
 		$security = false;
-        $name = ucfirst(strtolower($name));
-        $alt = ucfirst(strtolower($alt));
+        $name = $this->bot->core('tools')->sanitize_player($name);
+        $alt = $this->bot->core('tools')->sanitize_player($alt);
         if (($this->bot->core("settings")
                     ->get("Alts", "Security") == true)
             && ($this->bot
@@ -290,8 +291,8 @@ class Alts extends BaseActiveModule
     function add_alt($name, $alt, $admin = 0)
     {
         $security = false;
-        $name = ucfirst(strtolower($name));
-        $alt = ucfirst(strtolower($alt));
+        $name = $this->bot->core('tools')->sanitize_player($name);
+        $alt = $this->bot->core('tools')->sanitize_player($alt);
         if (($this->bot->core("settings")
                     ->get("Alts", "Security") == true)
             && ($this->bot
@@ -378,8 +379,8 @@ class Alts extends BaseActiveModule
     */
     function del_alt($name, $alt)
     {
-        $name = ucfirst(strtolower($name));
-        $alt = ucfirst(strtolower($alt));
+        $name = $this->bot->core('tools')->sanitize_player($name);
+        $alt = $this->bot->core('tools')->sanitize_player($alt);
         //Establish the main of the caller
         $main = $this->bot->core("alts")->main($name);
         //Check that we're not trying to register ourself as an alt
@@ -410,7 +411,9 @@ class Alts extends BaseActiveModule
 
     function confirm($alt, $main)
     {
-        $result = $this->bot->db->select("SELECT confirmed FROM #___alts WHERE alt = '$alt' AND main = '$main'");
+        $main = $this->bot->core('tools')->sanitize_player($main);
+		$alt = $this->bot->core('tools')->sanitize_player($alt);
+		$result = $this->bot->db->select("SELECT confirmed FROM #___alts WHERE alt = '$alt' AND main = '$main'");
         if (!empty($result)) {
             if ($result[0][0] == 0) {
                 $this->bot->db->query("UPDATE #___alts SET confirmed = 1 WHERE main = '$main' AND alt = '$alt'");

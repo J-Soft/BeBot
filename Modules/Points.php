@@ -337,6 +337,7 @@ class Points extends BaseActiveModule
     */
     function tomain_points($name, $toggle)
     {
+		$name = $this->bot->core('tools')->sanitize_player($name);
 		$check = false; $stat = false;
 		$add = "";
         $toggle = strtolower($toggle);
@@ -403,6 +404,7 @@ class Points extends BaseActiveModule
 
     function check_alts($main)
     {
+		$main = $this->bot->core('tools')->sanitize_player($main);
 		if($this->bot->core("settings")->get("Points", "To_main")) {
 			$alts = $this->bot->core("alts")->get_alts($main);
 			if (!empty($alts)) {
@@ -486,6 +488,7 @@ class Points extends BaseActiveModule
     */
     function give_points($name, $who, $num)
     {
+		$who = $this->bot->core('tools')->sanitize_player($who);
         if ($this->bot->core("settings")->get("Points", "Transfer")) {
             if (!is_numeric($num)) {
                 $this->bot->send_tell($name, "$num is not a valid points value.");
@@ -553,6 +556,7 @@ class Points extends BaseActiveModule
     */
     function add_points($name, $who, $num, $why, $silent = false)
     {
+		$who = $this->bot->core('tools')->sanitize_player($who);
         if (!is_numeric($num)) {
             $this->bot->send_tell($name, "$num is not a valid points value.");
             return false;
@@ -593,6 +597,7 @@ class Points extends BaseActiveModule
     */
     function rem_points($name, $who, $num, $why, $silent = false)
     {
+		$who = $this->bot->core('tools')->sanitize_player($who);
         if (!is_numeric($num)) {
             $this->bot->send_tell($name, "$num is not a valid points value.");
             return false;
@@ -630,6 +635,7 @@ class Points extends BaseActiveModule
     */
     function points_to($name, $tomain = true)
     {
+		$name = $this->bot->core('tools')->sanitize_player($name);
         if (!$tomain || !$this->bot->core("settings")->get("Points", "To_main")
         ) {
             return $this->bot->core('player')->id($name);
@@ -641,7 +647,8 @@ class Points extends BaseActiveModule
 
     function points_to_name($name, $tomain = true)
     {
-        if (!$tomain || !$this->bot->core("settings")->get("Points", "To_main")
+        $name = $this->bot->core('tools')->sanitize_player($name);
+		if (!$tomain || !$this->bot->core("settings")->get("Points", "To_main")
         ) {
             return $name;
         }
@@ -651,8 +658,8 @@ class Points extends BaseActiveModule
 
     function log($name, $who, $num, $why)
     {
-        $name = ucfirst(strtolower($name));
-        $who = ucfirst(strtolower($who));
+        $name = $this->bot->core('tools')->sanitize_player($name);
+        $who = $this->bot->core('tools')->sanitize_player($who);
         $this->bot->db->query(
             "INSERT INTO #___raid_points_log (name, points, by_who, time, why) VALUES ('$who', $num, '$name', " . time(
             ) . ", '" . mysqli_real_escape_string($this->bot->db->CONN,$why) . "')"

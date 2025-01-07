@@ -119,7 +119,7 @@ class Tokens extends BaseActiveModule
 	
     function sub_handler($name, $args)
     {
-		$name = ucfirst(strtolower($name));
+		$name = $this->bot->core('tools')->sanitize_player($name);
         switch ($args['sub']) {
             case 'alts':
                 return $this->showAlts($name);			

@@ -694,8 +694,8 @@ class Raid extends BaseActiveModule
     */
     function raid_stat($name, $source, $player)
     {		
-		$output = "";
-		$player = ucfirst(strtolower($player));
+		$output = "";		
+		$player = $this->bot->core('tools')->sanitize_player($player);
 		$uid = $this->bot->core('player')->id($player);
         if ($uid instanceof BotError) {
 			return "Player ##highlight##$player##end## does not exist!";
@@ -1273,7 +1273,7 @@ class Raid extends BaseActiveModule
     */
     function addto_raid($name, $player, $source)
     {
-        $player = ucfirst(strtolower($player));
+        $player = $this->bot->core('tools')->sanitize_player($player);
         if ($this->bot->core("security")->check_access(
             $name,
             $this->bot
@@ -1446,7 +1446,7 @@ class Raid extends BaseActiveModule
                 ->core("settings")->get('Raid', 'Command')
         )
         ) {
-            $who = ucfirst(strtolower($who));
+            $who = $this->bot->core('tools')->sanitize_player($who);
             if (!isset($this->user[$who]) && isset($this->user2[$who])) {
                 if ($this->user2[$who] == "Left PrivGroup" || $this->user2[$who] == "Bot Restart") {
                     if (!empty($why)) {

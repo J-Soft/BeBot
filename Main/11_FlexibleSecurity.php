@@ -153,7 +153,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
             return $highest;
         }
         // Make sure $player is always ucfirst-strtolower:
-        $player = ucfirst(strtolower($player));
+        $player = $this->bot->core('tools')->sanitize_player($player);
         // Check if cached, then compare $highest with cached access level
         if (isset($this->cache[$player])) {
             if ($this->cache[$player] > $highest) {

@@ -136,7 +136,7 @@ class SecurityTest extends BaseActiveModule
 
     function whois($name)
     { // Start function whois()
-        $name = ucfirst(strtolower($name));
+        $name = $this->bot->core('tools')->sanitize_player($name);
         $groups = $this->bot->core("security")->get_groups($name);
         $access = $this->bot->core("security")->get_access_level($name);
         $access = $this->get_access_name($access);

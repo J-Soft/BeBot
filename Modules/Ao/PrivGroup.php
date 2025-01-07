@@ -183,7 +183,7 @@ class PrivGroup extends BaseActiveModule
         if (!empty($who[1])) {
             $pmsg = " (" . $who[1] . ")";
         }
-        $who = ucfirst(strtolower($who[0]));
+		$who = $this->bot->core('tools')->sanitize_player($who[0]);
         $id = $this->bot->core('player')->id($who);
         if ($this->bot->botname == $who) {
             $msg = "You cannot invite the bot to its own chat group";
@@ -216,7 +216,7 @@ class PrivGroup extends BaseActiveModule
         } else {
 			$pmsg = "";
 		}
-        $target = ucfirst(strtolower($target[0]));
+		$target = $this->bot->core('tools')->sanitize_player($target[0]);
         if ($name == $target) {
             $this->bot->core("chat")->pgroup_kick($name);
         } elseif (!is_null($target)) {

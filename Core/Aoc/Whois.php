@@ -287,7 +287,7 @@ class Whois_Core extends BasePassiveModule
             $this->bot->core("statistics")
                 ->capture_statistic("Whois", "Lookup");
         }
-        $name = ucfirst(strtolower($name));
+        $name = $this->bot->core('tools')->sanitize_player($name);
         $uid = $this->bot->core("player")->id($name);
         /*
         Make sure we havent been passed a bogus name.
