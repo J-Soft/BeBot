@@ -2173,7 +2173,7 @@ class Security_Core extends BaseActiveModule
 
     function whois($name)
     { // Start function whois()
-        $name = $this->bot->core('tools')->sanitize_player($name);
+        $player = $this->bot->core('tools')->sanitize_player($name);
         $groups = $this->bot->core("security")->get_groups($player);
         $access = $this->bot->core("security")->get_access_level($player);
         $access = $this->get_access_name($access);

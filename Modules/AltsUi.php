@@ -14,7 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -52,11 +52,13 @@ class Alts extends BaseActiveModule
         $this->help['command']['alts add <player>'] = "Adds <player> as your alt (can add more than 1 coma-separated eg: Toon1,Toon2,etc).";
         $this->help['command']['alts del <player>'] = "Removes <player> from your alt list.";
         $this->help['command']['alts confirm <main>'] = "Confirms you as alt of <main>.";
+		$this->help['command']['alts deny <main>'] = "Denies you as alt of <main>.";
 		$this->help['command']['alts newmain <alt>'] = "Makes declared <alt> the new main of all declared alts.";
         $this->help['command']['altadmin add <main> <alt>'] = "Adds <alt> as alt to <main> (can add more than 1 coma-separated eg: Toon1,Toon2,etc).";
 		$this->help['command']['altadmin list <main>'] = "Lists all alts unconfirmed included.";
         $this->help['command']['altadmin del <main> <alt>'] = "Removes <alt> as alt from <main>.";
         $this->help['command']['altadmin confirm <main> <alt>'] = "Confirms <alt> as alt of <main>.";
+		$this->help['command']['altadmin deny <main> <alt>'] = "Denies <alt> as alt of <main>.";
 		$this->help['command']['altadmin newmain <alt>'] = "Makes declared <alt> the new main of all declared alts.";
 		$this->help['command']['altadmin recache'] = "Refreshes mains/alts cache of bot fully (after manual altadmin add/del, e.g.).";
         $this->bot->core("settings")
@@ -103,6 +105,8 @@ class Alts extends BaseActiveModule
                         return $this->display_alts($name);
                     case 'confirm':
                         return $this->confirm($name, $vars[2]);
+                    case 'deny':
+                        return $this->deny($name, $vars[2]);						
                     case 'newmain':
                         return $this->newmain($name, $vars[2], 0);						
                     default:
@@ -149,6 +153,8 @@ class Alts extends BaseActiveModule
                         return $this->del_alt($vars[2], $vars[3]);
                     case 'confirm':
                         return $this->confirm($vars[3], $vars[2]);
+                    case 'deny':
+                        return $this->deny($vars[3], $vars[2]);						
                     case 'newmain':
                         return $this->newmain($name, $vars[2], 1);	
                     case 'recache':
@@ -220,8 +226,9 @@ class Alts extends BaseActiveModule
         if (!empty($unconfirmed) && count($unconfirmed)>0) {
 			$return .= "\n\n##normal##Unconfirmed##end##: ";
             foreach($unconfirmed AS $key => $value) {
-				$return .= "<a href='chatcmd:///tell ".$this->bot->botname.
-						" altadmin confirm ".$main." ".$value[0]."'>".$value[0]."</a> ";
+				$return .= $value[0].":<a href='chatcmd:///tell ".$this->bot->botname.
+						" altadmin confirm ".$main." ".$value[0]."'>Confirm</a>|<a href='chatcmd:///tell ".$this->bot->botname.
+						" altadmin deny ".$main." ".$value[0]."'>Deny</a> ";
 				$total ++;
 			}
 		}
@@ -354,9 +361,9 @@ class Alts extends BaseActiveModule
         ) {
             $this->bot->db->query("INSERT INTO #___alts (alt, main, confirmed) VALUES ('$alt', '$main', 0)");
             $inside = "##blob_title##  :::  Alt Confirmation Request :::##end##\n\n";
-            $inside .= "##blob_text## $main has added you as an Alt\n\n " . $this->bot
-                    ->core("tools")
-                    ->chatcmd("alts confirm " . $main, "Click here") . " to Confirm.";
+            $inside .= "##blob_text## $main has added you as an Alt\n\n " .
+					$this->bot->core("tools")->chatcmd("alts confirm " . $main, "Confirm") . "|" .
+					$this->bot->core("tools")->chatcmd("alts deny " . $main, "Deny");
             $this->bot->send_tell(
                 $alt,
                 "Alt Confirmation :: " . $this->bot
@@ -375,7 +382,7 @@ class Alts extends BaseActiveModule
 
 
     /*
-    Removes an alt form your alt list
+    Removes an alt from alt list
     */
     function del_alt($name, $alt)
     {
@@ -408,7 +415,9 @@ class Alts extends BaseActiveModule
         }
     }
 
-
+    /*
+    Confirms an unconfirmed alt
+    */
     function confirm($alt, $main)
     {
         $main = $this->bot->core('tools')->sanitize_player($main);
@@ -429,6 +438,26 @@ class Alts extends BaseActiveModule
             return "##error####highlight##$alt##end## is not registered as an alt of ##highlight##$main##end##.##end##";
         }
     }
+	
+    /*
+    Denies an unconfirmed alt
+    */
+    function deny($alt, $main)
+    {
+        $main = $this->bot->core('tools')->sanitize_player($main);
+		$alt = $this->bot->core('tools')->sanitize_player($alt);
+		$result = $this->bot->db->select("SELECT confirmed FROM #___alts WHERE alt = '$alt' AND main = '$main'");
+        if (!empty($result)) {
+            if ($result[0][0] == 0) {
+                $this->bot->db->query("DELETE FROM #___alts WHERE confirmed = 0 AND main = '$main' AND alt = '$alt'");
+                return "##highlight##$alt##end## has been denied as a alt of ##highlight##$main##end##.";
+            } else {
+                return ("##highlight##$alt##end## is already a confirmed alt of ##highlight##$main##end##.");
+            }
+        } else {
+            return "##error####highlight##$alt##end## is not registered as an alt of ##highlight##$main##end##.##end##";
+        }
+    }	
 }
 
 ?>

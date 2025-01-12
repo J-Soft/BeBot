@@ -1,7 +1,7 @@
 ------------------------
 Release 0.8.3 - ??? 2025
 ------------------------
-- For both: sanitizer added
+- For both: sanitizer added, alts improved
 - For AO: ...
 - For AoC: ...
 
