@@ -576,6 +576,7 @@ INSERT INTO `symbiants` (`boss_id`, `ql`, `slot`, `unit`, `name`, `itemref`) VAL
   (41, 70, 'rhand', 'Infantry', 'Animated', 235770),
   (41, 80, 'rhand', 'Infantry', 'Moving', 235771),
   (42, 100, 'rhand', 'Infantry', 'Breathing', 235772),
+  (42, 100, 'legs', 'Infantry', 'Breathing', 235788),
   (5, 140, 'rhand', 'Infantry', 'Running', 235773),
   (5, 160, 'rhand', 'Infantry', 'Working', 235774),
   (45, 190, 'rhand', 'Infantry', 'Enduring', 235775),
