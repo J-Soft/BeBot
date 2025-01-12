@@ -86,6 +86,7 @@ class Symb_sql extends BaseActiveModule
         Switch ($this->bot->db->get_version("symbiants")) {
             case 1:
             case 2:
+			case 3:
                 $filename = "./Extras/Symbiants/Symbiants.sql";
                 $handle = fopen($filename, "r");
                 $query = fread($handle, filesize($filename));
@@ -97,7 +98,7 @@ class Symb_sql extends BaseActiveModule
                     }
                 }
         }
-        $this->bot->db->set_version("symbiants", 3);
+        $this->bot->db->set_version("symbiants", 4);
     }
 
 
