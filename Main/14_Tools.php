@@ -611,9 +611,7 @@ class tools extends BasePassiveModule
     }
 
     /*
-    Checks if a player name is valid and if the player exists.
-    Returns BotError on failure
-    Returns ucfirst(strtolower($name)) if the player exists.
+    Sanitizes wrong player name
     */
     function sanitize_player($name)
     {
@@ -633,7 +631,7 @@ class tools extends BasePassiveModule
             $this->error->set("Player name has to be between 4 and 13 characters long (inclusive)");
             return ($this->error);
         }
-        if (preg_match("|([a-z]+[0-9]*[^a-z]*)|", $name) == 0) {
+        if (preg_match("|([A-Za-z]+[0-9]*[^a-z]*)|", $name) == 0) {
             $this->error->set(
                 "Player name has to be alphabetical followed by 0 or more digits not followed by alphabetical characters."
             );
