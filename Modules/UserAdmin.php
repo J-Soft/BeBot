@@ -321,7 +321,7 @@ class UserAdmin extends BaseActiveModule {
 						$u['char_id'],
 						$u['last_seen_str'],
 						$this -> make_cmd('add', 'buddy add '. $u['char_id']),
-						$this -> make_cmd('not', $u['nickname'], 'notify on '),
+						$this -> make_cmd('not', $u['nickname'], 'notify on'),
 						$this -> make_cmd('alt', $u['nickname'], 'alts'),
 						$this -> make_cmd('who', $u['nickname'], 'whois'),
 						$this -> make_cmd('del', $u['nickname'], 'member del'));
