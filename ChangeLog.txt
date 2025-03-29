@@ -1,7 +1,7 @@
 ------------------------
 Release 0.8.3 - ??? 2025
 ------------------------
-- For both: Sanitizer added, Alts improved
+- For both: Sanitizer added, Alts improved, Uadmin/Uname fixed
 - For AO: Recipe improved
 - For AoC: ...
 
