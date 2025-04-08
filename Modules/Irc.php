@@ -85,6 +85,8 @@ class IRC extends BaseActiveModule
             $announcewhat = "joins";
         }
         $this->bot->core("settings")
+            ->create("IRC", "DiscRelay", false, "Should the bot be relaying IRC towards Discord ?", "On;Off");		
+        $this->bot->core("settings")
             ->create("IRC", "IncLog", false, "Should the bot be logging IRC Incoming messages ?", "On;Off");
         $this->bot->core("settings")
             ->create("IRC", "OutLog", false, "Should the bot be logging IRC Outgoing messages ?", "On;Off");		
@@ -1015,6 +1017,9 @@ class IRC extends BaseActiveModule
                     ->get("Irc", "Chat")
             );
 			if ($this->bot->core("settings")->get("IRC", "IncLog")) $this->bot->log("IRC", "Incoming", $txt);
+			if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Irc", "DiscRelay")) {
+						$this->bot->core("discord")->irc($data->nick,$msg);
+			}			
             /*if ($this->bot->core("settings")
                     ->get("Irc", "UseGuildRelay")
                 && $this->bot
@@ -1029,7 +1034,6 @@ class IRC extends BaseActiveModule
             }
         }
     }
-
 
     /*
     * Gets called when someone joins IRC chan

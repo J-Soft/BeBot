@@ -311,6 +311,30 @@ class DiscordRelay extends BaseActiveModule
 			}
 		}
 	}
+	
+    /*
+    This gets called on a msg in the irc relay
+    */
+    function irc($name, $msg)
+    {
+		$ignore = $this->bot->core("settings")->get("Discord", "ignoreSyntax");
+		if($ignore!=""&&substr($msg,0,1)==$ignore) return false;	
+		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
+			$channel = $this->bot->core("settings")->get("discord", "ChannelId");
+			$token = $this->bot->core("settings")->get("discord", "BotToken");
+			if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
+				$route = "/channels/{$channel}/messages";
+				$form = $this->strip_formatting($msg);			
+				$sent = "[Irc] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,1);
+				$data = array("content" => $sent);
+				$result = discord_post($route, $token, $data);
+				if ($this->bot->core("settings")->get("discord", "OutLog")) $this->bot->log("DISCORD", "Outgoing", $sent);
+				if(isset($result['message'])&& isset($result['code'])) {
+					$this->bot->log("DISCORD", "ERROR", "Irregular configuration : do !settings discord to fix");
+				}					
+			}
+		}
+	}	
 
     /*
     This gets called just below to clean text of msg
