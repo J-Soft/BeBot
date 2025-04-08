@@ -116,6 +116,8 @@ class DiscordRelay extends BaseActiveModule
         $this->bot->core("settings")
             ->create("discord", "WhatChat", "both", "Which channel(s) should be relayed into Discord and vice versa (user gc only for AoC) ?", "gc;pgroup;both");
         $this->bot->core("settings")
+            ->create("discord", "IrcRelay", false, "Should the bot be relaying Discord towards IRC ?", "On;Off");			
+        $this->bot->core("settings")
             ->create(
                 "discord",
                 "Announce",
@@ -449,6 +451,9 @@ class DiscordRelay extends BaseActiveModule
 									if(mb_detect_encoding($msg['content'], 'UTF-8', true)) $msg['content'] = mb_convert_encoding($msg['content'], 'ISO-8859-1', 'UTF-8');
 									$sent = "[Discord] ".ucfirst($msg['author']['username']).": ".strip_tags($msg['content']);									
 									$this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
+									if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Discord", "IrcRelay")) {
+												$this->bot->core("irc")->send_irc("", "", $sent);
+									}											
 								} else {
 									$com = explode(" ", $msg['content'], 2);
 									Switch ($com[0]) {
