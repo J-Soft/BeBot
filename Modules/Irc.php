@@ -1057,6 +1057,9 @@ class IRC extends BaseActiveModule
                     ->get("Irc", "Chat")
             );
         }
+		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Irc", "DiscRelay")) {
+					$this->bot->core("discord")->irc($data->nick,"has logged on.");
+		}			
         if (($data->nick != $this->bot->core("settings")->get("Irc", "Nick"))) {
             $this->irconline[strtolower($data->nick)] = strtolower($data->nick);
             $this->bot->db->query(
@@ -1100,6 +1103,9 @@ class IRC extends BaseActiveModule
                     ->get("Irc", "Chat")
             );
         }
+		if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Irc", "DiscRelay")) {
+					$this->bot->core("discord")->irc($data->nick,"has logged off.");
+		}		
         if (($data->nick != $this->bot->core("settings")->get("Irc", "Nick"))) {
             unset($this->irconline[strtolower($data->nick)]);
         }
