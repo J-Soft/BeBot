@@ -615,8 +615,7 @@ class tools extends BasePassiveModule
     */
     function sanitize_player($name)
     {
-		$seek = array("'","¨","¤","µ");
-        $name = trim(ucfirst(strtolower(str_replace($seek,"",$name))));
+        $name = trim(ucfirst(strtolower(preg_replace("/[^a-z0-9\-]/i","",$name))));		
 		return $name;
 	}
 
