@@ -86,7 +86,6 @@ class Ri {
 	}
 	function GetMember($name) {
 		for($i=0;$i<count($this->riMembers);$i++) {
-			print_r(get_object_vars($this->riMembers[$i]));
 			if($this->riMembers[$i]->GetName() == $name) {
 				return $this->riMembers[$i];
 			}

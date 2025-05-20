@@ -14,7 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all aknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -921,14 +921,23 @@ class NewRis extends BaseActiveModule
 						$sid = "!";
 					}
 				}
+				$color = "highlight";
+				if ($this->bot->exists_module("loots")&&isset($this->bot->core("loots")->loot[1])) {
+					$list = array_keys($this->bot->core("loots")->loot[1]);
+					foreach($list as $player) {
+						if (($player != "item") && ($player != "num") && ($this->bot->core("loots")->loot[1][$player] == 1) && ($player == $rimember->GetName())) {
+							$color = "blob_title";
+						}
+					}
+				}
 				if($rimember->IsLeader())
 				{
-					$msg .= "\t[##blob_title##" . $rimember->GetName() . " :: Leader##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ".$sid." ";
+					$msg .= "\t[##".$color."##" . $rimember->GetName() . " :: Leader##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ".$sid." ";
 					$msg .= $this->GetExtraInfo($rimember->GetName(),$index+1);
 				}
 				else
 				{
-					$msg .= "\t[##highlight##" . $rimember->GetName() . "##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ".$sid." ";
+					$msg .= "\t[##".$color."##" . $rimember->GetName() . "##end##] (" . $rimember->GetLevel() . " " . $rimember->GetProfession() . ") ".$sid." ";
 					$msg .= $this->GetExtraInfo($rimember->GetName(),$index+1);
 				}
 				foreach($this->ris as $indexri=>$ris)
@@ -941,7 +950,7 @@ class NewRis extends BaseActiveModule
 			$msg .= "\n";
 		}
 		$msg .= "\n";
-		$msg .= "##blob_title##::Looking For Ri::##end##\n\n";
+		$msg .= "##blob_title##::Looking For Ri::##end##\n";
 		foreach($this->pgroup as $index=>$array)
 		{
 			$test = $array;							
@@ -968,7 +977,16 @@ class NewRis extends BaseActiveModule
 							$sid = "!";
 						}
 					}				
-					$msg .= "\t[##highlight##" . $array[0] . "##end##] (" . $array[1] . " " . $array[2] . ") ".$sid." ";
+					$color = "highlight";
+					if ($this->bot->exists_module("loots")&&isset($this->bot->core("loots")->loot[1])) {
+						$list = array_keys($this->bot->core("loots")->loot[1]);
+						foreach($list as $player) {
+							if (($player != "item") && ($player != "num") && ($this->bot->core("loots")->loot[1][$player] == 1) && ($player == $array[0])) {
+								$color = "blob_title";
+							}
+						}
+					}					
+					$msg .= "\t[##".$color."##" . $array[0] . "##end##] (" . $array[1] . " " . $array[2] . ") ".$sid." ";
 					$msg .= $this -> bot -> core("tools") -> chatcmd("startri ".$array[0], "Start Ri");
 					foreach($this->ris as $indexri=>$ris)
 					{
