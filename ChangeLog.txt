@@ -2,7 +2,7 @@
 Release 0.8.3 - ??? 2025
 ------------------------
 - For both: Sanitizer added, Alts/Discord/Irc/Riadmin improved, Uadmin/Uname fixed
-- For AO: Recipe improved
+- For AO: Recipe/TaraViza improved
 - For AoC: ...
 
 ------------------------
