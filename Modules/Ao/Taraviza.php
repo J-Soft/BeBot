@@ -200,20 +200,22 @@ class Taraviza extends BaseActiveModule
 		} elseif ($cron == 1740) {
 			$ba = $this->bot->core("settings")->get("Taraviza", "BuffAlert");
 			if($ba!="None") {
-				$text = "Gauntbuff : ".$this->show_buff();
-				if($ba=='Both'||$ba=='Guildchat') {
-					$this->bot->send_gc($text);
-				}
-				if($ba=='Both'||$ba=='Private') {
-					$this->bot->send_pgroup($text);
-				}
-				if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Taraviza", "AlertDisc")) {
-					if($this->bot->core("settings")->get("Taraviza", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Taraviza", "DiscChanId"); } else { $chan = ""; }
-					if($this->bot->core("settings")->get("Taraviza", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Taraviza", "DiscTag")." "; } else { $dctag = ""; }
-					$this->bot->core("discord")->disc_alert($dctag.$text, $chan);
-				}
-				if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Taraviza", "AlertIrc")) {
-					$this->bot->core("irc")->send_irc("", "", $text);
+				$text = "GauntBuff:".$this->show_buff();
+				if (strpos($text, 'Current') !== false) {
+					if($ba=='Both'||$ba=='Guildchat') {
+						$this->bot->send_gc($text);
+					}
+					if($ba=='Both'||$ba=='Private') {
+						$this->bot->send_pgroup($text);
+					}
+					if ($this->bot->exists_module("discord")&&$this->bot->core("settings")->get("Taraviza", "AlertDisc")) {
+						if($this->bot->core("settings")->get("Taraviza", "DiscChanId")) { $chan = $this->bot->core("settings")->get("Taraviza", "DiscChanId"); } else { $chan = ""; }
+						if($this->bot->core("settings")->get("Taraviza", "DiscTag")) { $dctag = $this->bot->core("settings")->get("Taraviza", "DiscTag")." "; } else { $dctag = ""; }
+						$this->bot->core("discord")->disc_alert($dctag.$text, $chan);
+					}
+					if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Taraviza", "AlertIrc")) {
+						$this->bot->core("irc")->send_irc("", "", $text);
+					}
 				}
 			}			
 		}
