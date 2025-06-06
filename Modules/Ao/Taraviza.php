@@ -201,7 +201,7 @@ class Taraviza extends BaseActiveModule
 			$ba = $this->bot->core("settings")->get("Taraviza", "BuffAlert");
 			if($ba!="None") {
 				$text = "GauntBuff:".$this->show_buff();
-				if (strpos($text, 'Current') !== false) {
+				if (strpos($text, 'Currently') !== false) {
 					if($ba=='Both'||$ba=='Guildchat') {
 						$this->bot->send_gc($text);
 					}
@@ -355,7 +355,7 @@ class Taraviza extends BaseActiveModule
 							if ($sec < 10) { $sec = "0".$sec; }
 							if ($hour < 10) { $hour = "0".$hour; }
 							if ($min < 10) { $min = "0".$min; }
-							$return .= " Current RK".$buff->dimension." buff is ".$faction." and should expire in about ".$hour."h".$min."m ";						
+							$return .= " Currently RK".$buff->dimension." ".$faction." buff is up and expires in about ".$hour."h".$min."m ";						
 						}
 					}					
 				} else {
