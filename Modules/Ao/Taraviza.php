@@ -82,7 +82,7 @@ class Taraviza extends BaseActiveModule
 		$this->bot->core("settings")->create('Taraviza', 'TaraAlert', 'None', 'Towards which channel(s) should Tarasque pop alert be sent to (None = disable) ?', 'Both;Guildchat;Private;None');
 		$this->bot->core("settings")->create('Taraviza', 'VizaAlert', 'None', 'Towards which channel(s) should Gauntlet start alert be sent to (None = disable) ?', 'Both;Guildchat;Private;None');
 		$this->bot->core("settings")->create('Taraviza', 'PopAlertTime', 59, 'How long in minutes before pop/start should non-seasonal alerts be sent to selected channel(s)?', '14;23;32;41;50;59');
-		$this->bot->core("settings")->create('Taraviza', 'BuffAlert', 'None', 'Towards which channel(s) should Buff half-hour alerts be sent to (None = disable) ?', 'Both;Guildchat;Private;None');
+		$this->bot->core("settings")->create('Taraviza', 'BuffAlert', 'None', 'Towards which channel(s) should Buff 45min alerts be sent to (None = disable) ?', 'Both;Guildchat;Private;None');
         $this->bot->core("settings")
             ->create("Taraviza", "AlertDisc", false, "Do we alert Discord of non-seasonal bosses spawns ?");
         $this->bot->core("settings")
@@ -95,7 +95,7 @@ class Taraviza extends BaseActiveModule
             ->create("Taraviza", "ApiUrl", "https://timers.aobots.org/api/", "What's the Boss/Buff API URL we should use to auto-update (Nadybot's by default, leave empty to disable automation) ?");			
 		$this->register_event("cron", "1min");
 		$this->register_event("cron", "5min");
-		$this->register_event("cron", "29min");
+		$this->register_event("cron", "44min");
 		$this->tcycle=34200; // 9H30 tara cycle (30=immortality)
 		$this->vcycle=61620; // 17H07 viza cycle (7=immortality)
 		$this->apiver='v1.1';
@@ -197,7 +197,7 @@ class Taraviza extends BaseActiveModule
 					}
 				}
 			}
-		} elseif ($cron == 1740) {
+		} elseif ($cron == 2640) {
 			$ba = $this->bot->core("settings")->get("Taraviza", "BuffAlert");
 			if($ba!="None") {
 				$text = "GauntBuff:".$this->show_buff();
