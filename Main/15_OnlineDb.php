@@ -14,7 +14,7 @@
 * - Khalem (RK1)
 * - Naturalistic (RK1)
 * - Temar (RK1)
-*
+* - Bitnykk (RK5)
 * See Credits file for all acknowledgements.
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -55,6 +55,7 @@ class OnlineDB_Core extends BasePassiveModule
 { // Start Class
     var $last_seen; // Caches all known last seen info for faster access
     var $guest_cache; // Caches all character in the guest channel for optional security handling
+    var $org_cache; // Caches all character in the org channel for optional security handling
 
     /*
     Constructor:
@@ -82,6 +83,10 @@ class OnlineDB_Core extends BasePassiveModule
         $this->register_event("buddy");
         $this->register_event("connect");
         $this->register_event("disconnect");
+		
+		$this->register_event("privgroup");
+        $this->register_event("gmsg", "org");		
+		
         $this->update_online_table();
         if ($this->bot->guildbot) {
             $chan = "both";
@@ -127,6 +132,7 @@ class OnlineDB_Core extends BasePassiveModule
             ->create("Reinvite", "Notify", $reinvnot, "The notify sent on reinvites of silent is disabled.");
         $this->last_seen = array();
         $this->guest_cache = array();
+		$this->org_cache = array();
         $list = $this->bot->db->select("SELECT nickname, last_seen FROM #___users WHERE last_seen > 0");
         if (!empty($list)) {
             foreach ($list as $user) {
@@ -221,19 +227,38 @@ class OnlineDB_Core extends BasePassiveModule
         $this->bot->db->set_version("online", 5);
     }
 
-
+    /*
+    This gets called on a msg in the guild channel
+    */
+    function gmsg($name, $group, $msg)
+    {
+		if(!$this->in_org($name)) {
+			$this->buddy($name,1);
+		}
+	}
+	
+    /*
+    This gets called on a msg in the private group
+    */
+    function privgroup($name, $msg)
+    {
+		if(!$this->in_chat($name)) {
+			$this->pgjoin($name);
+		}
+	}
+	
     /*
     This gets called if someone joins the privgroup
     */
     function pgjoin($name)
-    { // Start function pgjoin()
+    {
         $this->status_change($name, "pg", 1);
         $this->guest_cache[ucfirst(strtolower($name))] = ucfirst(strtolower($name));
         // Mark $name for reinvite to chat group (UPDATE works as status_change() creates any needed entries
         $this->bot->db->query(
             "UPDATE #___online SET reinvite = '1' WHERE nickname = '" . $name . "' AND botname = '" . $this->bot->botname . "'"
         );
-    } // End function pgjoin()
+    }
 
     /*
     This gets called if someone leaves the privgroup
@@ -252,25 +277,27 @@ class OnlineDB_Core extends BasePassiveModule
     This gets called if a buddy logs on/off
     */
     function buddy($name, $msg)
-    { // Start function buddy()
+    {
         if ($msg == 1 || $msg == 0) {
             if ($this->bot->core("notify")->check($name)) {
                 if (!isset($this->bot->other_bots[$name])) {
                     if ($msg == 1) {
                         $this->status_change($name, "gc", 1);
+						$this->org_cache[ucfirst(strtolower($name))] = ucfirst(strtolower($name));
                     } else {
                         $this->status_change($name, "gc", 0);
+						unset($this->org_cache[ucfirst(strtolower($name))]);
                     }
                 }
             }
         }
-    } // End function buddy()
+    }
 
     /*
     This gets called when bot connects
     */
     function connect()
-    { // Start function connect()
+    {
         $this->everyone_offline();
         // Grab all users for reinvite - if reinvite is enabled:
         $inpg = $this->bot->db->select(
@@ -297,15 +324,15 @@ class OnlineDB_Core extends BasePassiveModule
                 }
             }
         }
-    } // End function connect()
+    }
 
     /*
     This gets called when bot disconnects
     */
     function disconnect()
-    { // Start function disconnect()
+    {
         $this->everyone_offline(); // FIXME: If doing a proper disconnect, should everyone go offline?
-    } // End function disconnect()
+    }
 
     /* --------------------------------------------------
     *
@@ -460,11 +487,18 @@ class OnlineDB_Core extends BasePassiveModule
     }
 
 
-    // Checks if $name is in chat group of the bot.
+    // Checks if $name is in priv group of the bot.
     function in_chat($name)
     {
         return isset($this->guest_cache[ucfirst(strtolower($name))]);
     }
+	
+
+    // Checks if $name is in org group of the bot.
+    function in_org($name)
+    {
+        return isset($this->org_cache[ucfirst(strtolower($name))]);
+    }	
 
 
     // Returns the WHERE clause to get all botnames to show in online displays.
