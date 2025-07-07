@@ -699,7 +699,7 @@ class NewRis extends BaseActiveModule
 						$this->pgroup[$name][4] = true;
 					}
 					$return = true;
-					if(!$suppress)
+					if(!$suppress&&$executer!="")
 					{
 					$this->bot->send_tell($executer,"[##highlight##".$name ."##end##] has been removed from ri ##highlight##". $i . "##end##");
 					}
@@ -713,7 +713,7 @@ class NewRis extends BaseActiveModule
 		}
 		else
 		{
-			if (!$silent)
+			if (!$silent&&$executer!="")
 			{
 				$this->bot->send_tell($executer,"Usage: <pre>remri &lt;name&gt;");
 			}
