@@ -1,4 +1,11 @@
 ------------------------
+Release 0.8.4 - ??? 202?
+------------------------
+- For both: ...
+- For AO: ...
+- For AoC: ...
+
+------------------------
 Release 0.8.3 - Jul 2025
 ------------------------
 - For both: Sanitizer added, Alts/Discord/Irc/Riadmin/Online improved, Uadmin/Uname fixed
