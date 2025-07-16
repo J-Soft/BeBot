@@ -64,8 +64,8 @@ class Notify_Core extends BasePassiveModule
 
     function add($source, $user)
     {
+		$user = $this->bot->core('tools')->sanitize_player($user);
         $id = $this->bot->core('player')->id($user);
-        $user = ucfirst(strtolower($user));
         if ($id instanceof BotError) {
             $this->error->set($user . " is no valid character name!");
             return $this->error;
@@ -93,8 +93,8 @@ class Notify_Core extends BasePassiveModule
 
     function del($user)
     {
+		$user = $this->bot->core('tools')->sanitize_player($user);
         $id = $this->bot->core('player')->id($user);
-        $user = ucfirst(strtolower($user));
         if (!is_numeric($id) || $id == 0) {
             $this->error->set($user . " is no valid character name!");
             return $this->error;

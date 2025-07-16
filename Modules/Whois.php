@@ -113,7 +113,7 @@ class Whois extends BaseActiveModule
     */
     function whois_player($source, $name, $origin)
     {
-        $name = ucfirst(strtolower($name));
+        $name = $this->bot->core('tools')->sanitize_player($name);
         if (strtolower($this->bot->game) == 'aoc') {
             $this->name[$name] = $source;
             $this->origin[$name] = $origin;

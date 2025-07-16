@@ -54,10 +54,11 @@ class AOChatWrapper_Core extends BasePassiveModule
     */
     function get_uid($user)
     {
-        $user = ucfirst(strtolower($user));
+        if (is_numeric($user)) { return $user; } // id provided
+		$user = ucfirst(strtolower($user));
         /*echo "Depreciated AOChatWrapper::get_uid() called for $user. Backtrace:\n";
         $this->bot->log("DEBUG", "BACKTRACE", $this->bot->debug_bt());
-        $this->debug_output("Deprecated call to core('chat')->get_uid(). Use bot->core('player')->id($user)\n");*/
+        $this->debug_output("Deprecated call to core('chat')->get_uid(). Use bot->core('player')->id($user)\n");*/		
         return $this->bot->core('player')->id($user);
     }
 
@@ -65,13 +66,14 @@ class AOChatWrapper_Core extends BasePassiveModule
     /*
     This is a wrapper function for aoc->get_uname() that checks the whois cache if aoc->get_uname() failes
     */
-    function get_uname($user)
-    {
-        $user = ucfirst(strtolower($user));
+    function get_uname($uid)
+    {		
+        if (!is_numeric($uid)) { return $uid; } // name provided
+		//$user = ucfirst(strtolower($user));
         /*$this->debug_output("Deprecated call to core('chat')->get_uname(). Use bot->core('player')->name($user)\n");
         echo "Depreciated AOChatWrapper::get_uname() called for $user. Backtrace:\n";
-        $this->bot->log("DEBUG", "BACKTRACE", $this->bot->debug_bt());*/
-        return $this->bot->core('player')->name($user);
+        $this->bot->log("DEBUG", "BACKTRACE", $this->bot->debug_bt());*/		
+        return $this->bot->core('player')->name($uid);
     }
 
 

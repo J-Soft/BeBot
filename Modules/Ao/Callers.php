@@ -87,7 +87,7 @@ class Callers extends BaseActiveModule
     */
     function caller_add($name)
     {
-        $name = ucfirst(strtolower($name));
+		$name = $this->bot->core('tools')->sanitize_player($name);
         if (! ($this->bot->core('player')->id($name) instanceof BotError) ) {
             $this->callers[$name] = 1;
             return "##YELLOW##" . $name . "##END## has been added to caller list. " . $this->show_callers();
@@ -102,7 +102,7 @@ class Callers extends BaseActiveModule
     */
     function caller_del($name)
     {
-        $name = ucfirst(strtolower($name));
+        $name = $this->bot->core('tools')->sanitize_player($name);
         if ($name == "All") {
             $this->callers = array();
             return "List of callers has been cleared.";
@@ -123,7 +123,7 @@ class Callers extends BaseActiveModule
 
     function clear_callers($name)
     {
-        $name = ucfirst(strtolower($name));
+        $name = $this->bot->core('tools')->sanitize_player($name);
         $this->callers = array();
         return "Caller list cleared by ##YELLOW##" . $name . "##END##.";
     }

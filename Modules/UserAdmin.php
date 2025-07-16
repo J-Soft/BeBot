@@ -31,6 +31,7 @@
  * Website:	http://bebot.link/
   ***************************************************************************************************
  * Changelog:
+ *	2025-03-30	0.0.9	Added an option to also fix notify of buddies (missing members)
  *	2023-11-25	0.0.8	Adapted for PHP8.2/3 ; notably replaced utf8_* deprecated functions
  *	2021-10-13	0.0.7	Adapted for PHP7+ & Bebot 0.7.x serie ; added idle clear/count & never seen.
  *	2018-06-03	0.0.6	Remove Yellow Gremlin integration.
@@ -315,14 +316,15 @@ class UserAdmin extends BaseActiveModule {
 			$count = 0;
 			foreach ($users as $u) {
 				if (!isset($buddies[$u['char_id']])) {
-					$output .= sprintf("%s :: %d :: %s :: [ %s | %s | %s | %s ]\n",
-						$nickname,
+					$output .= sprintf("%s :: %d :: %s :: [ %s | %s | %s | %s | %s ]\n",
+						$u['nickname'],
 						$u['char_id'],
 						$u['last_seen_str'],
 						$this -> make_cmd('add', 'buddy add '. $u['char_id']),
-						$this -> make_cmd('alts', $nickname, 'alts'),
-						$this -> make_cmd('whois', $nickname, 'whois'),
-						$this -> make_cmd('delete', $nickname, 'member del'));
+						$this -> make_cmd('not', $u['nickname'], 'notify on'),
+						$this -> make_cmd('alt', $u['nickname'], 'alts'),
+						$this -> make_cmd('who', $u['nickname'], 'whois'),
+						$this -> make_cmd('del', $u['nickname'], 'member del'));
 					$count++;
 				}
 			}
@@ -621,7 +623,7 @@ class UserAdmin extends BaseActiveModule {
 	 */
 	function make_cmd($textlink, $subcmd, $botcmd = 'useradmin') {
 		$command = $botcmd;
-		if (strlen($subcmd) > 0) $command .= ' '. $subcmd;
+		if (!is_null($subcmd) && strlen($subcmd) > 0) $command .= ' '. $subcmd;
 		return $this -> bot -> core('tools') -> chatcmd($command, $textlink);
 	}
 

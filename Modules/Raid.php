@@ -467,7 +467,7 @@ class Raid extends BaseActiveModule
     {
 		if($this->ddin) {
 			if($this->bot->core("security")->get_access_level($name)>=128) {
-				if(preg_match('/<a href="text:\/\/([^"]+)">(?:.*)Damage(?:.*)<\/a>/i', $msg, $info)) {
+				if(preg_match('/<a href="text:\/\/([^"]+)"(?: *)>(?:.*)Damage(?:.*)/i', $msg, $info)) {
 					$added = array();
 					$last = $this->bot->db->select("SELECT time FROM #___raid_log WHERE end > time ORDER BY id DESC LIMIT 1");
 					$time = $last[0][0];
@@ -492,6 +492,25 @@ class Raid extends BaseActiveModule
 								}
 								$trigger = true;
 							}
+						} elseif(preg_match('/'.$i.'. ([a-zA-Z0-9]+) \((?:[^\)]+)\) Total Damage: ([^ ]+) \| Per Minute: (?:[^ ]+) \| Percent: (?:[^ ]+)<br>/i', $info[1], $toon)) { // Mali
+							if(!is_numeric($toon[1])&&$toon[2]!='') {
+								$char = ucfirst($toon[1]);
+								$dmgd = $toon[2];
+								$unit = substr($dmgd, -1);
+								if($unit=='K') {
+									$num = floatval(str_replace(',', '.', str_replace('.', '', substr($toon[2], 0, -1))));
+									$dmgd = round($num*1000);
+								} elseif($unit=='M') {
+									$num = floatval(str_replace(',', '.', str_replace('.', '', substr($toon[2], 0, -1))));
+									$dmgd = round($num*1000000);
+								} elseif($unit=='B') {
+									$num = floatval(str_replace(',', '.', str_replace('.', '', substr($toon[2], 0, -1))));
+									$dmgd = round($num*1000000000);
+								} else {
+									$dmgd = round($dmgd);
+								}
+								$trigger = true;
+							}
 						} elseif(preg_match('/'.$i.'. ([a-zA-Z0-9]+) \( ([^ ]+) \/ (?:[^ ]+) \/ (?:[^ ]+) \/ (?:[^ ]+) \)/i', $info[1], $toon)) { // Tiny
 							if(!is_numeric($toon[1])&&$toon[2]!='') {
 								$char = ucfirst($toon[1]);
@@ -501,7 +520,7 @@ class Raid extends BaseActiveModule
 						}
 						if($trigger) {
 							$id = $this->bot->core("player")->id($char);
-							if ($id && !($id instanceof BotError)) {								
+							if ($id && !($id instanceof BotError)) {	
 								$verif = $this->bot->db->select("SELECT COUNT(*) FROM #___raid_log WHERE name = '".$char."' AND time =".$time);
 								if($verif[0][0]==1) {
 									if(!array_key_exists($char, $added)) {
@@ -515,7 +534,7 @@ class Raid extends BaseActiveModule
 							$trigger = false;
 						}
 					}
-					if(!$this->ddin) {
+					if(!$this->ddin) {					
 						foreach($added as $char => $dmgd) {
 							$this->bot->db->query("INSERT INTO #___raid_damage (name, time, rank) VALUES ('" . $char . "', $time, " . $dmgd . ") ON DUPLICATE KEY UPDATE time = $time");
 						}
@@ -694,8 +713,8 @@ class Raid extends BaseActiveModule
     */
     function raid_stat($name, $source, $player)
     {		
-		$output = "";
-		$player = ucfirst(strtolower($player));
+		$output = "";		
+		$player = $this->bot->core('tools')->sanitize_player($player);
 		$uid = $this->bot->core('player')->id($player);
         if ($uid instanceof BotError) {
 			return "Player ##highlight##$player##end## does not exist!";
@@ -1273,7 +1292,7 @@ class Raid extends BaseActiveModule
     */
     function addto_raid($name, $player, $source)
     {
-        $player = ucfirst(strtolower($player));
+        $player = $this->bot->core('tools')->sanitize_player($player);
         if ($this->bot->core("security")->check_access(
             $name,
             $this->bot
@@ -1446,7 +1465,7 @@ class Raid extends BaseActiveModule
                 ->core("settings")->get('Raid', 'Command')
         )
         ) {
-            $who = ucfirst(strtolower($who));
+            $who = $this->bot->core('tools')->sanitize_player($who);
             if (!isset($this->user[$who]) && isset($this->user2[$who])) {
                 if ($this->user2[$who] == "Left PrivGroup" || $this->user2[$who] == "Bot Restart") {
                     if (!empty($why)) {

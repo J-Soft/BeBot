@@ -144,8 +144,8 @@ class Blacklist extends BaseActiveModule
     */
     function set_blacklist($source, $target, $reason, $expire = 0)
     {
-        $source = ucfirst(strtolower($source));
-        $target = ucfirst(strtolower($target));
+        $source = $this->bot->core('tools')->sanitize_player($source);
+        $target = $this->bot->core('tools')->sanitize_player($target);
         $source = mysqli_real_escape_string($this->bot->db->CONN,$source);
         $target = mysqli_real_escape_string($this->bot->db->CONN,$target);
         $reason = mysqli_real_escape_string($this->bot->db->CONN,$reason);

@@ -66,8 +66,8 @@ class PlayerNotes_Core extends BasePassiveModule
     */
     function add($player, $author, $note, $class)
     { // Start function add()
-        $author = ucfirst(strtolower($author));
-        $player = ucfirst(strtolower($player));
+		$author = $this->bot->core('tools')->sanitize_player($author);
+        $player = $this->bot->core('tools')->sanitize_player($player);
         $class = strtolower($class);
         if (!is_numeric($class)) {
             switch ($class) {
@@ -143,8 +143,8 @@ class PlayerNotes_Core extends BasePassiveModule
     */
     function get_notes($name, $player = "All", $pnid = "all", $order = "ASC")
     { // Start function get_notes()
-        $name = ucfirst(strtolower($name)); // Name of person requesting notes.
-        $player = ucfirst(strtolower($player)); // Notes attached to this player.
+        $name = $this->bot->core('tools')->sanitize_player($name); // Name of person requesting notes.
+        $player = $this->bot->core('tools')->sanitize_player($player); // Notes attached to this player.
         $sql = "SELECT * FROM #___player_notes";
         $where = "WHERE";
         if ($player != "All") {

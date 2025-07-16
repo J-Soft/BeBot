@@ -142,7 +142,7 @@ class Alias extends BaseActiveModule
         $name = $this->bot->core("alts")->main($name);
         $result = $this->bot->db->select("SELECT nickname FROM #___alias WHERE alias = '$alias'");
         if (empty($result)) {
-            $name = ucfirst(strtolower($name));
+            $name = $this->bot->core('tools')->sanitize_player($name);
             if (!isset($this->main[$name])) {
                 $mainmsg = " and set as Main Alias";
                 $this->main[$name] = $alias;
@@ -200,7 +200,7 @@ class Alias extends BaseActiveModule
 
     function get_alias($name)
     {
-        $name = ucfirst(strtolower($name));
+        $name = $this->bot->core('tools')->sanitize_player($name);
         // Create Header
         $inside = "<center>##ao_ccheader##:::: Alias List ::::##end##</center>\n";
         $aliases = $this->alias;

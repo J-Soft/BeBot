@@ -349,7 +349,7 @@ class Mail extends BaseActiveModule
 
     function mail_send($sender, $recipient, $message)
     {
-        $recipient = ucfirst(strtolower($recipient));
+		$recipent= $this->bot->core('tools')->sanitize_player($recipient);
         $mailbox = $this->bot->core("alts")->main($recipient);
         $time = str_replace(
             '_',

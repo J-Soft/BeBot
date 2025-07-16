@@ -314,8 +314,8 @@ class BanManager extends BaseActiveModule
 
     function add_ban($source, $user, $duration, $reason)
     {
+		$user = $this->bot->core('tools')->sanitize_player($user);
         $id = $this->bot->core('player')->id($user);
-        $user = ucfirst(strtolower($user));
         if ($id instanceof BotError || $id == 0) {
             return "##highlight##" . $user . " ##end##is no valid character name!";
         }
@@ -367,8 +367,8 @@ class BanManager extends BaseActiveModule
 
     function del_ban($source, $user)
     {
+		$user = $this->bot->core('tools')->sanitize_player($user);
         $id = $this->bot->core('player')->id($user);
-        $user = ucfirst(strtolower($user));
         if ($id == 0) {
             return "##highlight##" . $user . " ##end##is no valid character name!";
         }

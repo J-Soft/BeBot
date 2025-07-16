@@ -91,7 +91,8 @@ class Announcer extends BaseActiveModule
 		else return false;
 	}
 
-	function register($botnet) {		
+	function register($botnet) {	
+		$botnet = $this->bot->core('tools')->sanitize_player($botnet);
 		if (!$this->bot->core('player')->id($botnet) instanceof BotError) {
 			$mains = explode(",",$this->bot->core("settings")->get("Announcer", "BotName"));
 			$found = false;
@@ -109,6 +110,7 @@ class Announcer extends BaseActiveModule
 	}
 	
 	function sendcommand($botnet, $command) {
+		$botnet = $this->bot->core('tools')->sanitize_player($botnet);
 		if (!$this->bot->core('player')->id($botnet) instanceof BotError) {
 			$mains = explode(",",$this->bot->core("settings")->get("Announcer", "BotName"));
 			$found = false;
@@ -126,7 +128,8 @@ class Announcer extends BaseActiveModule
 		}		
 	}
 	
-	function subscribe($botnet, $channel) {	
+	function subscribe($botnet, $channel) {
+		$botnet = $this->bot->core('tools')->sanitize_player($botnet);
 		if (!$this->bot->core('player')->id($botnet) instanceof BotError) {
 			$mains = explode(",",$this->bot->core("settings")->get("Announcer", "BotName"));
 			$found = false;
@@ -146,6 +149,7 @@ class Announcer extends BaseActiveModule
 	}
 
 	function unregister($botnet) {
+		$botnet = $this->bot->core('tools')->sanitize_player($botnet);
 		if (!$this->bot->core('player')->id($botnet) instanceof BotError) {
 			$mains = explode(",",$this->bot->core("settings")->get("Announcer", "BotName"));
 			$found = false;
@@ -164,7 +168,8 @@ class Announcer extends BaseActiveModule
 		}
 	}
 	
-	function unsubscribe($botnet, $channel) {		
+	function unsubscribe($botnet, $channel) {
+		$botnet = $this->bot->core('tools')->sanitize_player($botnet);		
 		if (!$this->bot->core('player')->id($botnet) instanceof BotError) {
 			$mains = explode(",",$this->bot->core("settings")->get("Announcer", "BotName"));
 			$found = false;

@@ -610,6 +610,14 @@ class tools extends BasePassiveModule
         return (int)$int;
     }
 
+    /*
+    Sanitizes wrong player name
+    */
+    function sanitize_player($name)
+    {
+        $name = trim(ucfirst(strtolower(preg_replace("/[^a-z0-9\-]/i","",$name))));		
+		return $name;
+	}
 
     /*
     Checks if a player name is valid and if the player exists.
@@ -618,12 +626,12 @@ class tools extends BasePassiveModule
     */
     function validate_player($name, $check_exists = true)
     {
-        $name = trim(ucfirst(strtolower($name)));
+        $name = $this->bot->core('tools')->sanitize_player($name);
         if (strlen($name) < 3 || strlen($name) > 14) {
             $this->error->set("Player name has to be between 4 and 13 characters long (inclusive)");
             return ($this->error);
         }
-        if (preg_match("|([a-z]+[0-9]*[^a-z]*)|", $name) == 0) {
+        if (preg_match("|([A-Za-z]+[0-9]*[^a-z]*)|", $name) == 0) {
             $this->error->set(
                 "Player name has to be alphabetical followed by 0 or more digits not followed by alphabetical characters."
             );

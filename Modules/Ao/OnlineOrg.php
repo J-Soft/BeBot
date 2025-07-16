@@ -99,6 +99,7 @@ class OnlineOrg extends BaseActiveModule
 	
 	function character($name,$charname,$origin)
 	{
+		$charname = $this->bot->core('tools')->sanitize_player($charname);
 		if ($this -> debug) echo "verif charname\n";
         if ($this->bot->core('player')->id($charname) instanceof BotError) {
             return "##error##Character ##highlight##$charname##end## does not exist.##end##";

@@ -116,6 +116,8 @@ class DiscordRelay extends BaseActiveModule
         $this->bot->core("settings")
             ->create("discord", "WhatChat", "both", "Which channel(s) should be relayed into Discord and vice versa (user gc only for AoC) ?", "gc;pgroup;both");
         $this->bot->core("settings")
+            ->create("discord", "IrcRelay", false, "Should the bot be relaying Discord towards IRC ?", "On;Off");			
+        $this->bot->core("settings")
             ->create(
                 "discord",
                 "Announce",
@@ -311,6 +313,30 @@ class DiscordRelay extends BaseActiveModule
 			}
 		}
 	}
+	
+    /*
+    This gets called on a msg in the irc relay
+    */
+    function irc($name, $msg)
+    {
+		$ignore = $this->bot->core("settings")->get("Discord", "ignoreSyntax");
+		if($ignore!=""&&substr($msg,0,1)==$ignore) return false;	
+		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
+			$channel = $this->bot->core("settings")->get("discord", "ChannelId");
+			$token = $this->bot->core("settings")->get("discord", "BotToken");
+			if ($channel>0 && $token!="" && substr($msg,0,1)!=$this->bot->commpre) {
+				$route = "/channels/{$channel}/messages";
+				$form = $this->strip_formatting($msg);			
+				$sent = "[Irc] ".ucfirst($name).": ".$this->bot->core("tools")->cleanString($form,1);
+				$data = array("content" => $sent);
+				$result = discord_post($route, $token, $data);
+				if ($this->bot->core("settings")->get("discord", "OutLog")) $this->bot->log("DISCORD", "Outgoing", $sent);
+				if(isset($result['message'])&& isset($result['code'])) {
+					$this->bot->log("DISCORD", "ERROR", "Irregular configuration : do !settings discord to fix");
+				}					
+			}
+		}
+	}	
 
     /*
     This gets called just below to clean text of msg
@@ -425,6 +451,9 @@ class DiscordRelay extends BaseActiveModule
 									if(mb_detect_encoding($msg['content'], 'UTF-8', true)) $msg['content'] = mb_convert_encoding($msg['content'], 'ISO-8859-1', 'UTF-8');
 									$sent = "[Discord] ".ucfirst($msg['author']['username']).": ".strip_tags($msg['content']);									
 									$this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
+									if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Discord", "IrcRelay")) {
+												$this->bot->core("irc")->send_irc("", "", $sent);
+									}											
 								} else {
 									$com = explode(" ", $msg['content'], 2);
 									Switch ($com[0]) {

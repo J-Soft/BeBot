@@ -750,7 +750,7 @@ class Security_Core extends BaseActiveModule
     */
     function add_group_member($target, $group, $caller = "Internal Process")
     { // Start function add_group_member()
-        $target = ucfirst(strtolower($target));
+		$target = $this->bot->core('tools')->sanitize_player($target);
         $group = strtolower($group);
         $uid = $this->bot->core('player')->id($target);
         if ($uid instanceof BotError) {
@@ -792,7 +792,7 @@ class Security_Core extends BaseActiveModule
     */
     function rem_group_member($target, $group, $caller)
     { // Start function rem_group_member()
-        $target = ucfirst(strtolower($target));
+        $target = $this->bot->core('tools')->sanitize_player($target);
         $group = strtolower($group);
         $uid = $this->bot->core('player')->id($target);
         if (!$uid) {
@@ -837,8 +837,8 @@ class Security_Core extends BaseActiveModule
     */
     function add_user($admin, $target)
     { // Start function add_user()
-        $admin = ucfirst(strtolower($admin));
-        $target = ucfirst(strtolower($target));
+		$admin = $this->bot->core('tools')->sanitize_player($admin);
+        $target = $this->bot->core('tools')->sanitize_player($target);
         //$level = strtoupper($level);
         $uid = $this->bot->core('player')->id($target);
         // Check to see if user is banned.
@@ -889,8 +889,8 @@ class Security_Core extends BaseActiveModule
     */
     function del_user($admin, $target)
     { // Start function del_user()
-        $admin = ucfirst(strtolower($admin));
-        $target = ucfirst(strtolower($target));
+		$admin = $this->bot->core('tools')->sanitize_player($admin);
+        $target = $this->bot->core('tools')->sanitize_player($target);
         if (!isset($this->cache["members"][$target]) && !isset($this->cache["guests"][$target])) {
             $this->error->set($target . " is not a member of <botname>.");
             return $this->error;
@@ -990,8 +990,8 @@ class Security_Core extends BaseActiveModule
     */
     function rem_ban($admin, $target, $caller = "Internal Process")
     { // Start function rem_ban()
-        $admin = ucfirst(strtolower($admin));
-        $target = ucfirst(strtolower($target));
+		$admin = $this->bot->core('tools')->sanitize_player($admin);
+        $target = $this->bot->core('tools')->sanitize_player($target);
         if (!isset($this->cache['banned'][$target])) {
             $this->error->set($target . " is not banned.");
             return $this->error;
@@ -1384,7 +1384,7 @@ class Security_Core extends BaseActiveModule
     */
     function get_groups($name)
     { // Start function get_groups()
-        $name = ucfirst(strtolower($name));
+        $name = $this->bot->core('tools')->sanitize_player($name);
         $tmp = array();
         if (!isset($this->cache['membership'][$name]) || empty($this->cache['membership'][$name])) {
             return -1;
@@ -1419,7 +1419,7 @@ class Security_Core extends BaseActiveModule
     */
     function get_access_level_player($player)
     { // Start function get_access_level()
-
+        $player = $this->bot->core('tools')->sanitize_player($player);
         $uid = $this->bot->core("player")->id($player);
         // If user does not exist return ANONYMOUS access right away
         if (!$uid) {
@@ -1506,6 +1506,7 @@ class Security_Core extends BaseActiveModule
     */
     function get_access_level($player)
     {
+		$player = $this->bot->core('tools')->sanitize_player($player);
         // If setting UseAlts got changed since last round whipe mains cache:
         if ($this->last_alts_status != $this->bot->core("settings")
                 ->get("Security", "UseAlts")
@@ -1668,6 +1669,7 @@ class Security_Core extends BaseActiveModule
     */
     function org_rank_access($player, $highest)
     { // Start function org_rank_access()
+		$player = $this->bot->core('tools')->sanitize_player($player);
         $who = $this->bot->core("whois")
             ->lookup($player, true); // Do whois with no XML lookup, guild members should be cached...
         if ($who instanceof BotError) {
@@ -1685,6 +1687,7 @@ class Security_Core extends BaseActiveModule
 
     function org_rank_id($player, $highest)
     { // Start function org_rank_access()
+		$player = $this->bot->core('tools')->sanitize_player($player);
         $who = $this->bot->core("whois")
             ->lookup($player, true); // Do whois with no XML lookup, guild members should be cached...
         if ($who instanceof BotError) {
@@ -1706,6 +1709,7 @@ class Security_Core extends BaseActiveModule
     */
     function group_access($player, $highest)
     { // Start function group_access()
+		$player = $this->bot->core('tools')->sanitize_player($player);
         $groups = $this->get_groups($player);
         if ($groups == -1) {
             return $highest; // $player is not a member of any groups.
@@ -1731,7 +1735,7 @@ class Security_Core extends BaseActiveModule
         if (!$this->enabled) {
             return false;
         } // No access is granted until the secuirty subsystems are ready.
-        $name = ucfirst(strtolower($name));
+        $name = $this->bot->core('tools')->sanitize_player($name);
         $level = strtoupper($level);
         if ($level == "RAIDLEADER") {
             $this->bot->log("SECURITY", "WARNING", "Deprecated level raidleader passed to check_access().");
@@ -1818,6 +1822,7 @@ class Security_Core extends BaseActiveModule
     // Returns true if the user is banned, otherwise false
     function is_banned($name)
     { // Start function is_banned()
+		$name = $this->bot->core('tools')->sanitize_player($name);
         if ($this->enabled) {
             return (isset($this->cache['banned'][ucfirst(strtolower($name))]));
         } else {
@@ -2149,6 +2154,7 @@ class Security_Core extends BaseActiveModule
     */
     function whoami($name)
     { // Start function whoami
+		$name = $this->bot->core('tools')->sanitize_player($name);
 		$groupmsg = "";
         $groups = $this->bot->core("security")->get_groups($name);
         $access = $this->bot->core("security")->get_access_level($name);
@@ -2167,7 +2173,7 @@ class Security_Core extends BaseActiveModule
 
     function whois($name)
     { // Start function whois()
-        $player = ucfirst(strtolower($name));
+        $player = $this->bot->core('tools')->sanitize_player($name);
         $groups = $this->bot->core("security")->get_groups($player);
         $access = $this->bot->core("security")->get_access_level($player);
         $access = $this->get_access_name($access);

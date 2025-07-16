@@ -1,4 +1,11 @@
 ------------------------
+Release 0.8.3 - Jul 2025
+------------------------
+- For both: Sanitizer added, Alts/Discord/Irc/Riadmin/Online improved, Uadmin/Uname fixed
+- For AO: Recipe/TaraViza/Raid improved
+- For AoC: no specific change in this patch
+
+------------------------
 Release 0.8.2 - Jan 2025
 ------------------------
 - For both: PHP 8.4 fixes, Online, MassMsg, AoChat, AutoUserAdd, Admins, Bots, Discord/Irc improved
