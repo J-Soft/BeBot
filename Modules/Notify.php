@@ -69,6 +69,12 @@ class Notify extends BaseActiveModule
                 return $this->add_notify($name, $com['arg']);
             case 'off':
                 return $this->del_notify($com['arg']);	
+			case 'check':
+				if($this->bot->core("notify")->check($com['arg'])) {
+					return $com['arg']." is in notify list.";
+				} else {
+					return $com['arg']." is not in notify list.";
+				}
 			case 'over':
 				return $this -> over_notify($com['arg']);					
             case 'cache':
