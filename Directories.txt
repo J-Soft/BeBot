@@ -32,8 +32,8 @@ Modules in here should never contain any user commands, but just offer interface
 
 Custom
 ======
-The custom directory contains a core/ and modules/ directory. Here you can place your own custom
-modules. BeBot releases will never touch any files in here.
+The custom directory contains a Core/ and Modules/ directory. Here you can place your own custom
+modules. BeBot releases should never touch any files in here.
 
 Extras
 =====
