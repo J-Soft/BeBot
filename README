@@ -290,6 +290,7 @@ It will allow you to use an SQL window to copy-paste and then execute requests b
 PHASE 4: CREATE A DATABASE AND DATABASE USER FOR BEBOT
 ------------------------------------------------------
 
+0.  Set engine by command : SET GLOBAL default_storage_engine = 'InnoDB'; 
 1.	Type CREATE DATABASE databasename CHARACTER SET latin1; (or utf8 for recent PHP/SQL)
     (replace databasename with the name of the database you wish to create)
 2.	Press Enter/Return. 
