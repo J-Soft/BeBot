@@ -616,6 +616,7 @@ Then right click the wanted channel to copy its Id all below its contextual menu
 Now go https://discord.com/developers/applications to create an access for your Bebot :
  Click "New Application" & give it a name which can be different from ingame botname.
  Go into "Bot" tab, activate this option by clicking "Add Bot" & confirming.
+ Since you're here, make sure option "Message Content Intent" is checked.
  Copy the Bot Token from this tab, it will be used later below.
  Then go into "OAuth2" tab, check "bot" option in the "Scopes" window.
  In "Permissions", check at least "View Channels" & "Send Messages" (aka 3072)
@@ -623,7 +624,7 @@ Now go https://discord.com/developers/applications to create an access for your 
  Paste link in a web browser to visit it, select wanted server, confirm, captcha & win!
  Now your bot should show as offline in your Discord (except at quick connection ping).
 
-Execute this section only if you run Bebot on a PHP version lower than 7.0 :
+Execute the section below only if you run Bebot on a PHP version lower than 7.0 :
 Any Discord bot would be limitated until it has connected Discord wsocket once.
 There is a lib to automate that but it only works with PHP 7.0+ ...
 So to emulate this 1-timer ping, you can use any compatible solution for few minutes.

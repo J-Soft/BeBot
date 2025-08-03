@@ -36,6 +36,17 @@ class BetterClient extends \WebSocket\Client {
 		return $data;
 	}
 
+	/**
+	 * Helper to convert a binary to a string of '0' and '1'.
+	 */
+	protected static function sprintB($string) {
+		$ret = '';
+		for ($i = 0; $i < strlen($string); $i++) {
+			$ret .= sprintf("%08b", ord($string[$i]));
+		}
+		return $ret;
+	}
+
 	protected function receive_fragment() {
 		// Just read the main fragment information first.
 		$data = $this->read(2);
