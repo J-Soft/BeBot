@@ -138,7 +138,7 @@ class DiscordRelay extends BaseActiveModule
             ->create("discord", "PrivRelay", false, "Should the bot be relaying private join/leave to Discord ?", "On;Off");
 		$this->bot->core("settings")
             ->create("discord", "EventWarn", false, "Should the bot be warning of next Discord event(s) hourly ?", "On;Off");			
-		$this->register_event("cron", "60min");
+		$this->register_event("cron", "1hour");
 	}
 	
     /*
