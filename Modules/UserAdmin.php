@@ -73,6 +73,7 @@ class UserAdmin extends BaseActiveModule {
 		$this -> help['command']['useradmin buddylist'] = "Displays a list of all of the bot's buddies.";
 		$this -> help['command']['useradmin buddylist missing'] = "Displays a list of members not currently added to the bot's buddylist.";
 		$this -> help['command']['useradmin buddylist clear'] = "Wipes all of the bots buddies from the bot's buddylist. Note: Safe to run, you can always re-add members by running rosterupdate.";
+		$this -> help['command']['useradmin buddylist fix'] = "Removes all buddies that ain't members nor guests, adds all missing members/guests. Note: Safe to run, you can always re-add members by running rosterupdate.";
 		$this -> help['command']['useradmin buddy add <id>'] = "Add a character identified by id to the bot's buddylist.";
 		$this -> help['command']['useradmin buddy remove <id>'] = "Remove a character identified by id from the bot's buddylist. Note: Safe to run, you can always re-add members by running rosterupdate.";
 		$this -> help['command']['useradmin whois clear <all|member|guest|anonymous|banned|obsolete>'] = "Remove entries from the whois database. Note: Safe to run, whois database will build itself up again when characters gets added to bot or people run whois.";
@@ -119,6 +120,9 @@ class UserAdmin extends BaseActiveModule {
 		else if (preg_match('/^useradmin buddylist clear$/i', $msg)) {
 			$rv = $this -> clear_buddies();
 		}
+		else if (preg_match('/^useradmin buddylist fix$/i', $msg)) {
+			$rv = $this -> fix_buddies();
+		}		
 		else if (preg_match('/^useradmin buddy add ([\d]+)$/i', $msg, $m)) {
 			$rv = $this -> add_buddy($m[1]);
 		}
@@ -256,7 +260,7 @@ class UserAdmin extends BaseActiveModule {
 		));
 
 		$output .= $this -> section_overview('Buddies', array(
-			array('title' => 'Total Buddies', 'count' => count($buddies), 'links' => array($this -> make_cmd('list', 'buddylist'), $this -> make_cmd('clear', 'buddylist clear'), $this -> make_cmd('rosterupdate', '', 'rosterupdate'))),
+			array('title' => 'Total Buddies', 'count' => count($buddies), 'links' => array($this -> make_cmd('list', 'buddylist'), $this -> make_cmd('clear', 'buddylist clear'), $this -> make_cmd('fix', 'buddylist fix'), $this -> make_cmd('rosterupdate', '', 'rosterupdate'))),
 			array('title' => 'Members', 'count' => $buddy_member_count, 'links' => array()),
 			array('title' => 'Missing members', 'count' => ($member_count - $buddy_member_count), 'links' => array($this -> make_cmd('list', 'buddylist missing'))),
 			array('title' => 'Guests', 'count' => $buddy_guest_count, 'links' => array()),
@@ -349,6 +353,29 @@ class UserAdmin extends BaseActiveModule {
 		}
 		return sprintf("Removed ##seablue##%d##end## buddies from <botname>'s buddylist", $count);
 	}
+	
+	/**
+	 * Fixes the buddylist
+	 * @return string
+	 */
+	function fix_buddies() {
+		$buddies = $this -> bot -> aoc -> buddies;
+		$count = 0; $remove = 0; $missing = 0;
+		$users = $this -> load_users();
+		foreach($users as $u) {
+			if (!isset($buddies[$u['char_id']])) {
+				$this -> bot -> core('chat') -> buddy_add($u['char_id']);
+				$count++; $missing++;				
+			}
+		}		
+		foreach ($buddies as $id => $value) {
+			if(!isset($users[$id])) {
+				$this -> bot -> core('chat') -> buddy_remove($id);			
+				$count++; $remove++;
+			}
+		}
+		return sprintf("Fixed ##seablue##%d##end## buddies from <botname>'s buddylist (%d deleted ; %d added)", $count, $remove, $missing);
+	}	
 
 	/**
 	 * Add a character to the buddylist
@@ -396,12 +423,14 @@ class UserAdmin extends BaseActiveModule {
 				$output = $this -> blob_header(count($users). ' idle members last '. $limit .' days') ."<b></b>\n";
 				if ($filter == 'Idle') {
 					foreach ($users as $char_id => $u) {
-						$output .= sprintf("%s @ %s :: [ %s | %s | %s ]\n",
+						$output .= sprintf("%s @ %s :: [ %s | %s | %s ",
 							$u['nickname'],
 							$u['last_seen_date'],
 							$this -> make_cmd('alts', $u['nickname'], 'alts'),
 							$this -> make_cmd('whois', $u['nickname'], 'whois'),
 							$this -> make_cmd('delete', $u['nickname'], 'member del'));
+						$output .= $this -> bot -> core("tools") -> chatcmd("kick ".$u['nickname'],"kick","org");
+						$output .= "]\n";						
 					}
 				}
 				return sprintf("Found ##seablue##%d##end## idle members the last %d day(s) :: %s", count($users), $limit, $this -> make_blob('Show', $output));
@@ -464,11 +493,13 @@ class UserAdmin extends BaseActiveModule {
 		}
 		if (count($users) > 0) {
 			foreach ($users as $char_id => $u) {
-				$output .= sprintf("%s ( %s-%d @ %s )\n",
+				$output .= sprintf("%s ( %s-%d @ %s ) ",
 					$u['nickname'],
 					strtoupper(substr(($this -> user_level_encode($u['user_level'])),0,1)),
 					$u['char_id'],
 					$u['last_seen_date']);
+				if ($level == 'never') $output .= $this -> bot -> core("tools") -> chatcmd("kick ".$u['nickname'],"kick","org");
+				$output .= "\n";
 			}
 			return sprintf("Found ##seablue##%d##end## users :: %s", count($users), $this -> make_blob('Show', $output));
 		}
