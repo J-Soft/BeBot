@@ -500,6 +500,9 @@ Then the service should be waiting for main bot connection ...
 Now edit you Conf/Bot.conf and set $dimension to the correct value :
 For AO its a number, e.g. for Live Proxy : $dimension = "95";
 
+You may also inform of how many peripherals the bot will dispose (eg:3) :
+$periph = "3";
+
 Finally, run main bot and it should connect along with all slaves.
 (This may take long especially the first time with huge list ...)
 
@@ -515,7 +518,7 @@ First create all needed slaves in one or several account(s).
 E.g. if your main bot is Mybot, slaves could be serially named :
 Myslave1, Myslave2, Myslave3, etc.
 
-Edit conf file of your main bot & add this line all below before "?>" :
+Edit conf file of your main bot & change this line accordingly :
   $slave = "Myslave1";
 If you have more slaves, edit conf file of first slave to add same way :
   $slave = "Myslave2";
@@ -529,6 +532,7 @@ Now you should bring all bots (main + slaves) online together.
 
 Start by listing all slaves (comma-separated) into main bot, e.g. :
 !set Online OtherBots Myslave1,Myslave2,Myslave3
+NB : can also use $other_bots[] array in conf to ignore them from !online.
 
 Once done, each slave should also have its leader set :
 On Myslave1 : !adduser Mybot leader

@@ -1,7 +1,7 @@
 ------------------------
 Release 0.8.4 - ??? 202?
 ------------------------
-- For both: Preferences/Notify/Discord improved
+- For both: Preferences/Notify/Discord/Conf/Member improved
 - For AO: GSP improved
 - For AoC: ...
 

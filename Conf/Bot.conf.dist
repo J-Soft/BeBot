@@ -23,7 +23,8 @@
   // $super_admin["Superadmin1"] = true;// Bot superadmins.
   // $super_admin["Superadmin2"] = true;
 
-
+  $slave = ""; // Name of slave bot if some (empty default)
+  $periph = "0"; // Number of peripheral bot(s) if some (0 default)
   // $other_bots["Bot1"] = true;   // All other bots that are guildmembers/raidbotmembers
   // $other_bots["Bot2"] = true;
 
