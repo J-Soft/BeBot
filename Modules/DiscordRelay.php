@@ -515,24 +515,29 @@ class DiscordRelay extends BaseActiveModule
 					$route = "/guilds/{$server}/scheduled-events";
 					$result = discord_get($route, $token);
 					if(is_array($result)&&!is_null($result)) {
-						$inside = "";
+						$inside = ""; $diserr = false;
 						foreach($result as $event) {
-							$time = new DateTime($event['scheduled_start_time'],new DateTimeZone('UTC'));
-							$now = time();
-							if($time->getTimestamp()>$now&&$time->getTimestamp()<$now+86400) {
-								$left = $time->getTimestamp()-$now;
-								$hour = floor($left/3600);
-								$left = $left - ($hour*3600);
-								$min = floor($left/60);
-								$sec = $left - ($min*60);
-								if ($sec < 10) { $sec = "0".$sec; }
-								if ($hour < 10) { $hour = "0".$hour; }
-								if ($min < 10) { $min = "0".$min; }
-								$inside .= ucfirst(strip_tags($event['name']))." (".strip_tags($event['description']).") in ".$hour."h".$min."m \n";
+							if(isset($event['scheduled_start_time']) && isset($event['name']) && isset($event['description'])) {
+								$time = new DateTime($event['scheduled_start_time'],new DateTimeZone('UTC'));
+								$now = time();
+								if($time->getTimestamp()>$now&&$time->getTimestamp()<$now+86400) {
+									$left = $time->getTimestamp()-$now;
+									$hour = floor($left/3600);
+									$left = $left - ($hour*3600);
+									$min = floor($left/60);
+									$sec = $left - ($min*60);
+									if ($sec < 10) { $sec = "0".$sec; }
+									if ($hour < 10) { $hour = "0".$hour; }
+									if ($min < 10) { $min = "0".$min; }
+									$inside .= ucfirst(strip_tags($event['name']))." (".strip_tags($event['description']).") in ".$hour."h".$min."m \n";
+								}
+							} else {
+								$diserr = true;
 							}
 						}
+						if($diserr) $this->bot->log("DISCORD", "ERROR", "Unknown distant unsupported error(s) Discord side ...");
 						$msg = "Next Discord event(s): ".$this->bot->core("tools")->make_blob("click to view", $inside);
-						if($inside!="") $this->bot->send_output("", $msg,$this->bot->core("settings")->get("discord", "WhatChat"));
+						if($inside!="") $this->bot->send_output("", $msg,$this->bot->core("settings")->get("discord", "WhatChat"));						
 					} else {
 						$this->bot->log("DISCORD", "ERROR", "Clumsy configuration : do !settings discord to fix");
 					}
