@@ -330,18 +330,26 @@ class Preferences_core extends BasePassiveModule
         $query = "UPDATE #___preferences_def SET default_value = '$value' WHERE module='$module' AND name='$setting' LIMIT 1";
         $this->bot->db->query($query);
         //Remove custom preferences for this module->setting
-        //$query = "DELETE FROM #___preferences WHERE pref_id=(SELECT ID FROM #___preferences_def WHERE module='$module' AND name='$setting' LIMIT 1)";
+        $query = "DELETE FROM #___preferences WHERE pref_id=(SELECT ID FROM #___preferences_def WHERE module='$module' AND name='$setting' LIMIT 1)";
+		$this->bot->db->query($query);
         //Update the cache.
         $this->cache['def'][$module][$setting] = $value;
         //Remove any customisation for this cached entry
-        //foreach($this->cache as &$user)
-        //{
-        //	if(isset($user[$module][$setting]))
-        //	{
-        //		unset($user[$module][$setting]);
-        //	}
-        //}
-        //unset($user);
+        foreach($this->cache as $user => &$content)
+        {
+			if(is_numeric($user)&&$user!="def") {
+				if(isset($content[$module][$setting])&&$content[$module][$setting]==$value)
+				{
+					unset($content[$module][$setting]);
+				}
+				if(isset($content[$module])&&count($content[$module])==0) {
+					unset($content[$module]);
+				}
+				if(isset($this->cache[$user])&&count($content)==0) {
+					unset($this->cache[$user]);
+				}
+			}
+        }
         $this->bot->log("PREFS", "CHANGE", "$name changed the default value for setting $module -> $setting to $value");
         return ("The default value for {$module}->{$setting} has been set to '$value'.");
     }

@@ -305,7 +305,23 @@ class Roster_Handler extends BaseActiveModule
         }
         $blob = " :: " . $this->bot->core("tools")
                 ->make_blob("click to view", $inside);
-        return $total . " members in <botname> (".$oncount." online)" . $blob;
+		$limit = 1;
+		if(strtolower($this->bot->game)=='ao'&&$this->bot->port>9000) {
+			if(isset($this->bot->periph)&&is_numeric($this->bot->periph)&&$this->bot->periph>0) $limit += $this->bot->periph;
+		} else {
+			if(isset($this->bot->slave)&&$this->bot->slave!="") {
+				$slave = 1; $confother = 0; $setonloth = 0;
+				if(is_array($this->bot->other_bots)&&count($this->bot->other_bots)>0) {
+					$confother = count($this->bot->other_bots);
+				}
+				if($this->bot->core("settings")->get("Online", "Otherbots")!="") {
+					$setonloth = count(explode(",",$this->bot->core("settings")->get("Online", "Otherbots")));
+				}				
+				$vals = array($slave,$confother,$setonloth);
+				$limit += max($vals);
+			}
+		}
+        return $total . " members in <botname> over ".$limit."K limit (".$oncount." online)" . $blob;
     }
 
 

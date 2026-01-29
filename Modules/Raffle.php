@@ -63,6 +63,7 @@ class Raffle extends BaseActiveModule
         $this->help['command']['raffle output <(group|guild|both)>'] = "Chooses which channel(s) raffle should be announced to.";
         $this->help['command']['raffle join'] = "Joins the current raffle.";
         $this->help['command']['raffle leave'] = "Leaves the current raffle.";
+		$this->help['command']['raffle list'] = "Shows players than joined raffle.";
         $this->help['notes'] = "If your provide several items/refs, in AO you may separate them with spaces, while in AoC you shouldn't.";
         $this->bot->core("settings")
             ->create("Raffle", "timer", 0, "How Long shold a Raffle Last? 0 = disabled");
@@ -97,9 +98,13 @@ class Raffle extends BaseActiveModule
                                     if (preg_match("/^raffle result$/i", $msg, $info)) {
                                         $this->raffle_result($name);
                                     } else {
-                                        if (preg_match("/^raffle admin$/i", $msg, $info)) {
-                                            $this->bot->send_tell($name, $this->make_admin($name));
-                                        }
+                                        if (preg_match("/^raffle list$/i", $msg, $info)) {
+                                            $this->raffle_list();
+                                        } else {
+											if (preg_match("/^raffle admin$/i", $msg, $info)) {
+												$this->bot->send_tell($name, $this->make_admin($name));
+											}											
+										}
                                     }
                                 }
                             }
@@ -110,7 +115,23 @@ class Raffle extends BaseActiveModule
         }
     }
 
-
+    /*
+    Shows rafflers
+    */
+    function raffle_list()
+    {
+		$count = 0;
+        $inside = "##ao_ccheader##:::: List of Raffler(s) ::::##end####lightyellow##\n\n";
+		if (!empty($this->users)) {
+			foreach ($this->users as $key => $points) {
+				$inside .= $key." ";
+				$count ++;
+			}
+		}
+		$output = $count." Joined Rafflers : ".$this->bot->core("tools")->make_blob("click", $inside);
+		$this->output($output);
+	}
+		
     /*
     End raffle
     */

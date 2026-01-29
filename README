@@ -290,6 +290,7 @@ It will allow you to use an SQL window to copy-paste and then execute requests b
 PHASE 4: CREATE A DATABASE AND DATABASE USER FOR BEBOT
 ------------------------------------------------------
 
+0.  Set engine by command : SET GLOBAL default_storage_engine = 'InnoDB'; 
 1.	Type CREATE DATABASE databasename CHARACTER SET latin1; (or utf8 for recent PHP/SQL)
     (replace databasename with the name of the database you wish to create)
 2.	Press Enter/Return. 
@@ -499,6 +500,9 @@ Then the service should be waiting for main bot connection ...
 Now edit you Conf/Bot.conf and set $dimension to the correct value :
 For AO its a number, e.g. for Live Proxy : $dimension = "95";
 
+You may also inform of how many peripherals the bot will dispose (eg:3) :
+$periph = "3";
+
 Finally, run main bot and it should connect along with all slaves.
 (This may take long especially the first time with huge list ...)
 
@@ -514,7 +518,7 @@ First create all needed slaves in one or several account(s).
 E.g. if your main bot is Mybot, slaves could be serially named :
 Myslave1, Myslave2, Myslave3, etc.
 
-Edit conf file of your main bot & add this line all below before "?>" :
+Edit conf file of your main bot & change this line accordingly :
   $slave = "Myslave1";
 If you have more slaves, edit conf file of first slave to add same way :
   $slave = "Myslave2";
@@ -528,6 +532,7 @@ Now you should bring all bots (main + slaves) online together.
 
 Start by listing all slaves (comma-separated) into main bot, e.g. :
 !set Online OtherBots Myslave1,Myslave2,Myslave3
+NB : can also use $other_bots[] array in conf to ignore them from !online.
 
 Once done, each slave should also have its leader set :
 On Myslave1 : !adduser Mybot leader
@@ -616,6 +621,7 @@ Then right click the wanted channel to copy its Id all below its contextual menu
 Now go https://discord.com/developers/applications to create an access for your Bebot :
  Click "New Application" & give it a name which can be different from ingame botname.
  Go into "Bot" tab, activate this option by clicking "Add Bot" & confirming.
+ Since you're here, make sure option "Message Content Intent" is checked.
  Copy the Bot Token from this tab, it will be used later below.
  Then go into "OAuth2" tab, check "bot" option in the "Scopes" window.
  In "Permissions", check at least "View Channels" & "Send Messages" (aka 3072)
@@ -623,7 +629,7 @@ Now go https://discord.com/developers/applications to create an access for your 
  Paste link in a web browser to visit it, select wanted server, confirm, captcha & win!
  Now your bot should show as offline in your Discord (except at quick connection ping).
 
-Execute this section only if you run Bebot on a PHP version lower than 7.0 :
+Execute the section below only if you run Bebot on a PHP version lower than 7.0 :
 Any Discord bot would be limitated until it has connected Discord wsocket once.
 There is a lib to automate that but it only works with PHP 7.0+ ...
 So to emulate this 1-timer ping, you can use any compatible solution for few minutes.

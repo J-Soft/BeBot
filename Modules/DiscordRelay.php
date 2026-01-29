@@ -136,6 +136,9 @@ class DiscordRelay extends BaseActiveModule
             ->create("Discord", "ignoreSyntax", "", "Is there a first letter that should make the bot ignore messages for Discord relay (leave empty if none) ?");
 		$this->bot->core("settings")
             ->create("discord", "PrivRelay", false, "Should the bot be relaying private join/leave to Discord ?", "On;Off");
+		$this->bot->core("settings")
+            ->create("discord", "EventWarn", false, "Should the bot be warning of next Discord event(s) hourly ?", "On;Off");			
+		$this->register_event("cron", "1hour");
 	}
 	
     /*
@@ -426,84 +429,119 @@ class DiscordRelay extends BaseActiveModule
 	}
 	
     /*
-    Cron reads Discord channel 30x/min (hard limit: 1000x/min)
+    Cron reads Discord channel 30x/min (hard limit: 1000x/min) + Discord event(s) hourly
     */	
-    function cron()
+    function cron($cron)
     {
 		$invert = null;
 		if ($this->bot->core("settings")->get("discord", "DiscordRelay")) {
-			$channel = $this->bot->core("settings")->get("discord", "ChannelId");
 			$token = $this->bot->core("settings")->get("discord", "BotToken");
-			if ($channel>0 && $token!="") {
-				$route = "/channels/{$channel}/messages";
-				if ($this->lastmsg>0) { $route = "/channels/{$channel}/messages?after=".$this->lastmsg; }
-				$result = discord_get($route, $token);
-				if ($this->lastcheck==0) $this->lastcheck = date('Y-m-d').'T'.date("H:i:s").'.000000+00:00';
-				if(is_array($result)&&!is_null($result)) $invert = array_reverse($result);
-				if( (isset($invert['message'])&&isset($invert['code'])) || is_null($invert) ) {
-					$this->bot->log("DISCORD", "ERROR", "Wrong configuration : do !settings discord to fix");
-				} else {
-					foreach ($invert as $msg) {
-							if ($msg['id']>$this->lastmsg) { $this->lastmsg = $msg['id']; }
-							if ($msg['timestamp']>$this->lastcheck && !isset($msg['author']['bot'])) {
-								if ($this->bot->core("settings")->get("discord", "IncLog")) $this->bot->log("DISCORD", "Incoming", ucfirst($msg['author']['username']).": ".strip_tags($msg['content']));
-								if(substr($msg['content'],0,1)!=$this->bot->commpre) {
-									if(mb_detect_encoding($msg['content'], 'UTF-8', true)) $msg['content'] = mb_convert_encoding($msg['content'], 'ISO-8859-1', 'UTF-8');
-									$sent = "[Discord] ".ucfirst($msg['author']['username']).": ".strip_tags($msg['content']);									
-									$this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
-									if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Discord", "IrcRelay")) {
-												$this->bot->core("irc")->send_irc("", "", $sent);
-									}											
-								} else {
-									$com = explode(" ", $msg['content'], 2);
-									Switch ($com[0]) {
-										case $this->bot->commpre . 'is':
-											$sent = $this->discord_is($msg['content']);
-											Break;
-										case $this->bot->commpre . 'alts':
-											$sent = $this->discord_alts($msg['content']);
-											Break;											
-										case $this->bot->commpre . 'tara':
-											$sent = $this->discord_tara($msg['content']);
-											Break;
-										case $this->bot->commpre . 'viza':
-											$sent = $this->discord_viza($msg['content']);
-											Break;											
-										case $this->bot->commpre . 'online':
-										case $this->bot->commpre . 'sm':
-											$sent = $this->discord_sm($msg['content']);
-											Break;
-										case $this->bot->commpre . 'whois':
-											$sent = $this->discord_whois($msg['content']);
-											Break;
-										case $this->bot->commpre . 'level':
-										case $this->bot->commpre . 'lvl':
-										case $this->bot->commpre . 'pvp':
-											$sent = $this->discord_lvl($msg['content']);
-											Break;
-										case $this->bot->commpre . 'bots':
-										case $this->bot->commpre . 'bot':
-										case $this->bot->commpre . 'up':										
-											$sent = $this->discord_up($msg['content']);
-											Break;											
-										Default:
-											$sent = $this->note;
-											Break;
-									}
-									if($sent!="") {
-										$route = "/channels/{$channel}/messages";
-										$sent = "[Gamebot] ".$this->bot->botname.": ".$this->bot->core("tools")->cleanString($sent,0);
-										$data = array("content" => $sent);
-										$result = discord_post($route, $token, $data);
-										if(isset($result['message'])&& isset($result['code'])) {
-											$this->bot->log("DISCORD", "ERROR", "False configuration : do !settings discord to fix");
-										}								
+			if ($cron == intval($this->crondelay)) {	
+				$channel = $this->bot->core("settings")->get("discord", "ChannelId");
+				if ($channel>0 && $token!="") {
+					if ($this->lastmsg>0) { $route = "/channels/{$channel}/messages?after=".$this->lastmsg; }
+					$route = "/channels/{$channel}/messages";
+					$result = discord_get($route, $token);
+					if ($this->lastcheck==0) $this->lastcheck = date('Y-m-d').'T'.date("H:i:s").'.000000+00:00';
+					if(is_array($result)&&!is_null($result)) $invert = array_reverse($result);
+					if( (isset($invert['message'])&&isset($invert['code'])) || is_null($invert) ) {
+						$this->bot->log("DISCORD", "ERROR", "Wrong configuration : do !settings discord to fix");
+					} else {
+						foreach ($invert as $msg) {
+								if ($msg['id']>$this->lastmsg) { $this->lastmsg = $msg['id']; }
+								if ($msg['timestamp']>$this->lastcheck && !isset($msg['author']['bot'])) {
+									if ($this->bot->core("settings")->get("discord", "IncLog")) $this->bot->log("DISCORD", "Incoming", ucfirst($msg['author']['username']).": ".strip_tags($msg['content']));
+									if(substr($msg['content'],0,1)!=$this->bot->commpre) {
+										if(mb_detect_encoding($msg['content'], 'UTF-8', true)) $msg['content'] = mb_convert_encoding($msg['content'], 'ISO-8859-1', 'UTF-8');
+										$sent = "[Discord] ".ucfirst($msg['author']['username']).": ".strip_tags($msg['content']);									
+										$this->bot->send_output("", $sent,$this->bot->core("settings")->get("discord", "WhatChat"));
+										if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Discord", "IrcRelay")) {
+													$this->bot->core("irc")->send_irc("", "", $sent);
+										}											
+									} else {
+										$com = explode(" ", $msg['content'], 2);
+										Switch ($com[0]) {
+											case $this->bot->commpre . 'is':
+												$sent = $this->discord_is($msg['content']);
+												Break;
+											case $this->bot->commpre . 'alts':
+												$sent = $this->discord_alts($msg['content']);
+												Break;											
+											case $this->bot->commpre . 'tara':
+												$sent = $this->discord_tara($msg['content']);
+												Break;
+											case $this->bot->commpre . 'viza':
+												$sent = $this->discord_viza($msg['content']);
+												Break;											
+											case $this->bot->commpre . 'online':
+											case $this->bot->commpre . 'sm':
+												$sent = $this->discord_sm($msg['content']);
+												Break;
+											case $this->bot->commpre . 'whois':
+												$sent = $this->discord_whois($msg['content']);
+												Break;
+											case $this->bot->commpre . 'level':
+											case $this->bot->commpre . 'lvl':
+											case $this->bot->commpre . 'pvp':
+												$sent = $this->discord_lvl($msg['content']);
+												Break;
+											case $this->bot->commpre . 'bots':
+											case $this->bot->commpre . 'bot':
+											case $this->bot->commpre . 'up':										
+												$sent = $this->discord_up($msg['content']);
+												Break;											
+											Default:
+												$sent = $this->note;
+												Break;
+										}
+										if($sent!="") {
+											$route = "/channels/{$channel}/messages";
+											$sent = "[Gamebot] ".$this->bot->botname.": ".$this->bot->core("tools")->cleanString($sent,0);
+											$data = array("content" => $sent);
+											$result = discord_post($route, $token, $data);
+											if(isset($result['message'])&& isset($result['code'])) {
+												$this->bot->log("DISCORD", "ERROR", "False configuration : do !settings discord to fix");
+											}								
+										}
 									}
 								}
+						}
+					}
+					$this->lastcheck = date('Y-m-d').'T'.date("H:i:s").'.000000+00:00';
+				}
+			} elseif ($cron == 3600) {
+				$server = $this->bot->core("settings")->get("discord", "ServerId");
+				if ($server>0 && $token!="" && $this->bot->core("settings")->get("discord", "EventWarn")) {
+					$route = "/guilds/{$server}/scheduled-events";
+					$result = discord_get($route, $token);
+					if(is_array($result)&&!is_null($result)) {
+						$inside = ""; $diserr = false;
+						foreach($result as $event) {
+							if(isset($event['scheduled_start_time']) && isset($event['name']) && isset($event['description'])) {
+								$time = new DateTime($event['scheduled_start_time'],new DateTimeZone('UTC'));
+								$now = time();
+								if($time->getTimestamp()>$now&&$time->getTimestamp()<$now+86400) {
+									$left = $time->getTimestamp()-$now;
+									$hour = floor($left/3600);
+									$left = $left - ($hour*3600);
+									$min = floor($left/60);
+									$sec = $left - ($min*60);
+									if ($sec < 10) { $sec = "0".$sec; }
+									if ($hour < 10) { $hour = "0".$hour; }
+									if ($min < 10) { $min = "0".$min; }
+									$inside .= ucfirst(strip_tags($event['name']))." (".strip_tags($event['description']).") in ".$hour."h".$min."m \n";
+								}
+							} else {
+								$diserr = true;
 							}
+						}
+						if($diserr) $this->bot->log("DISCORD", "ERROR", "Unknown distant unsupported error(s) Discord side ...");
+						$msg = "Next Discord event(s): ".$this->bot->core("tools")->make_blob("click to view", $inside);
+						if($inside!="") $this->bot->send_output("", $msg,$this->bot->core("settings")->get("discord", "WhatChat"));						
+					} else {
+						$this->bot->log("DISCORD", "ERROR", "Clumsy configuration : do !settings discord to fix");
 					}
 				}
-				$this->lastcheck = date('Y-m-d').'T'.date("H:i:s").'.000000+00:00';
 			}
 		}
     }

@@ -1,4 +1,11 @@
 ------------------------
+Release 0.8.4 - Jan 2026
+------------------------
+- For both: Preferences/Notify/Discord/Irc/Conf/Member/Useradmin/Raffle improved
+- For AO: GSP improved, Mobs added
+- For AoC: nothing to report
+
+------------------------
 Release 0.8.3 - Jul 2025
 ------------------------
 - For both: Sanitizer added, Alts/Discord/Irc/Riadmin/Online improved, Uadmin/Uname fixed
@@ -1233,7 +1240,7 @@ Release 0.2.1 - Feb 2005
 - The bot will remind you to enable the cloaking device every hour now if its disabled.
 - It is now possible to have the points all saved on the main character's accout. !points tomain (on|off)
 - Bot can now be set to auto invite members on logon. !autoinv (on|off)
-- Special characters (ιδρω etc) should now work properly.
+- Special characters (     etc) should now work properly.
 
 ------------------------
 Release 0.2.0 - Dec 2004

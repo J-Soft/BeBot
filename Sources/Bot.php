@@ -217,7 +217,11 @@ class Bot
         self::$instance[$bothandle]->dimension = ucfirst(strtolower($dimension));
         self::$instance[$bothandle]->botversion = 'BOT_VERSION';
         self::$instance[$bothandle]->botversionname = 'BOT_VERSION_NAME';
-        self::$instance[$bothandle]->other_bots = array();
+		if (is_array($other_bots)) {
+			self::$instance[$bothandle]->other_bots = $other_bots;
+		} else {
+			self::$instance[$bothandle]->other_bots = array();
+		}
         self::$instance[$bothandle]->commands = array();
         self::$instance[$bothandle]->commpre = $command_prefix;
         self::$instance[$bothandle]->crondelay = $cron_delay;
@@ -243,6 +247,11 @@ class Bot
             self::$instance[$bothandle]->slave = $slave;
         } else {
             self::$instance[$bothandle]->slave = null;
+        }		
+        if (isset($periph)) {
+            self::$instance[$bothandle]->periph = $periph;
+        } else {
+            self::$instance[$bothandle]->periph = 0;
         }		
         if (isset($owner)) {
             self::$instance[$bothandle]->owner = $owner;

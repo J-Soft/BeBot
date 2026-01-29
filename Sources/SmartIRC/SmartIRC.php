@@ -1835,8 +1835,11 @@ class Net_SmartIRC_base
             if ($this->_usesockets == true) {
 				$sread = array($this->_socket);
 				$w = null; $e = null;
-				$result = @socket_select($sread, $w, $e, 0);				
-
+				try {
+					$result = @socket_select($sread, $w, $e, 0);
+				} catch (Exception $e) {
+					$result = false;
+				}
                 if ($result == 1) {
                     // the socket got data to read
                     $rawdata = @socket_read($this->_socket, 10240);

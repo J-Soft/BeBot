@@ -84,6 +84,10 @@ class Preferences_GUI extends BaseActiveModule
                 }
                 break;
             case 'set':
+				//Add to notify list in 4 specific cases
+			    if( (strtolower($com['module'])=="autoinv"&&strtolower($com['preference'])=="receive_auto_invite"&&strtolower($com['value'])=="on") || (strtolower($com['module'])=="mail"&&strtolower($com['preference'])=="logon_notification"&&strtolower($com['value'])=="yes") || (strtolower($com['module'])=="massmsg"&&strtolower($com['value'])=="yes") ) { // covers mass:message+invites
+						if(!$this->bot->core("notify")->check($name)) $this->bot->core("notify")->add($name, $name);
+				}				
                 //Set a given value
                 return ($this->bot->core("prefs")
                     ->change($name, $com['module'], $com['preference'], $com['value']));

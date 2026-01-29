@@ -139,7 +139,7 @@ class Gsp extends BaseActiveModule
 					$name = $datas->name;
 					$info = $datas->info;
 					if($this->live!=$live) {
-						if($live==1) {
+						if($live==1&&$name!="") {
 							$msg = "GSP event starting : ".$name." (".$info.")";
 							if ($channels == "pgroup" || $channels == "both") {
 								$this->bot->send_pgroup($msg);
@@ -154,10 +154,14 @@ class Gsp extends BaseActiveModule
 							if ($this->bot->exists_module("irc")&&$this->bot->core("settings")->get("Gsp", "AlertIrc")) {
 								$this->bot->core("irc")->send_irc("", "", $msg);
 							}							
+							$this->live = $live;
+							$this->name = $name;
+							$this->info = $info;
+						} elseif($live==0) {
+							$this->live = 0;
+							$this->name = "";
+							$this->info = "";							
 						}
-						$this->live = $live;
-						$this->name = $name;
-						$this->info = $info;
 					}
 				}
 			}

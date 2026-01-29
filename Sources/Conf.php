@@ -154,6 +154,10 @@ class Conf
         }
         $sa[0] .= '// Bot superadmins.';
         $sa = implode("", $sa);
+		$slave = $this->ask("Name of slave (if some, otherwise empty):");
+		if($slave=="") $slave = "";
+		$periph = $this->ask("Number of peripherals (if some, otherwise 0):");
+		if($periph=="") $periph = 0;
         $file
             = '<?php
 	//These are the general settings of the bot:
@@ -176,7 +180,8 @@ class Conf
 	*/
 	$owner = "' . $owner . '";				 // Owner of the bot.' . $sa . '
 
-
+	$slave = "'.$slave.'"; // Name of slave bot if some (empty default)
+	$periph = "'.$periph.'"; // Number of peripheral bot(s) if some (0 default)
 	// $other_bots["Bot1"] = true;	 // All other bots that are guildmembers/raidbotmembers
 	// $other_bots["Bot2"] = true;
 
