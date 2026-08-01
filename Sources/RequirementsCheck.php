@@ -49,7 +49,7 @@ if ((float)phpversion() < 8.0) {
 Load extentions we need
 */
 if (!extension_loaded("sockets")) {
-    if ('OS_WINDOWS') {
+    if (stristr(PHP_OS, 'WIN')) {
         if (!dl("php_sockets.dll")) {
             die("Loading php_sockets.dll failed. Sockets extention required to run this bot");
         }
@@ -60,7 +60,7 @@ if (!extension_loaded("sockets")) {
     }
 }
 if (!extension_loaded("mysqli")) {
-    if ('OS_WINDOWS') {
+    if (stristr(PHP_OS, 'WIN')) {
         if (!dl("php_mysqli.dll")) {
             die("Loading php_mysqli.dll failed. MySQLi extention required to run this bot");
         }
@@ -71,7 +71,7 @@ if (!extension_loaded("mysqli")) {
     }
 }
 if (!extension_loaded("mbstring")) {
-    if ('OS_WINDOWS') {
+    if (stristr(PHP_OS, 'WIN')) {
         if (!dl("php_mbstring.dll")) {
             die("Loading php_mbstring.dll failed. MbString extention required to run this bot");
         }
@@ -82,7 +82,7 @@ if (!extension_loaded("mbstring")) {
     }
 }
 if (!extension_loaded("bcmath")) {
-    if ('OS_WINDOWS') {
+    if (stristr(PHP_OS, 'WIN')) {
         if (!dl("php_bcmath.dll")) {
             die("Loading php_bcmath.dll failed. BcMath extention required to run this bot");
         }
@@ -107,7 +107,7 @@ if (!extension_loaded("bcmath")) {
 }
 // Check if we have curl available
 if (!extension_loaded("curl")) {
-    if ('OS_WINDOWS') {
+    if (stristr(PHP_OS, 'WIN')) {
         if (@!dl("php_curl.dll")) {
             echo "Curl not available\n";
         } else {
