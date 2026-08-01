@@ -45,7 +45,7 @@ that format in PR titles/commits.
 **Recommended: Kubernetes, via [bebot-helm](https://github.com/zznathans/bebot-helm).**
 That chart builds a Docker image from this repo (as a git submodule) on
 every release and publishes a Helm chart for deploying it - see that repo's
-README for values/setup. This is how every bot in production actually runs.
+README for values/setup.
 
 **Manual / local install** is also fully supported (e.g. for local
 development against a throwaway database - no Docker/Kubernetes required)
