@@ -199,6 +199,8 @@ class CharacterServerConnection extends ServerConnection
                         $blocked = $stream->ReadUInt32();
                         $stream->ReadUInt32(); // ?? Offline levels
                         $stream->ReadString(); // ?? Blob MD5
+                        $stream->ReadUInt32(); // ??
+                        $stream->ReadUInt32(); // ??
 
                         $this->m_Parent->chars[] = array(
                             "id" => $characterID,
