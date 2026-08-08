@@ -11,10 +11,6 @@ things a guild/raid leader would otherwise do by hand.
 This is a fork of [J-Soft/BeBot](https://github.com/J-Soft/BeBot) with
 custom additions on top of upstream, most notably:
 
-- **`Market`** ([`Modules/Ao/Market.php`](Modules/Ao/Market.php)) - live GMI
-  price search, per-item price history, personal watchlists with
-  price/QL-range alert filters, and automatic tracking of the most
-  actively-traded items (sourced from ao-stonks.com).
 - **Redis-backed caching** ([`Sources/Redis.php`](Sources/Redis.php)) -
   optional, fails soft if unconfigured/unreachable.
 - **Structured (JSON) logging** - see [`Sources/Log/`](Sources/Log/).
@@ -78,13 +74,11 @@ Summary, grouped:
 
 | Area | What changed |
 | --- | --- |
-| **Market module** | New `!market` command family: GMI price search, live order book, per-item price history, personal watchlists with tell alerts, price/QL-range alert filters, automatic tracking of the most actively-traded items (sourced from ao-stonks.com), admin bulk-unwatch/untrack-all tools. |
-| **Advertise module** | New module, added alongside Market. |
 | **Redis caching** | Optional Redis-backed cache for nickname->uid lookups ([`Sources/Redis.php`](Sources/Redis.php)); fails soft (no extension, no config, or unreachable server all leave it disabled rather than erroring). |
 | **Structured logging** | Opt-in JSON logging, configurable per destination (console/file/security); formatter/handler pipeline refactor ([`Sources/Log/`](Sources/Log/)); log-format settings seeded from `Bot.conf` on first boot; fixed a recursive-logging bug and a bug where `DbLogHandler` permanently captured a null database reference. |
 | **MySQL** | Configurable port and SSL/TLS connections. |
 | **Database reliability** | Made the access-control primary-key migration atomic; switched Symbiants seed tables from MyISAM to InnoDB. |
-| **Bug fixes** | `Market-Poll`/`Market-AutoTrack` internal timers made self-healing (previously could silently duplicate and fire several times per configured interval); `ConsoleLogHandler` no longer corrupts JSON log lines. |
+| **Bug fixes** | Internal timer creation made self-healing (previously could silently duplicate and fire multiple times per configured interval); `ConsoleLogHandler` no longer corrupts JSON log lines. |
 | **CI/CD** | GitHub Actions CI (PHP lint + PHPUnit, see [Supported PHP versions](#supported-php-versions) above); semantic-release automated versioning; this repo builds, Trivy-scans, and publishes its own Docker image; automatic PRs notify `bebot-helm` and update `CHANGELOG.md` on every release. |
 | **Docs** | This README. |
 
@@ -217,7 +211,7 @@ root.
 
 Most modules are configured via the settings module: `!settings` lists
 configurable modules, `!settings <module>` opens one (e.g.
-`!settings security`, `!settings market`).
+`!settings security`, `!settings bank`).
 
 ## Adding/removing modules
 

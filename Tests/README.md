@@ -15,7 +15,6 @@ Regenerates automatically on commit if you've run
 
 | Class under test | Test file | # Tests |
 | --- | --- | --- |
-| [`Market`](../Modules/Ao/Market.php) | [`Modules/Ao/MarketTest.php`](Modules/Ao/MarketTest.php) | 8 |
 | [`Relay`](../Modules/Relay.php) | [`Modules/RelayTest.php`](Modules/RelayTest.php) | 14 |
 | [`ConsoleLogHandler`](../Sources/Log/ConsoleLogHandler.php) | [`Sources/Log/ConsoleLogHandlerTest.php`](Sources/Log/ConsoleLogHandlerTest.php) | 2 |
 | [`DbLogHandler`](../Sources/Log/DbLogHandler.php) | [`Sources/Log/DbLogHandlerTest.php`](Sources/Log/DbLogHandlerTest.php) | 4 |
@@ -24,24 +23,11 @@ Regenerates automatically on commit if you've run
 | [`LogDispatcher`](../Sources/Log/LogDispatcher.php) | [`Sources/Log/LogDispatcherTest.php`](Sources/Log/LogDispatcherTest.php) | 12 |
 | [`LogRecord`](../Sources/Log/LogRecord.php) | [`Sources/Log/LogRecordTest.php`](Sources/Log/LogRecordTest.php) | 1 |
 | [`PlainTextLogFormatter`](../Sources/Log/PlainTextLogFormatter.php) | [`Sources/Log/PlainTextLogFormatterTest.php`](Sources/Log/PlainTextLogFormatterTest.php) | 5 |
-| **Total** | | **49** |
+| **Total** | | **41** |
 
 Everything else in `Modules/`/`Sources/`/`Main/` (the bulk of the codebase)
 has no automated coverage yet - it's exercised manually against a live bot
 instead.
-
-## `Modules/Ao/MarketTest.php`
-
-| Test | Purpose |
-| --- | --- |
-| `testConstructorAddsExactlyOnePollAndOneAutoTrackTimer` | Constructing Market registers exactly one Market-Poll and one Market-AutoTrack timer. |
-| `testConstructorDeletesAnyExistingCopiesOfBothTimersFirst` | The constructor issues a cleanup DELETE for both timer names before re-adding them. |
-| `testConstructorIsSelfHealingAcrossRepeatedBoots` | Repeated construction (simulating restarts against the same persistent timer table) never accumulates duplicate timers - the cleanup DELETE fires on every boot, not just the first. |
-| `testPollAndAutoTrackIntervalsComeFromSettings` | Timer durations/repeat intervals reflect the PollIntervalMinutes/AutoTrackIntervalMinutes settings. |
-| `testWatchAnnouncesNewItemAsManualWhenLogToPrivateChannelEnabled` | watch() announces a newly-tracked item as manually-sourced when LogToPrivateChannel is on. |
-| `testWatchDoesNotAnnounceWhenLogToPrivateChannelDisabled` | watch() stays silent when LogToPrivateChannel is off (the default). |
-| `testAnnounceTrackedAutoSourceUsesBackgroundChannelGate` | announce_tracked()'s "auto" source rides announce_background()'s own gate, independent of LogToPrivateChannel. |
-| `testAnnounceTrackedAutoSourceIgnoresLogToPrivateChannel` | announce_tracked()'s "auto" source is silent when only LogToPrivateChannel (not LogBackgroundToPrivateChannel) is on. |
 
 ## `Modules/RelayTest.php`
 

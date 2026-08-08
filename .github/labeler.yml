@@ -1,9 +1,3 @@
-market:
-- changed-files:
-  - any-glob-to-any-file:
-    - 'Modules/Ao/Market.php'
-    - 'Tests/Modules/Ao/MarketTest.php'
-
 logging:
 - changed-files:
   - any-glob-to-any-file:
@@ -377,11 +371,6 @@ module-nroll:
   - any-glob-to-any-file:
     - 'Modules/nroll.php'
 
-module-ao-advertise:
-- changed-files:
-  - any-glob-to-any-file:
-    - 'Modules/Ao/Advertise.php'
-
 module-ao-aggdef:
 - changed-files:
   - any-glob-to-any-file:
@@ -496,11 +485,6 @@ module-ao-loot:
 - changed-files:
   - any-glob-to-any-file:
     - 'Modules/Ao/Loot.php'
-
-module-ao-market:
-- changed-files:
-  - any-glob-to-any-file:
-    - 'Modules/Ao/Market.php'
 
 module-ao-mobs:
 - changed-files:
